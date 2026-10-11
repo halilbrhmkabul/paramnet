@@ -37,11 +37,12 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 
 ## Faz 1A — Domain çekirdeği
 
-### [ ] F1-01 Para ve tarih yardımcıları (`packages/shared`)
+### [x] F1-01 Para ve tarih yardımcıları (`packages/shared`)
 - `money.ts`: kuruş tipi, toplama/çıkarma, `formatTRY(12000_00) → "12.000,00 TL"`, `parseTRY("12.000,50")`.
 - `dates.ts`: Europe/Istanbul gün hesabı, `addMonthsClamped` (31 Ocak + 1 ay → 28/29 Şubat).
 - **Kabul:** Vitest birim testleri; sınır durumları (0, negatif reddi, büyük tutarlar, ay sonu, artık yıl).
 - **Spec:** BR-01, BR-16
+- **Not (2026-10-11):** `formatTRY`/`parseTRY` elle (ADR-010), `todayInIstanbul` sabit +03:00 (ADR-011). Ek olarak `addDays`, `isIsoDate`, `addMinor`/`subtractMinor`. Tarih kütüphanesi eklenmedi.
 
 ### [ ] F1-02 Ödeme planı üretimi
 - `generatePlan({ principal, downPayment, count, period, firstDueDate })` → taksit listesi. Eşit bölme, yuvarlama farkı son taksite. Tek seferlik ve vadesiz destek. Özel (eşit olmayan) plan doğrulaması.
