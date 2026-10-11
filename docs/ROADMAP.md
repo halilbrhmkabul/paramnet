@@ -119,9 +119,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Skill:** paramnet-domain, supabase-postgres-best-practices
 - **Not (2026-10-11):** `20261011194806_core_schema.sql`: 10 enum, `phone_tr` domain, 12 tablo, tüm FK'ler indeksli, kısıtlar (tutar > 0, kalan ≤ anapara, durum ↔ zaman damgası, BR-12, TRY), yalnızca-ekleme tetikleyicileri (olaylar; versiyonda yalnızca durum değişir), RLS açık + politika yok. `agreements.started_on` eklendi (ADR-019). pgTAP 49 test; `db lint` temiz; `db.types.ts` yenilendi.
 
-### [ ] F1-13 RLS politikaları
+### [x] F1-13 RLS politikaları
 - Okuma: taraf olan görür; kişisel mod yalnızca oluşturan; contacts yalnızca sahibi. Yazma: istemciye tamamen kapalı.
 - **Kabul:** pgTAP: iki kullanıcıyla izinli/izinsiz okuma, doğrudan insert/update reddi.
+- **Not (2026-10-11):** Tablolarda `anon`'a hiçbir yetki, `authenticated`'a yalnızca SELECT (outbox, reminders, push_tokens hiç); varsayılan yetkiler kapalı. Politikalar: anlaşma = oluşturan veya (karşı taraf ve kişisel değil); alt tablolar `private.can_view_agreement`; kişi, profil, onay = yalnızca sahibi. Başkalarının adı okuma RPC'lerinden (ADR-020). pgTAP 34 test (A/B/C kullanıcıları, anon, yazma reddi).
 
 ### [ ] F1-14 Kişisel mod RPC'leri
 - `create_agreement`, `update_personal_agreement`, `record_payment` (kişisel), `cancel_agreement` (kişisel), otomatik `settled`.
