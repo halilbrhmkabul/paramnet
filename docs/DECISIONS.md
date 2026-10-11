@@ -120,3 +120,13 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Tarih gösterimi (`10 Kas 2026`, `10 Kasım 2026`) `packages/shared` `formatDateTR` ile, Intl'siz (ADR-010 ile aynı gerekçe).
 	- Kök `index` şimdilik `(tabs)`'a yönlendirir; oturum kontrolü F1-06'da.
 	- Testler: `src/testing/providers.tsx` (sabit saat 2026-10-11, gecikmesiz sahte adaptör, `gcTime: Infinity` — aksi halde React Query zamanlayıcısı Jest'i açık tutar). RNTL 14'te `fireEvent` beklenir (`await`).
+
+## ADR-016 — Sahte auth ve yönlendirme
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- `AuthApi` arayüzü (`requestOtp`, `verifyOtp`, `updateProfile`, `signOut`); sahte adaptör kodu `123456` (yerel Supabase test koduyla aynı), kod 3 dk geçerli, 60 sn içinde yeniden istek `rate_limited`. Yalnızca TR cep numarası.
+	- Oturum `zustand@~5.0.15` store'unda (spec 9.1: yerel UI durumu), yalnızca bellekte; uygulama yeniden açılınca karşılama ekranı. F1-16 Supabase oturumunu SecureStore ile kalıcı yapacak.
+	- "Oturum açık" = kullanıcı var **ve** profil + bildirim adımları bitti. Kök Stack'te `Stack.Protected` ile `(tabs)`/`new` ve `(auth)` ayrılır; `(auth)` başlangıç rotası `welcome`. Adı olan dönen kullanıcı profil adımlarını atlar.
+	- Bildirim izni `src/lib/notifications.ts` arkasında sahte ("granted"); F1-18'de expo-notifications.
+	- Form doğrulama kodları `src/features/forms/fieldError.ts`'de Türkçeye çevrilir. Yeni bileşenler: `TextField`, `Checkbox`. Shared'a `displayNameSchema`.
+	- Bekleyen davet varsa Talepler'e yönlendirme (spec 5.1 adım 6) davetler olmadan anlamsız; F2-10'da.

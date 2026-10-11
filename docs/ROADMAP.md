@@ -77,9 +77,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Skill:** paramnet-mobile, expo (expo-router, expo-native-ui), platform-design-skills
 - **Not (2026-10-11):** Rotalar `(auth)`, `(tabs)` (4 sekme + ortada "+" → `new` modal), sekme ekranları iskelet; Talepler Faz 1 boş durumu. `src/theme` (token + `useAppTheme`), `src/i18n/tr.ts` + `fill`, `src/api` (arayüz, bugüne göre tohumlanan sahte adaptör, TanStack Query hook'ları, `errors.ts`), bileşenler + `LoadingState`, `Screen`, `ScreenTitle`. Shared'a `formatDateTR`, `monthOf`, `daysOfMonth`, `isoWeekday`. iOS/Android bundle ve expo-doctor 21/21 (ADR-015).
 
-### [ ] F1-06 Kayıt ve giriş ekranları (S01–S04) — sahte auth
+### [x] F1-06 Kayıt ve giriş ekranları (S01–S04) — sahte auth
 - Karşılama, telefon, OTP (sahte doğrulama), profil + bildirim izni ekranı.
 - **Kabul:** Akış baştan sona tıklanabiliyor; hata durumları (yanlış kod, süre dolumu) görünüyor.
+- **Not (2026-10-11):** Karşılama (3 kart, atlanabilir) → telefon (+90 sabit, TR cep) → OTP (`123456`, 3 dk geçerlilik, 60 sn yeniden gönderme, hatalı/süresi dolmuş) → profil (ad + KVKK) → bildirim izni (sahte). `Stack.Protected` ile yönlendirme, oturum Zustand'da bellekte (ADR-016). Bekleyen davet varsa Talepler'e yönlendirme Faz 2'ye (F2-10) kaldı.
 
 ### [ ] F1-07 Yeni kayıt akışı (S08–S10)
 - Tür seçimi (4 seçenek), dinamik form, kişi seçici (rehber + elle), plan önizleme ve satır düzenleme.

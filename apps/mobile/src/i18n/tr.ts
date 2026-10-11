@@ -23,20 +23,53 @@ export const tr = {
 		title: "Verdiğin, aldığın ve taksitle ödediğin her şey tek yerde.",
 		subtitle: "Planı kaydet, istersen karşı tarafla paylaş, ödemeleri birlikte takip edin.",
 		cta: "Başla",
+		next: "İleri",
+		skip: "Geç",
+		cards: [
+			{
+				title: "Hepsini kaydet",
+				body: "Verdiğin ve aldığın borçları, taksitli alışverişlerini tek listede tut.",
+			},
+			{
+				title: "Ödeme günlerini unutma",
+				body: "Ödeme günü gelince Paramnet hatırlatır; kimse istemek zorunda kalmaz.",
+			},
+			{
+				title: "İstersen birlikte takip edin",
+				body: "Planı karşı tarafla paylaş, ödemeleri ikiniz de aynı şekilde görün.",
+			},
+		],
+		cardPosition: "{current} / {total}",
 	},
 	phone: {
 		title: "Telefon numaran",
 		helper: "Sana bir doğrulama kodu göndereceğiz.",
+		label: "Cep telefonu",
+		prefix: "+90",
+		placeholder: "5XX XXX XX XX",
+		errorInvalid: "Bu bir Türkiye cep numarası gibi görünmüyor.",
+		legal: "Devam ederek Kullanım Koşulları'nı kabul etmiş ve KVKK Aydınlatma Metni'ni okumuş olursun.",
 	},
 	otp: {
 		title: "Kodu gir",
+		helper: "{phone} numarasına gönderdiğimiz 6 haneli kodu yaz.",
+		label: "Doğrulama kodu",
 		resend: "Kodu tekrar gönder",
+		resendIn: "Kodu tekrar gönder ({seconds} sn)",
+		resent: "Yeni kod gönderildi.",
 		errorInvalid: "Kod hatalı. Tekrar dener misin?",
 		errorExpired: "Kodun süresi doldu. Yeni kod iste.",
+		changeNumber: "Numarayı değiştir",
 	},
 	profile: {
 		name: "Adın nasıl görünsün?",
+		nameLabel: "Görünen ad",
+		nameHelper: "Planı paylaştığın kişiler seni bu adla görür.",
+		consent: "KVKK Aydınlatma Metni'ni okudum, kabul ediyorum.",
+		notificationsTitle: "Hatırlatmalar",
 		notificationsReason: "Ödeme günlerini hatırlatabilmemiz için bildirim izni gerekiyor.",
+		notificationsAllow: "Bildirimlere izin ver",
+		notificationsLater: "Şimdi değil",
 	},
 	home: {
 		receivable: "Alacağın",
@@ -110,6 +143,10 @@ export const tr = {
 		placeholder: "0,00",
 		currency: "TL",
 	},
+	form: {
+		required: "Bu alanı doldurur musun?",
+		tooLong: "Bu alan çok uzun.",
+	},
 	error: {
 		generic: "Bir sorun çıktı, tekrar dener misin?",
 		offline: "İnternet bağlantısı yok. Kayıt eklemek için bağlantı gerekiyor.",
@@ -119,6 +156,7 @@ export const tr = {
 		forbidden: "Bu işlem için yetkin yok.",
 		invalidTransition: "Bu kayıt şu an bu işleme uygun değil.",
 		validation: "Bilgileri kontrol eder misin?",
+		rateLimited: "Biraz bekleyip tekrar dener misin?",
 	},
 	settled: {
 		title: "Tebrikler, bu plan tamamlandı!",

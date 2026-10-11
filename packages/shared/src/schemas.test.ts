@@ -4,6 +4,7 @@ import type { z } from "zod";
 import {
 	contactInputSchema,
 	createAgreementInputSchema,
+	displayNameSchema,
 	installmentSchema,
 	isoDateSchema,
 	normalizePhoneTR,
@@ -221,5 +222,13 @@ describe("installmentSchema", () => {
 			paid_minor: 101,
 		});
 		expect(codes(result)).toEqual(["paid_exceeds_amount"]);
+	});
+});
+
+describe("displayNameSchema", () => {
+	it("trims and requires 1..80 characters", () => {
+		expect(displayNameSchema.parse("  Halil  ")).toBe("Halil");
+		expect(codes(displayNameSchema.safeParse("   "))).toEqual(["required"]);
+		expect(codes(displayNameSchema.safeParse("a".repeat(81)))).toEqual(["too_long"]);
 	});
 });

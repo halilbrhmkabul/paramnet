@@ -2,13 +2,21 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 import type { AgreementsApi } from "./AgreementsApi";
+import type { AuthApi } from "./auth/AuthApi";
+import { createMockAuthApi } from "./auth/mockAuth";
 import { createMockApi } from "./mock/mockApi";
 
-const ApiContext = createContext<AgreementsApi | null>(null);
+type Apis = { agreements: AgreementsApi; auth: AuthApi };
 
-// Only the mock adapter exists until F1-17; EXPO_PUBLIC_API_MODE=supabase will select the real one.
+const ApiContext = createContext<Apis | null>(null);
+
+// Only the mock adapters exist until F1-16/F1-17; EXPO_PUBLIC_API_MODE=supabase will select the real ones.
 export function createApi(): AgreementsApi {
 	return createMockApi();
+}
+
+export function createAuthApi(): AuthApi {
+	return createMockAuthApi();
 }
 
 export function createQueryClient(): QueryClient {
@@ -22,14 +30,19 @@ export function createQueryClient(): QueryClient {
 
 export function ApiProvider({
 	api,
+	authApi,
 	queryClient,
 	children,
 }: {
 	api?: AgreementsApi;
+	authApi?: AuthApi;
 	queryClient?: QueryClient;
 	children: ReactNode;
 }) {
-	const [value] = useState(() => api ?? createApi());
+	const [value] = useState<Apis>(() => ({
+		agreements: api ?? createApi(),
+		auth: authApi ?? createAuthApi(),
+	}));
 	const [client] = useState(() => queryClient ?? createQueryClient());
 	return (
 		<ApiContext.Provider value={value}>
@@ -38,10 +51,18 @@ export function ApiProvider({
 	);
 }
 
-export function useApi(): AgreementsApi {
-	const api = useContext(ApiContext);
-	if (api === null) {
-		throw new Error("useApi must be used inside ApiProvider");
+function useApis(): Apis {
+	const apis = useContext(ApiContext);
+	if (apis === null) {
+		throw new Error("API hooks must be used inside ApiProvider");
 	}
-	return api;
+	return apis;
+}
+
+export function useApi(): AgreementsApi {
+	return useApis().agreements;
+}
+
+export function useAuthApi(): AuthApi {
+	return useApis().auth;
 }

@@ -2,6 +2,8 @@ import { QueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
 import { ApiProvider } from "@/api/ApiProvider";
+import type { AuthApi } from "@/api/auth/AuthApi";
+import { createMockAuthApi } from "@/api/auth/mockAuth";
 import { createMockApi, type MockApiOptions } from "@/api/mock/mockApi";
 
 export const TEST_NOW = () => new Date("2026-10-11T09:00:00Z");
@@ -20,15 +22,22 @@ export function createTestApi(options: MockApiOptions = {}) {
 	return createMockApi({ now: TEST_NOW, latencyMs: 0, ...options });
 }
 
+// Real clock on purpose: expiry tests move it with jest fake timers.
+export function createTestAuthApi(): AuthApi {
+	return createMockAuthApi({ latencyMs: 0 });
+}
+
 export function TestProviders({
 	api = createTestApi(),
+	authApi = createTestAuthApi(),
 	children,
 }: {
 	api?: ReturnType<typeof createMockApi>;
+	authApi?: AuthApi;
 	children: ReactNode;
 }) {
 	return (
-		<ApiProvider api={api} queryClient={createTestQueryClient()}>
+		<ApiProvider api={api} authApi={authApi} queryClient={createTestQueryClient()}>
 			{children}
 		</ApiProvider>
 	);
