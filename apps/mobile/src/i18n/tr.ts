@@ -236,6 +236,26 @@ export const tr = {
 		message:
 			"{name} seninle Paramnet'te bir ödeme planı paylaştı. Birlikte takip etmek için: {link}",
 	},
+	calendar: {
+		prev: "Önceki ay",
+		next: "Sonraki ay",
+		weekdays: ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"],
+		dayEmpty: "Bu gün ödeme yok.",
+		dayLabel: "{date}, {count} ödeme",
+		hasOverdue: "gecikmiş var",
+	},
+	settings: {
+		title: "Profil",
+		open: "Profil ve ayarlar",
+		phone: "Telefon",
+		notifications: "Bildirim tercihleri",
+		appLock: "Uygulama kilidi",
+		export: "Verilerimi dışa aktar",
+		deleteAccount: "Hesabı sil",
+		kvkk: "KVKK Aydınlatma Metni",
+		comingSoon: "Yakında",
+		signOut: "Çıkış yap",
+	},
 	requests: {
 		emptyTitle: "Bekleyen talep yok",
 		emptyBody: "Bir planı paylaştığında onaylar ve ödeme bildirimleri burada görünür.",

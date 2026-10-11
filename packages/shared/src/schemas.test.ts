@@ -5,6 +5,7 @@ import {
 	contactInputSchema,
 	createAgreementInputSchema,
 	displayNameSchema,
+	formatPhoneTR,
 	installmentSchema,
 	isoDateSchema,
 	normalizePhoneTR,
@@ -230,5 +231,12 @@ describe("displayNameSchema", () => {
 		expect(displayNameSchema.parse("  Halil  ")).toBe("Halil");
 		expect(codes(displayNameSchema.safeParse("   "))).toEqual(["required"]);
 		expect(codes(displayNameSchema.safeParse("a".repeat(81)))).toEqual(["too_long"]);
+	});
+});
+
+describe("formatPhoneTR", () => {
+	it("groups a Turkish mobile for display", () => {
+		expect(formatPhoneTR("+905550000001")).toBe("+90 555 000 00 01");
+		expect(formatPhoneTR("+15551234567")).toBe("+15551234567");
 	});
 });

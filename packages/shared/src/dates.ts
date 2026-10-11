@@ -162,3 +162,17 @@ export function formatDateTimeTR(timestamp: string): string {
 	const local = new Date(time + ISTANBUL_OFFSET_MS).toISOString();
 	return `${formatDateTR(local.slice(0, 10), "short")}, ${local.slice(11, 16)}`;
 }
+
+// Calendar navigation: first day of the month `delta` months away (negative goes back).
+export function shiftMonth(date: IsoDate, delta: number): IsoDate {
+	const { year, month } = parseOrThrow(date);
+	if (!Number.isSafeInteger(delta)) {
+		throw new RangeError("delta must be an integer");
+	}
+	const index = year * 12 + (month - 1) + delta;
+	return fromParts({
+		year: Math.floor(index / 12),
+		month: (((index % 12) + 12) % 12) + 1,
+		day: 1,
+	});
+}
