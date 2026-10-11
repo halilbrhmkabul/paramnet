@@ -13,3 +13,5 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Lisanslı açık bankacılık sağlayıcısıyla iş ortaklığı (3.x)
 
 ## Yeni fikirler
+
+- Ödemeyi belirli bir taksite yönlendirme (spec 5.5 gelişmiş seçenek; F1-03 sırasında, `allocatePayment` yalnızca FIFO).

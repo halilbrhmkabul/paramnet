@@ -88,3 +88,12 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Ortak test vektörleri `packages/shared/test-vectors/plan.json`; beklenen değerler elle yazılmıştır, Vitest şimdi okur, pgTAP plan üreticisi aynı dosyayla doğrulanacak.
 	- `fast-check` yalnızca `packages/shared` devDependency (özellik testleri; F1-03'te de kullanılacak).
 - **Sonuç:** Hata kodları F1-04 zod şemalarına ve mobil `tr.ts` metinlerine eşlenecek; ad değişikliği iki yeri etkiler.
+
+## ADR-013 — Ödeme dağıtımı ve türetilmiş taksit durumu
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- `allocatePayment(installments, amount)` seq sırasıyla FIFO dağıtır; yalnızca pozitif pay alan taksitleri `{ seq, amount_minor }` olarak döndürür. Kullanıcı girdisi hataları result tipiyle (`invalid_amount`, `amount_exceeds_outstanding` — skill hata koduyla aynı); veritabanından gelen bozuk taksit (`paid > amount` vb.) `RangeError` fırlatır.
+	- `installmentStatus` `{ status: upcoming | due_today | overdue | paid, partial }` döndürür: spec 8.4'te `partial` diğer durumlarla birlikte gösterilen bir işarettir. Vadesiz taksit `upcoming`.
+	- `outstanding` = anapara − `confirmed` ödemeler (payment, down_payment, discount); negatif olursa `RangeError` (BR-04 yukarıda bozulmuş demektir). `reportedTotal` onay bekleyen tutarı ayrıca verir.
+	- Ortak vektörler `packages/shared/test-vectors/allocation.json`.
+	- Belirli taksite yönlendirme (spec 5.5 gelişmiş seçenek) bu görevde yapılmadı; BACKLOG'a yazıldı.

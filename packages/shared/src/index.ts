@@ -4,6 +4,7 @@ export const DEFAULT_CURRENCY = "TRY";
 // BR-16: due dates are calendar days in this zone; events are timestamptz.
 export const APP_TIME_ZONE = "Europe/Istanbul";
 
+export * from "./allocation";
 export * from "./dates";
 export * from "./money";
 export * from "./plan";
