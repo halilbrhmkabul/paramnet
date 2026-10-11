@@ -23,6 +23,12 @@ function describe(event: EventView): string {
 			return tr.history.cancelled;
 		case "settled":
 			return tr.history.settled;
+		case "shared":
+			return tr.history.shared;
+		case "share_withdrawn":
+			return tr.history.shareWithdrawn;
+		case "invite_expired":
+			return tr.history.inviteExpired;
 	}
 }
 

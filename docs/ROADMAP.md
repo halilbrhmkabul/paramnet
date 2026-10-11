@@ -161,9 +161,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 
 ## Faz 2 — Karşılıklı akış
 
-### [ ] F2-01 Davet altyapısı
+### [x] F2-01 Davet altyapısı
 - `invites` tablosu, `share_agreement` (256-bit token, yalnızca hash saklanır, düz token bir kez döner), `withdraw_share`, `expire-invites` cron.
 - **Kabul:** pgTAP: token hash, süre sonu, geri çekme, kendine paylaşım reddi (BR-12).
+- **Not (2026-10-12):** `invites` (istemciye kapalı), `share_agreement` (32 bayt token base64url, yalnızca sha256 saklanır, düz token bir kez döner; TR cep, kendine paylaşım yok; kişiye numara yazılır ve profile bağlanır), `withdraw_share` (pending/countered → personal), `expire_invites` + saatlik cron (7 gün → personal). Ek düzeltme: F1-14 kilit fonksiyonundaki NULL karşılaştırması (yabancı `forbidden` yerine `not_found` alır). pgTAP 32 test. **Açık soru:** pending iken "linki tekrar paylaş" yeni token gerektirir; durum makinesinde pending → pending geçişi yok (ADR-026).
 
 ### [ ] F2-02 Davet edge function'ları
 - `invite-open`, `invite-otp-send` (rate limit, yalnızca +90), `invite-otp-verify` (5 deneme, 5 dk), `invite-decide`.

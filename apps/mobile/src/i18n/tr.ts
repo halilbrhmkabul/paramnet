@@ -318,6 +318,9 @@ export const tr = {
 		paymentRecorded: "Ödeme kaydedildi: {amount}",
 		updated: "Plan güncellendi",
 		cancelled: "Kayıt iptal edildi",
+		shared: "Plan paylaşıldı",
+		shareWithdrawn: "Paylaşım geri çekildi",
+		inviteExpired: "Paylaşım bağlantısının süresi doldu",
 		settled: "Plan tamamlandı",
 		actors: {
 			me: "Sen",

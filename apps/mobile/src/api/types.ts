@@ -62,7 +62,15 @@ export type PaymentView = {
 	created_at: string;
 };
 
-export type EventType = "created" | "payment_recorded" | "updated" | "cancelled" | "settled";
+export type EventType =
+	| "created"
+	| "payment_recorded"
+	| "updated"
+	| "cancelled"
+	| "settled"
+	| "shared"
+	| "share_withdrawn"
+	| "invite_expired";
 
 export type EventView = {
 	id: string;
