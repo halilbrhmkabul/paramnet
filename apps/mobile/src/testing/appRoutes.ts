@@ -12,6 +12,7 @@ import Contacts from "../../app/(tabs)/contacts";
 import Home from "../../app/(tabs)/index";
 import Requests from "../../app/(tabs)/requests";
 import Index from "../../app/index";
+import Invite from "../../app/invite/[token]";
 import AgreementHistory from "../../app/agreement/[id]/history";
 import AgreementDetail from "../../app/agreement/[id]/index";
 import AgreementInvitePreview from "../../app/agreement/[id]/invite-preview";
@@ -51,4 +52,5 @@ export const appRoutes = {
 	"agreement/[id]/invite-preview": AgreementInvitePreview,
 	"contact/[id]": ContactDetail,
 	"settings/index": Settings,
+	"invite/[token]": Invite,
 };

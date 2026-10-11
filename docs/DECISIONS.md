@@ -272,3 +272,10 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Turnstile yalnızca `NEXT_PUBLIC_TURNSTILE_SITE_KEY` varken çizilir; yerel testlerde yok (fonksiyon tarafında `TURNSTILE_DISABLED=1`).
 	- Playwright (Chromium, Pixel 7 görünümü) üretim derlemesiyle gerçek yerel yığına karşı; CI `integration` işinde.
 - **Bilinen sınır (F3-05):** fonksiyonlar IP'yi `cf-connecting-ip` / `x-forwarded-for` başlığından alıyor; doğrudan çağıran biri başlığı değiştirerek IP penceresini aşabilir (numara penceresi ve kilit yine geçerli). Web sunucusu ile fonksiyonlar arasında paylaşılan bir başlık sırrı veya platformun güvenilir istemci IP'si kötüye kullanım testlerinde ele alınacak.
+
+## ADR-030 — Derin bağlantılar
+- **Tarih:** 2026-10-12
+- **Karar:**
+	- Link biçimi `https://<APP_DOMAIN>/i/<token>`; uygulamadaki ekran `/invite/<token>`. Eşleme `app/+native-intent.tsx` `redirectSystemPath` ile (geliştirmede `paramnet://i/<token>` de).
+	- Alan adı ve imza bilgileri kodda sabit değil: mobilde `EXPO_PUBLIC_APP_DOMAIN` (`app.config.ts` app.json'ı genişletir), webde `APPLE_TEAM_ID` ve `ANDROID_SHA256_CERT_FINGERPRINTS`. Değer yoksa associated domains/intent filtresi eklenmez ve `.well-known` dosyaları 404 döner (yarım yapılandırma yayınlanmaz).
+	- `invite/[token]` rotası oturum korumasının dışında; oturum yoksa token yalnızca bellekte tutulur (kalıcı saklanmaz), kullanıcı karşılama/giriş akışına gider, oturum açılınca aynı davet açılır.
