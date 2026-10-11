@@ -10,7 +10,7 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 
 ## Faz S — Kurulum
 
-### [ ] S-01 Monorepo iskeleti ve araçlar
+### [x] S-01 Monorepo iskeleti ve araçlar
 - pnpm workspaces: `apps/mobile`, `packages/shared`, `supabase/` (web-confirm Faz 2'de).
 - `apps/mobile`: Expo (güncel SDK) + TypeScript strict + Expo Router. Expo monorepo rehberine uy (expo skill).
 - Uygulama kimliği: ad `Paramnet`, slug `paramnet`, şema `paramnet`. iOS bundle ID / Android paket adı (ör. `com.<şirket>.paramnet`) kullanıcıya sorulur; karar DECISIONS.md'ye yazılır.
@@ -18,6 +18,7 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - `.gitignore`, `.env.example` (`EXPO_PUBLIC_API_MODE=mock`, `EXPO_PUBLIC_APP_DOMAIN=`, Supabase URL/anon key yer tutucuları).
 - **Kabul:** `pnpm install`, `pnpm typecheck`, `pnpm lint`, `pnpm test` kökten çalışıyor; mobil uygulama simülatörde/Expo Go'da boş ekranla açılıyor. CLAUDE.md "Komutlar" tablosu güncellendi.
 - **Skill:** expo, react-native-best-practices
+- **Not (2026-10-11):** Expo SDK 57, RN 0.86, TS 6.0, ESLint 9. Bundle ID `com.paramnet.app` (ADR-005), test araçları ADR-006, monorepo ayrıntıları ADR-007. Expo Go'da açılış kullanıcı tarafından elle doğrulanacak.
 
 ### [ ] S-02 CI
 - GitHub Actions: install → typecheck → lint → test (packages/shared + mobile). Veritabanı testleri S-03 sonrası eklenir.
@@ -130,7 +131,7 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 ### [ ] F1-19 Faz 1 kapısı
 - Maestro: kayıt → anlaşma → ödeme → kapanış akışı.
 - **Kabul (spec 15):** Kişisel modda anlaşma oluştur, öde, kapat; hatırlatma telefona düşüyor. Tüm testler yeşil.
-- **Skill:** maestro-mobile-testing
+- **Skill:** maestro-mobile-testing — yüklü değil; spec 18.7 Faz 2'de kurulumu öngörüyor, bu görevden önce kurulmalı.
 
 ---
 

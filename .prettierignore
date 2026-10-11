@@ -1,0 +1,12 @@
+node_modules
+pnpm-lock.yaml
+dist
+coverage
+.expo
+docs
+*.md
+.claude
+apps/mobile/ios
+apps/mobile/android
+apps/mobile/expo-env.d.ts
+skills-lock.json

@@ -75,14 +75,18 @@ Faz sonundaki "Faz kapısı" görevi tamamlanmadan sonraki faza başlanmaz.
 
 ## Komutlar
 
-> İlk kurulum görevi (S-01) tamamlanınca bu bölümü gerçek komutlarla güncelle.
+Tüm komutlar repo kökünden çalışır.
 
 | Amaç | Komut |
 |---|---|
 | Bağımlılıkları kur | `pnpm install` |
-| Mobil uygulamayı başlat | _S-01'de doldurulacak_ |
-| Tüm testler | _S-01'de doldurulacak_ |
-| Typecheck + lint | _S-01'de doldurulacak_ |
+| Mobil uygulamayı başlat (Expo Go QR) | `pnpm mobile` |
+| Tüm testler (shared: Vitest, mobile: Jest) | `pnpm test` |
+| Tek paket testi | `pnpm --filter @paramnet/shared test` / `pnpm --filter mobile test` |
+| Typecheck + lint | `pnpm typecheck` · `pnpm lint` |
+| Biçim kontrolü / düzeltme | `pnpm format:check` · `pnpm format` |
+| Mobil bağımlılık ekle (SDK uyumlu) | `cd apps/mobile && pnpm exec expo install <paket>` |
+| Expo uyumluluk kontrolü | `cd apps/mobile && npx expo-doctor@latest` |
 | Yerel Supabase | `pnpm supabase start` / `pnpm supabase stop` |
 | Veritabanı testleri | `pnpm supabase test db` |
 | DB tiplerini üret | _S-03'te doldurulacak_ |
