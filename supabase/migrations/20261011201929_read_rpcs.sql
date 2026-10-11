@@ -279,7 +279,7 @@ begin
 			select coalesce(jsonb_agg(jsonb_build_object(
 				'id', p.id, 'amount_minor', p.amount_minor, 'paid_on', p.paid_on, 'method', p.method, 'kind', p.kind,
 				'status', p.status, 'note', p.note, 'created_at', p.created_at
-			) order by p.created_at desc, p.id), '[]'::jsonb)
+			) order by p.paid_on desc, p.created_at desc, p.id), '[]'::jsonb)
 			from public.payments p where p.agreement_id = p_id
 		),
 		'events', (
