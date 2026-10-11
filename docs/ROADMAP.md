@@ -58,10 +58,11 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Spec:** 5.5 "Ödemenin taksitlere dağıtımı", 8.4, BR-04
 - **Not (2026-10-11):** `allocatePayment` result tipi (`invalid_amount`, `amount_exceeds_outstanding`), `installmentStatus` → `{ status, partial }`, `outstanding` + `reportedTotal` (ADR-013). Ortak vektörler `test-vectors/allocation.json`. Taksite yönlendirme yapılmadı (BACKLOG).
 
-### [ ] F1-04 Zod şemaları ve domain tipleri
+### [x] F1-04 Zod şemaları ve domain tipleri
 - Agreement, Version terms, Installment, Payment, Contact girdileri için zod şemaları (form ve RPC ortak kullanacak).
 - `termsHash(terms)`: kanonik JSON + SHA-256 (istemci ve sunucu aynı sonucu üretmeli; test vektörleri dosyası oluştur).
 - **Kabul:** Testler; test vektörleri `packages/shared/test-vectors/terms-hash.json`.
+- **Not (2026-10-11):** `enums.ts` (DB enum'ları), `schemas.ts` (terms, contact, create agreement, payment, installment; hata mesajları kod), `termsHash` = SHA-256(kanonik JSON) hex (ADR-014). zod 4.6, @noble/hashes 2.4. Açık soru: spec 5.2'deki "verildiği tarih" alanının şemada karşılığı yok (F1-12 öncesi karar).
 
 ---
 

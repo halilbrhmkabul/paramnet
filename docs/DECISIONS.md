@@ -97,3 +97,15 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- `outstanding` = anapara − `confirmed` ödemeler (payment, down_payment, discount); negatif olursa `RangeError` (BR-04 yukarıda bozulmuş demektir). `reportedTotal` onay bekleyen tutarı ayrıca verir.
 	- Ortak vektörler `packages/shared/test-vectors/allocation.json`.
 	- Belirli taksite yönlendirme (spec 5.5 gelişmiş seçenek) bu görevde yapılmadı; BACKLOG'a yazıldı.
+
+## ADR-014 — Zod şemaları ve terms_hash
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- Bağımlılıklar (`packages/shared` runtime): `zod@^4.6.5` (spec 9.1 formlar + RPC ortak doğrulama), `@noble/hashes@^2.4.0` (saf JS SHA-256; Hermes'te `crypto.subtle` yok, Node/Deno/Hermes aynı sonucu verir, bağımlılığı yok, denetlenmiş).
+	- Postgres enum'ları `enums.ts`'de `as const` dizileri; tipler bunlardan türetilir.
+	- Zod issue mesajları kullanıcı metni değil **kod**: `required`, `too_long`, `invalid_phone`, `invalid_amount`, `invalid_date`, `invalid_option`, `invalid_id`, `invalid_counterparty`, `invalid_seq`, `paid_exceeds_amount` ve plan hata kodları (ADR-012). Mobil `tr.ts` eşler.
+	- Telefon: yalnızca Türkiye cep numarası (`+905XXXXXXXXX`); `0555…`, `90555…`, `555…`, boşluk/tire/parantezli girdiler normalize edilir. Kişi için telefon isteğe bağlı (boş string → `null`).
+	- Metinler trim + NFC; isteğe bağlı metin boşsa `null`. Sınırlar: başlık ve ad 80, açıklama ve ödeme notu 500, terms notu 1000.
+	- `termsSchema` strict (bilinmeyen anahtar yok; hash her şeyi kapsar), seq 1..n sıralı, BR-03 ve plan kuralları `validatePlan` ile.
+	- `termsHash(terms)` = SHA-256(UTF-8(kanonik JSON)) küçük harf hex. Kanonik JSON: anahtarlar sıralı, boşluk yok, string kaçışı `JSON.stringify` ile aynı, yalnızca güvenli tam sayı; boolean/ondalık/undefined hata. plpgsql `jsonb::text` kullanamaz (boşluk ekler, anahtarları önce uzunluğa göre sıralar); string'i elle kurmalı. Vektörler `test-vectors/terms-hash.json` (kanonik string'ler elle yazıldı, hash'ler Python hashlib ile).
+- **Açık soru:** Spec 5.2 "verildiği/alındığı tarih" alanı istiyor, şemada karşılığı yok. F1-12 migration'ından önce `agreements.started_on date` gibi bir sütun eklenip eklenmeyeceğine karar verilmeli; şimdilik giriş şemasında yok.
