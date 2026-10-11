@@ -15,6 +15,7 @@ export const SEED_IDS = {
 	elifLoan: "00000000-0000-4000-8000-0000000000b3",
 	mertSale: "00000000-0000-4000-8000-0000000000b4",
 	mertLoan: "00000000-0000-4000-8000-0000000000b5",
+	zeynepShare: "00000000-0000-4000-8000-0000000000c1",
 } as const;
 
 function at(date: IsoDate): string {
@@ -23,7 +24,7 @@ function at(date: IsoDate): string {
 
 // Dates are relative to today so the prototype always shows something overdue, due today and upcoming.
 export function seedState(seed: MockSeed, today: IsoDate): MockState {
-	const state: MockState = { contacts: [], agreements: [] };
+	const state: MockState = { contacts: [], agreements: [], incoming: [], shares: new Map() };
 	if (seed === "empty") {
 		return state;
 	}
@@ -159,6 +160,21 @@ export function seedState(seed: MockSeed, today: IsoDate): MockState {
 		status: "confirmed",
 		note: null,
 		created_at: at(oldDue),
+	});
+
+	// Someone shared a plan with me: it waits in Talepler (S14, S19).
+	state.incoming.push({
+		agreement_id: SEED_IDS.zeynepShare,
+		token: "demo-incoming",
+		title: "Kira payı",
+		kind: "loan",
+		creator_name: "Zeynep Arslan",
+		my_role: "debtor",
+		status: "pending",
+		principal_minor: 600000,
+		down_payment_minor: 0,
+		notes: "Ekim kirasından",
+		plan: planFor(600000, 0, 3, "monthly", addDays(today, 20)),
 	});
 
 	return state;

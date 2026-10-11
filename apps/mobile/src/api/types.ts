@@ -32,6 +32,7 @@ export type AgreementSummary = {
 	title: string;
 	status: AgreementStatus;
 	my_role: PartyRole;
+	is_creator: boolean;
 	counterparty: Counterparty;
 	principal_minor: number;
 	outstanding_minor: number;
@@ -133,4 +134,48 @@ export type Dashboard = {
 export type CalendarMonth = {
 	month: IsoDate;
 	days: Partial<Record<IsoDate, DueItem[]>>;
+};
+
+// Sharing (F2-06) ----------------------------------------------------------------------------------
+
+export type ShareResult = { token: string; expires_at: string };
+
+export type InviteResolution = {
+	status: "active" | "expired" | "consumed" | "revoked" | "locked" | "invalid";
+	creator_name?: string;
+	// The invite was sent to another number than this account's.
+	mismatch?: boolean;
+	agreement_id?: string | null;
+};
+
+export type TermsView = {
+	principal_minor: number;
+	down_payment_minor: number;
+	notes: string | null;
+	plan: { seq: number; due_date: IsoDate | null; amount_minor: number }[];
+};
+
+export type PendingDecision = {
+	agreement_id: string;
+	title: string;
+	actor: "creator" | "counterparty";
+	other_name: string | null;
+	my_role: PartyRole;
+	version: number;
+	terms_hash: string;
+	current: TermsView;
+	proposed: TermsView;
+	can_reject: boolean;
+	payments: { amount_minor: number; paid_on: IsoDate; kind: PaymentKind }[];
+};
+
+export type Decision = "accept" | "counter" | "reject";
+
+export type RequestItem = {
+	agreement_id: string;
+	kind: "share" | "counter";
+	title: string;
+	from_name: string | null;
+	my_role: PartyRole;
+	principal_minor: number;
 };

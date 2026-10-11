@@ -13,6 +13,7 @@ import Home from "../../app/(tabs)/index";
 import Requests from "../../app/(tabs)/requests";
 import Index from "../../app/index";
 import Invite from "../../app/invite/[token]";
+import AgreementDecide from "../../app/agreement/[id]/decide";
 import AgreementHistory from "../../app/agreement/[id]/history";
 import AgreementDetail from "../../app/agreement/[id]/index";
 import AgreementInvitePreview from "../../app/agreement/[id]/invite-preview";
@@ -48,6 +49,7 @@ export const appRoutes = {
 	"agreement/[id]/index": AgreementDetail,
 	"agreement/[id]/payment": AgreementPayment,
 	"agreement/[id]/history": AgreementHistory,
+	"agreement/[id]/decide": AgreementDecide,
 	"agreement/[id]/share": AgreementShare,
 	"agreement/[id]/invite-preview": AgreementInvitePreview,
 	"contact/[id]": ContactDetail,

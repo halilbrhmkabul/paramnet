@@ -76,6 +76,7 @@ function AppNavigator() {
 					name="agreement/[id]/payment"
 					options={{ ...detailHeader, presentation: "modal" }}
 				/>
+				<Stack.Screen name="agreement/[id]/decide" options={detailHeader} />
 				<Stack.Screen name="agreement/[id]/history" options={detailHeader} />
 				<Stack.Screen
 					name="agreement/[id]/share"

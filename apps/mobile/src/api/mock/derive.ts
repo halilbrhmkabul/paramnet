@@ -35,6 +35,7 @@ export function toSummary(
 		title: agreement.title,
 		status: agreement.status,
 		my_role: agreement.my_role,
+		is_creator: agreement.is_creator,
 		counterparty: {
 			contact_id: contact.id,
 			display_name: contact.display_name,
