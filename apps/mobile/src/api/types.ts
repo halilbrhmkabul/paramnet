@@ -70,7 +70,11 @@ export type EventType =
 	| "settled"
 	| "shared"
 	| "share_withdrawn"
-	| "invite_expired";
+	| "invite_expired"
+	| "accepted"
+	| "countered"
+	| "rejected"
+	| "made_personal";
 
 export type EventView = {
 	id: string;

@@ -29,6 +29,14 @@ function describe(event: EventView): string {
 			return tr.history.shareWithdrawn;
 		case "invite_expired":
 			return tr.history.inviteExpired;
+		case "accepted":
+			return tr.history.accepted;
+		case "countered":
+			return tr.history.countered;
+		case "rejected":
+			return tr.history.rejected;
+		case "made_personal":
+			return tr.history.madePersonal;
 	}
 }
 
