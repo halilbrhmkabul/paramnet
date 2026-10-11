@@ -234,3 +234,15 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Yanıt beklenirken (`pending`) ödeme, düzenleme, yeniden paylaşım yapılamaz (durum makinesinde tanımlı değil).
 	- Düzeltme: F1-14'teki `lock_personal_agreement` `not (a or NULL)` yüzünden paylaşılmış ama kabul edilmemiş anlaşmada yabancıya `forbidden` dönüyordu; `private.is_party` null-güvenli kontrolüyle `not_found` döner (yeni migration'da `create or replace`).
 - **Açık soru:** Mobil S11'de `pending` için birincil aksiyon "Hatırlat / Linki tekrar paylaş". Token saklanmadığı için tekrar paylaşım yeni token (eskisini `revoked`) demek; bu `pending → pending` geçişi durum makinesinde yok. Eklenmeli mi?
+
+## ADR-027 — Karar RPC'leri
+- **Tarih:** 2026-10-12
+- **Karar:**
+	- Sıra: F2-03, F2-02'den önce yapıldı; `invite-decide` aynı karar mantığını kullanacak.
+	- Karar verebilen: anlaşmaya bağlı karşı taraf (`counterparty_profile_id`) ya da henüz bağlı değilse oturumdaki doğrulanmış numarası aktif davetin hedef numarasıyla aynı olan hesap (BR-11). Diğer herkese `not_found`, oluşturana `forbidden`.
+	- Her karar `version` + `terms_hash` taşır; bekleyen versiyon ve sunucudaki hash ile eşleşmezse `conflict` (BR-06).
+	- `accept`: karşı taraf profile bağlanır, versiyon yürürlüğe girer (`private.activate_version`): versiyon değiştiyse eski `superseded`, yeni taksitler üretilir, onaylı ödemeler (peşinat hariç) FIFO yeniden dağıtılır; kalan 0 ise `settled`. Paylaşım öncesi kişisel moddaki ödemeler korunur.
+	- `counter`: yeni versiyon `proposed` (öneren adına), anlaşma `countered`, karşı taraf bağlanır (yanıtı uygulamada görebilsin). Peşinat değişmez, toplam ödenenin altına inemez. Karşı öneriye karşı öneri gelirse önceki öneri `rejected`.
+	- `reject`: anlaşma `rejected`, reddeden hesap bağlanmaz ("Bu plan bana ait değil"). Oluşturan `make_personal` ile kişisel moda döner.
+	- `decide_counter` yalnızca `accept` / `counter`; oluşturanın "hayır"ı `withdraw_share`.
+	- Her kararda aktif davet `consumed` olur; olay kaydında karar verenin doğrulanmış numarası (`actor_phone_e164`).

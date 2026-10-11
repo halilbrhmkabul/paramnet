@@ -321,6 +321,10 @@ export const tr = {
 		shared: "Plan paylaşıldı",
 		shareWithdrawn: "Paylaşım geri çekildi",
 		inviteExpired: "Paylaşım bağlantısının süresi doldu",
+		accepted: "Plan onaylandı",
+		countered: "Düzeltme önerildi",
+		rejected: "Plan kabul edilmedi",
+		madePersonal: "Kişisel kayda döndü",
 		settled: "Plan tamamlandı",
 		actors: {
 			me: "Sen",

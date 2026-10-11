@@ -171,9 +171,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** Deno testleri; GET hiçbir durum değiştirmiyor; yanlış numara onaylayamıyor.
 - **Skill:** paramnet-domain (references/security.md)
 
-### [ ] F2-03 Karar RPC'leri
+### [x] F2-03 Karar RPC'leri
 - `decide_agreement` (accept / counter / reject), versiyon + terms_hash kontrolü, karşı tarafın profile bağlanması.
 - **Kabul:** pgTAP: eski versiyonu onaylama reddi; tüm geçişler.
+- **Not (2026-10-12):** F2-02'den önce yapıldı (invite-decide bu RPC'lere dayanır). `decide_agreement` (accept / counter / reject; karar veren: bağlı karşı taraf veya doğrulanmış numarası davet hedefiyle eşleşen hesap), `decide_counter` (accept / counter), `make_personal`; versiyon + terms_hash kontrolü (BR-06), kabulde profile bağlanma, yeni versiyonda ödemelerin yeniden dağıtılması. pgTAP 37 test (ADR-027).
 
 ### [ ] F2-04 Web onay sayfası (`apps/web-confirm`, W01–W04)
 - Next.js tek rota, Turnstile, CSRF, güvenlik başlıkları (HSTS, no-referrer, noindex, CSP).

@@ -659,12 +659,33 @@ export type Database = {
 				Returns: Json;
 			};
 			create_agreement: { Args: { idem_key: string; input: Json }; Returns: Json };
+			decide_agreement: {
+				Args: {
+					p_counter_terms: Json;
+					p_decision: string;
+					p_id: string;
+					p_terms_hash: string;
+					p_version: number;
+				};
+				Returns: Json;
+			};
+			decide_counter: {
+				Args: {
+					p_counter_terms: Json;
+					p_decision: string;
+					p_id: string;
+					p_terms_hash: string;
+					p_version: number;
+				};
+				Returns: Json;
+			};
 			finish_notifications: { Args: { p_results: Json }; Returns: Json };
 			get_agreement_detail: { Args: { p_id: string }; Returns: Json };
 			get_calendar: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
+			make_personal: { Args: { p_id: string }; Returns: Json };
 			record_payment: {
 				Args: {
 					p_agreement_id: string;
