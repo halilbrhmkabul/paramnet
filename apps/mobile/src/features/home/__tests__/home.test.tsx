@@ -33,7 +33,8 @@ describe("Home (S05)", () => {
 		const upcoming = screen.getByTestId("home.upcoming.list");
 		expect(within(upcoming).getAllByTestId(/^home\.upcoming\.item\./)).toHaveLength(5);
 		expect(within(upcoming).getByText(tr.installment.status.due_today)).toBeTruthy();
-		expect(screen.queryByTestId("home.pending.band")).toBeNull();
+		// The demo has one plan shared with me (S19).
+		expect(screen.getByTestId("home.pending.band")).toHaveTextContent("1 iş seni bekliyor");
 	});
 
 	it("opens the agreement from a due item", async () => {

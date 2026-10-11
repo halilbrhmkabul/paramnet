@@ -17,6 +17,7 @@ const MESSAGES: Partial<Record<string, string>> = {
 	count_exceeds_remaining: tr.form.countExceedsRemaining,
 	dates_not_ascending: tr.form.datesNotAscending,
 	non_positive_installment: tr.form.nonPositiveInstallment,
+	sum_mismatch: tr.form.sumMismatch,
 };
 
 export function messageForCode(code: string): string {

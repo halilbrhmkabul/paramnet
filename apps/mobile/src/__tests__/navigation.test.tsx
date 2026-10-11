@@ -1,7 +1,6 @@
 import { fireEvent, renderRouter, screen } from "expo-router/testing-library";
 
 import { resetSession } from "@/features/auth/sessionStore";
-import { tr } from "@/i18n/tr";
 import { appRoutes } from "@/testing/appRoutes";
 import { signInForTest } from "@/testing/session";
 
@@ -21,7 +20,7 @@ describe("navigation (signed in)", () => {
 		expect(screen.getByTestId("calendar.screen")).toBeTruthy();
 
 		await fireEvent.press(screen.getByTestId("tabs.requests"));
-		expect(screen.getByText(tr.requests.emptyTitle)).toBeTruthy();
+		expect(screen.getByTestId("requests.screen")).toBeTruthy();
 	});
 
 	it("the centre + button opens the new-record modal", async () => {

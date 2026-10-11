@@ -33,8 +33,9 @@ export type MockAgreement = {
 	description: string | null;
 	started_on: IsoDate | null;
 	notes: string | null;
-	// In personal mode the user is always the creator, so the creator role is "my" role.
 	my_role: PartyRole;
+	// False only for plans someone else shared with me and I accepted.
+	is_creator: boolean;
 	contact_id: string;
 	status: AgreementStatus;
 	principal_minor: number;
@@ -46,22 +47,46 @@ export type MockAgreement = {
 	events: EventView[];
 };
 
-export type MockState = { contacts: MockContact[]; agreements: MockAgreement[] };
+// A plan someone else shared with me (S14 in the prototype).
+export type MockIncoming = {
+	agreement_id: string;
+	token: string;
+	title: string;
+	kind: AgreementKind;
+	creator_name: string;
+	my_role: PartyRole;
+	status: "pending" | "countered" | "rejected";
+	principal_minor: number;
+	down_payment_minor: number;
+	notes: string | null;
+	plan: { seq: number; due_date: IsoDate | null; amount_minor: number }[];
+};
+
+export type MockState = {
+	contacts: MockContact[];
+	agreements: MockAgreement[];
+	incoming: MockIncoming[];
+	// token → agreement id for plans I shared.
+	shares: Map<string, string>;
+};
 
 export type NewMockAgreement = Omit<
 	MockAgreement,
-	"installments" | "payments" | "events" | "status" | "row_version"
+	"installments" | "payments" | "events" | "status" | "row_version" | "is_creator"
 > & {
+	status?: AgreementStatus;
+	is_creator?: boolean;
 	plan: { seq: number; due_date: IsoDate | null; amount_minor: number }[];
 	down_payment_on: IsoDate;
 };
 
 // Mirrors create_agreement: version 1, installments, confirmed down payment, "created" event.
 export function insertAgreement(state: MockState, input: NewMockAgreement): MockAgreement {
-	const { plan, down_payment_on, ...fields } = input;
+	const { plan, down_payment_on, status = "personal", is_creator = true, ...fields } = input;
 	const agreement: MockAgreement = {
 		...fields,
-		status: "personal",
+		status,
+		is_creator,
 		row_version: 1,
 		installments: plan.map((row) => ({
 			id: `${input.id}-i${String(row.seq)}`,

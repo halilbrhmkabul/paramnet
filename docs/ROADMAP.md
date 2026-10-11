@@ -188,7 +188,8 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Skill:** expo (expo-app-clip — AASA bölümü), paramnet-mobile (deep-links.md)
 - **Not (2026-10-12):** Web: `/.well-known/apple-app-site-association` (yalnızca `/i/*`) ve `assetlinks.json`, ortam değişkenlerinden (`APPLE_TEAM_ID`, `ANDROID_SHA256_CERT_FINGERPRINTS`), yoksa 404. Mobil: `app.config.ts` (`EXPO_PUBLIC_APP_DOMAIN` varsa associatedDomains + autoVerify intent filtresi), `+native-intent` `/i/<token>` → `/invite/<token>`, oturumsuz açılışta token bellekte tutulur ve girişten sonra davete dönülür. **Doğrulanmadı:** alan adı, Apple Team ID, imza parmak izi yok; cihazda link → uygulama açılışı elle denenmeli. Davet ekranının içeriği F2-06'da.
 
-### [ ] F2-06 Paylaşım ve gelen paylaşım ekranları (S13, S14)
+### [x] F2-06 Paylaşım ve gelen paylaşım ekranları (S13, S14)
+- **Not (2026-10-12):** S13 gerçek paylaşım (`share_agreement`, bağlantı `EXPO_PUBLIC_INVITE_BASE_URL` / `EXPO_PUBLIC_APP_DOMAIN` ile, sistem paylaşım menüsü); S14 karar ekranı (`get_pending_decision`: önerilen ve mevcut şartlar, önceki ödemeler; Onayla / satır düzenleyerek Düzeltme öner / Reddet; oluşturan için Öneriyi kabul et / Düzeltme / Paylaşımı geri çek); uygulamadaki davet bağlantısı `resolve_invite` (başka numaraya ayrıntı yok); Talepler "Paylaşımlar" (`list_requests`) ve Ana Sayfa bandı; anlaşma detayında pending/countered/rejected aksiyonları (`is_creator`). Sahte adaptörde gelen paylaşım demosu (Zeynep Arslan). pgTAP 23 + RNTL (ADR-031).
 
 ### [ ] F2-07 Ödeme bildirimi ve doğrulama
 - `record_payment` (borçlu → reported), `decide_payment`, `withdraw_payment`; Talepler ekranı (S19).

@@ -715,6 +715,7 @@ export type Database = {
 			get_calendar: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
+			get_pending_decision: { Args: { p_id: string }; Returns: Json };
 			invite_decide: {
 				Args: {
 					p_counter_terms: Json;
@@ -739,6 +740,7 @@ export type Database = {
 				Returns: Json;
 			};
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
+			list_requests: { Args: Record<PropertyKey, never>; Returns: Json };
 			make_personal: { Args: { p_id: string }; Returns: Json };
 			record_payment: {
 				Args: {
@@ -750,6 +752,7 @@ export type Database = {
 				Returns: Json;
 			};
 			register_push_token: { Args: { p_platform: string; p_token: string }; Returns: Json };
+			resolve_invite: { Args: { p_token: string }; Returns: Json };
 			share_agreement: {
 				Args: { p_id: string; p_phone: string; p_row_version: number };
 				Returns: Json;

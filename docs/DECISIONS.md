@@ -279,3 +279,12 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Link biçimi `https://<APP_DOMAIN>/i/<token>`; uygulamadaki ekran `/invite/<token>`. Eşleme `app/+native-intent.tsx` `redirectSystemPath` ile (geliştirmede `paramnet://i/<token>` de).
 	- Alan adı ve imza bilgileri kodda sabit değil: mobilde `EXPO_PUBLIC_APP_DOMAIN` (`app.config.ts` app.json'ı genişletir), webde `APPLE_TEAM_ID` ve `ANDROID_SHA256_CERT_FINGERPRINTS`. Değer yoksa associated domains/intent filtresi eklenmez ve `.well-known` dosyaları 404 döner (yarım yapılandırma yayınlanmaz).
 	- `invite/[token]` rotası oturum korumasının dışında; oturum yoksa token yalnızca bellekte tutulur (kalıcı saklanmaz), kullanıcı karşılama/giriş akışına gider, oturum açılınca aynı davet açılır.
+
+## ADR-031 — Paylaşım ve gelen paylaşım ekranları
+- **Tarih:** 2026-10-12
+- **Karar:**
+	- Uygulamada davet bağlantısı `resolve_invite(token)` ile çözülür: yalnızca doğrulanmış numarası davet hedefi olan hesap anlaşma kimliğini alır; diğerleri yalnızca paylaşanın adını ve "başka numaraya gönderilmiş" bilgisini görür. Uygulamada ikinci OTP istenmez (hesap numarası zaten doğrulanmış, deep-links.md).
+	- Karar ekranı tek RPC'den (`get_pending_decision`): sıra kimdeyse (`actor`: counterparty → `decide_agreement`, creator → `decide_counter`) önerilen versiyon + hash, mevcut şartlar ve paylaşım öncesi ödemeler. Uygulamadaki düzeltme önerisi satır bazlı (tarih + tutar), toplam ve peşinat sabit (web ile aynı).
+	- `list_requests()` Talepler'in "Paylaşımlar" bölümünü ve Ana Sayfa'daki bekleyen iş sayısını besler (`get_dashboard.pending_count` = onay bekleyen bildirilmiş ödemeler + bekleyen paylaşım kararları).
+	- Görünüm modeline `is_creator` eklendi; S11 birincil aksiyonu durum + rol + oluşturan bilgisinden seçilir. `pending` iken oluşturana yeniden paylaşım yok (ADR-026 açık sorusu), yalnızca geri çekme.
+	- Paylaşım bağlantısının kökü: `EXPO_PUBLIC_INVITE_BASE_URL` (yerelde web-confirm geliştirme sunucusu) yoksa `https://EXPO_PUBLIC_APP_DOMAIN`; ikisi de yoksa paylaşım yapılır ama bağlantı gösterilemez ve kullanıcıya söylenir. Sahte modda prototip bağlantısı.

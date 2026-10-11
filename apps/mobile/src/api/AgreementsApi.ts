@@ -6,6 +6,12 @@ import type {
 	ContactDetail,
 	ContactSummary,
 	Dashboard,
+	Decision,
+	InviteResolution,
+	PendingDecision,
+	RequestItem,
+	ShareResult,
+	TermsView,
 } from "./types";
 
 // Screens only see this interface; mock and Supabase adapters both implement it (EXPO_PUBLIC_API_MODE).
@@ -27,4 +33,19 @@ export interface AgreementsApi {
 		rowVersion: number,
 		idempotencyKey: string,
 	): Promise<{ payment_id: string; replayed: boolean }>;
+	// Sharing (F2-06).
+	shareAgreement(id: string, phone: string, rowVersion: number): Promise<ShareResult>;
+	withdrawShare(id: string): Promise<void>;
+	makePersonal(id: string): Promise<void>;
+	resolveInvite(token: string): Promise<InviteResolution>;
+	getPendingDecision(id: string): Promise<PendingDecision>;
+	decide(
+		id: string,
+		actor: PendingDecision["actor"],
+		version: number,
+		termsHash: string,
+		decision: Decision,
+		counterTerms: TermsView | null,
+	): Promise<{ status: string; version: number }>;
+	listRequests(): Promise<RequestItem[]>;
 }

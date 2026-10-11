@@ -1,5 +1,6 @@
 import {
 	createAgreementInputSchema,
+	normalizePhoneTR,
 	outstanding,
 	paymentInputSchema,
 	todayInIstanbul,
@@ -8,7 +9,7 @@ import {
 
 import type { AgreementsApi } from "../AgreementsApi";
 import { ApiError } from "../errors";
-import type { CalendarMonth, ContactSummary, DueItem } from "../types";
+import type { CalendarMonth, ContactSummary, DueItem, PendingDecision, TermsView } from "../types";
 import { dueItems, inMonth, isOpen, toDetail, toSummary } from "./derive";
 import { seedState, type MockSeed } from "./seed";
 import { applyPayment, insertAgreement, type MockContact, type MockState } from "./store";
@@ -89,8 +90,9 @@ export function createMockApi({
 					collect_this_month_minor: thisMonth("creditor"),
 					overdue: items.filter((item) => item.state.status === "overdue"),
 					upcoming: items.filter((item) => item.due_date >= day).slice(0, UPCOMING_LIMIT),
-					// Personal mode has nothing waiting for the other party (Faz 2).
-					pending_count: 0,
+					// Plans shared with me that wait for my answer.
+					pending_count: state.incoming.filter((item) => item.status === "pending")
+						.length,
 					has_agreements: state.agreements.length > 0,
 				};
 			}),
@@ -222,6 +224,185 @@ export function createMockApi({
 				paymentByKey.set(idempotencyKey, id);
 				return { payment_id: id, replayed: false };
 			}),
+
+		// Sharing (F2-06) — the prototype has no other party, so sharing only changes my record.
+		shareAgreement: (id, phone, rowVersion) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) => a.id === id && a.is_creator);
+				if (agreement === undefined) {
+					throw new ApiError("not_found");
+				}
+				if (agreement.status !== "personal") {
+					throw new ApiError("invalid_transition");
+				}
+				if (agreement.row_version !== rowVersion) {
+					throw new ApiError("conflict");
+				}
+				if (normalizePhoneTR(phone) === null) {
+					throw new ApiError("validation_error");
+				}
+				const token = `mock-${id}`;
+				state.shares.set(token, id);
+				agreement.status = "pending";
+				agreement.row_version += 1;
+				agreement.events.push({
+					id: `${id}-shared-${String(agreement.row_version)}`,
+					type: "shared",
+					at: now().toISOString(),
+					actor: "me",
+					amount_minor: null,
+				});
+				return {
+					token,
+					expires_at: new Date(now().getTime() + 7 * 24 * 3600 * 1000).toISOString(),
+				};
+			}),
+
+		withdrawShare: (id) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) => a.id === id && a.is_creator);
+				if (agreement === undefined) {
+					throw new ApiError("not_found");
+				}
+				if (agreement.status !== "pending" && agreement.status !== "countered") {
+					throw new ApiError("invalid_transition");
+				}
+				agreement.status = "personal";
+				agreement.row_version += 1;
+				agreement.events.push({
+					id: `${id}-withdrawn-${String(agreement.row_version)}`,
+					type: "share_withdrawn",
+					at: now().toISOString(),
+					actor: "me",
+					amount_minor: null,
+				});
+			}),
+
+		makePersonal: (id) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) => a.id === id && a.is_creator);
+				if (agreement?.status !== "rejected") {
+					throw new ApiError(
+						agreement === undefined ? "not_found" : "invalid_transition",
+					);
+				}
+				agreement.status = "personal";
+				agreement.row_version += 1;
+			}),
+
+		resolveInvite: (token) =>
+			respond(() => {
+				const incoming = state.incoming.find((item) => item.token === token);
+				if (incoming !== undefined) {
+					return incoming.status === "pending"
+						? {
+								status: "active" as const,
+								creator_name: incoming.creator_name,
+								mismatch: false,
+								agreement_id: incoming.agreement_id,
+							}
+						: { status: "consumed" as const, creator_name: incoming.creator_name };
+				}
+				// My own link was sent to the other person's number, not to me.
+				return state.shares.has(token)
+					? {
+							status: "active" as const,
+							creator_name: "",
+							mismatch: true,
+							agreement_id: null,
+						}
+					: { status: "invalid" as const };
+			}),
+
+		getPendingDecision: (id) =>
+			respond((): PendingDecision => {
+				const incoming = state.incoming.find(
+					(item) => item.agreement_id === id && item.status === "pending",
+				);
+				if (incoming === undefined) {
+					throw new ApiError("not_found");
+				}
+				const terms: TermsView = {
+					principal_minor: incoming.principal_minor,
+					down_payment_minor: incoming.down_payment_minor,
+					notes: incoming.notes,
+					plan: incoming.plan,
+				};
+				return {
+					agreement_id: id,
+					title: incoming.title,
+					actor: "counterparty",
+					other_name: incoming.creator_name,
+					my_role: incoming.my_role,
+					version: 1,
+					terms_hash: "mock",
+					current: terms,
+					proposed: terms,
+					can_reject: true,
+					payments: [],
+				};
+			}),
+
+		decide: (id, _actor, version, termsHash, decision) =>
+			respond(() => {
+				const incoming = state.incoming.find(
+					(item) => item.agreement_id === id && item.status === "pending",
+				);
+				if (incoming === undefined) {
+					throw new ApiError("not_found");
+				}
+				if (version !== 1 || termsHash !== "mock") {
+					throw new ApiError("conflict");
+				}
+				if (decision === "reject") {
+					incoming.status = "rejected";
+					return { status: "rejected", version: 1 };
+				}
+				if (decision === "counter") {
+					incoming.status = "countered";
+					return { status: "countered", version: 2 };
+				}
+				const contactId = nextId();
+				state.contacts.push({
+					id: contactId,
+					display_name: incoming.creator_name,
+					phone_e164: null,
+					kind: "person",
+				});
+				state.incoming = state.incoming.filter((item) => item !== incoming);
+				insertAgreement(state, {
+					id,
+					kind: incoming.kind,
+					title: incoming.title,
+					description: null,
+					started_on: null,
+					notes: incoming.notes,
+					my_role: incoming.my_role,
+					contact_id: contactId,
+					principal_minor: incoming.principal_minor,
+					down_payment_minor: incoming.down_payment_minor,
+					down_payment_on: today(),
+					created_at: now().toISOString(),
+					plan: incoming.plan,
+					status: "active",
+					is_creator: false,
+				});
+				return { status: "active", version: 1 };
+			}),
+
+		listRequests: () =>
+			respond(() =>
+				state.incoming
+					.filter((item) => item.status === "pending")
+					.map((item) => ({
+						agreement_id: item.agreement_id,
+						kind: "share" as const,
+						title: item.title,
+						from_name: item.creator_name,
+						my_role: item.my_role,
+						principal_minor: item.principal_minor,
+					})),
+			),
 	};
 
 	return Object.assign(api, {

@@ -13,7 +13,7 @@ describe("mock AgreementsApi — demo seed", () => {
 		expect(dashboard.due_this_month_minor).toBe(400000);
 		expect(dashboard.collect_this_month_minor).toBe(550000);
 		expect(dashboard.has_agreements).toBe(true);
-		expect(dashboard.pending_count).toBe(0);
+		expect(dashboard.pending_count).toBe(1);
 	});
 
 	it("lists overdue and the next five due installments", async () => {

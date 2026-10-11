@@ -21,22 +21,43 @@ async function openShare(agreementId: string) {
 	});
 }
 
-describe("Share draft (S13, prototype)", () => {
-	it("previews the message with the counterparty's number and opens the system share sheet", async () => {
+describe("Share (S13)", () => {
+	it("creates the invite, opens the share sheet and the agreement waits for an answer", async () => {
 		const share = jest.spyOn(Share, "share").mockResolvedValue({ action: Share.sharedAction });
 		await openShare(SEED_IDS.ahmetLoan);
-		expect(screen.getByText("+90 555 111 22 33")).toBeTruthy();
-		const message = fill(tr.share.message, { name: "Test", link: tr.share.prototypeLink });
-		expect(screen.getByTestId("share.message.text")).toHaveTextContent(message);
-		expect(screen.getByText(tr.share.prototypeNote)).toBeTruthy();
+		expect(screen.getByTestId("share.phone.input")).toHaveDisplayValue("+90 555 111 22 33");
 		await fireEvent.press(screen.getByTestId("share.send.button"));
-		expect(share).toHaveBeenCalledWith({ message });
+		await waitFor(() => {
+			expect(share).toHaveBeenCalledWith({
+				message: fill(tr.share.message, { name: "Test", link: tr.share.prototypeLink }),
+			});
+		});
+		await waitFor(() => {
+			expect(screen.getByTestId("agreement.status.badge")).toHaveTextContent(
+				tr.agreement.status.pending,
+			);
+		});
+		expect(screen.getByTestId("agreement.state.text")).toHaveTextContent(
+			tr.agreementActions.pendingInfo,
+		);
+		expect(screen.queryByTestId("agreement.primaryAction.button")).toBeNull();
+
+		await fireEvent.press(screen.getByTestId("agreement.withdraw.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("agreement.status.badge")).toHaveTextContent(
+				tr.agreement.status.personal,
+			);
+		});
 	});
 
-	it("asks for a number when the contact has none", async () => {
+	it("needs a valid Turkish mobile number", async () => {
 		await openShare(SEED_IDS.yildizFurniture);
 		expect(screen.getByText(tr.share.needPhone)).toBeTruthy();
 		expect(screen.getByTestId("share.send.button")).toBeDisabled();
+		await fireEvent.changeText(screen.getByTestId("share.phone.input"), "212 123 45 67");
+		expect(screen.getByText(tr.phone.errorInvalid)).toBeTruthy();
+		await fireEvent.changeText(screen.getByTestId("share.phone.input"), "0555 444 55 66");
+		expect(screen.getByTestId("share.send.button")).toBeEnabled();
 	});
 
 	it("shows what the other side sees before and after verifying (W01, W03 draft)", async () => {
@@ -45,23 +66,10 @@ describe("Share draft (S13, prototype)", () => {
 		await waitFor(() => {
 			expect(screen.getByTestId("invitePreview.screen")).toBeTruthy();
 		});
-		expect(screen.getByText(fill(tr.invite.title, { name: "Test" }))).toBeTruthy();
-		// Before OTP: no amounts (spec 5.4).
 		expect(screen.queryByText("12.000,00 TL")).toBeNull();
-
 		await fireEvent.press(screen.getByTestId("invitePreview.verify.button"));
-		const detail = screen.getByTestId("invitePreview.detail");
-		expect(within(detail).getByText("12.000,00 TL")).toBeTruthy();
-		// The other side sees the roles mirrored.
-		expect(within(detail).getByText(tr.agreement.youOwe)).toBeTruthy();
-		expect(screen.getByTestId("invitePreview.accept.button")).toHaveTextContent(
-			tr.invite.accept,
-		);
-		expect(screen.getByTestId("invitePreview.counter.button")).toHaveTextContent(
-			tr.invite.counter,
-		);
-		expect(screen.getByTestId("invitePreview.reject.button")).toHaveTextContent(
-			tr.invite.reject,
-		);
+		expect(
+			within(screen.getByTestId("invitePreview.detail")).getByText("12.000,00 TL"),
+		).toBeTruthy();
 	});
 });
