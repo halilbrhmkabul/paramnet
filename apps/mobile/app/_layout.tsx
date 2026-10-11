@@ -3,7 +3,10 @@ import { StatusBar } from "expo-status-bar";
 
 import { ApiProvider } from "@/api/ApiProvider";
 import { useIsSignedIn } from "@/features/auth/sessionStore";
+import { tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
+
+const detailHeader = { headerShown: true, title: "", headerShadowVisible: false };
 
 export default function RootLayout() {
 	const { scheme, colors } = useAppTheme();
@@ -28,9 +31,16 @@ export default function RootLayout() {
 					<Stack.Protected guard={signedIn}>
 						<Stack.Screen name="(tabs)" />
 						<Stack.Screen name="new" options={{ presentation: "modal" }} />
+						<Stack.Screen name="agreement/[id]/index" options={detailHeader} />
 						<Stack.Screen
-							name="agreement/[id]/index"
-							options={{ headerShown: true, title: "" }}
+							name="agreement/[id]/payment"
+							options={{ ...detailHeader, presentation: "modal" }}
+						/>
+						<Stack.Screen name="agreement/[id]/history" options={detailHeader} />
+						<Stack.Screen name="contact/[id]" options={detailHeader} />
+						<Stack.Screen
+							name="settings/index"
+							options={{ ...detailHeader, title: tr.settings.title }}
 						/>
 					</Stack.Protected>
 					<Stack.Protected guard={!signedIn}>

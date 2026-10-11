@@ -40,4 +40,12 @@ describe("navigation (signed out)", () => {
 		await renderRouter(appRoutes, { initialUrl: "/contacts" });
 		expect(screen.getByTestId("welcome.screen")).toBeTruthy();
 	});
+
+	it.each(["/agreement/00000000-0000-4000-8000-0000000000b1", "/settings", "/new"])(
+		"cannot open %s without a session",
+		async (url) => {
+			await renderRouter(appRoutes, { initialUrl: url });
+			expect(screen.getByTestId("welcome.screen")).toBeTruthy();
+		},
+	);
 });

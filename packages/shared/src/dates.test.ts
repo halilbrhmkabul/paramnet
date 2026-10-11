@@ -9,6 +9,7 @@ import {
 	isIsoDate,
 	isoWeekday,
 	monthOf,
+	shiftMonth,
 	todayInIstanbul,
 } from "./dates";
 
@@ -167,5 +168,13 @@ describe("formatDateTimeTR", () => {
 
 	it("rejects an invalid timestamp", () => {
 		expect(() => formatDateTimeTR("yesterday")).toThrow(RangeError);
+	});
+});
+
+describe("shiftMonth", () => {
+	it("moves to the first day of another month in both directions", () => {
+		expect(shiftMonth("2026-10-11", 1)).toBe("2026-11-01");
+		expect(shiftMonth("2026-01-31", -1)).toBe("2025-12-01");
+		expect(shiftMonth("2026-03-15", -14)).toBe("2025-01-01");
 	});
 });

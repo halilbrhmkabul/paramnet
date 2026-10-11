@@ -97,8 +97,9 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** Ödeme eklenince bakiye ve taksit durumları anında güncelleniyor (sahte adaptör).
 - **Not (2026-10-11):** Detay: üst kart (karşı taraf, rol, kalan, ilerleme, toplam, durum, "Yalnızca sen görüyorsun"), birincil aksiyon Ödeme ekle (çevrimdışı kapalı + neden), taksitler, ödemeler, kapandı mesajı; ödeme: tutar, tarih (gelecek olamaz), yöntem, not, FIFO dağıtım önizlemesi, kalan borç aşımı; geçmiş: olay zaman çizelgesi. Sahte `recordPayment` (idempotent, row_version, BR-14). Dekont ve haptic BACKLOG'da (ADR-018).
 
-### [ ] F1-10 Takvim (S18) ve Profil (S20 iskelet)
+### [x] F1-10 Takvim (S18) ve Profil (S20 iskelet)
 - **Kabul:** Ay görünümü, gün seçimi, gecikenler işaretli.
+- **Not (2026-10-11):** Takvim: pazartesiyle başlayan ay ızgarası, önceki/sonraki ay, vade noktası (en acil durumun rengi + erişilebilir etiket "…, gecikmiş var"), bugün seçili, gün listesi. Profil: Ana Sayfa avatarından açılır; ad, numara, gelecek maddeler "Yakında", çıkış. Kök Stack'te detay rotalarının korunması düzeltildi (ödeme, geçmiş, kişi, ayarlar artık `Stack.Protected` içinde).
 
 ### [ ] F1-11 Prototip kapısı (Faz 0 doğrulaması için)
 - Paylaş butonu ve web onay ekranının görsel taslağı (sahte; gerçek link yok).

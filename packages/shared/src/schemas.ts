@@ -27,6 +27,12 @@ export function normalizePhoneTR(input: string): string | null {
 	return null;
 }
 
+// Display only; anything that is not a +90 mobile is shown as stored.
+export function formatPhoneTR(e164: string): string {
+	const match = /^\+90(\d{3})(\d{3})(\d{2})(\d{2})$/.exec(e164);
+	return match === null ? e164 : `+90 ${match.slice(1).join(" ")}`;
+}
+
 export const phoneE164Schema = z.string({ error: "invalid_phone" }).transform((value, ctx) => {
 	const phone = normalizePhoneTR(value);
 	if (phone === null) {

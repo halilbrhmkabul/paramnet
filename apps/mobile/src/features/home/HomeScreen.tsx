@@ -1,5 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
 import { useDashboard } from "@/api/hooks";
@@ -158,6 +159,32 @@ function DashboardContent({ data }: { data: Dashboard }) {
 	);
 }
 
+// Spec 6.1: profile and settings open from the avatar at the top right of Home.
+function ProfileButton() {
+	const { colors, sizes } = useAppTheme();
+	return (
+		<Pressable
+			testID="home.profile.button"
+			accessibilityRole="button"
+			accessibilityLabel={tr.settings.open}
+			onPress={() => {
+				router.push("/settings");
+			}}
+			style={[
+				styles.avatar,
+				{
+					width: sizes.minTouch,
+					height: sizes.minTouch,
+					borderRadius: sizes.minTouch / 2,
+					backgroundColor: colors.surface,
+				},
+			]}
+		>
+			<Ionicons name="person-outline" size={22} color={colors.primary} />
+		</Pressable>
+	);
+}
+
 // S05
 export function HomeScreen() {
 	const dashboard = useDashboard();
@@ -175,9 +202,12 @@ export function HomeScreen() {
 				/>
 			}
 		>
-			<ScreenTitle>
-				{name === null ? tr.tabs.home : fill(tr.home.greeting, { name })}
-			</ScreenTitle>
+			<View style={styles.header}>
+				<ScreenTitle>
+					{name === null ? tr.tabs.home : fill(tr.home.greeting, { name })}
+				</ScreenTitle>
+				<ProfileButton />
+			</View>
 			{dashboard.isPending ? (
 				<LoadingState rows={4} testID="home.loading" />
 			) : dashboard.isError ? (
@@ -196,6 +226,16 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+	header: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		gap: 8,
+	},
+	avatar: {
+		alignItems: "center",
+		justifyContent: "center",
+	},
 	grid: {
 		flexDirection: "row",
 		flexWrap: "wrap",

@@ -20,6 +20,7 @@ import NewLayout from "../../app/new/_layout";
 import NewForm from "../../app/new/form";
 import NewIndex from "../../app/new/index";
 import NewPlan from "../../app/new/plan";
+import Settings from "../../app/settings/index";
 
 // Every route of the app for expo-router's renderRouter; extend when a route file is added.
 export const appRoutes = {
@@ -45,4 +46,5 @@ export const appRoutes = {
 	"agreement/[id]/payment": AgreementPayment,
 	"agreement/[id]/history": AgreementHistory,
 	"contact/[id]": ContactDetail,
+	"settings/index": Settings,
 };
