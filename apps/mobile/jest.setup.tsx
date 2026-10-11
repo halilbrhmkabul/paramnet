@@ -39,7 +39,7 @@ jest.mock("@/api/ApiProvider", () => {
 		const [api] = useState(() => props.api ?? mockTesting.takeTestApi());
 		const [authApi] = useState(() => props.authApi ?? mockTesting.takeTestAuthApi());
 		const [queryClient] = useState(
-			() => props.queryClient ?? mockTesting.createTestQueryClient(),
+			() => props.queryClient ?? mockTesting.takeTestQueryClient(),
 		);
 		return (
 			<actual.ApiProvider {...props} api={api} authApi={authApi} queryClient={queryClient} />

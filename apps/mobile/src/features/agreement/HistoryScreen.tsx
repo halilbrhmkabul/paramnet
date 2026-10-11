@@ -17,6 +17,10 @@ function describe(event: EventView): string {
 			return tr.history.created;
 		case "payment_recorded":
 			return fill(tr.history.paymentRecorded, { amount: formatTRY(event.amount_minor ?? 0) });
+		case "updated":
+			return tr.history.updated;
+		case "cancelled":
+			return tr.history.cancelled;
 		case "settled":
 			return tr.history.settled;
 	}

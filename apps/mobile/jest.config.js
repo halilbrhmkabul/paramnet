@@ -8,6 +8,8 @@ const [nodeModulesPattern, ...otherIgnorePatterns] = expoPreset.transformIgnoreP
 module.exports = {
 	preset: "jest-expo",
 	testMatch: ["<rootDir>/src/**/__tests__/**/*.test.{ts,tsx}"],
+	// Run with `pnpm --filter mobile test:integration` against a local Supabase.
+	testPathIgnorePatterns: ["/node_modules/", "\\.integration\\.test\\.ts$"],
 	setupFilesAfterEnv: ["<rootDir>/jest.setup.tsx"],
 	transformIgnorePatterns: [
 		nodeModulesPattern.replace("(?!(.pnpm|", "(?!(.pnpm|@noble|"),

@@ -203,3 +203,11 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Profil `complete_profile(display_name, kvkk_version, terms_version)` security definer RPC'siyle; numara `auth.users`'tan alınır, istemciden değil. Onay sürümleri `src/lib/legal.ts` (`2026-10`).
 	- GoTrue hata eşlemesi: `otp_expired` (yanlış ve süresi dolmuş kod aynı yanıt) → `otp_invalid`; `over_sms_send_rate_limit` → `rate_limited`. RPC hataları `P0001` + mesaj kodu → `ApiError`.
 	- Test notu: `jest.setup` `ApiProvider` üzerinden `secureStorage`'ı önceden yüklediği için modül mock'u gereken testler `jest.isolateModules` kullanır.
+
+## ADR-024 — Supabase anlaşma adaptörü
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- `createSupabaseAgreementsApi(client)` yalnızca RPC çağırır; dönüştürme yok (ADR-022). Tip uyumu: karşı taraf görünümünde `contact_id` null olabilir; olay türlerine `updated`, `cancelled` eklendi.
+	- Ağ hataları (`TypeError`, postgrest-js'in "Network request failed" mesajı, `AuthRetryableFetchError`) `network` koduna, yani çevrimdışı mesajına eşlenir.
+	- Çıkışta React Query önbelleği temizlenir (aynı cihazdaki sonraki hesap önceki verileri görmesin).
+	- Entegrasyon testleri `*.integration.test.ts`, ayrı `jest.integration.config.js` ile düz Node ortamında (jest-expo `fetch`'i sahteler); yerel Supabase ve `PARAMNET_SUPABASE_URL/KEY` yoksa atlanır. Normal `pnpm test` bunları çalıştırmaz. CI'a tam Supabase yığınıyla eklenmesi F1-19 faz kapısında değerlendirilecek.

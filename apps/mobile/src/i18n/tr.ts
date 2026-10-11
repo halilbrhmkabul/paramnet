@@ -316,6 +316,8 @@ export const tr = {
 		title: "Geçmiş",
 		created: "Kayıt oluşturuldu",
 		paymentRecorded: "Ödeme kaydedildi: {amount}",
+		updated: "Plan güncellendi",
+		cancelled: "Kayıt iptal edildi",
 		settled: "Plan tamamlandı",
 		actors: {
 			me: "Sen",

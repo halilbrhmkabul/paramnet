@@ -1,4 +1,5 @@
 import { formatPhoneTR } from "@paramnet/shared";
+import { useQueryClient } from "@tanstack/react-query";
 import { View } from "react-native";
 
 import { useAuthApi } from "@/api/ApiProvider";
@@ -27,6 +28,7 @@ export function SettingsScreen() {
 	const auth = useAuthApi();
 	const user = useSession((state) => state.user);
 	const signOut = useSession((state) => state.signOut);
+	const queryClient = useQueryClient();
 
 	return (
 		<Screen
@@ -39,7 +41,11 @@ export function SettingsScreen() {
 					onPress={() => {
 						// The local session ends even if the server call fails; there is nothing to keep.
 						// Flipping the session guard takes the user back to welcome.
-						void auth.signOut().finally(signOut);
+						void auth.signOut().finally(() => {
+							// The next person on this device must not see the previous account's data.
+							queryClient.clear();
+							signOut();
+						});
 					}}
 					testID="settings.signOut.button"
 				/>

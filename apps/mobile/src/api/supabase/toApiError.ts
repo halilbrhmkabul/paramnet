@@ -42,8 +42,13 @@ export function toApiError(error: unknown): ApiError | Error {
 	if (auth !== undefined) {
 		return new ApiError(auth);
 	}
-	// fetch failures surface as TypeError("Network request failed") in React Native.
-	if (error instanceof TypeError || field(error, "name") === "AuthRetryableFetchError") {
+	// fetch failures surface as TypeError("Network request failed") in React Native; postgrest-js
+	// wraps them into an error object whose message keeps that text.
+	if (
+		error instanceof TypeError ||
+		field(error, "name") === "AuthRetryableFetchError" ||
+		/Network request failed|Failed to fetch|fetch failed/.test(message ?? "")
+	) {
 		return new ApiError("network");
 	}
 	return error instanceof Error ? error : new Error(message ?? "unknown error");
