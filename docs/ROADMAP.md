@@ -124,10 +124,11 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** pgTAP: iki kullanıcıyla izinli/izinsiz okuma, doğrudan insert/update reddi.
 - **Not (2026-10-11):** Tablolarda `anon`'a hiçbir yetki, `authenticated`'a yalnızca SELECT (outbox, reminders, push_tokens hiç); varsayılan yetkiler kapalı. Politikalar: anlaşma = oluşturan veya (karşı taraf ve kişisel değil); alt tablolar `private.can_view_agreement`; kişi, profil, onay = yalnızca sahibi. Başkalarının adı okuma RPC'lerinden (ADR-020). pgTAP 34 test (A/B/C kullanıcıları, anon, yazma reddi).
 
-### [ ] F1-14 Kişisel mod RPC'leri
+### [x] F1-14 Kişisel mod RPC'leri
 - `create_agreement`, `update_personal_agreement`, `record_payment` (kişisel), `cancel_agreement` (kişisel), otomatik `settled`.
 - `FOR UPDATE`, `row_version`, idempotency, olay kaydı. Plan ve dağıtım mantığı `packages/shared` test vektörleriyle aynı sonucu vermeli.
 - **Kabul:** pgTAP: her geçiş, idempotent tekrar, eşzamanlı ödeme, kalan borçtan fazla ödeme reddi.
+- **Not (2026-10-11):** `private.generate_plan/validate_plan/allocate_payment/canonical_json/terms_hash` plpgsql'de; `pnpm db:vectors` shared JSON vektörlerinden `030_domain_vectors.test.sql` üretir (56 kontrol, CI güncelliğini denetler). RPC'ler: `create_agreement` (idempotent, kişi oluşturma/yeniden kullanma, profil bağlama, peşinat), `record_payment` (FOR UPDATE, row_version, FIFO dağıtım, otomatik settled), `update_personal_agreement` (yeni versiyon, peşinat sabit, ödemeler yeniden dağıtılır), `cancel_agreement`. pgTAP 54 test; eşzamanlılık tek oturumda eski row_version ile simüle edildi. `db lint` temiz (ADR-021).
 
 ### [ ] F1-15 Okuma RPC'leri
 - `get_dashboard`, `get_calendar(month)`, `get_agreement_detail(id)`, `list_contacts_with_balance`.

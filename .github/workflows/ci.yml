@@ -32,6 +32,8 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check
+      # plpgsql is tested with the same vectors as packages/shared; the generated pgTAP file must be current.
+      - run: pnpm db:vectors && git diff --exit-code supabase/tests/database/030_domain_vectors.test.sql
       - run: pnpm test
         env:
           CI: true
