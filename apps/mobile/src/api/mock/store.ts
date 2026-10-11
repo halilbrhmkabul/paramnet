@@ -31,6 +31,7 @@ export type MockAgreement = {
 	kind: AgreementKind;
 	title: string;
 	description: string | null;
+	started_on: IsoDate | null;
 	notes: string | null;
 	// In personal mode the user is always the creator, so the creator role is "my" role.
 	my_role: PartyRole;

@@ -173,6 +173,7 @@ export function createMockApi({
 					kind: fields.kind,
 					title: fields.title,
 					description: fields.description,
+					started_on: fields.started_on,
 					notes: terms.notes,
 					my_role: fields.creator_role,
 					contact_id: contactId,

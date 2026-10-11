@@ -107,6 +107,8 @@ export const tr = {
 		boughtInstallmentHint: "Elden taksitle bir şey aldın.",
 		soldInstallmentHint: "Elden taksitle bir şey sattın.",
 		loanTitle: "Borç",
+		startedOnLent: "Verdiğin tarih",
+		startedOnBorrowed: "Aldığın tarih",
 		formTitle: "Bilgiler",
 		person: "Kişi",
 		seller: "Satıcı",

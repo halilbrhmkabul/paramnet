@@ -150,6 +150,8 @@ export const createAgreementInputSchema = z.strictObject({
 	creator_role: z.enum(PARTY_ROLES, { error: "invalid_option" }),
 	title: titleSchema,
 	description: optionalText(DESCRIPTION_MAX),
+	// Spec 5.2 "verildiği / alındığı tarih"; not part of the terms, so not in terms_hash (ADR-019).
+	started_on: isoDateSchema.nullish().transform((value) => value ?? null),
 	counterparty: z.union(
 		[
 			z.strictObject({ contact_id: uuidSchema }),

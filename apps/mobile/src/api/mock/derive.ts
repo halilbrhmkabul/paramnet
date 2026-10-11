@@ -67,6 +67,7 @@ export function toDetail(
 	return {
 		...toSummary(agreement, contact, today),
 		description: agreement.description,
+		started_on: agreement.started_on,
 		notes: agreement.notes,
 		down_payment_minor: agreement.down_payment_minor,
 		created_at: agreement.created_at,

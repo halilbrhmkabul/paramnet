@@ -37,6 +37,8 @@ export type NewFormValues = {
 	// Name shown in the form for the chosen contact.
 	contact_label: string;
 	title: string;
+	// Loans only: when the money changed hands (spec 5.2, ADR-019).
+	started_on: IsoDate | null;
 	amount_minor: number | null;
 	down_payment_minor: number | null;
 	repayment: "once" | "installments";
@@ -54,6 +56,7 @@ export function defaultValues(today: IsoDate): NewFormValues {
 		contact: null,
 		contact_label: "",
 		title: "",
+		started_on: today,
 		amount_minor: null,
 		down_payment_minor: null,
 		repayment: "once",
@@ -166,6 +169,7 @@ export function toCreateInput(
 		creator_role: config.role,
 		title: config.purchase ? values.title.trim().normalize("NFC") : tr.new.loanTitle,
 		description: null,
+		started_on: config.purchase ? null : values.started_on,
 		counterparty: values.contact,
 		terms: {
 			principal_minor: values.amount_minor ?? 0,

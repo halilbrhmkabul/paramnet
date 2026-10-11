@@ -173,6 +173,16 @@ describe("createAgreementInputSchema", () => {
 		});
 	});
 
+	it("started_on is optional and defaults to null (ADR-019)", () => {
+		expect(createAgreementInputSchema.parse(base).started_on).toBeNull();
+		expect(
+			createAgreementInputSchema.parse({ ...base, started_on: "2026-10-01" }).started_on,
+		).toBe("2026-10-01");
+		expect(
+			createAgreementInputSchema.safeParse({ ...base, started_on: "2026-02-30" }).success,
+		).toBe(false);
+	});
+
 	it("accepts an existing contact id", () => {
 		const parsed = createAgreementInputSchema.parse({
 			...base,

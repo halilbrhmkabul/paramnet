@@ -106,16 +106,18 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - Development build veya Expo Go ile telefonda çalışan sürüm.
 - **Kabul:** Kullanıcı görüşmelerinde gösterilebilir prototip. Görüşme sonuçlarına göre ROADMAP güncellenir.
 - **Durum (2026-10-11):** Kod tarafı bitti, kapı açık. Kişisel anlaşmada ikincil "Paylaş" → S13 taslağı (numara kontrolü, mesaj önizlemesi, sistem paylaşım menüsü, yer tutucu link) → "Karşı taraf ne görecek?" W01/W03 taslağı (doğrulama öncesi tutar yok, sonrası plan + 3 karar butonu, pasif). iOS/Android bundle ve expo-doctor 21/21 geçti.
+- **Karar (2026-10-11, kullanıcı):** Kapı ertelendi; görüşmeler beklenirken Faz 1C'ye geçildi. Görüşme sonuçları gelince ROADMAP güncellenir.
 - **Kapıyı kapatmak için (kullanıcı):** `pnpm mobile` ile Expo Go'da telefonda baştan sona dene (kayıt `123456`, yeni kayıt, ödeme, takvim, paylaş taslağı); görüşmeleri yap; sonuçlara göre ROADMAP'i güncelle ve bu görevi `[x]` yap.
 
 ---
 
 ## Faz 1C — Gerçek backend (kişisel mod)
 
-### [ ] F1-12 Şema migration'ı
+### [x] F1-12 Şema migration'ı
 - Enum'lar, tablolar (profiles, contacts, agreements, agreement_versions, installments, payments, payment_allocations, agreement_events, reminders, notification_outbox, push_tokens, consents), indeksler, kısıtlar.
 - **Kabul:** pgTAP: tablolar, kısıtlar (tutar > 0, UNIQUE idempotency_key vb.).
 - **Skill:** paramnet-domain, supabase-postgres-best-practices
+- **Not (2026-10-11):** `20261011194806_core_schema.sql`: 10 enum, `phone_tr` domain, 12 tablo, tüm FK'ler indeksli, kısıtlar (tutar > 0, kalan ≤ anapara, durum ↔ zaman damgası, BR-12, TRY), yalnızca-ekleme tetikleyicileri (olaylar; versiyonda yalnızca durum değişir), RLS açık + politika yok. `agreements.started_on` eklendi (ADR-019). pgTAP 49 test; `db lint` temiz; `db.types.ts` yenilendi.
 
 ### [ ] F1-13 RLS politikaları
 - Okuma: taraf olan görür; kişisel mod yalnızca oluşturan; contacts yalnızca sahibi. Yazma: istemciye tamamen kapalı.
