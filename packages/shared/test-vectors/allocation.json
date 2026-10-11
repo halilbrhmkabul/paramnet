@@ -1,0 +1,125 @@
+{
+	"description": "FIFO payment allocation vectors shared by packages/shared (Vitest) and the plpgsql implementation (pgTAP). Installments are given in seq order; allocations list only installments that receive a positive amount. Expected values are hand-written.",
+	"allocate": [
+		{
+			"name": "exact first installment",
+			"input": {
+				"installments": [
+					{ "seq": 1, "amount_minor": 400000, "paid_minor": 0 },
+					{ "seq": 2, "amount_minor": 400000, "paid_minor": 0 }
+				],
+				"amount": 400000
+			},
+			"expected": { "ok": true, "allocations": [{ "seq": 1, "amount_minor": 400000 }] }
+		},
+		{
+			"name": "less than an installment leaves it partial",
+			"input": {
+				"installments": [
+					{ "seq": 1, "amount_minor": 400000, "paid_minor": 0 },
+					{ "seq": 2, "amount_minor": 400000, "paid_minor": 0 }
+				],
+				"amount": 150000
+			},
+			"expected": { "ok": true, "allocations": [{ "seq": 1, "amount_minor": 150000 }] }
+		},
+		{
+			"name": "overflow spills to the next installments",
+			"input": {
+				"installments": [
+					{ "seq": 1, "amount_minor": 400000, "paid_minor": 0 },
+					{ "seq": 2, "amount_minor": 400000, "paid_minor": 0 },
+					{ "seq": 3, "amount_minor": 400000, "paid_minor": 0 }
+				],
+				"amount": 900000
+			},
+			"expected": {
+				"ok": true,
+				"allocations": [
+					{ "seq": 1, "amount_minor": 400000 },
+					{ "seq": 2, "amount_minor": 400000 },
+					{ "seq": 3, "amount_minor": 100000 }
+				]
+			}
+		},
+		{
+			"name": "starts at the oldest unpaid installment and completes a partial one",
+			"input": {
+				"installments": [
+					{ "seq": 1, "amount_minor": 333333, "paid_minor": 333333 },
+					{ "seq": 2, "amount_minor": 333333, "paid_minor": 100000 },
+					{ "seq": 3, "amount_minor": 333334, "paid_minor": 0 }
+				],
+				"amount": 300000
+			},
+			"expected": {
+				"ok": true,
+				"allocations": [
+					{ "seq": 2, "amount_minor": 233333 },
+					{ "seq": 3, "amount_minor": 66667 }
+				]
+			}
+		},
+		{
+			"name": "pays off the whole remaining balance",
+			"input": {
+				"installments": [
+					{ "seq": 1, "amount_minor": 333333, "paid_minor": 333333 },
+					{ "seq": 2, "amount_minor": 333333, "paid_minor": 1 },
+					{ "seq": 3, "amount_minor": 333334, "paid_minor": 0 }
+				],
+				"amount": 666666
+			},
+			"expected": {
+				"ok": true,
+				"allocations": [
+					{ "seq": 2, "amount_minor": 333332 },
+					{ "seq": 3, "amount_minor": 333334 }
+				]
+			}
+		},
+		{
+			"name": "one kuruş",
+			"input": {
+				"installments": [{ "seq": 1, "amount_minor": 1, "paid_minor": 0 }],
+				"amount": 1
+			},
+			"expected": { "ok": true, "allocations": [{ "seq": 1, "amount_minor": 1 }] }
+		},
+		{
+			"name": "more than the outstanding balance",
+			"input": {
+				"installments": [
+					{ "seq": 1, "amount_minor": 400000, "paid_minor": 400000 },
+					{ "seq": 2, "amount_minor": 400000, "paid_minor": 0 }
+				],
+				"amount": 400001
+			},
+			"expected": { "ok": false, "error": "amount_exceeds_outstanding" }
+		},
+		{
+			"name": "nothing left to pay",
+			"input": {
+				"installments": [{ "seq": 1, "amount_minor": 400000, "paid_minor": 400000 }],
+				"amount": 1
+			},
+			"expected": { "ok": false, "error": "amount_exceeds_outstanding" }
+		},
+		{
+			"name": "zero amount",
+			"input": {
+				"installments": [{ "seq": 1, "amount_minor": 400000, "paid_minor": 0 }],
+				"amount": 0
+			},
+			"expected": { "ok": false, "error": "invalid_amount" }
+		},
+		{
+			"name": "fractional amount",
+			"input": {
+				"installments": [{ "seq": 1, "amount_minor": 400000, "paid_minor": 0 }],
+				"amount": 10.5
+			},
+			"expected": { "ok": false, "error": "invalid_amount" }
+		}
+	]
+}

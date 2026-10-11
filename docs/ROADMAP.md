@@ -50,12 +50,13 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Spec:** 5.2 "Ödeme planı oluşturma kuralları", BR-03
 - **Not (2026-10-11):** `generatePlan` + `validatePlan` (eşit olmayan plan), result tipi ve hata kodları, en fazla 120 taksit (ADR-012). Ortak test vektörleri `packages/shared/test-vectors/plan.json` (plpgsql tarafı da kullanacak). fast-check 4.10 devDependency.
 
-### [ ] F1-03 Ödeme dağıtımı ve türetilmiş durumlar
+### [x] F1-03 Ödeme dağıtımı ve türetilmiş durumlar
 - `allocatePayment(installments, amount)` FIFO; kısmi; fazlası sonraki taksitlere; kalan borçtan fazlası hata.
 - `installmentStatus(installment, today)` → upcoming / due_today / overdue / partial / paid.
 - `outstanding(agreement, payments)`.
 - **Kabul:** Özellik testleri: dağıtım toplamı = ödeme; kalan hiç negatif değil.
 - **Spec:** 5.5 "Ödemenin taksitlere dağıtımı", 8.4, BR-04
+- **Not (2026-10-11):** `allocatePayment` result tipi (`invalid_amount`, `amount_exceeds_outstanding`), `installmentStatus` → `{ status, partial }`, `outstanding` + `reportedTotal` (ADR-013). Ortak vektörler `test-vectors/allocation.json`. Taksite yönlendirme yapılmadı (BACKLOG).
 
 ### [ ] F1-04 Zod şemaları ve domain tipleri
 - Agreement, Version terms, Installment, Payment, Contact girdileri için zod şemaları (form ve RPC ortak kullanacak).
