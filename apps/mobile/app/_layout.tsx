@@ -1,16 +1,72 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type Theme } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 
-import { ApiProvider } from "@/api/ApiProvider";
-import { useIsSignedIn } from "@/features/auth/sessionStore";
+import { ApiProvider, useAuthApi } from "@/api/ApiProvider";
+import { useIsSignedIn, useSession } from "@/features/auth/sessionStore";
 import { tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
 
 const detailHeader = { headerShown: true, title: "", headerShadowVisible: false };
 
+// Keep the native splash until the stored session has been checked (no flash of the welcome screen).
+void SplashScreen.preventAutoHideAsync();
+
+function AppNavigator() {
+	const auth = useAuthApi();
+	const signedIn = useIsSignedIn();
+	const restored = useSession((state) => state.restored);
+	const finishRestore = useSession((state) => state.finishRestore);
+
+	useEffect(() => {
+		if (restored) {
+			return;
+		}
+		// A broken stored session just means signing in again.
+		void auth
+			.restore()
+			.catch(() => null)
+			.then(finishRestore)
+			.finally(() => {
+				void SplashScreen.hideAsync();
+			});
+	}, [auth, restored, finishRestore]);
+
+	if (!restored) {
+		return null;
+	}
+	return (
+		<Stack screenOptions={{ headerShown: false }}>
+			<Stack.Protected guard={signedIn}>
+				<Stack.Screen name="(tabs)" />
+				<Stack.Screen name="new" options={{ presentation: "modal" }} />
+				<Stack.Screen name="agreement/[id]/index" options={detailHeader} />
+				<Stack.Screen
+					name="agreement/[id]/payment"
+					options={{ ...detailHeader, presentation: "modal" }}
+				/>
+				<Stack.Screen name="agreement/[id]/history" options={detailHeader} />
+				<Stack.Screen
+					name="agreement/[id]/share"
+					options={{ ...detailHeader, presentation: "modal" }}
+				/>
+				<Stack.Screen name="agreement/[id]/invite-preview" options={detailHeader} />
+				<Stack.Screen name="contact/[id]" options={detailHeader} />
+				<Stack.Screen
+					name="settings/index"
+					options={{ ...detailHeader, title: tr.settings.title }}
+				/>
+			</Stack.Protected>
+			<Stack.Protected guard={!signedIn}>
+				<Stack.Screen name="(auth)" />
+			</Stack.Protected>
+		</Stack>
+	);
+}
+
 export default function RootLayout() {
 	const { scheme, colors } = useAppTheme();
-	const signedIn = useIsSignedIn();
 	const base = scheme === "dark" ? DarkTheme : DefaultTheme;
 	const navigationTheme: Theme = {
 		...base,
@@ -27,31 +83,7 @@ export default function RootLayout() {
 	return (
 		<ApiProvider>
 			<ThemeProvider value={navigationTheme}>
-				<Stack screenOptions={{ headerShown: false }}>
-					<Stack.Protected guard={signedIn}>
-						<Stack.Screen name="(tabs)" />
-						<Stack.Screen name="new" options={{ presentation: "modal" }} />
-						<Stack.Screen name="agreement/[id]/index" options={detailHeader} />
-						<Stack.Screen
-							name="agreement/[id]/payment"
-							options={{ ...detailHeader, presentation: "modal" }}
-						/>
-						<Stack.Screen name="agreement/[id]/history" options={detailHeader} />
-						<Stack.Screen
-							name="agreement/[id]/share"
-							options={{ ...detailHeader, presentation: "modal" }}
-						/>
-						<Stack.Screen name="agreement/[id]/invite-preview" options={detailHeader} />
-						<Stack.Screen name="contact/[id]" options={detailHeader} />
-						<Stack.Screen
-							name="settings/index"
-							options={{ ...detailHeader, title: tr.settings.title }}
-						/>
-					</Stack.Protected>
-					<Stack.Protected guard={!signedIn}>
-						<Stack.Screen name="(auth)" />
-					</Stack.Protected>
-				</Stack>
+				<AppNavigator />
 				<StatusBar style="auto" />
 			</ThemeProvider>
 		</ApiProvider>

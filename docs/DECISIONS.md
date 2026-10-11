@@ -192,3 +192,14 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Kişi sıralaması `tr-TR-x-icu` harmanlamasıyla.
 	- `private.today()` testlerde `paramnet.today` ayarıyla sabitlenebilir; yalnızca oturum kullanıcısı `postgres` iken geçerli, API istekleri (`authenticator`) için etkisiz.
 	- Olay türleri `created`, `payment_recorded`, `updated`, `cancelled`, `settled`; mobil geçmiş ekranı F1-17'de `updated`/`cancelled`'ı da gösterecek.
+
+## ADR-023 — Gerçek auth (Supabase telefon OTP)
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- Bağımlılıklar: `@supabase/supabase-js 2.117.2` (sabit; daha yenisi 2 haftadan genç), `expo-secure-store` (SDK sürümü).
+	- Adaptör seçimi `EXPO_PUBLIC_API_MODE` (`mock` varsayılan | `supabase`) + `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_KEY` (yalnızca publishable/anon anahtar). `.env.example` commit'li, `.env.local` değil. Expo Go'dan yerel Supabase'e Mac'in LAN IP'siyle erişilir.
+	- Oturum SecureStore'da 1800 karakterlik parçalar halinde (`key.count` + `key.N`); bir parça eksikse oturum yok sayılır. Token yenileme yalnızca uygulama öndeyken (AppState).
+	- Açılışta `AuthApi.restore()`; sonuç gelene kadar native splash açık kalır. Profili olmayan oturum profil adımından devam eder.
+	- Profil `complete_profile(display_name, kvkk_version, terms_version)` security definer RPC'siyle; numara `auth.users`'tan alınır, istemciden değil. Onay sürümleri `src/lib/legal.ts` (`2026-10`).
+	- GoTrue hata eşlemesi: `otp_expired` (yanlış ve süresi dolmuş kod aynı yanıt) → `otp_invalid`; `over_sms_send_rate_limit` → `rate_limited`. RPC hataları `P0001` + mesaj kodu → `ApiError`.
+	- Test notu: `jest.setup` `ApiProvider` üzerinden `secureStorage`'ı önceden yüklediği için modül mock'u gereken testler `jest.isolateModules` kullanır.

@@ -4,19 +4,26 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import type { AgreementsApi } from "./AgreementsApi";
 import type { AuthApi } from "./auth/AuthApi";
 import { createMockAuthApi } from "./auth/mockAuth";
+import { createSupabaseAuthApi } from "./auth/supabaseAuth";
 import { createMockApi } from "./mock/mockApi";
+import { readConfig } from "@/lib/config";
+import { getSupabase } from "@/lib/supabase";
 
 type Apis = { agreements: AgreementsApi; auth: AuthApi };
 
 const ApiContext = createContext<Apis | null>(null);
 
-// Only the mock adapters exist until F1-16/F1-17; EXPO_PUBLIC_API_MODE=supabase will select the real ones.
+// EXPO_PUBLIC_API_MODE selects the adapters (paramnet-mobile skill); the agreements adapter for
+// Supabase arrives in F1-17.
 export function createApi(): AgreementsApi {
 	return createMockApi();
 }
 
 export function createAuthApi(): AuthApi {
-	return createMockAuthApi();
+	const config = readConfig();
+	return config.mode === "supabase"
+		? createSupabaseAuthApi(getSupabase(config.supabaseUrl, config.supabaseKey))
+		: createMockAuthApi();
 }
 
 export function createQueryClient(): QueryClient {

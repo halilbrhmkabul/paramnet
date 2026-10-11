@@ -135,9 +135,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** pgTAP + performans için indeks kontrolü.
 - **Not (2026-10-11):** `get_dashboard`, `get_calendar`, `get_agreement_detail`, `list_contacts_with_balance` + `get_contact_detail` (mobil `getContact` için). Mobil görünüm modelleriyle birebir JSON; rol ve karşı taraf çağıranın bakış açısından. pgTAP 35 test, mobil sahte adaptörün demo verisiyle aynı sayılar; okuma indeksleri doğrulandı (ADR-022).
 
-### [ ] F1-16 Gerçek auth
+### [x] F1-16 Gerçek auth
 - Supabase telefon OTP (yerelde test numaraları), oturumun SecureStore'da saklanması, profil oluşturma, KVKK onayı kaydı (`consents`).
 - **Kabul:** Simülatörde gerçek yerel auth ile giriş/çıkış.
+- **Not (2026-10-11):** `EXPO_PUBLIC_API_MODE=supabase` ile Supabase telefon OTP; oturum SecureStore'da parçalı (`chunkedSecureStorage`), açılışta geri yüklenir (splash açık kalır); `complete_profile` RPC profil + KVKK/koşullar onayı (`consents`). OTP/RPC protokolü yerel Supabase'e karşı Node ile doğrulandı; adaptör birim testli. **Cihazda doğrulanmadı:** `.env.local` ile Expo Go'da `+905550000001` / `123456` giriş-çıkış elle denenmeli (ADR-023).
 
 ### [ ] F1-17 Sahte adaptörü gerçeğiyle değiştir
 - `src/api` gerçek Supabase RPC adaptörü; hata eşleme (409 conflict → yeniden çek), çevrimdışı davranış (yazma butonları devre dışı).

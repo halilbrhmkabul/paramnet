@@ -1,7 +1,10 @@
 import { Redirect } from "expo-router";
 
-import { useIsSignedIn } from "@/features/auth/sessionStore";
+import { useIsSignedIn, useSession } from "@/features/auth/sessionStore";
 
 export default function Index() {
-	return <Redirect href={useIsSignedIn() ? "/(tabs)" : "/welcome"} />;
+	const signedIn = useIsSignedIn();
+	// A verified number without a profile (e.g. restored session) continues at the profile step.
+	const needsProfile = useSession((state) => state.user !== null && !state.onboarded);
+	return <Redirect href={signedIn ? "/(tabs)" : needsProfile ? "/profile" : "/welcome"} />;
 }

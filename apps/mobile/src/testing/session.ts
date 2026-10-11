@@ -5,5 +5,6 @@ export function signInForTest(): void {
 		user: { id: "u-test", phone_e164: "+905550000001", display_name: "Test" },
 		pendingPhone: null,
 		onboarded: true,
+		restored: true,
 	});
 }
