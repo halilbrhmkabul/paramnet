@@ -223,3 +223,14 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Edge function'ın saf mantığı `supabase/functions/_shared` altında (Deno API'si yok); `packages/shared` Vitest ile test eder. Giriş dosyaları (`*/index.ts`) ESLint dışında; yerelde `supabase functions serve` ile denenir. Deno yerelde kurulu değil.
 	- Kapsam dışı (BACKLOG): anlaşma bazında hatırlatma kapatma, Expo push receipt kontrolü.
 - **Ek (2026-10-11):** Expo Go'nun Android sürümünde (SDK 53+) `expo-notifications` içe aktarıldığı anda hata atıyor ve onu içe aktaran rotaları (`_layout`, bildirim ve ayarlar ekranları) düşürüyordu. Modül artık yalnızca `src/lib/notifications.ts` içinde, ilk ihtiyaçta `require` ile yükleniyor; Android'de Expo Go'da hiç yüklenmiyor ve bildirimler sessizce kapalı kalıyor (izin "denied", token yok). Testi `notificationsLoader.test.ts`.
+
+## ADR-026 — Davet altyapısı
+- **Tarih:** 2026-10-12
+- **Karar:**
+	- Token: `gen_random_bytes(32)` → base64url (43 karakter, `=` yok). Saklanan: `sha256(utf8(token))` (bytea, tekil). Düz token yalnızca `share_agreement` yanıtında; DB'de, olaylarda, loglarda yok.
+	- `share_agreement(id, phone, row_version)`: yalnızca oluşturan, yalnızca `personal` iken; numara `normalizePhoneTR` ile aynı kuralla normalize edilir, kendi numarası reddedilir (BR-12). Kişinin numarası yoksa paylaşılan numara yazılır ve kayıtlı bir profile aitse bağlanır. Davet 7 gün geçerli; anlaşma `pending`, `pending_version = active_version`, olay `shared`.
+	- `withdraw_share(id)` (skill imzası; row_version yok): `pending`/`countered` → `personal`, aktif davetler `revoked`, olay `share_withdrawn`.
+	- `private.expire_invites(now)` saatlik pg_cron: süresi dolan aktif davet `expired`, bekleyen anlaşma `personal`, sistem olayı `invite_expired`.
+	- Yanıt beklenirken (`pending`) ödeme, düzenleme, yeniden paylaşım yapılamaz (durum makinesinde tanımlı değil).
+	- Düzeltme: F1-14'teki `lock_personal_agreement` `not (a or NULL)` yüzünden paylaşılmış ama kabul edilmemiş anlaşmada yabancıya `forbidden` dönüyordu; `private.is_party` null-güvenli kontrolüyle `not_found` döner (yeni migration'da `create or replace`).
+- **Açık soru:** Mobil S11'de `pending` için birincil aksiyon "Hatırlat / Linki tekrar paylaş". Token saklanmadığı için tekrar paylaşım yeni token (eskisini `revoked`) demek; bu `pending → pending` geçişi durum makinesinde yok. Eklenmeli mi?

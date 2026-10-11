@@ -323,6 +323,54 @@ export type Database = {
 					},
 				];
 			};
+			invites: {
+				Row: {
+					agreement_id: string;
+					consumed_at: string | null;
+					created_at: string;
+					expires_at: string;
+					id: string;
+					otp_attempts: number;
+					status: Database["public"]["Enums"]["invite_status"];
+					target_phone_e164: string;
+					token_hash: string;
+					version: number;
+				};
+				ComputedFields: never;
+				Insert: {
+					agreement_id: string;
+					consumed_at?: string | null;
+					created_at?: string;
+					expires_at: string;
+					id?: string;
+					otp_attempts?: number;
+					status?: Database["public"]["Enums"]["invite_status"];
+					target_phone_e164: string;
+					token_hash: string;
+					version: number;
+				};
+				Update: {
+					agreement_id?: string;
+					consumed_at?: string | null;
+					created_at?: string;
+					expires_at?: string;
+					id?: string;
+					otp_attempts?: number;
+					status?: Database["public"]["Enums"]["invite_status"];
+					target_phone_e164?: string;
+					token_hash?: string;
+					version?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "invites_agreement_id_version_fkey";
+						columns: ["agreement_id", "version"];
+						isOneToOne: false;
+						referencedRelation: "agreement_versions";
+						referencedColumns: ["agreement_id", "version"];
+					},
+				];
+			};
 			notification_outbox: {
 				Row: {
 					attempts: number;
@@ -627,11 +675,16 @@ export type Database = {
 				Returns: Json;
 			};
 			register_push_token: { Args: { p_platform: string; p_token: string }; Returns: Json };
+			share_agreement: {
+				Args: { p_id: string; p_phone: string; p_row_version: number };
+				Returns: Json;
+			};
 			unregister_push_token: { Args: { p_token: string }; Returns: Json };
 			update_personal_agreement: {
 				Args: { p_id: string; p_row_version: number; p_terms: Json };
 				Returns: Json;
 			};
+			withdraw_share: { Args: { p_id: string }; Returns: Json };
 		};
 		Enums: {
 			agreement_kind: "loan" | "installment_purchase";
