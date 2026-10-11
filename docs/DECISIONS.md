@@ -162,3 +162,11 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Tüm yabancı anahtarlar indeksli (pgTAP genel kontrolü); hatırlatma ve outbox için kısmi indeksler.
 	- `invites` ve `rate_limits` Faz 2'de (F2-01) eklenecek; `invite_status` enum'u şimdiden var.
 	- RLS her tabloda açık, politika yok; varsayılan Supabase tablo yetkileri F1-13'te daraltılacak.
+
+## ADR-020 — RLS ve tablo yetkileri
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- Supabase'in varsayılan geniş yetkileri kaldırıldı: `anon` hiçbir tabloya erişemez; `authenticated` yalnızca SELECT alır (profiles, contacts, agreements, agreement_versions, installments, payments, payment_allocations, agreement_events, consents). `reminders`, `notification_outbox`, `push_tokens` istemciye tamamen kapalı. `alter default privileges` ile sonraki tablolar/fonksiyonlar da kapalı başlar; her migration ihtiyacını açıkça `grant` eder.
+	- Görünürlük: oluşturan her zaman; karşı taraf yalnızca `status <> 'personal'` iken (BR: kişisel mod yalnızca oluşturana). Alt tablolar `private.can_view_agreement(uuid)` (security definer, `private` şeması Data API'de yok) ile; `auth.uid()` `(select …)` içinde.
+	- `profiles` yalnızca kendisi. schema.md'deki "ortak anlaşması olanların adı (görünüm)" yerine karşı tarafın adı okuma RPC'lerinden (F1-15) gelir: security definer view açmaktan daha dar yüzey.
+	- Not: `supabase migration new` stdin açıkken içerik bekler; betiklerde `< /dev/null` ile çağrılmalı.
