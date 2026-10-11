@@ -73,6 +73,7 @@ export type EventView = {
 
 export type AgreementDetail = AgreementSummary & {
 	description: string | null;
+	started_on: IsoDate | null;
 	notes: string | null;
 	down_payment_minor: number;
 	created_at: string;

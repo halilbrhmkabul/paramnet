@@ -11,6 +11,7 @@ const furniture: CreateAgreementInput = {
 	creator_role: "debtor",
 	title: "Mobilya",
 	description: null,
+	started_on: null,
 	counterparty: { contact: { display_name: "Kaya Mobilya", phone_e164: null, kind: "merchant" } },
 	terms: {
 		principal_minor: 2800000,
@@ -30,7 +31,7 @@ describe("mock createAgreement", () => {
 	it("creates a personal agreement with its plan, a confirmed down payment and a new contact", async () => {
 		const api = createMockApi({ now, seed: "empty", latencyMs: 0 });
 		const { agreement_id, replayed } = await api.createAgreement(
-			furniture,
+			{ ...furniture, started_on: "2026-10-01" },
 			"11111111-1111-4111-8111-111111111111",
 		);
 		expect(replayed).toBe(false);
@@ -40,6 +41,7 @@ describe("mock createAgreement", () => {
 			status: "personal",
 			my_role: "debtor",
 			title: "Mobilya",
+			started_on: "2026-10-01",
 			principal_minor: 2800000,
 			outstanding_minor: 2000000,
 			down_payment_minor: 800000,

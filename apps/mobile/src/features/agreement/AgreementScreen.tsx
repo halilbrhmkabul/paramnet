@@ -139,6 +139,21 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 						testID="agreement.total.text"
 					/>
 				</View>
+				{agreement.started_on === null ? null : (
+					<View style={styles.rowBetween}>
+						<Text style={[typography.caption, { color: colors.textMuted }]}>
+							{agreement.my_role === "creditor"
+								? tr.new.startedOnLent
+								: tr.new.startedOnBorrowed}
+						</Text>
+						<Text
+							testID="agreement.startedOn.text"
+							style={[typography.callout, { color: colors.text }]}
+						>
+							{formatDateTR(agreement.started_on, "long")}
+						</Text>
+					</View>
+				)}
 				{agreement.status === "personal" ? (
 					<Text style={[typography.caption, { color: colors.textMuted }]}>
 						{tr.agreement.personalBadge}

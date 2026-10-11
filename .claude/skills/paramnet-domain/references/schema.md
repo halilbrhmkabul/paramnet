@@ -50,6 +50,7 @@ create type event_channel    as enum ('app','web','system');
 | kind | agreement_kind | |
 | title | text not null | |
 | description | text null | |
+| started_on | date null | Verildiği/alındığı tarih (ADR-019) |
 | currency | char(3) default 'TRY' | Değişmez |
 | principal_minor | bigint check > 0 | |
 | outstanding_minor | bigint check >= 0 | Önbellek; ödemelerden doğrulanır |

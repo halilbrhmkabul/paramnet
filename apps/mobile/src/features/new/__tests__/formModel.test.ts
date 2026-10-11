@@ -93,6 +93,7 @@ describe("planFromValues / toCreateInput", () => {
 		const input = toCreateInput("boughtInstallment", furniture, plan);
 		expect(createAgreementInputSchema.safeParse(input).success).toBe(true);
 		expect(input).toMatchObject({
+			started_on: null,
 			kind: "installment_purchase",
 			creator_role: "debtor",
 			title: "Mobilya",
@@ -115,6 +116,7 @@ describe("planFromValues / toCreateInput", () => {
 			kind: "loan",
 			creator_role: "creditor",
 			title: "Borç",
+			started_on: "2026-10-11",
 			terms: { principal_minor: 1000000, down_payment_minor: 0, notes: "Tatil" },
 		});
 	});

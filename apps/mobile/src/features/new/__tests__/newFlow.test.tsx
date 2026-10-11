@@ -130,6 +130,7 @@ describe("new record flow (S08–S10)", () => {
 			expect(screen.getByText("Elif Kaya")).toBeTruthy();
 		});
 		await fireEvent.press(screen.getByText("Elif Kaya"));
+		expect(screen.getByTestId("newForm.startedOn")).toHaveTextContent("11 Ekim 2026");
 		await fireEvent.changeText(screen.getByTestId("newForm.amount.input"), "2500");
 		await fireEvent.press(screen.getByTestId("newForm.noDueDate.checkbox"));
 		expect(screen.getByTestId("newForm.dueDate")).toHaveTextContent(tr.new.noDueDate);
@@ -141,5 +142,6 @@ describe("new record flow (S08–S10)", () => {
 		await waitFor(() => {
 			expect(screen.getByTestId("agreement.title.text")).toHaveTextContent(tr.new.loanTitle);
 		});
+		expect(screen.getByTestId("agreement.startedOn.text")).toHaveTextContent("11 Ekim 2026");
 	});
 });

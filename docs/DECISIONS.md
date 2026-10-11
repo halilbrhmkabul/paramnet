@@ -151,3 +151,14 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Taksit durumu `{ status, partial }` rozetle; ilerleme çubuğu `accessibilityRole="progressbar"` + yüzde.
 	- Olay zamanları `formatDateTimeTR` (shared, sabit +03:00).
 	- Kapsam dışı: dekont yükleme (Storage gerektirir) ve ödeme sonrası haptic — BACKLOG.
+
+## ADR-019 — Çekirdek şema ve `started_on`
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- `agreements.started_on date null` eklendi (kullanıcı kararı): spec 5.2 formundaki "verildiği / alındığı tarih". Şartların (terms) parçası değil, `terms_hash`'e girmez. Giriş şemasında isteğe bağlı (yoksa `null`); mobil formda yalnızca borç türlerinde, varsayılan bugün; taksitli türlerde `null`.
+	- Telefon sütunları `phone_tr` domain'i (`^\+905[0-9]{9}$`), ADR-014 ile aynı kural.
+	- Tutarlılık kısıtları DB'de: `outstanding ≤ principal`, `status = settled ⇔ settled_at`, `status = cancelled ⇔ cancelled_at`, `counterparty_profile_id ≠ creator_id` (BR-12), `currency = 'TRY'` (BR-02), `paid ≤ amount`, `decided_by ⇔ decided_at`, metin uzunlukları zod sınırlarıyla aynı.
+	- Yalnızca ekleme (BR-13): `agreement_events` güncellenemez/silinemez; `agreement_versions` silinemez ve yalnızca `status` değişebilir (tetikleyici, `P0001`). Hesap silme anonimleştirmesi F3-03'te ayrı bir yolla ele alınacak.
+	- Tüm yabancı anahtarlar indeksli (pgTAP genel kontrolü); hatırlatma ve outbox için kısmi indeksler.
+	- `invites` ve `rate_limits` Faz 2'de (F2-01) eklenecek; `invite_status` enum'u şimdiden var.
+	- RLS her tabloda açık, politika yok; varsayılan Supabase tablo yetkileri F1-13'te daraltılacak.

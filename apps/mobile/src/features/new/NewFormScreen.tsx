@@ -177,6 +177,24 @@ function NewForm({ type }: { type: NewType }) {
 				/>
 			) : null}
 
+			{config.purchase ? null : (
+				<Controller
+					control={control}
+					name="started_on"
+					render={({ field }) => (
+						<DateField
+							label={
+								type === "lent" ? tr.new.startedOnLent : tr.new.startedOnBorrowed
+							}
+							value={field.value}
+							onChange={field.onChange}
+							defaultPickerDate={today}
+							testID="newForm.startedOn"
+						/>
+					)}
+				/>
+			)}
+
 			<Controller
 				control={control}
 				name="amount_minor"
