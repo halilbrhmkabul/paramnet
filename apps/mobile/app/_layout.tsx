@@ -1,14 +1,34 @@
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type Theme } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "react-native";
+
+import { ApiProvider } from "@/api/ApiProvider";
+import { useAppTheme } from "@/theme/useAppTheme";
 
 export default function RootLayout() {
-	const colorScheme = useColorScheme();
+	const { scheme, colors } = useAppTheme();
+	const base = scheme === "dark" ? DarkTheme : DefaultTheme;
+	const navigationTheme: Theme = {
+		...base,
+		colors: {
+			...base.colors,
+			primary: colors.primary,
+			background: colors.bg,
+			card: colors.bg,
+			text: colors.text,
+			border: colors.border,
+		},
+	};
 
 	return (
-		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-			<Stack screenOptions={{ headerShown: false }} />
-			<StatusBar style="auto" />
-		</ThemeProvider>
+		<ApiProvider>
+			<ThemeProvider value={navigationTheme}>
+				<Stack screenOptions={{ headerShown: false }}>
+					<Stack.Screen name="(tabs)" />
+					<Stack.Screen name="(auth)" />
+					<Stack.Screen name="new" options={{ presentation: "modal" }} />
+				</Stack>
+				<StatusBar style="auto" />
+			</ThemeProvider>
+		</ApiProvider>
 	);
 }

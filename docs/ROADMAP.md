@@ -68,13 +68,14 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 
 ## Faz 1B — Mobil prototip (sahte veri)
 
-### [ ] F1-05 Mobil temel yapı
+### [x] F1-05 Mobil temel yapı
 - Expo Router: `(auth)` ve `(tabs)` grupları, 4 sekme + ortada "+" butonu.
 - Tema: `paramnet-mobile/references/design-tokens.md`'deki token'lar, açık/koyu tema.
 - `src/i18n/tr.ts` (copy-tr.md'den), `src/api/` katmanı: **arayüz + sahte adaptör** (bellek içi örnek veri), TanStack Query hook'ları.
 - Ortak bileşenler: Button, AmountText, AmountInput, Card, StatusBadge, EmptyState, ErrorState, ListItem.
 - **Kabul:** Uygulama açılıyor, sekmeler arası geçiş, açık/koyu tema; bileşenlerin RNTL testleri.
 - **Skill:** paramnet-mobile, expo (expo-router, expo-native-ui), platform-design-skills
+- **Not (2026-10-11):** Rotalar `(auth)`, `(tabs)` (4 sekme + ortada "+" → `new` modal), sekme ekranları iskelet; Talepler Faz 1 boş durumu. `src/theme` (token + `useAppTheme`), `src/i18n/tr.ts` + `fill`, `src/api` (arayüz, bugüne göre tohumlanan sahte adaptör, TanStack Query hook'ları, `errors.ts`), bileşenler + `LoadingState`, `Screen`, `ScreenTitle`. Shared'a `formatDateTR`, `monthOf`, `daysOfMonth`, `isoWeekday`. iOS/Android bundle ve expo-doctor 21/21 (ADR-015).
 
 ### [ ] F1-06 Kayıt ve giriş ekranları (S01–S04) — sahte auth
 - Karşılama, telefon, OTP (sahte doğrulama), profil + bildirim izni ekranı.

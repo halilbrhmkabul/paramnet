@@ -109,3 +109,14 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- `termsSchema` strict (bilinmeyen anahtar yok; hash her şeyi kapsar), seq 1..n sıralı, BR-03 ve plan kuralları `validatePlan` ile.
 	- `termsHash(terms)` = SHA-256(UTF-8(kanonik JSON)) küçük harf hex. Kanonik JSON: anahtarlar sıralı, boşluk yok, string kaçışı `JSON.stringify` ile aynı, yalnızca güvenli tam sayı; boolean/ondalık/undefined hata. plpgsql `jsonb::text` kullanamaz (boşluk ekler, anahtarları önce uzunluğa göre sıralar); string'i elle kurmalı. Vektörler `test-vectors/terms-hash.json` (kanonik string'ler elle yazıldı, hash'ler Python hashlib ile).
 - **Açık soru:** Spec 5.2 "verildiği/alındığı tarih" alanı istiyor, şemada karşılığı yok. F1-12 migration'ından önce `agreements.started_on date` gibi bir sütun eklenip eklenmeyeceğine karar verilmeli; şimdilik giriş şemasında yok.
+
+## ADR-015 — Mobil temel yapı
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- Bağımlılıklar: `@tanstack/react-query ~5.103.3` (spec 9.1; en yeni sürüm 2 haftadan genç olduğu için bir önceki), `expo-crypto` (Hermes'te `crypto.randomUUID` yok; idempotency anahtarı için, F1-07'de kullanılacak), `@expo/vector-icons` + `expo-font` (tek ikon seti, Expo Go'da çalışır; expo-doctor peer uyarısı). Zustand ilk yerel UI durumu gerektiğinde (F1-07) eklenecek.
+	- Tema: `src/theme/tokens.ts` tek kaynak; `useAppTheme()` sistem açık/koyu temasını izler; navigasyon teması token'lardan.
+	- API: `AgreementsApi` arayüzü görünüm modelleri döndürür (türetilmiş taksit durumu, kalan, işaretli kişi bakiyesi). Sahte adaptör tohum verisini **bugüne göre** üretir (gecikmiş, bugün, yaklaşan her zaman görünür), domain hesaplarını yalnızca `@paramnet/shared`'dan yapar, varsayılan 300 ms gecikme ekler, dönen nesneleri JSON kopyasıyla verir. Seçim `createApi()` içinde; Supabase adaptörü F1-17'de.
+	- `AmountInput` yazılan metni yerel tutar, dışarıya yalnızca kuruş tam sayı verir; `.` binlik ayraç, ama sona tek `.` yazılırsa (TR dışı klavye) ondalık sayılır. Tam sayı kısmı 13 haneyle sınırlı (güvenli tam sayı).
+	- Tarih gösterimi (`10 Kas 2026`, `10 Kasım 2026`) `packages/shared` `formatDateTR` ile, Intl'siz (ADR-010 ile aynı gerekçe).
+	- Kök `index` şimdilik `(tabs)`'a yönlendirir; oturum kontrolü F1-06'da.
+	- Testler: `src/testing/providers.tsx` (sabit saat 2026-10-11, gecikmesiz sahte adaptör, `gcTime: Infinity` — aksi halde React Query zamanlayıcısı Jest'i açık tutar). RNTL 14'te `fireEvent` beklenir (`await`).

@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { addDays, addMonthsClamped, isIsoDate, todayInIstanbul } from "./dates";
+import {
+	addDays,
+	addMonthsClamped,
+	daysOfMonth,
+	formatDateTR,
+	isIsoDate,
+	isoWeekday,
+	monthOf,
+	todayInIstanbul,
+} from "./dates";
 
 describe("isIsoDate", () => {
 	it.each(["2026-10-11", "2028-02-29", "2000-02-29", "2026-12-31", "2026-01-01"])(
@@ -116,5 +125,35 @@ describe("todayInIstanbul", () => {
 
 	it("rejects an invalid Date", () => {
 		expect(() => todayInIstanbul(new Date(Number.NaN))).toThrow(RangeError);
+	});
+});
+
+describe("formatDateTR", () => {
+	it.each([
+		["2026-11-10", "short", "10 Kas 2026"],
+		["2026-11-10", "long", "10 Kasım 2026"],
+		["2027-01-01", "short", "1 Oca 2027"],
+		["2028-02-29", "long", "29 Şubat 2028"],
+		["2026-08-31", "short", "31 Ağu 2026"],
+		["2026-08-31", "dayMonth", "31 Ağustos"],
+	] as const)("formats %s as %s", (date, style, expected) => {
+		expect(formatDateTR(date, style)).toBe(expected);
+	});
+
+	it("rejects an invalid date", () => {
+		expect(() => formatDateTR("2026-02-30", "short")).toThrow(RangeError);
+	});
+});
+
+describe("monthOf / daysOfMonth", () => {
+	it("returns the first day of the month and lists every day", () => {
+		expect(monthOf("2028-02-17")).toBe("2028-02-01");
+		expect(daysOfMonth("2028-02-01")).toHaveLength(29);
+		expect(daysOfMonth("2027-02-01").at(-1)).toBe("2027-02-28");
+	});
+
+	it("isoWeekday is Monday = 1 … Sunday = 7", () => {
+		expect(isoWeekday("2026-10-11")).toBe(7);
+		expect(isoWeekday("2026-10-12")).toBe(1);
 	});
 });
