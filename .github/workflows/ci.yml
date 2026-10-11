@@ -75,7 +75,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # Auth (phone OTP test numbers), PostgREST and Kong are needed; the rest is skipped to save time.
       - run: pnpm supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
-      # The mobile adapters against the real stack (apps/mobile/src/api/__tests__/*.integration.test.ts).
+      # Invite edge functions with local-only settings (no real secrets), then wait until they answer.
+      - run: |
+          nohup pnpm supabase functions serve --env-file supabase/functions/.env.example > /tmp/functions.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf "http://127.0.0.1:54321/functions/v1/invite-open?token=x" > /dev/null && exit 0
+            sleep 2
+          done
+          cat /tmp/functions.log
+          exit 1
+      # The mobile adapters and the invite flow against the real stack (*.integration.test.ts).
       - run: |
           eval "$(pnpm --silent supabase status -o env)"
           PARAMNET_SUPABASE_URL="$API_URL" PARAMNET_SUPABASE_KEY="$PUBLISHABLE_KEY" PARAMNET_REQUIRE_INTEGRATION=1 \

@@ -1,5 +1,6 @@
 {
 	// Lets ESLint type-check the Deno-free helpers; packages/shared typechecks and tests them too.
 	"extends": "../../../tsconfig.base.json",
-	"include": ["*.ts"]
+	"include": ["*.ts"],
+	"exclude": ["server.ts"]
 }
