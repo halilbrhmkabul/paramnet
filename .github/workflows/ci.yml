@@ -57,3 +57,26 @@ jobs:
       # Yalnızca Postgres; pgTAP için Auth/Storage konteynerleri gerekmez.
       - run: pnpm supabase db start
       - run: pnpm db:test
+
+  integration:
+    name: integration (local Supabase)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      # Auth (phone OTP test numbers), PostgREST and Kong are needed; the rest is skipped to save time.
+      - run: pnpm supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      # The mobile adapters against the real stack (apps/mobile/src/api/__tests__/*.integration.test.ts).
+      - run: |
+          eval "$(pnpm --silent supabase status -o env)"
+          PARAMNET_SUPABASE_URL="$API_URL" PARAMNET_SUPABASE_KEY="$PUBLISHABLE_KEY" PARAMNET_REQUIRE_INTEGRATION=1 \
+            pnpm --filter mobile test:integration

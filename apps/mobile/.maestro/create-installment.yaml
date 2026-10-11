@@ -1,0 +1,47 @@
+# Taksitle aldım: 28.000 / 8.000 peşinat / 5 taksit → plan önizleme değerleri → kayıt
+appId: com.paramnet.app
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    id: tabs.new.button
+- tapOn:
+    id: new.type.boughtInstallment
+- tapOn:
+    id: newForm.contact.picker
+- tapOn:
+    id: contactPicker.manual.button
+- tapOn:
+    id: contactPicker.manualName.input
+- inputText: "Maestro Mobilya"
+- tapOn:
+    id: contactPicker.manualSave.button
+- tapOn:
+    id: newForm.title.input
+- inputText: "Mobilya"
+- tapOn:
+    id: newForm.amount.input
+- inputText: "28000"
+- tapOn:
+    id: newForm.downPayment.input
+- inputText: "8000"
+- tapOn:
+    id: newForm.count.input
+- eraseText: 3
+- inputText: "5"
+- tapOn:
+    id: newForm.submit.button
+- assertVisible:
+    id: plan.screen
+- assertVisible:
+    id: plan.remaining.text
+    text: "20.000,00 TL"
+- assertVisible:
+    id: plan.row.5.amount.input
+    text: "4.000"
+- tapOn:
+    id: plan.save.button
+- extendedWaitUntil:
+    visible:
+      id: agreement.outstanding.text
+    timeout: 10000
+- assertVisible: "20.000,00 TL"

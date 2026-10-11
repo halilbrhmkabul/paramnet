@@ -18,6 +18,13 @@ const rawUrl: unknown = process.env.PARAMNET_SUPABASE_URL;
 const rawKey: unknown = process.env.PARAMNET_SUPABASE_KEY;
 const url = typeof rawUrl === "string" ? rawUrl : undefined;
 const key = typeof rawKey === "string" ? rawKey : undefined;
+// CI sets this so a missing URL/key fails the job instead of silently skipping every test.
+const required: unknown = process.env.PARAMNET_REQUIRE_INTEGRATION;
+if (required === "1" && (url === undefined || key === undefined)) {
+	throw new Error(
+		"PARAMNET_REQUIRE_INTEGRATION=1 but PARAMNET_SUPABASE_URL / PARAMNET_SUPABASE_KEY are missing",
+	);
+}
 const describeLocal = url !== undefined && key !== undefined ? describe : describe.skip;
 
 describeLocal("Supabase adapters against local Supabase (F1-17)", () => {

@@ -1,0 +1,30 @@
+# Kısmi ödeme → taksit "Kısmen ödendi" → kalanın tamamı → Kapandı
+appId: com.paramnet.app
+---
+- runFlow: create-loan.yaml
+- tapOn:
+    id: agreement.primaryAction.button
+- tapOn:
+    id: payment.amount.input
+- inputText: "1000"
+- tapOn:
+    id: payment.save.button
+- extendedWaitUntil:
+    visible:
+      id: agreement.outstanding.text
+      text: "1.500,00 TL"
+    timeout: 10000
+- assertVisible: ".*Kısmen ödendi.*"
+- tapOn:
+    id: agreement.primaryAction.button
+- tapOn:
+    id: payment.amount.input
+- inputText: "1500"
+- tapOn:
+    id: payment.save.button
+- extendedWaitUntil:
+    visible: "Tebrikler, bu plan tamamlandı!"
+    timeout: 10000
+- assertVisible:
+    id: agreement.status.badge
+    text: "Kapandı"

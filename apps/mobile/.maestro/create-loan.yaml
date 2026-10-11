@@ -1,0 +1,34 @@
+# Borç verdim, tek seferlik, vadesiz → detay
+appId: com.paramnet.app
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    id: tabs.new.button
+- tapOn:
+    id: new.type.lent
+- tapOn:
+    id: newForm.contact.picker
+- tapOn:
+    id: contactPicker.manual.button
+- tapOn:
+    id: contactPicker.manualName.input
+- inputText: "Maestro Borç"
+- tapOn:
+    id: contactPicker.manualSave.button
+- tapOn:
+    id: newForm.amount.input
+- inputText: "2500"
+- tapOn:
+    id: newForm.noDueDate.checkbox
+- tapOn:
+    id: newForm.submit.button
+- assertVisible:
+    id: plan.screen
+- tapOn:
+    id: plan.save.button
+- extendedWaitUntil:
+    visible:
+      id: agreement.outstanding.text
+    timeout: 10000
+- assertVisible: "2.500,00 TL"
+- assertVisible: "Kişisel"
