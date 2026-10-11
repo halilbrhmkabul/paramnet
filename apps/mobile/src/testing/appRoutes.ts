@@ -12,8 +12,11 @@ import Contacts from "../../app/(tabs)/contacts";
 import Home from "../../app/(tabs)/index";
 import Requests from "../../app/(tabs)/requests";
 import Index from "../../app/index";
+import AgreementDetail from "../../app/agreement/[id]/index";
 import NewLayout from "../../app/new/_layout";
+import NewForm from "../../app/new/form";
 import NewIndex from "../../app/new/index";
+import NewPlan from "../../app/new/plan";
 
 // Every route of the app for expo-router's renderRouter; extend when a route file is added.
 export const appRoutes = {
@@ -33,4 +36,7 @@ export const appRoutes = {
 	"(tabs)/requests": Requests,
 	"new/_layout": NewLayout,
 	"new/index": NewIndex,
+	"new/form": NewForm,
+	"new/plan": NewPlan,
+	"agreement/[id]/index": AgreementDetail,
 };

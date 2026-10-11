@@ -1,5 +1,5 @@
-import type { IsoDate } from "@paramnet/shared";
-import { useQuery } from "@tanstack/react-query";
+import type { CreateAgreementInput, IsoDate } from "@paramnet/shared";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useApi } from "./ApiProvider";
 
@@ -34,4 +34,20 @@ export function useAgreement(id: string) {
 export function useCalendar(month: IsoDate) {
 	const api = useApi();
 	return useQuery({ queryKey: queryKeys.calendar(month), queryFn: () => api.getCalendar(month) });
+}
+
+export function useCreateAgreement() {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			input,
+			idempotencyKey,
+		}: {
+			input: CreateAgreementInput;
+			idempotencyKey: string;
+		}) => api.createAgreement(input, idempotencyKey),
+		// A new agreement changes the dashboard, contacts and calendar at once.
+		onSuccess: () => queryClient.invalidateQueries(),
+	});
 }
