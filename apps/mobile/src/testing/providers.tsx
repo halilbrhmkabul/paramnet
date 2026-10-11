@@ -22,6 +22,19 @@ export function createTestApi(options: MockApiOptions = {}) {
 	return createMockApi({ now: TEST_NOW, latencyMs: 0, ...options });
 }
 
+let nextApi: ReturnType<typeof createMockApi> | null = null;
+
+// renderRouter builds the real root layout; this hands its ApiProvider a prepared adapter (e.g. a failing one).
+export function provideTestApi(api: ReturnType<typeof createMockApi>): void {
+	nextApi = api;
+}
+
+export function takeTestApi(): ReturnType<typeof createMockApi> {
+	const api = nextApi ?? createTestApi();
+	nextApi = null;
+	return api;
+}
+
 // Real clock on purpose: expiry tests move it with jest fake timers.
 export function createTestAuthApi(): AuthApi {
 	return createMockAuthApi({ latencyMs: 0 });

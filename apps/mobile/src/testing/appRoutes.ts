@@ -13,6 +13,7 @@ import Home from "../../app/(tabs)/index";
 import Requests from "../../app/(tabs)/requests";
 import Index from "../../app/index";
 import AgreementDetail from "../../app/agreement/[id]/index";
+import ContactDetail from "../../app/contact/[id]";
 import NewLayout from "../../app/new/_layout";
 import NewForm from "../../app/new/form";
 import NewIndex from "../../app/new/index";
@@ -39,4 +40,5 @@ export const appRoutes = {
 	"new/form": NewForm,
 	"new/plan": NewPlan,
 	"agreement/[id]/index": AgreementDetail,
+	"contact/[id]": ContactDetail,
 };

@@ -12,6 +12,8 @@ type DraftState = {
 	start: (type: NewType) => void;
 	setValues: (values: NewFormValues) => void;
 	finish: (contactId: string | null) => void;
+	// Opening "new record" from a contact puts that contact first in the picker.
+	preferContact: (contactId: string) => void;
 };
 
 export const useNewDraft = create<DraftState>()((set) => ({
@@ -24,6 +26,9 @@ export const useNewDraft = create<DraftState>()((set) => ({
 	},
 	setValues: (values) => {
 		set({ values });
+	},
+	preferContact: (contactId) => {
+		set({ lastContactId: contactId });
 	},
 	finish: (contactId) => {
 		set((state) => ({

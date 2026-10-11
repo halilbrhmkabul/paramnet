@@ -5,16 +5,6 @@ import { resetSession, useSession } from "@/features/auth/sessionStore";
 import { tr } from "@/i18n/tr";
 import { appRoutes } from "@/testing/appRoutes";
 
-jest.mock("@/api/ApiProvider", () => {
-	const actual = jest.requireActual<typeof import("@/api/ApiProvider")>("@/api/ApiProvider");
-	const testing = jest.requireActual<typeof import("@/testing/providers")>("@/testing/providers");
-	return {
-		...actual,
-		createApi: () => testing.createTestApi(),
-		createAuthApi: () => testing.createTestAuthApi(),
-	};
-});
-
 beforeEach(() => {
 	resetSession();
 });
