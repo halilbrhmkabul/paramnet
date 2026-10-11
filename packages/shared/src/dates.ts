@@ -83,3 +83,72 @@ export function addMonthsClamped(date: IsoDate, months: number): IsoDate {
 		day: Math.min(day, daysInMonth(nextYear, nextMonth)),
 	});
 }
+
+// Hand-written like formatTRY (ADR-010): Hermes' Intl month names depend on device ICU.
+const MONTHS_LONG = [
+	"Ocak",
+	"Şubat",
+	"Mart",
+	"Nisan",
+	"Mayıs",
+	"Haziran",
+	"Temmuz",
+	"Ağustos",
+	"Eylül",
+	"Ekim",
+	"Kasım",
+	"Aralık",
+] as const;
+const MONTHS_SHORT = [
+	"Oca",
+	"Şub",
+	"Mar",
+	"Nis",
+	"May",
+	"Haz",
+	"Tem",
+	"Ağu",
+	"Eyl",
+	"Eki",
+	"Kas",
+	"Ara",
+] as const;
+
+export type DateStyle = "short" | "long" | "dayMonth";
+
+export function formatDateTR(date: IsoDate, style: DateStyle): string {
+	const { year, month, day } = parseOrThrow(date);
+	if (style === "short") {
+		return `${String(day)} ${MONTHS_SHORT[month - 1] ?? ""} ${String(year)}`;
+	}
+	const monthName = MONTHS_LONG[month - 1] ?? "";
+	return style === "long"
+		? `${String(day)} ${monthName} ${String(year)}`
+		: `${String(day)} ${monthName}`;
+}
+
+export function monthName(month: number): string {
+	const name = MONTHS_LONG[month - 1];
+	if (name === undefined) {
+		throw new RangeError("month must be 1..12");
+	}
+	return name;
+}
+
+export function monthOf(date: IsoDate): IsoDate {
+	const { year, month } = parseOrThrow(date);
+	return fromParts({ year, month, day: 1 });
+}
+
+export function daysOfMonth(date: IsoDate): IsoDate[] {
+	const { year, month } = parseOrThrow(date);
+	return Array.from({ length: daysInMonth(year, month) }, (_, i) =>
+		fromParts({ year, month, day: i + 1 }),
+	);
+}
+
+export function isoWeekday(date: IsoDate): number {
+	const { year, month, day } = parseOrThrow(date);
+	const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+	return weekday === 0 ? 7 : weekday;
+}

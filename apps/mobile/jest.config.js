@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- Jest loads this file as CommonJS.
 const expoPreset = require("jest-expo/jest-preset");
 
 // @noble/hashes (via @paramnet/shared termsHash) ships ESM only, so Jest must transform it too.
