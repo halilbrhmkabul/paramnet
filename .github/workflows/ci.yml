@@ -35,3 +35,23 @@ jobs:
       - run: pnpm test
         env:
           CI: true
+
+  db:
+    name: database (pgTAP)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # CLI root devDependency'den gelir; yerelle aynı sürüm.
+      - run: pnpm install --frozen-lockfile
+      # Yalnızca Postgres; pgTAP için Auth/Storage konteynerleri gerekmez.
+      - run: pnpm supabase db start
+      - run: pnpm db:test

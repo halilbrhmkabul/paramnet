@@ -11,6 +11,8 @@ export default tseslint.config(
 			"**/coverage/**",
 			"**/.expo/**",
 			"**/expo-env.d.ts",
+			// `pnpm db:types` çıktısı; elle düzenlenmez.
+			"packages/shared/src/db.types.ts",
 			"apps/mobile/ios/**",
 			"apps/mobile/android/**",
 			".claude/**",

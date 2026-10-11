@@ -12,7 +12,9 @@
 		"lint:fix": "eslint . --fix",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"test": "pnpm -r test"
+		"test": "pnpm -r test",
+		"db:test": "supabase test db",
+		"db:types": "supabase gen types typescript --local --schema public > packages/shared/src/db.types.ts && prettier --write packages/shared/src/db.types.ts"
 	},
 	"devDependencies": {
 		"eslint": "^9.39.5",
@@ -20,6 +22,7 @@
 		"eslint-config-prettier": "^10.1.8",
 		"globals": "^17.13.0",
 		"prettier": "^3.9.9",
+		"supabase": "2.120.0",
 		"typescript": "~6.0.3",
 		"typescript-eslint": "^8.71.1"
 	}

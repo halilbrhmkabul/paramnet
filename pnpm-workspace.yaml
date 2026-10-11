@@ -5,3 +5,5 @@ packages:
 # Native binding ships via optionalDependencies; the postinstall fallback is not needed.
 allowBuilds:
   unrs-resolver: false
+  # Supabase CLI binary'si postinstall ile indirilir.
+  supabase: true

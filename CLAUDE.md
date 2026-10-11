@@ -87,6 +87,7 @@ Tüm komutlar repo kökünden çalışır.
 | Biçim kontrolü / düzeltme | `pnpm format:check` · `pnpm format` |
 | Mobil bağımlılık ekle (SDK uyumlu) | `cd apps/mobile && pnpm exec expo install <paket>` |
 | Expo uyumluluk kontrolü | `cd apps/mobile && npx expo-doctor@latest` |
-| Yerel Supabase | `pnpm supabase start` / `pnpm supabase stop` |
-| Veritabanı testleri | `pnpm supabase test db` |
-| DB tiplerini üret | _S-03'te doldurulacak_ |
+| Yerel Supabase (Docker gerekir) | `pnpm supabase start` / `pnpm supabase stop` |
+| Veritabanı testleri (pgTAP) | `pnpm db:test` |
+| DB tiplerini üret (yerel DB açıkken) | `pnpm db:types` → `packages/shared/src/db.types.ts` |
+| Yerel test telefonları (OTP `123456`) | `+905550000001` (A), `+905550000002` (B), `+905550000003` (yetkisiz) |
