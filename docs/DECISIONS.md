@@ -170,3 +170,14 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Görünürlük: oluşturan her zaman; karşı taraf yalnızca `status <> 'personal'` iken (BR: kişisel mod yalnızca oluşturana). Alt tablolar `private.can_view_agreement(uuid)` (security definer, `private` şeması Data API'de yok) ile; `auth.uid()` `(select …)` içinde.
 	- `profiles` yalnızca kendisi. schema.md'deki "ortak anlaşması olanların adı (görünüm)" yerine karşı tarafın adı okuma RPC'lerinden (F1-15) gelir: security definer view açmaktan daha dar yüzey.
 	- Not: `supabase migration new` stdin açıkken içerik bekler; betiklerde `< /dev/null` ile çağrılmalı.
+
+## ADR-021 — Kişisel mod RPC'leri ve plpgsql domain mantığı
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- Plan üretimi/doğrulaması, ödeme dağıtımı ve terms hash plpgsql'de `private` şemasında (istemciye kapalı); TS ile aynı hata kodları. `scripts/db-vectors.mjs` (`pnpm db:vectors`) shared test vektörlerini pgTAP dosyasına çevirir; CI, üretilen dosya güncel değilse kırılır. TS'deki satır `index`'i SQL'de hata DETAIL'ında.
+	- Hata sözleşmesi: oturum yoksa SQLSTATE `28000` / `not_authenticated`; diğer tüm iş hataları SQLSTATE `P0001`, mesaj = kod (`not_found`, `forbidden`, `invalid_transition`, `conflict`, `amount_exceeds_outstanding`, `validation_error`), ayrıntı DETAIL'da. İstemci mesajdaki koda göre eşler (`src/api/errors.ts`). Görme yetkisi olmayan kayıt için `not_found` (varlığı sızdırılmaz).
+	- Girdiler katı: terms tam olarak `{principal_minor, down_payment_minor, plan, notes}` (BR-15), plan satırları `{seq, due_date, amount_minor}` ve seq 1..n; metinler istemcide (zod) kırpılmış + NFC gelmeli, sunucu yalnızca doğrular. Ödeme tarihi Europe/Istanbul bugününden sonra olamaz.
+	- `create_agreement`: `agreements.idempotency_key` ile tekrar; başka kullanıcının anahtarı `conflict`. Yeni kişi aynı sahipte aynı numarayla varsa yeniden kullanılır; numara kayıtlı bir profile aitse `linked_profile_id` dolar; kendi numarasıyla kişi reddedilir (BR-12). Peşinat `confirmed` `down_payment` ödemesi, yöntemi `other`, tarihi `started_on` ya da bugün; taksitlere dağıtılmaz.
+	- `update_personal_agreement`: yeni versiyon `accepted`, eskisi `superseded`; peşinat değiştirilemez (kayıtlı bir ödeme); onaylı ödemeler (peşinat hariç) ödeme tarihi sırasıyla yeni taksitlere FIFO dağıtılır, eski dağıtımlar geçmiş olarak kalır; yeni toplam ödenenin altına inemez; kalan 0 olursa `settled`.
+	- Eşzamanlılık: anlaşma satırı `FOR UPDATE` ile kilitlenir; aynı `row_version` ile gelen ikinci yazma `conflict` alır.
+	- plpgsql_check (`supabase db lint`) temiz tutulur: yardımcılar `STABLE`, hata atma satır içi `raise`.

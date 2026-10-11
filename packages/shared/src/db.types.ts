@@ -122,6 +122,7 @@ export type Database = {
 					currency: string;
 					description: string | null;
 					id: string;
+					idempotency_key: string | null;
 					kind: Database["public"]["Enums"]["agreement_kind"];
 					outstanding_minor: number;
 					pending_version: number | null;
@@ -144,6 +145,7 @@ export type Database = {
 					currency?: string;
 					description?: string | null;
 					id?: string;
+					idempotency_key?: string | null;
 					kind: Database["public"]["Enums"]["agreement_kind"];
 					outstanding_minor: number;
 					pending_version?: number | null;
@@ -165,6 +167,7 @@ export type Database = {
 					currency?: string;
 					description?: string | null;
 					id?: string;
+					idempotency_key?: string | null;
 					kind?: Database["public"]["Enums"]["agreement_kind"];
 					outstanding_minor?: number;
 					pending_version?: number | null;
@@ -601,7 +604,21 @@ export type Database = {
 			[_ in never]: never;
 		};
 		Functions: {
-			[_ in never]: never;
+			cancel_agreement: { Args: { p_id: string; p_row_version: number }; Returns: Json };
+			create_agreement: { Args: { idem_key: string; input: Json }; Returns: Json };
+			record_payment: {
+				Args: {
+					p_agreement_id: string;
+					p_idempotency_key: string;
+					p_input: Json;
+					p_row_version: number;
+				};
+				Returns: Json;
+			};
+			update_personal_agreement: {
+				Args: { p_id: string; p_row_version: number; p_terms: Json };
+				Returns: Json;
+			};
 		};
 		Enums: {
 			agreement_kind: "loan" | "installment_purchase";

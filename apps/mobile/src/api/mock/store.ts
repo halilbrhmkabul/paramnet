@@ -84,7 +84,8 @@ export function insertAgreement(state: MockState, input: NewMockAgreement): Mock
 			id: `${input.id}-down`,
 			amount_minor: input.down_payment_minor,
 			paid_on: down_payment_on,
-			method: "cash",
+			// Same as create_agreement: the method of a down payment is not asked.
+			method: "other",
 			kind: "down_payment",
 			status: "confirmed",
 			note: null,
