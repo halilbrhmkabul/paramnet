@@ -10,6 +10,7 @@ import { Screen } from "@/components/Screen";
 import { ScreenTitle } from "@/components/ScreenTitle";
 import { Badge } from "@/components/StatusBadge";
 import { useSession } from "@/features/auth/sessionStore";
+import { unregisterDevice } from "@/features/push/device";
 import { tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
 
@@ -41,11 +42,13 @@ export function SettingsScreen() {
 					onPress={() => {
 						// The local session ends even if the server call fails; there is nothing to keep.
 						// Flipping the session guard takes the user back to welcome.
-						void auth.signOut().finally(() => {
-							// The next person on this device must not see the previous account's data.
-							queryClient.clear();
-							signOut();
-						});
+						void unregisterDevice(auth)
+							.then(() => auth.signOut())
+							.finally(() => {
+								// The next person on this device must not see the previous account's data.
+								queryClient.clear();
+								signOut();
+							});
 					}}
 					testID="settings.signOut.button"
 				/>

@@ -51,3 +51,12 @@ jest.mock("@/api/ApiProvider", () => {
 jest.mock("@react-native-community/netinfo", () =>
 	jest.requireActual<object>("@react-native-community/netinfo/jest/netinfo-mock.js"),
 );
+
+// Native notifications are not available in Jest; tests drive this wrapper instead.
+jest.mock("@/lib/notifications", () => ({
+	requestNotificationPermission: jest.fn(() => Promise.resolve("granted")),
+	hasNotificationPermission: jest.fn(() => Promise.resolve(false)),
+	getPushToken: jest.fn(() => Promise.resolve(null)),
+	onNotificationOpened: jest.fn(() => () => undefined),
+	configureForegroundNotifications: jest.fn(),
+}));

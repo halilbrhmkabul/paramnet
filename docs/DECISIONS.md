@@ -211,3 +211,14 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Ağ hataları (`TypeError`, postgrest-js'in "Network request failed" mesajı, `AuthRetryableFetchError`) `network` koduna, yani çevrimdışı mesajına eşlenir.
 	- Çıkışta React Query önbelleği temizlenir (aynı cihazdaki sonraki hesap önceki verileri görmesin).
 	- Entegrasyon testleri `*.integration.test.ts`, ayrı `jest.integration.config.js` ile düz Node ortamında (jest-expo `fetch`'i sahteler); yerel Supabase ve `PARAMNET_SUPABASE_URL/KEY` yoksa atlanır. Normal `pnpm test` bunları çalıştırmaz. CI'a tam Supabase yığınıyla eklenmesi F1-19 faz kapısında değerlendirilecek.
+
+## ADR-025 — Hatırlatmalar ve push
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- Hatırlatma saatleri spec 5.9'dan; saat 10:00 Europe/Istanbul. `reminders` tablosu "gönderildi" kaydıdır (taksit + kişi + tür tekil); pg_cron 15 dakikada bir `private.enqueue_due_reminders(now())` çalıştırır. Bir slot kaçarsa aynı gün 22:00'ye kadar telafi edilir, sonra bırakılır (kayıttan önce geçmiş vadeler için toplu bildirim olmaz). Sessiz saatlerde (22:00–09:00) kuyruğa hiçbir şey girmez. Kapalı/iptal/itirazlı anlaşmalar ve ödenmiş taksitler hariç.
+	- Kişisel modda yalnızca oluşturan bildirim alır (rolüne göre); paylaşılmış anlaşmada karşı taraf da.
+	- Outbox yükü yalnızca şablon değişkenleri (ad, tutar kuruş, tarih, sıra); not ve serbest metin yok. Metinler edge function'da (copy-tr `notif.*`), uygulama adına; para biçimi uygulamayla aynı (Vitest sözleşme testi).
+	- `dispatch-notifications` edge function'ı pg_cron + pg_net ile her dakika (yalnızca bekleyen varsa) çağrılır; URL ve servis anahtarı Vault'ta (`project_url`, `service_role_key`, kurulum `supabase/README.md`). Fonksiyon kendi anahtar kontrolünü yapar (`verify_jwt = false`). Satırlar 5 dakikalık kirayla alınır (çift gönderim yok), en az bir cihaz kabul ederse `sent`, geçici hatada üstel geri çekilme (en çok 5 deneme), `DeviceNotRegistered` token'ları silinir.
+	- Mobil: `expo-notifications` + `expo-device`; token yalnızca gerçek cihazda ve EAS proje kimliği varken alınır (yoksa sessizce atlanır). Token oturum açıkken her açılışta yenilenir, çıkışta silinir. Bildirime dokunmak ilgili anlaşmayı açar; uygulama öndeyken banner gösterilir.
+	- Edge function'ın saf mantığı `supabase/functions/_shared` altında (Deno API'si yok); `packages/shared` Vitest ile test eder. Giriş dosyaları (`*/index.ts`) ESLint dışında; yerelde `supabase functions serve` ile denenir. Deno yerelde kurulu değil.
+	- Kapsam dışı (BACKLOG): anlaşma bazında hatırlatma kapatma, Expo push receipt kontrolü.

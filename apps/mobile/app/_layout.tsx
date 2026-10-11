@@ -1,17 +1,20 @@
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type Theme } from "expo-router";
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider, router, type Theme } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
 import { ApiProvider, useAuthApi } from "@/api/ApiProvider";
 import { useIsSignedIn, useSession } from "@/features/auth/sessionStore";
+import { registerDevice } from "@/features/push/device";
 import { tr } from "@/i18n/tr";
+import { configureForegroundNotifications, onNotificationOpened } from "@/lib/notifications";
 import { useAppTheme } from "@/theme/useAppTheme";
 
 const detailHeader = { headerShown: true, title: "", headerShadowVisible: false };
 
 // Keep the native splash until the stored session has been checked (no flash of the welcome screen).
 void SplashScreen.preventAutoHideAsync();
+configureForegroundNotifications();
 
 function AppNavigator() {
 	const auth = useAuthApi();
@@ -32,6 +35,23 @@ function AppNavigator() {
 				void SplashScreen.hideAsync();
 			});
 	}, [auth, restored, finishRestore]);
+
+	// Refresh this device's push token for the signed-in account (best effort, F1-18).
+	useEffect(() => {
+		if (signedIn) {
+			void registerDevice(auth);
+		}
+	}, [auth, signedIn]);
+
+	// A tapped reminder opens its agreement (spec 5.9).
+	useEffect(() => {
+		if (!signedIn) {
+			return;
+		}
+		return onNotificationOpened((agreementId) => {
+			router.push({ pathname: "/agreement/[id]", params: { id: agreementId } });
+		});
+	}, [signedIn]);
 
 	if (!restored) {
 		return null;

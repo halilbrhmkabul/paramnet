@@ -16,6 +16,9 @@ export default tseslint.config(
 			"apps/mobile/ios/**",
 			"apps/mobile/android/**",
 			".claude/**",
+			// Deno edge function entry points (npm: imports, Deno globals); their logic lives in
+			// supabase/functions/_shared and is linted/tested through packages/shared.
+			"supabase/functions/*/index.ts",
 			"docs/**",
 		],
 	},

@@ -145,9 +145,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** F1-06…F1-10 akışları gerçek yerel backend ile çalışıyor.
 - **Not (2026-10-11):** `createSupabaseAgreementsApi` RPC'leri çağırır (okuma RPC'leri görünüm modelini döndürür); `EXPO_PUBLIC_API_MODE=supabase` ile seçilir. Hata eşleme (P0001 kodları, ağ hatası → çevrimdışı mesajı; conflict sonrası sorgular yenilenir). Çıkışta sorgu önbelleği temizlenir. Entegrasyon testi (`pnpm --filter mobile test:integration`, yerel Supabase) giriş, profil, kayıt, idempotent tekrar, ödeme, conflict, kalan aşımı, kişi, takvim, yetkisiz okuma akışını gerçek backend'le doğruladı. **Cihazda doğrulanmadı:** ekran akışlarını `.env.local` (supabase modu) ile Expo Go'da elle dene (ADR-024).
 
-### [ ] F1-18 Push ve hatırlatmalar
+### [x] F1-18 Push ve hatırlatmalar
 - Push token kaydı, `notification_outbox`, `dispatch-notifications` edge function, `schedule-reminders` pg_cron işi, sessiz saatler.
 - **Kabul:** Yerelde zamanı ileri alınmış bir vade için bildirim cihaza düşüyor.
+- **Not (2026-10-11):** `enqueue_due_reminders` (spec 5.9: −3 gün borçlu, vade günü iki taraf, +1 gün borçlu, +7 gün iki taraf; 10:00 İstanbul; sessiz saatler; tekrar yok; geçmiş hatırlatmalar sonradan gitmez), `notification_outbox` + servis rolüne açık `claim/finish_notifications`, `register/unregister_push_token`, pg_cron işleri, `dispatch-notifications` edge function (Expo Push, DeviceNotRegistered temizliği, üstel geri çekilme). pgTAP 29 + Vitest 10. Yerelde edge runtime + sahte Expo sunucusuyla ve pg_cron/pg_net/Vault yoluyla uçtan uca doğrulandı. Mobil: izin, token kaydı/silme, bildirime dokununca anlaşma. **Cihaza push doğrulanmadı:** EAS proje kimliği (F3-06) ve iOS'ta Expo Go / Android'de development build gerekir. Anlaşma bazında hatırlatma kapatma BACKLOG'da (ADR-025).
 
 ### [ ] F1-19 Faz 1 kapısı
 - Maestro: kayıt → anlaşma → ödeme → kapanış akışı.

@@ -85,5 +85,14 @@ export function createMockAuthApi({
 		restore() {
 			return Promise.resolve(null);
 		},
+
+		// The prototype sends no pushes.
+		registerPushToken() {
+			return Promise.resolve();
+		},
+
+		unregisterPushToken() {
+			return Promise.resolve();
+		},
 	};
 }

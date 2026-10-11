@@ -605,11 +605,13 @@ export type Database = {
 		};
 		Functions: {
 			cancel_agreement: { Args: { p_id: string; p_row_version: number }; Returns: Json };
+			claim_notifications: { Args: { p_limit: number }; Returns: Json };
 			complete_profile: {
 				Args: { p_display_name: string; p_kvkk_version: string; p_terms_version: string };
 				Returns: Json;
 			};
 			create_agreement: { Args: { idem_key: string; input: Json }; Returns: Json };
+			finish_notifications: { Args: { p_results: Json }; Returns: Json };
 			get_agreement_detail: { Args: { p_id: string }; Returns: Json };
 			get_calendar: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
@@ -624,6 +626,8 @@ export type Database = {
 				};
 				Returns: Json;
 			};
+			register_push_token: { Args: { p_platform: string; p_token: string }; Returns: Json };
+			unregister_push_token: { Args: { p_token: string }; Returns: Json };
 			update_personal_agreement: {
 				Args: { p_id: string; p_row_version: number; p_terms: Json };
 				Returns: Json;
