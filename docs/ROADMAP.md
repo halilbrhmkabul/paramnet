@@ -154,6 +154,8 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - Maestro: kayıt → anlaşma → ödeme → kapanış akışı.
 - **Kabul (spec 15):** Kişisel modda anlaşma oluştur, öde, kapat; hatırlatma telefona düşüyor. Tüm testler yeşil.
 - **Skill:** maestro-mobile-testing — yüklü değil; spec 18.7 Faz 2'de kurulumu öngörüyor, bu görevden önce kurulmalı.
+- **Durum (2026-10-12):** Kapı açık; kullanıcı kararıyla ertelendi, Faz 2'ye geçildi. Hazır olanlar: `apps/mobile/.maestro/` (onboarding, create-loan, create-installment, record-payment, subflows/login; **hiçbir cihazda çalıştırılmadı**), `pnpm --filter mobile e2e`; CI'da `integration` işi tam yerel Supabase yığınıyla mobil adaptör entegrasyon testini çalıştırıyor.
+- **Kapıyı kapatmak için (kullanıcı):** Maestro CLI + simülatör/emülatör veya development build (EAS, `eas init` → `extra.eas.projectId`); akışları çalıştır ve düzelt; Vault sırlarıyla zamanı ileri alınmış bir vade için bildirimin telefona düştüğünü gör (supabase/README.md).
 
 ---
 

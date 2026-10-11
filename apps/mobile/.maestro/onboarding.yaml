@@ -1,0 +1,44 @@
+# Karşılama → telefon → OTP (test kodu) → profil → Ana Sayfa
+appId: com.paramnet.app
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: welcome.screen
+- tapOn:
+    id: welcome.next.button
+- tapOn:
+    id: welcome.next.button
+- tapOn:
+    id: welcome.next.button
+- tapOn:
+    id: phone.number.input
+- inputText: "5550000001"
+- tapOn:
+    id: phone.continue.button
+- tapOn:
+    id: otp.code.input
+- inputText: "000000"
+- assertVisible: "Kod hatalı. Tekrar dener misin?"
+- eraseText: 6
+- inputText: "123456"
+- runFlow:
+    when:
+      visible:
+        id: profile.screen
+    commands:
+      - tapOn:
+          id: profile.name.input
+      - inputText: "Maestro"
+      - tapOn:
+          id: profile.consent.checkbox
+      - tapOn:
+          id: profile.save.button
+      - assertVisible:
+          id: notifications.screen
+      - tapOn:
+          id: notifications.later.button
+- extendedWaitUntil:
+    visible:
+      id: home.screen
+    timeout: 15000
