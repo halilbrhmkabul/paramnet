@@ -63,3 +63,15 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Tipler `pnpm db:types` ile yalnızca `public` şemasından `packages/shared/src/db.types.ts`'e üretilir, prettier'dan geçirilip commit'lenir; ESLint dışında tutulur.
 	- CI'da ayrı `db` işi: `supabase db start` (yalnızca Postgres) + `supabase test db`.
 - **Sonuç:** Tiplerin şemayla güncel olup olmadığı CI'da denetlenmiyor; gerekirse F1-12'de eklenir.
+
+## ADR-010 — `formatTRY` / `parseTRY` Intl kullanmadan, elle
+- **Tarih:** 2026-10-11
+- **Bağlam:** Gösterim her yerde birebir `12.000,00 TL` olmalı. `Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" })` Node'da `₺12.000,00` üretir; Hermes'te Intl platform ICU'suna bağlıdır ve ayraç/boşluk karakterleri cihaza göre değişebilir. Intl ayrıca `number` ister, bu da kuruşu 100'e bölüp ondalığa geçmek demektir (BR-01).
+- **Karar:** `formatTRY` kuruşun rakam dizisi üzerinde çalışır (son 2 hane kuruş, kalan 3'lü gruplanır, `.` binlik, `,` ondalık, normal boşluk + `TL`). Negatif değer yalnızca gösterim için `-` önekiyle biçimlenir (ör. plan farkı). `parseTRY` katıdır: `.` yalnızca geçerli 3'lü binlik grubu, `,` ondalık, en fazla 2 ondalık, baştaki sıfır yok, isteğe bağlı `TL` son eki; negatif, boş ve güvenli tam sayı aralığı dışı reddedilir. Sonuç `{ ok, value | error }` döner. Sıfır biçim düzeyinde geçerlidir; "tutar > 0" kuralı zod şemalarında (F1-04) uygulanır. `MinorAmount` düz `number` (branded değil).
+- **Sonuç:** Node, Hermes ve Deno aynı çıktıyı verir; `parseTRY(formatTRY(x)) === x`. Yazım sırasındaki ara durumları (`12,`) `AmountInput` ele almalı.
+
+## ADR-011 — İstanbul günü sabit UTC+03:00 ile hesaplanır
+- **Tarih:** 2026-10-11
+- **Bağlam:** BR-16 vade ve "bugün" hesaplarını Europe/Istanbul gününe bağlar. Hermes'te `Intl.DateTimeFormat` `timeZone` desteğine güvenmek istemiyoruz; yalnızca bunun için tarih kütüphanesi (date-fns-tz vb.) eklemek gereksiz.
+- **Karar:** Türkiye 2016'dan beri yaz saati uygulamadan UTC+03:00'te; `todayInIstanbul` sabit +3 saat ofsetle hesaplar. Takvim tarihleri `"YYYY-MM-DD"` string'i (`IsoDate`) olarak taşınır; `addDays` ve `addMonthsClamped` saat dilimine dokunmaz. Tarih kütüphanesi eklenmedi.
+- **Sonuç:** Bir Vitest testi 2026–2030 aralığında sonucu Node'un IANA `Europe/Istanbul` verisiyle karşılaştırır; Türkiye saat politikasını değiştirirse test kırılır ve tek sabit güncellenir. Geçmiş (2016 öncesi) anlar için doğru değildir; kullanım yalnızca "şimdi".
