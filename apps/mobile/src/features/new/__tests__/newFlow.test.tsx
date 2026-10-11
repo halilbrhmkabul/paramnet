@@ -5,16 +5,6 @@ import { tr } from "@/i18n/tr";
 import { appRoutes } from "@/testing/appRoutes";
 import { signInForTest } from "@/testing/session";
 
-jest.mock("@/api/ApiProvider", () => {
-	const actual = jest.requireActual<typeof import("@/api/ApiProvider")>("@/api/ApiProvider");
-	const testing = jest.requireActual<typeof import("@/testing/providers")>("@/testing/providers");
-	return {
-		...actual,
-		createApi: () => testing.createTestApi(),
-		createAuthApi: () => testing.createTestAuthApi(),
-	};
-});
-
 jest.mock("@/lib/contactPicker", () => ({
 	pickContact: jest.fn(() =>
 		Promise.resolve({ display_name: "Ahmet Yılmaz", phone_e164: "+905551112233" }),

@@ -87,9 +87,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** Mobilya örneği (28.000 / 8.000 peşinat / 5 taksit) önizlemede doğru; form doğrulama mesajları Türkçe.
 - **Not (2026-10-11):** S08 dört kart → S09 türe göre form (react-hook-form + `validateForm`, plan hataları ilgili alana) + kişi seçici (kayıtlı kişiler, son kullanılan önde, rehberden seçme, elle ekleme) → S10 plan önizleme (satır satır tutar/tarih düzenleme, fark mesajı, "Eşit dağıt") → kaydet → geçici anlaşma ekranı. Sahte adaptör `createAgreement` (idempotent, şemayla doğrular). "Verildiği tarih" alanı şemada olmadığı için formda yok (ADR-014 açık soru). (ADR-017)
 
-### [ ] F1-08 Ana Sayfa, Kişiler, Kişi detay (S05–S07)
+### [x] F1-08 Ana Sayfa, Kişiler, Kişi detay (S05–S07)
 - Özet kartları, yaklaşan vadeler, bekleyen işler bandı; kişi bazında net bakiye.
 - **Kabul:** Sahte veriyle doğru toplamlar; boş durumlar.
+- **Not (2026-10-11):** Ana Sayfa: selamlama, 4 özet kartı, gecikenler, yaklaşan 5 vade, bekleyen işler bandı (Faz 1'de 0 olduğundan görünmez), boş durumda 3 hızlı şablon; Kişiler: arama, işaretli net bakiye; Kişi detay: net bakiye, kayıtlar, bu kişiyle yeni kayıt. Ortak `DueItemRow`, `AgreementRow`. Testlerde kök layout'a hazır adaptör `provideTestApi` ile verilir.
 
 ### [ ] F1-09 Anlaşma detay, ödeme ekle, geçmiş (S11, S12, S17)
 - Durum etiketi, ilerleme, taksitler, ödemeler, zaman çizelgesi; ödeme ekleme ve dağıtım önizlemesi.
