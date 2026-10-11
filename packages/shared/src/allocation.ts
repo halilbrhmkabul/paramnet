@@ -1,4 +1,5 @@
 import { isIsoDate, type IsoDate } from "./dates";
+import type { PaymentKind, PaymentStatus } from "./enums";
 import { isMinorAmount, type MinorAmount } from "./money";
 
 export type AllocationInstallment = {
@@ -16,8 +17,6 @@ export type InstallmentStatus = "upcoming" | "due_today" | "overdue" | "paid";
 // Spec 8.4: "partial" is shown together with the date-based status, so it is a flag, not a fifth state.
 export type InstallmentState = { status: InstallmentStatus; partial: boolean };
 
-export type PaymentKind = "payment" | "down_payment" | "discount";
-export type PaymentStatus = "confirmed" | "reported" | "rejected" | "withdrawn" | "voided";
 export type PaymentLike = { amount_minor: MinorAmount; kind: PaymentKind; status: PaymentStatus };
 
 // Installments come from the database, so a broken invariant is a bug, not user input: throw.

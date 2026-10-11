@@ -1,0 +1,147 @@
+{
+	"description": "terms_hash vectors: canonical JSON (keys sorted by code point, no whitespace, JSON.stringify string escaping, integers only) and lowercase hex SHA-256 of its UTF-8 bytes. Shared by packages/shared and plpgsql. canonical strings are hand-written; sha256 computed with Python hashlib.",
+	"vectors": [
+		{
+			"name": "spec 5.2 furniture plan",
+			"terms": {
+				"principal_minor": 2800000,
+				"down_payment_minor": 800000,
+				"plan": [
+					{
+						"seq": 1,
+						"due_date": "2026-11-10",
+						"amount_minor": 400000
+					},
+					{
+						"seq": 2,
+						"due_date": "2026-12-10",
+						"amount_minor": 400000
+					},
+					{
+						"seq": 3,
+						"due_date": "2027-01-10",
+						"amount_minor": 400000
+					},
+					{
+						"seq": 4,
+						"due_date": "2027-02-10",
+						"amount_minor": 400000
+					},
+					{
+						"seq": 5,
+						"due_date": "2027-03-10",
+						"amount_minor": 400000
+					}
+				],
+				"notes": null
+			},
+			"canonical": "{\"down_payment_minor\":800000,\"notes\":null,\"plan\":[{\"amount_minor\":400000,\"due_date\":\"2026-11-10\",\"seq\":1},{\"amount_minor\":400000,\"due_date\":\"2026-12-10\",\"seq\":2},{\"amount_minor\":400000,\"due_date\":\"2027-01-10\",\"seq\":3},{\"amount_minor\":400000,\"due_date\":\"2027-02-10\",\"seq\":4},{\"amount_minor\":400000,\"due_date\":\"2027-03-10\",\"seq\":5}],\"principal_minor\":2800000}",
+			"sha256": "77f5252e0b70b17ca569df40714c8d2c8510e21c39f4970bf961263d98803068"
+		},
+		{
+			"name": "same terms with keys in a different order",
+			"terms": {
+				"notes": null,
+				"plan": [
+					{
+						"amount_minor": 400000,
+						"seq": 1,
+						"due_date": "2026-11-10"
+					},
+					{
+						"amount_minor": 400000,
+						"seq": 2,
+						"due_date": "2026-12-10"
+					},
+					{
+						"amount_minor": 400000,
+						"seq": 3,
+						"due_date": "2027-01-10"
+					},
+					{
+						"amount_minor": 400000,
+						"seq": 4,
+						"due_date": "2027-02-10"
+					},
+					{
+						"amount_minor": 400000,
+						"seq": 5,
+						"due_date": "2027-03-10"
+					}
+				],
+				"principal_minor": 2800000,
+				"down_payment_minor": 800000
+			},
+			"canonical": "{\"down_payment_minor\":800000,\"notes\":null,\"plan\":[{\"amount_minor\":400000,\"due_date\":\"2026-11-10\",\"seq\":1},{\"amount_minor\":400000,\"due_date\":\"2026-12-10\",\"seq\":2},{\"amount_minor\":400000,\"due_date\":\"2027-01-10\",\"seq\":3},{\"amount_minor\":400000,\"due_date\":\"2027-02-10\",\"seq\":4},{\"amount_minor\":400000,\"due_date\":\"2027-03-10\",\"seq\":5}],\"principal_minor\":2800000}",
+			"sha256": "77f5252e0b70b17ca569df40714c8d2c8510e21c39f4970bf961263d98803068"
+		},
+		{
+			"name": "one-off without due date, Turkish notes",
+			"terms": {
+				"principal_minor": 50000,
+				"down_payment_minor": 0,
+				"plan": [
+					{
+						"seq": 1,
+						"due_date": null,
+						"amount_minor": 50000
+					}
+				],
+				"notes": "Çay parası — ğüşıöç İ"
+			},
+			"canonical": "{\"down_payment_minor\":0,\"notes\":\"Çay parası — ğüşıöç İ\",\"plan\":[{\"amount_minor\":50000,\"due_date\":null,\"seq\":1}],\"principal_minor\":50000}",
+			"sha256": "0867ce084795e002275d8d013d7485491211de52888992263f06911cd42496b9"
+		},
+		{
+			"name": "notes with quote, backslash, newline, tab and a control character",
+			"terms": {
+				"principal_minor": 300,
+				"down_payment_minor": 0,
+				"plan": [
+					{
+						"seq": 1,
+						"due_date": "2026-11-10",
+						"amount_minor": 300
+					}
+				],
+				"notes": "a\"b\\c\nd\te\u0001"
+			},
+			"canonical": "{\"down_payment_minor\":0,\"notes\":\"a\\\"b\\\\c\\nd\\te\\u0001\",\"plan\":[{\"amount_minor\":300,\"due_date\":\"2026-11-10\",\"seq\":1}],\"principal_minor\":300}",
+			"sha256": "b17ecfc29964ee68b2affa431b926dbd114f6cc70f5afff326150409fddc90d8"
+		},
+		{
+			"name": "emoji outside the BMP",
+			"terms": {
+				"principal_minor": 300,
+				"down_payment_minor": 0,
+				"plan": [
+					{
+						"seq": 1,
+						"due_date": "2026-11-10",
+						"amount_minor": 300
+					}
+				],
+				"notes": "🙂 teşekkürler"
+			},
+			"canonical": "{\"down_payment_minor\":0,\"notes\":\"🙂 teşekkürler\",\"plan\":[{\"amount_minor\":300,\"due_date\":\"2026-11-10\",\"seq\":1}],\"principal_minor\":300}",
+			"sha256": "badfbcb306d1acfa64750033608c0b7ea44593ebfb36e8a1a14eba56c020dfae"
+		},
+		{
+			"name": "largest safe amount",
+			"terms": {
+				"principal_minor": 9007199254740991,
+				"down_payment_minor": 9007199254740990,
+				"plan": [
+					{
+						"seq": 1,
+						"due_date": "2099-12-31",
+						"amount_minor": 1
+					}
+				],
+				"notes": null
+			},
+			"canonical": "{\"down_payment_minor\":9007199254740990,\"notes\":null,\"plan\":[{\"amount_minor\":1,\"due_date\":\"2099-12-31\",\"seq\":1}],\"principal_minor\":9007199254740991}",
+			"sha256": "97d5610ac6bc2ab758d7e36c401ba18585f6d97ae516d7a8706b6381681a0f70"
+		}
+	]
+}
