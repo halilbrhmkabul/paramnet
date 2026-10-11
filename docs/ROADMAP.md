@@ -44,10 +44,11 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Spec:** BR-01, BR-16
 - **Not (2026-10-11):** `formatTRY`/`parseTRY` elle (ADR-010), `todayInIstanbul` sabit +03:00 (ADR-011). Ek olarak `addDays`, `isIsoDate`, `addMinor`/`subtractMinor`. Tarih kütüphanesi eklenmedi.
 
-### [ ] F1-02 Ödeme planı üretimi
+### [x] F1-02 Ödeme planı üretimi
 - `generatePlan({ principal, downPayment, count, period, firstDueDate })` → taksit listesi. Eşit bölme, yuvarlama farkı son taksite. Tek seferlik ve vadesiz destek. Özel (eşit olmayan) plan doğrulaması.
 - **Kabul:** Özellik tabanlı testler (fast-check): taksit toplamı + peşinat = anapara her zaman; tüm tutarlar > 0; tarihler artan.
 - **Spec:** 5.2 "Ödeme planı oluşturma kuralları", BR-03
+- **Not (2026-10-11):** `generatePlan` + `validatePlan` (eşit olmayan plan), result tipi ve hata kodları, en fazla 120 taksit (ADR-012). Ortak test vektörleri `packages/shared/test-vectors/plan.json` (plpgsql tarafı da kullanacak). fast-check 4.10 devDependency.
 
 ### [ ] F1-03 Ödeme dağıtımı ve türetilmiş durumlar
 - `allocatePayment(installments, amount)` FIFO; kısmi; fazlası sonraki taksitlere; kalan borçtan fazlası hata.

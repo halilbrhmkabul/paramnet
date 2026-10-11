@@ -1,0 +1,497 @@
+{
+	"description": "Plan generation and validation vectors shared by packages/shared (Vitest) and the plpgsql implementation (pgTAP). Amounts are kuruş, dates are ISO calendar days. Expected values are hand-written, not produced by the implementation.",
+	"generate": [
+		{
+			"name": "spec 5.2 furniture: 28.000 TL, 8.000 down, 5 monthly from 10 Nov 2026",
+			"input": {
+				"principal": 2800000,
+				"down_payment": 800000,
+				"count": 5,
+				"period": "monthly",
+				"first_due_date": "2026-11-10"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2026-11-10", "amount_minor": 400000 },
+					{ "seq": 2, "due_date": "2026-12-10", "amount_minor": 400000 },
+					{ "seq": 3, "due_date": "2027-01-10", "amount_minor": 400000 },
+					{ "seq": 4, "due_date": "2027-02-10", "amount_minor": 400000 },
+					{ "seq": 5, "due_date": "2027-03-10", "amount_minor": 400000 }
+				]
+			}
+		},
+		{
+			"name": "spec 5.2 rounding: 10.000 TL in 3, difference to the last installment",
+			"input": {
+				"principal": 1000000,
+				"down_payment": 0,
+				"count": 3,
+				"period": "monthly",
+				"first_due_date": "2026-11-10"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2026-11-10", "amount_minor": 333333 },
+					{ "seq": 2, "due_date": "2026-12-10", "amount_minor": 333333 },
+					{ "seq": 3, "due_date": "2027-01-10", "amount_minor": 333334 }
+				]
+			}
+		},
+		{
+			"name": "one-off without due date",
+			"input": {
+				"principal": 500000,
+				"down_payment": 0,
+				"count": 1,
+				"period": "monthly",
+				"first_due_date": null
+			},
+			"expected": {
+				"ok": true,
+				"plan": [{ "seq": 1, "due_date": null, "amount_minor": 500000 }]
+			}
+		},
+		{
+			"name": "one-off with due date and down payment",
+			"input": {
+				"principal": 500000,
+				"down_payment": 100000,
+				"count": 1,
+				"period": "monthly",
+				"first_due_date": "2026-12-31"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [{ "seq": 1, "due_date": "2026-12-31", "amount_minor": 400000 }]
+			}
+		},
+		{
+			"name": "one kuruş remaining",
+			"input": {
+				"principal": 100001,
+				"down_payment": 100000,
+				"count": 1,
+				"period": "monthly",
+				"first_due_date": "2026-11-10"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [{ "seq": 1, "due_date": "2026-11-10", "amount_minor": 1 }]
+			}
+		},
+		{
+			"name": "remaining equals count: one kuruş each",
+			"input": {
+				"principal": 3,
+				"down_payment": 0,
+				"count": 3,
+				"period": "weekly",
+				"first_due_date": "2026-11-10"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2026-11-10", "amount_minor": 1 },
+					{ "seq": 2, "due_date": "2026-11-17", "amount_minor": 1 },
+					{ "seq": 3, "due_date": "2026-11-24", "amount_minor": 1 }
+				]
+			}
+		},
+		{
+			"name": "monthly from the 31st clamps short months without drifting",
+			"input": {
+				"principal": 400,
+				"down_payment": 0,
+				"count": 4,
+				"period": "monthly",
+				"first_due_date": "2027-01-31"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2027-01-31", "amount_minor": 100 },
+					{ "seq": 2, "due_date": "2027-02-28", "amount_minor": 100 },
+					{ "seq": 3, "due_date": "2027-03-31", "amount_minor": 100 },
+					{ "seq": 4, "due_date": "2027-04-30", "amount_minor": 100 }
+				]
+			}
+		},
+		{
+			"name": "monthly from the 31st in a leap year",
+			"input": {
+				"principal": 300,
+				"down_payment": 0,
+				"count": 3,
+				"period": "monthly",
+				"first_due_date": "2028-01-31"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2028-01-31", "amount_minor": 100 },
+					{ "seq": 2, "due_date": "2028-02-29", "amount_minor": 100 },
+					{ "seq": 3, "due_date": "2028-03-31", "amount_minor": 100 }
+				]
+			}
+		},
+		{
+			"name": "monthly across a year boundary into a leap February",
+			"input": {
+				"principal": 300,
+				"down_payment": 0,
+				"count": 3,
+				"period": "monthly",
+				"first_due_date": "2027-12-30"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2027-12-30", "amount_minor": 100 },
+					{ "seq": 2, "due_date": "2028-01-30", "amount_minor": 100 },
+					{ "seq": 3, "due_date": "2028-02-29", "amount_minor": 100 }
+				]
+			}
+		},
+		{
+			"name": "monthly from 29 Feb of a leap year reaches a non-leap February",
+			"input": {
+				"principal": 1300,
+				"down_payment": 0,
+				"count": 13,
+				"period": "monthly",
+				"first_due_date": "2028-02-29"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2028-02-29", "amount_minor": 100 },
+					{ "seq": 2, "due_date": "2028-03-29", "amount_minor": 100 },
+					{ "seq": 3, "due_date": "2028-04-29", "amount_minor": 100 },
+					{ "seq": 4, "due_date": "2028-05-29", "amount_minor": 100 },
+					{ "seq": 5, "due_date": "2028-06-29", "amount_minor": 100 },
+					{ "seq": 6, "due_date": "2028-07-29", "amount_minor": 100 },
+					{ "seq": 7, "due_date": "2028-08-29", "amount_minor": 100 },
+					{ "seq": 8, "due_date": "2028-09-29", "amount_minor": 100 },
+					{ "seq": 9, "due_date": "2028-10-29", "amount_minor": 100 },
+					{ "seq": 10, "due_date": "2028-11-29", "amount_minor": 100 },
+					{ "seq": 11, "due_date": "2028-12-29", "amount_minor": 100 },
+					{ "seq": 12, "due_date": "2029-01-29", "amount_minor": 100 },
+					{ "seq": 13, "due_date": "2029-02-28", "amount_minor": 100 }
+				]
+			}
+		},
+		{
+			"name": "weekly across a year boundary with rounding",
+			"input": {
+				"principal": 1000,
+				"down_payment": 0,
+				"count": 3,
+				"period": "weekly",
+				"first_due_date": "2026-12-24"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2026-12-24", "amount_minor": 333 },
+					{ "seq": 2, "due_date": "2026-12-31", "amount_minor": 333 },
+					{ "seq": 3, "due_date": "2027-01-07", "amount_minor": 334 }
+				]
+			}
+		},
+		{
+			"name": "biweekly through a leap day",
+			"input": {
+				"principal": 900,
+				"down_payment": 0,
+				"count": 3,
+				"period": "biweekly",
+				"first_due_date": "2028-02-15"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2028-02-15", "amount_minor": 300 },
+					{ "seq": 2, "due_date": "2028-02-29", "amount_minor": 300 },
+					{ "seq": 3, "due_date": "2028-03-14", "amount_minor": 300 }
+				]
+			}
+		},
+		{
+			"name": "largest safe amount",
+			"input": {
+				"principal": 9007199254740991,
+				"down_payment": 0,
+				"count": 7,
+				"period": "monthly",
+				"first_due_date": "2026-11-10"
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2026-11-10", "amount_minor": 1286742750677284 },
+					{ "seq": 2, "due_date": "2026-12-10", "amount_minor": 1286742750677284 },
+					{ "seq": 3, "due_date": "2027-01-10", "amount_minor": 1286742750677284 },
+					{ "seq": 4, "due_date": "2027-02-10", "amount_minor": 1286742750677284 },
+					{ "seq": 5, "due_date": "2027-03-10", "amount_minor": 1286742750677284 },
+					{ "seq": 6, "due_date": "2027-04-10", "amount_minor": 1286742750677284 },
+					{ "seq": 7, "due_date": "2027-05-10", "amount_minor": 1286742750677287 }
+				]
+			}
+		},
+		{
+			"name": "zero principal",
+			"input": {
+				"principal": 0,
+				"down_payment": 0,
+				"count": 1,
+				"period": "monthly",
+				"first_due_date": null
+			},
+			"expected": { "ok": false, "error": "invalid_principal" }
+		},
+		{
+			"name": "fractional principal",
+			"input": {
+				"principal": 100.5,
+				"down_payment": 0,
+				"count": 1,
+				"period": "monthly",
+				"first_due_date": null
+			},
+			"expected": { "ok": false, "error": "invalid_principal" }
+		},
+		{
+			"name": "negative down payment",
+			"input": {
+				"principal": 1000,
+				"down_payment": -1,
+				"count": 1,
+				"period": "monthly",
+				"first_due_date": null
+			},
+			"expected": { "ok": false, "error": "invalid_down_payment" }
+		},
+		{
+			"name": "down payment equal to principal",
+			"input": {
+				"principal": 1000,
+				"down_payment": 1000,
+				"count": 1,
+				"period": "monthly",
+				"first_due_date": null
+			},
+			"expected": { "ok": false, "error": "down_payment_too_large" }
+		},
+		{
+			"name": "down payment above principal",
+			"input": {
+				"principal": 1000,
+				"down_payment": 1001,
+				"count": 1,
+				"period": "monthly",
+				"first_due_date": null
+			},
+			"expected": { "ok": false, "error": "down_payment_too_large" }
+		},
+		{
+			"name": "zero installments",
+			"input": {
+				"principal": 1000,
+				"down_payment": 0,
+				"count": 0,
+				"period": "monthly",
+				"first_due_date": "2026-11-10"
+			},
+			"expected": { "ok": false, "error": "invalid_count" }
+		},
+		{
+			"name": "more than 120 installments",
+			"input": {
+				"principal": 100000,
+				"down_payment": 0,
+				"count": 121,
+				"period": "monthly",
+				"first_due_date": "2026-11-10"
+			},
+			"expected": { "ok": false, "error": "invalid_count" }
+		},
+		{
+			"name": "installment would be zero kuruş",
+			"input": {
+				"principal": 102,
+				"down_payment": 100,
+				"count": 3,
+				"period": "monthly",
+				"first_due_date": "2026-11-10"
+			},
+			"expected": { "ok": false, "error": "count_exceeds_remaining" }
+		},
+		{
+			"name": "non-existent first due date",
+			"input": {
+				"principal": 1000,
+				"down_payment": 0,
+				"count": 2,
+				"period": "monthly",
+				"first_due_date": "2027-02-29"
+			},
+			"expected": { "ok": false, "error": "invalid_due_date" }
+		},
+		{
+			"name": "several installments without a first due date",
+			"input": {
+				"principal": 1000,
+				"down_payment": 0,
+				"count": 2,
+				"period": "monthly",
+				"first_due_date": null
+			},
+			"expected": { "ok": false, "error": "due_date_required" }
+		}
+	],
+	"validate": [
+		{
+			"name": "uneven plan summing to the remaining amount",
+			"input": {
+				"principal": 2800000,
+				"down_payment": 800000,
+				"installments": [
+					{ "due_date": "2026-11-10", "amount_minor": 500000 },
+					{ "due_date": "2026-12-10", "amount_minor": 500000 },
+					{ "due_date": "2027-01-10", "amount_minor": 1000000 }
+				]
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2026-11-10", "amount_minor": 500000 },
+					{ "seq": 2, "due_date": "2026-12-10", "amount_minor": 500000 },
+					{ "seq": 3, "due_date": "2027-01-10", "amount_minor": 1000000 }
+				]
+			}
+		},
+		{
+			"name": "equal consecutive dates are allowed",
+			"input": {
+				"principal": 300,
+				"down_payment": 0,
+				"installments": [
+					{ "due_date": "2026-11-10", "amount_minor": 100 },
+					{ "due_date": "2026-11-10", "amount_minor": 200 }
+				]
+			},
+			"expected": {
+				"ok": true,
+				"plan": [
+					{ "seq": 1, "due_date": "2026-11-10", "amount_minor": 100 },
+					{ "seq": 2, "due_date": "2026-11-10", "amount_minor": 200 }
+				]
+			}
+		},
+		{
+			"name": "single installment without due date",
+			"input": {
+				"principal": 300,
+				"down_payment": 100,
+				"installments": [{ "due_date": null, "amount_minor": 200 }]
+			},
+			"expected": {
+				"ok": true,
+				"plan": [{ "seq": 1, "due_date": null, "amount_minor": 200 }]
+			}
+		},
+		{
+			"name": "down payment equal to principal",
+			"input": {
+				"principal": 300,
+				"down_payment": 300,
+				"installments": [{ "due_date": null, "amount_minor": 1 }]
+			},
+			"expected": { "ok": false, "error": "down_payment_too_large" }
+		},
+		{
+			"name": "no rows",
+			"input": {
+				"principal": 300,
+				"down_payment": 0,
+				"installments": []
+			},
+			"expected": { "ok": false, "error": "empty_plan" }
+		},
+		{
+			"name": "zero amount row",
+			"input": {
+				"principal": 300,
+				"down_payment": 0,
+				"installments": [
+					{ "due_date": "2026-11-10", "amount_minor": 300 },
+					{ "due_date": "2026-12-10", "amount_minor": 0 }
+				]
+			},
+			"expected": { "ok": false, "error": "non_positive_installment", "index": 1 }
+		},
+		{
+			"name": "fractional amount row",
+			"input": {
+				"principal": 300,
+				"down_payment": 0,
+				"installments": [
+					{ "due_date": "2026-11-10", "amount_minor": 150.5 },
+					{ "due_date": "2026-12-10", "amount_minor": 149.5 }
+				]
+			},
+			"expected": { "ok": false, "error": "non_positive_installment", "index": 0 }
+		},
+		{
+			"name": "rows do not add up to the remaining amount",
+			"input": {
+				"principal": 300,
+				"down_payment": 100,
+				"installments": [
+					{ "due_date": "2026-11-10", "amount_minor": 100 },
+					{ "due_date": "2026-12-10", "amount_minor": 101 }
+				]
+			},
+			"expected": { "ok": false, "error": "sum_mismatch" }
+		},
+		{
+			"name": "a date earlier than the previous row",
+			"input": {
+				"principal": 300,
+				"down_payment": 0,
+				"installments": [
+					{ "due_date": "2026-11-10", "amount_minor": 100 },
+					{ "due_date": "2026-12-10", "amount_minor": 100 },
+					{ "due_date": "2026-12-09", "amount_minor": 100 }
+				]
+			},
+			"expected": { "ok": false, "error": "dates_not_ascending", "index": 2 }
+		},
+		{
+			"name": "missing due date in a multi-row plan",
+			"input": {
+				"principal": 300,
+				"down_payment": 0,
+				"installments": [
+					{ "due_date": "2026-11-10", "amount_minor": 100 },
+					{ "due_date": null, "amount_minor": 200 }
+				]
+			},
+			"expected": { "ok": false, "error": "due_date_required", "index": 1 }
+		},
+		{
+			"name": "non-existent due date",
+			"input": {
+				"principal": 300,
+				"down_payment": 0,
+				"installments": [
+					{ "due_date": "2026-11-31", "amount_minor": 100 },
+					{ "due_date": "2026-12-10", "amount_minor": 200 }
+				]
+			},
+			"expected": { "ok": false, "error": "invalid_due_date", "index": 0 }
+		}
+	]
+}

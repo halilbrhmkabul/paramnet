@@ -75,3 +75,16 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 - **Bağlam:** BR-16 vade ve "bugün" hesaplarını Europe/Istanbul gününe bağlar. Hermes'te `Intl.DateTimeFormat` `timeZone` desteğine güvenmek istemiyoruz; yalnızca bunun için tarih kütüphanesi (date-fns-tz vb.) eklemek gereksiz.
 - **Karar:** Türkiye 2016'dan beri yaz saati uygulamadan UTC+03:00'te; `todayInIstanbul` sabit +3 saat ofsetle hesaplar. Takvim tarihleri `"YYYY-MM-DD"` string'i (`IsoDate`) olarak taşınır; `addDays` ve `addMonthsClamped` saat dilimine dokunmaz. Tarih kütüphanesi eklenmedi.
 - **Sonuç:** Bir Vitest testi 2026–2030 aralığında sonucu Node'un IANA `Europe/Istanbul` verisiyle karşılaştırır; Türkiye saat politikasını değiştirirse test kırılır ve tek sabit güncellenir. Geçmiş (2016 öncesi) anlar için doğru değildir; kullanım yalnızca "şimdi".
+
+## ADR-012 — Ödeme planı üretimi ve doğrulaması
+- **Tarih:** 2026-10-11
+- **Bağlam:** Spec 5.2 ve BR-03 eşit taksit, yuvarlama, periyot ve eşit olmayan plan kurallarını verir; peşinat sınırları, taksit sayısı üst sınırı, "özel" periyodun anlamı ve vadesiz çok taksitli plan açıkta kalıyordu. Aynı mantık ileride plpgsql'de de olacak (skill ilke 8).
+- **Karar:**
+	- `generatePlan` (aylık, haftalık, iki haftalık) ve `validatePlan` (eşit olmayan plan). "Özel" periyot bir üretici değildir: kullanıcı satırları düzenler, `validatePlan` doğrular. Şemada periyot saklanmaz; plan yalnızca satırlardır.
+	- Hata dönüşü throw değil result tipi (`{ ok, plan } | { ok: false, error, index? }`), `parseTRY` ile aynı desen. `index` `validatePlan`'da ilk hatalı satırdır. Kodlar: `invalid_principal`, `invalid_down_payment`, `down_payment_too_large`, `invalid_count`, `count_exceeds_remaining`, `invalid_due_date`, `due_date_required`, `empty_plan`, `non_positive_installment`, `sum_mismatch`, `dates_not_ascending`. Kontrol sırası: tutarlar → taksit sayısı → tarih; satırlarda tutar → tarih → sıra; toplam en sonda.
+	- Peşinat 0 olabilir; peşinat ≥ anapara reddedilir (en az bir taksit > 0). Taksit sayısı 1–120. Kalan < taksit sayısı reddedilir (taksit 0 kuruşa düşmez, sayı sessizce azaltılmaz).
+	- Vade yalnızca tek taksitli planda boş olabilir. Geçmiş tarihli ilk vade plan katmanında reddedilmez (eski borç kaydı meşru).
+	- Satır şekli `terms.plan` ile aynı: `{ seq, due_date, amount_minor }` (snake_case); terms hash (F1-04) ve plpgsql vektörleri eşleyicisiz kullanır.
+	- Ortak test vektörleri `packages/shared/test-vectors/plan.json`; beklenen değerler elle yazılmıştır, Vitest şimdi okur, pgTAP plan üreticisi aynı dosyayla doğrulanacak.
+	- `fast-check` yalnızca `packages/shared` devDependency (özellik testleri; F1-03'te de kullanılacak).
+- **Sonuç:** Hata kodları F1-04 zod şemalarına ve mobil `tr.ts` metinlerine eşlenecek; ad değişikliği iki yeri etkiler.
