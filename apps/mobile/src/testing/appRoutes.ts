@@ -14,7 +14,9 @@ import Requests from "../../app/(tabs)/requests";
 import Index from "../../app/index";
 import AgreementHistory from "../../app/agreement/[id]/history";
 import AgreementDetail from "../../app/agreement/[id]/index";
+import AgreementInvitePreview from "../../app/agreement/[id]/invite-preview";
 import AgreementPayment from "../../app/agreement/[id]/payment";
+import AgreementShare from "../../app/agreement/[id]/share";
 import ContactDetail from "../../app/contact/[id]";
 import NewLayout from "../../app/new/_layout";
 import NewForm from "../../app/new/form";
@@ -45,6 +47,8 @@ export const appRoutes = {
 	"agreement/[id]/index": AgreementDetail,
 	"agreement/[id]/payment": AgreementPayment,
 	"agreement/[id]/history": AgreementHistory,
+	"agreement/[id]/share": AgreementShare,
+	"agreement/[id]/invite-preview": AgreementInvitePreview,
 	"contact/[id]": ContactDetail,
 	"settings/index": Settings,
 };

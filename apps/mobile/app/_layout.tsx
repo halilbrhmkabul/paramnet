@@ -37,6 +37,11 @@ export default function RootLayout() {
 							options={{ ...detailHeader, presentation: "modal" }}
 						/>
 						<Stack.Screen name="agreement/[id]/history" options={detailHeader} />
+						<Stack.Screen
+							name="agreement/[id]/share"
+							options={{ ...detailHeader, presentation: "modal" }}
+						/>
+						<Stack.Screen name="agreement/[id]/invite-preview" options={detailHeader} />
 						<Stack.Screen name="contact/[id]" options={detailHeader} />
 						<Stack.Screen
 							name="settings/index"

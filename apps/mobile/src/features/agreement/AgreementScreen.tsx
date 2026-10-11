@@ -172,6 +172,19 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 							{tr.error.offline}
 						</Text>
 					)}
+					{agreement.status === "personal" ? (
+						<Button
+							label={tr.share.action}
+							variant="secondary"
+							onPress={() => {
+								router.push({
+									pathname: "/agreement/[id]/share",
+									params: { id: agreement.id },
+								});
+							}}
+							testID="agreement.share.button"
+						/>
+					) : null}
 				</View>
 			) : null}
 

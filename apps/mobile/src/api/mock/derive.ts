@@ -39,6 +39,7 @@ export function toSummary(
 			contact_id: contact.id,
 			display_name: contact.display_name,
 			kind: contact.kind,
+			phone_e164: contact.phone_e164,
 		},
 		principal_minor: agreement.principal_minor,
 		outstanding_minor: outstanding(agreement, agreement.payments),

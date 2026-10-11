@@ -233,6 +233,14 @@ export const tr = {
 	},
 	share: {
 		title: "Planı paylaş",
+		action: "Paylaş",
+		to: "Kime",
+		needPhone: "Paylaşmak için karşı tarafın telefon numarası gerekli.",
+		preview: "Mesaj önizlemesi",
+		send: "Paylaş",
+		seeAsCounterparty: "Karşı taraf ne görecek?",
+		prototypeNote: "Prototip: bu link henüz çalışmıyor, paylaşım yalnızca mesajı gösterir.",
+		prototypeLink: "https://paramnet.app/d/ornek",
 		message:
 			"{name} seninle Paramnet'te bir ödeme planı paylaştı. Birlikte takip etmek için: {link}",
 	},
@@ -259,6 +267,14 @@ export const tr = {
 	requests: {
 		emptyTitle: "Bekleyen talep yok",
 		emptyBody: "Bir planı paylaştığında onaylar ve ödeme bildirimleri burada görünür.",
+	},
+	invitePreview: {
+		before: "Doğrulamadan önce",
+		after: "Doğrulamadan sonra",
+		preOtpBody: "Planın ayrıntılarını görmek için telefon numaranı doğrula.",
+		verify: "Numaramı doğrula",
+		prototypeNote: "Prototip: web onay sayfasının taslağı. Butonlar bir şey kaydetmez.",
+		plan: "Ödeme planı",
 	},
 	invite: {
 		title: "{name} seninle bir ödeme planı paylaştı",

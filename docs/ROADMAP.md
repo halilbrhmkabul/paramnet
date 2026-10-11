@@ -105,6 +105,8 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - Paylaş butonu ve web onay ekranının görsel taslağı (sahte; gerçek link yok).
 - Development build veya Expo Go ile telefonda çalışan sürüm.
 - **Kabul:** Kullanıcı görüşmelerinde gösterilebilir prototip. Görüşme sonuçlarına göre ROADMAP güncellenir.
+- **Durum (2026-10-11):** Kod tarafı bitti, kapı açık. Kişisel anlaşmada ikincil "Paylaş" → S13 taslağı (numara kontrolü, mesaj önizlemesi, sistem paylaşım menüsü, yer tutucu link) → "Karşı taraf ne görecek?" W01/W03 taslağı (doğrulama öncesi tutar yok, sonrası plan + 3 karar butonu, pasif). iOS/Android bundle ve expo-doctor 21/21 geçti.
+- **Kapıyı kapatmak için (kullanıcı):** `pnpm mobile` ile Expo Go'da telefonda baştan sona dene (kayıt `123456`, yeni kayıt, ödeme, takvim, paylaş taslağı); görüşmeleri yap; sonuçlara göre ROADMAP'i güncelle ve bu görevi `[x]` yap.
 
 ---
 
