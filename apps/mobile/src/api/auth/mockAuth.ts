@@ -80,5 +80,10 @@ export function createMockAuthApi({
 			await delay();
 			current = null;
 		},
+
+		// The prototype keeps nothing between launches (ADR-016).
+		restore() {
+			return Promise.resolve(null);
+		},
 	};
 }

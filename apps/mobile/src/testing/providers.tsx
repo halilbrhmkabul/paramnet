@@ -35,6 +35,18 @@ export function takeTestApi(): ReturnType<typeof createMockApi> {
 	return api;
 }
 
+let nextAuthApi: AuthApi | null = null;
+
+export function provideTestAuthApi(api: AuthApi): void {
+	nextAuthApi = api;
+}
+
+export function takeTestAuthApi(): AuthApi {
+	const api = nextAuthApi ?? createTestAuthApi();
+	nextAuthApi = null;
+	return api;
+}
+
 // Real clock on purpose: expiry tests move it with jest fake timers.
 export function createTestAuthApi(): AuthApi {
 	return createMockAuthApi({ latencyMs: 0 });

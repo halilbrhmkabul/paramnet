@@ -8,6 +8,9 @@ type SessionState = {
 	pendingPhone: string | null;
 	// Profile and notification steps done; only then the tabs open (spec 5.1).
 	onboarded: boolean;
+	// The stored session has been checked at launch; until then the splash screen stays up.
+	restored: boolean;
+	finishRestore: (user: AuthUser | null) => void;
 	setPendingPhone: (phone: string | null) => void;
 	signIn: (user: AuthUser) => void;
 	setUser: (user: AuthUser) => void;
@@ -17,9 +20,13 @@ type SessionState = {
 
 const initial = { user: null, pendingPhone: null, onboarded: false };
 
-// In memory only: the prototype starts signed out after a restart; F1-16 persists the Supabase session.
+// Persistence lives in the auth adapter (Supabase session in SecureStore, F1-16); the store only mirrors it.
 export const useSession = create<SessionState>()((set) => ({
 	...initial,
+	restored: false,
+	finishRestore: (user) => {
+		set({ user, onboarded: user?.display_name != null, restored: true });
+	},
 	setPendingPhone: (pendingPhone) => {
 		set({ pendingPhone });
 	},
@@ -34,7 +41,7 @@ export const useSession = create<SessionState>()((set) => ({
 		set({ onboarded: true });
 	},
 	signOut: () => {
-		set(initial);
+		set({ ...initial, restored: true });
 	},
 }));
 
@@ -43,5 +50,5 @@ export function useIsSignedIn(): boolean {
 }
 
 export function resetSession(): void {
-	useSession.setState(initial);
+	useSession.setState({ ...initial, restored: true });
 }

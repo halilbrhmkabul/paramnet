@@ -6,4 +6,6 @@ export interface AuthApi {
 	verifyOtp(phone: string, code: string): Promise<AuthUser>;
 	updateProfile(displayName: string): Promise<AuthUser>;
 	signOut(): Promise<void>;
+	// Session kept on the device from an earlier launch, or null.
+	restore(): Promise<AuthUser | null>;
 }
