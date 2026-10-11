@@ -48,3 +48,8 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Araç sürümleri Expo SDK 57 ile uyumlu tutulur: TypeScript ~6.0 (7 değil), ESLint 9 (eslint-config-expo eklentileri 10'u desteklemiyor).
 	- `unrs-resolver` kurulum script'i reddedildi (`allowBuilds`); native binary optional bağımlılıkla geliyor.
 	- Yalnızca iOS ve Android hedeflenir (`platforms`); web hedefi yok.
+
+## ADR-008 — CI: GitHub Actions
+- **Tarih:** 2026-10-11
+- **Karar:** `.github/workflows/ci.yml`, her PR'da ve `main`'e push'ta tek iş: `pnpm install --frozen-lockfile` → `typecheck` → `lint` → `format:check` → `test`. Node sürümü `.nvmrc`'den, pnpm sürümü `packageManager` alanından okunur (tek kaynak). Yetki `contents: read`; aynı ref'te eski çalışma iptal edilir.
+- **Sonuç:** `format:check` görev tanımında yoktu, düşük maliyetli olduğu için eklendi. Veritabanı testleri (`supabase test db`) S-03 sonrası ayrı adım olarak eklenecek.

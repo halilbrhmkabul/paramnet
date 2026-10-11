@@ -20,9 +20,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Skill:** expo, react-native-best-practices
 - **Not (2026-10-11):** Expo SDK 57, RN 0.86, TS 6.0, ESLint 9. Bundle ID `com.paramnet.app` (ADR-005), test araçları ADR-006, monorepo ayrıntıları ADR-007. Expo Go'da açılış kullanıcı tarafından telefonda doğrulandı (SDK 57 destekleniyor).
 
-### [ ] S-02 CI
+### [x] S-02 CI
 - GitHub Actions: install → typecheck → lint → test (packages/shared + mobile). Veritabanı testleri S-03 sonrası eklenir.
 - **Kabul:** PR açıldığında iş akışı yeşil.
+- **Not (2026-10-11):** `.github/workflows/ci.yml`; `format:check` adımı da eklendi (ADR-008).
 
 ### [ ] S-03 Yerel Supabase
 - `supabase init`, `config.toml` (auth: telefon girişi açık, yerel test OTP numaraları tanımlı), pgTAP etkin, `supabase test db` çalışıyor (örnek test).
