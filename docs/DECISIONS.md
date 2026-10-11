@@ -140,3 +140,14 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Kişi seçicide rehberden gelen numara kayıtlı bir kişiye aitse o kişi kullanılır; elle eklenen satıcı (Taksitle aldım) `merchant`.
 	- Tek uygulama saati `src/lib/clock.ts`; sahte adaptör ve ekranlar aynı "bugün"ü kullanır, testler `jest.setup.tsx`'te 2026-10-11'e sabitler. Jest'te tarih seçici ve rehber seçici mock'lanır.
 	- Mock seed ve yeni kayıt ID'leri UUID biçiminde (giriş şemaları `contact_id`'yi UUID olarak doğrular).
+
+## ADR-018 — Anlaşma detayı ve ödeme ekleme
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- `recordPayment(agreementId, input, rowVersion, idempotencyKey)`: sahte adaptör sırayla idempotency → bulunamadı → şema → durum (yalnızca `personal`/`active`, BR-14) → `row_version` (`conflict`) → kalan borç aşımı kontrol eder; kişisel modda ödeme `confirmed`, FIFO dağıtılır, kalan 0 olunca `settled`.
+	- Ödeme ekranında idempotency anahtarı ekran açılışında bir kez üretilir. Başarı veya hata sonrası tüm sorgular yenilenir (conflict'te güncel `row_version` gelsin diye).
+	- Ödeme tarihi bugünden sonra olamaz (istemci kuralı; spec'te açık değil, sunucu RPC'sinde de uygulanacak).
+	- Çevrimdışı tespiti `@react-native-community/netinfo` (Expo SDK sürümü); bilinmeyen durum çevrimiçi sayılır. Yazma butonları kapalı ve neden yazılı (mobil kural 2).
+	- Taksit durumu `{ status, partial }` rozetle; ilerleme çubuğu `accessibilityRole="progressbar"` + yüzde.
+	- Olay zamanları `formatDateTimeTR` (shared, sabit +03:00).
+	- Kapsam dışı: dekont yükleme (Storage gerektirir) ve ödeme sonrası haptic — BACKLOG.

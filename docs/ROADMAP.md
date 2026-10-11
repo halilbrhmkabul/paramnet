@@ -92,9 +92,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** Sahte veriyle doğru toplamlar; boş durumlar.
 - **Not (2026-10-11):** Ana Sayfa: selamlama, 4 özet kartı, gecikenler, yaklaşan 5 vade, bekleyen işler bandı (Faz 1'de 0 olduğundan görünmez), boş durumda 3 hızlı şablon; Kişiler: arama, işaretli net bakiye; Kişi detay: net bakiye, kayıtlar, bu kişiyle yeni kayıt. Ortak `DueItemRow`, `AgreementRow`. Testlerde kök layout'a hazır adaptör `provideTestApi` ile verilir.
 
-### [ ] F1-09 Anlaşma detay, ödeme ekle, geçmiş (S11, S12, S17)
+### [x] F1-09 Anlaşma detay, ödeme ekle, geçmiş (S11, S12, S17)
 - Durum etiketi, ilerleme, taksitler, ödemeler, zaman çizelgesi; ödeme ekleme ve dağıtım önizlemesi.
 - **Kabul:** Ödeme eklenince bakiye ve taksit durumları anında güncelleniyor (sahte adaptör).
+- **Not (2026-10-11):** Detay: üst kart (karşı taraf, rol, kalan, ilerleme, toplam, durum, "Yalnızca sen görüyorsun"), birincil aksiyon Ödeme ekle (çevrimdışı kapalı + neden), taksitler, ödemeler, kapandı mesajı; ödeme: tutar, tarih (gelecek olamaz), yöntem, not, FIFO dağıtım önizlemesi, kalan borç aşımı; geçmiş: olay zaman çizelgesi. Sahte `recordPayment` (idempotent, row_version, BR-14). Dekont ve haptic BACKLOG'da (ADR-018).
 
 ### [ ] F1-10 Takvim (S18) ve Profil (S20 iskelet)
 - **Kabul:** Ay görünümü, gün seçimi, gecikenler işaretli.

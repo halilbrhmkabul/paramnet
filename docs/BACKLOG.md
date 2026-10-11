@@ -15,3 +15,4 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 ## Yeni fikirler
 
 - Ödemeyi belirli bir taksite yönlendirme (spec 5.5 gelişmiş seçenek; F1-03 sırasında, `allocatePayment` yalnızca FIFO).
+- Ödeme dekontu yükleme (S12; Storage + imzalı URL, spec 11) ve ödeme sonrası haptic/ilerleme animasyonu (design-tokens "Hareket") — F1-09 sırasında.

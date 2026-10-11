@@ -5,6 +5,7 @@ import {
 	addMonthsClamped,
 	daysOfMonth,
 	formatDateTR,
+	formatDateTimeTR,
 	isIsoDate,
 	isoWeekday,
 	monthOf,
@@ -155,5 +156,16 @@ describe("monthOf / daysOfMonth", () => {
 	it("isoWeekday is Monday = 1 … Sunday = 7", () => {
 		expect(isoWeekday("2026-10-11")).toBe(7);
 		expect(isoWeekday("2026-10-12")).toBe(1);
+	});
+});
+
+describe("formatDateTimeTR", () => {
+	it("shows an event timestamp in Istanbul time", () => {
+		expect(formatDateTimeTR("2026-11-09T21:30:00.000Z")).toBe("10 Kas 2026, 00:30");
+		expect(formatDateTimeTR("2026-10-11T09:05:00Z")).toBe("11 Eki 2026, 12:05");
+	});
+
+	it("rejects an invalid timestamp", () => {
+		expect(() => formatDateTimeTR("yesterday")).toThrow(RangeError);
 	});
 });

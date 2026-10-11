@@ -1,4 +1,4 @@
-import type { CreateAgreementInput, IsoDate } from "@paramnet/shared";
+import type { CreateAgreementInput, IsoDate, PaymentInput } from "@paramnet/shared";
 
 import type {
 	AgreementDetail,
@@ -20,4 +20,11 @@ export interface AgreementsApi {
 		input: CreateAgreementInput,
 		idempotencyKey: string,
 	): Promise<{ agreement_id: string; replayed: boolean }>;
+	// record_payment: row_version guards concurrent edits; the key makes retries safe.
+	recordPayment(
+		agreementId: string,
+		input: PaymentInput,
+		rowVersion: number,
+		idempotencyKey: string,
+	): Promise<{ payment_id: string; replayed: boolean }>;
 }

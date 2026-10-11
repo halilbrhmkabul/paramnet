@@ -12,7 +12,9 @@ import Contacts from "../../app/(tabs)/contacts";
 import Home from "../../app/(tabs)/index";
 import Requests from "../../app/(tabs)/requests";
 import Index from "../../app/index";
+import AgreementHistory from "../../app/agreement/[id]/history";
 import AgreementDetail from "../../app/agreement/[id]/index";
+import AgreementPayment from "../../app/agreement/[id]/payment";
 import ContactDetail from "../../app/contact/[id]";
 import NewLayout from "../../app/new/_layout";
 import NewForm from "../../app/new/form";
@@ -40,5 +42,7 @@ export const appRoutes = {
 	"new/form": NewForm,
 	"new/plan": NewPlan,
 	"agreement/[id]/index": AgreementDetail,
+	"agreement/[id]/payment": AgreementPayment,
+	"agreement/[id]/history": AgreementHistory,
 	"contact/[id]": ContactDetail,
 };
