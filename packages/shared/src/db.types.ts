@@ -606,6 +606,11 @@ export type Database = {
 		Functions: {
 			cancel_agreement: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			create_agreement: { Args: { idem_key: string; input: Json }; Returns: Json };
+			get_agreement_detail: { Args: { p_id: string }; Returns: Json };
+			get_calendar: { Args: { p_month: string }; Returns: Json };
+			get_contact_detail: { Args: { p_id: string }; Returns: Json };
+			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
+			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
 			record_payment: {
 				Args: {
 					p_agreement_id: string;

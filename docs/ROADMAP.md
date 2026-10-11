@@ -130,9 +130,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** pgTAP: her geçiş, idempotent tekrar, eşzamanlı ödeme, kalan borçtan fazla ödeme reddi.
 - **Not (2026-10-11):** `private.generate_plan/validate_plan/allocate_payment/canonical_json/terms_hash` plpgsql'de; `pnpm db:vectors` shared JSON vektörlerinden `030_domain_vectors.test.sql` üretir (56 kontrol, CI güncelliğini denetler). RPC'ler: `create_agreement` (idempotent, kişi oluşturma/yeniden kullanma, profil bağlama, peşinat), `record_payment` (FOR UPDATE, row_version, FIFO dağıtım, otomatik settled), `update_personal_agreement` (yeni versiyon, peşinat sabit, ödemeler yeniden dağıtılır), `cancel_agreement`. pgTAP 54 test; eşzamanlılık tek oturumda eski row_version ile simüle edildi. `db lint` temiz (ADR-021).
 
-### [ ] F1-15 Okuma RPC'leri
+### [x] F1-15 Okuma RPC'leri
 - `get_dashboard`, `get_calendar(month)`, `get_agreement_detail(id)`, `list_contacts_with_balance`.
 - **Kabul:** pgTAP + performans için indeks kontrolü.
+- **Not (2026-10-11):** `get_dashboard`, `get_calendar`, `get_agreement_detail`, `list_contacts_with_balance` + `get_contact_detail` (mobil `getContact` için). Mobil görünüm modelleriyle birebir JSON; rol ve karşı taraf çağıranın bakış açısından. pgTAP 35 test, mobil sahte adaptörün demo verisiyle aynı sayılar; okuma indeksleri doğrulandı (ADR-022).
 
 ### [ ] F1-16 Gerçek auth
 - Supabase telefon OTP (yerelde test numaraları), oturumun SecureStore'da saklanması, profil oluşturma, KVKK onayı kaydı (`consents`).
