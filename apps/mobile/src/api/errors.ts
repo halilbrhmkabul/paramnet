@@ -8,7 +8,11 @@ export type ApiErrorCode =
 	| "amount_exceeds_outstanding"
 	| "not_found"
 	| "validation_error"
-	| "network";
+	| "network"
+	| "invalid_phone"
+	| "otp_invalid"
+	| "otp_expired"
+	| "rate_limited";
 
 export class ApiError extends Error {
 	constructor(readonly code: ApiErrorCode) {
@@ -25,6 +29,10 @@ const MESSAGES: Record<ApiErrorCode, string> = {
 	not_found: tr.error.notFound,
 	validation_error: tr.error.validation,
 	network: tr.error.offline,
+	invalid_phone: tr.phone.errorInvalid,
+	otp_invalid: tr.otp.errorInvalid,
+	otp_expired: tr.otp.errorExpired,
+	rate_limited: tr.error.rateLimited,
 };
 
 export function messageForError(error: unknown): string {

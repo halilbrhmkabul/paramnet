@@ -1,6 +1,7 @@
 import { Redirect } from "expo-router";
 
-// F1-06 decides between (auth) and (tabs) from the session.
+import { useIsSignedIn } from "@/features/auth/sessionStore";
+
 export default function Index() {
-	return <Redirect href="/(tabs)" />;
+	return <Redirect href={useIsSignedIn() ? "/(tabs)" : "/welcome"} />;
 }

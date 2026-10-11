@@ -127,8 +127,10 @@ export const termsSchema = z
 
 export type Terms = z.output<typeof termsSchema>;
 
+export const displayNameSchema = requiredText(NAME_MAX);
+
 export const contactInputSchema = z.strictObject({
-	display_name: requiredText(NAME_MAX),
+	display_name: displayNameSchema,
 	phone_e164: optionalPhoneSchema,
 	kind: z.enum(CONTACT_KINDS, { error: "invalid_option" }).default("person"),
 });

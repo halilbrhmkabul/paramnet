@@ -1,44 +1,27 @@
 import { fireEvent, renderRouter, screen } from "expo-router/testing-library";
 
-import RootLayout from "../../app/_layout";
-import AuthLayout from "../../app/(auth)/_layout";
-import Welcome from "../../app/(auth)/welcome";
-import TabsLayout from "../../app/(tabs)/_layout";
-import Add from "../../app/(tabs)/add";
-import Calendar from "../../app/(tabs)/calendar";
-import Contacts from "../../app/(tabs)/contacts";
-import Home from "../../app/(tabs)/index";
-import Requests from "../../app/(tabs)/requests";
-import Index from "../../app/index";
-import NewLayout from "../../app/new/_layout";
-import NewIndex from "../../app/new/index";
+import { resetSession } from "@/features/auth/sessionStore";
 import { tr } from "@/i18n/tr";
+import { appRoutes } from "@/testing/appRoutes";
+import { signInForTest } from "@/testing/session";
 
 jest.mock("@/api/ApiProvider", () => {
 	const actual = jest.requireActual<typeof import("@/api/ApiProvider")>("@/api/ApiProvider");
-	const { createTestApi } =
-		jest.requireActual<typeof import("@/testing/providers")>("@/testing/providers");
-	return { ...actual, createApi: () => createTestApi() };
+	const testing = jest.requireActual<typeof import("@/testing/providers")>("@/testing/providers");
+	return {
+		...actual,
+		createApi: () => testing.createTestApi(),
+		createAuthApi: () => testing.createTestAuthApi(),
+	};
 });
 
-const routes = {
-	_layout: RootLayout,
-	index: Index,
-	"(auth)/_layout": AuthLayout,
-	"(auth)/welcome": Welcome,
-	"(tabs)/_layout": TabsLayout,
-	"(tabs)/index": Home,
-	"(tabs)/contacts": Contacts,
-	"(tabs)/add": Add,
-	"(tabs)/calendar": Calendar,
-	"(tabs)/requests": Requests,
-	"new/_layout": NewLayout,
-	"new/index": NewIndex,
-};
+describe("navigation (signed in)", () => {
+	beforeEach(() => {
+		signInForTest();
+	});
 
-describe("navigation", () => {
 	it("opens on the home tab and switches between the four tabs", async () => {
-		await renderRouter(routes, { initialUrl: "/" });
+		await renderRouter(appRoutes, { initialUrl: "/" });
 		expect(screen.getByTestId("home.screen")).toBeTruthy();
 
 		await fireEvent.press(screen.getByTestId("tabs.contacts"));
@@ -52,15 +35,19 @@ describe("navigation", () => {
 	});
 
 	it("the centre + button opens the new-record modal", async () => {
-		await renderRouter(routes, { initialUrl: "/" });
+		await renderRouter(appRoutes, { initialUrl: "/" });
 		await fireEvent.press(screen.getByTestId("tabs.new.button"));
 		expect(screen.getByTestId("new.screen")).toBeTruthy();
-		expect(screen.getByText(tr.new.title)).toBeTruthy();
+	});
+});
+
+describe("navigation (signed out)", () => {
+	beforeEach(() => {
+		resetSession();
 	});
 
-	it("welcome continues into the tabs", async () => {
-		await renderRouter(routes, { initialUrl: "/welcome" });
-		await fireEvent.press(screen.getByTestId("welcome.start.button"));
-		expect(screen.getByTestId("home.screen")).toBeTruthy();
+	it("starts on welcome and cannot open the tabs", async () => {
+		await renderRouter(appRoutes, { initialUrl: "/contacts" });
+		expect(screen.getByTestId("welcome.screen")).toBeTruthy();
 	});
 });

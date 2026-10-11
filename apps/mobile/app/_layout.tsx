@@ -2,10 +2,12 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type Theme } from "expo-
 import { StatusBar } from "expo-status-bar";
 
 import { ApiProvider } from "@/api/ApiProvider";
+import { useIsSignedIn } from "@/features/auth/sessionStore";
 import { useAppTheme } from "@/theme/useAppTheme";
 
 export default function RootLayout() {
 	const { scheme, colors } = useAppTheme();
+	const signedIn = useIsSignedIn();
 	const base = scheme === "dark" ? DarkTheme : DefaultTheme;
 	const navigationTheme: Theme = {
 		...base,
@@ -23,9 +25,13 @@ export default function RootLayout() {
 		<ApiProvider>
 			<ThemeProvider value={navigationTheme}>
 				<Stack screenOptions={{ headerShown: false }}>
-					<Stack.Screen name="(tabs)" />
-					<Stack.Screen name="(auth)" />
-					<Stack.Screen name="new" options={{ presentation: "modal" }} />
+					<Stack.Protected guard={signedIn}>
+						<Stack.Screen name="(tabs)" />
+						<Stack.Screen name="new" options={{ presentation: "modal" }} />
+					</Stack.Protected>
+					<Stack.Protected guard={!signedIn}>
+						<Stack.Screen name="(auth)" />
+					</Stack.Protected>
 				</Stack>
 				<StatusBar style="auto" />
 			</ThemeProvider>
