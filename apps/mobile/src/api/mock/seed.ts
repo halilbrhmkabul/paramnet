@@ -4,6 +4,19 @@ import { applyPayment, insertAgreement, planFor, type MockState } from "./store"
 
 export type MockSeed = "demo" | "empty";
 
+// UUID-shaped like real ids, because the input schemas validate contact_id as a UUID.
+export const SEED_IDS = {
+	ahmet: "00000000-0000-4000-8000-0000000000a1",
+	yildiz: "00000000-0000-4000-8000-0000000000a2",
+	elif: "00000000-0000-4000-8000-0000000000a3",
+	mert: "00000000-0000-4000-8000-0000000000a4",
+	ahmetLoan: "00000000-0000-4000-8000-0000000000b1",
+	yildizFurniture: "00000000-0000-4000-8000-0000000000b2",
+	elifLoan: "00000000-0000-4000-8000-0000000000b3",
+	mertSale: "00000000-0000-4000-8000-0000000000b4",
+	mertLoan: "00000000-0000-4000-8000-0000000000b5",
+} as const;
+
 function at(date: IsoDate): string {
 	return `${date}T09:00:00.000Z`;
 }
@@ -16,25 +29,35 @@ export function seedState(seed: MockSeed, today: IsoDate): MockState {
 	}
 	state.contacts.push(
 		{
-			id: "c-ahmet",
+			id: SEED_IDS.ahmet,
 			display_name: "Ahmet Yılmaz",
 			phone_e164: "+905551112233",
 			kind: "person",
 		},
-		{ id: "c-yildiz", display_name: "Yıldız Mobilya", phone_e164: null, kind: "merchant" },
-		{ id: "c-elif", display_name: "Elif Kaya", phone_e164: "+905552223344", kind: "person" },
-		{ id: "c-mert", display_name: "Mert Demir", phone_e164: "+905553334455", kind: "person" },
+		{ id: SEED_IDS.yildiz, display_name: "Yıldız Mobilya", phone_e164: null, kind: "merchant" },
+		{
+			id: SEED_IDS.elif,
+			display_name: "Elif Kaya",
+			phone_e164: "+905552223344",
+			kind: "person",
+		},
+		{
+			id: SEED_IDS.mert,
+			display_name: "Mert Demir",
+			phone_e164: "+905553334455",
+			kind: "person",
+		},
 	);
 
 	const lentStart = addDays(today, -40);
 	const lent = insertAgreement(state, {
-		id: "ag-ahmet",
+		id: SEED_IDS.ahmetLoan,
 		kind: "loan",
 		title: "Borç",
 		description: null,
 		notes: null,
 		my_role: "creditor",
-		contact_id: "c-ahmet",
+		contact_id: SEED_IDS.ahmet,
 		principal_minor: 1200000,
 		down_payment_minor: 0,
 		down_payment_on: lentStart,
@@ -63,13 +86,13 @@ export function seedState(seed: MockSeed, today: IsoDate): MockState {
 	});
 
 	insertAgreement(state, {
-		id: "ag-yildiz",
+		id: SEED_IDS.yildizFurniture,
 		kind: "installment_purchase",
 		title: "Mobilya",
 		description: "Yemek odası takımı",
 		notes: null,
 		my_role: "debtor",
-		contact_id: "c-yildiz",
+		contact_id: SEED_IDS.yildiz,
 		principal_minor: 2800000,
 		down_payment_minor: 800000,
 		down_payment_on: addDays(today, -20),
@@ -78,13 +101,13 @@ export function seedState(seed: MockSeed, today: IsoDate): MockState {
 	});
 
 	insertAgreement(state, {
-		id: "ag-elif",
+		id: SEED_IDS.elifLoan,
 		kind: "loan",
 		title: "Borç",
 		description: null,
 		notes: "Tatil dönüşü",
 		my_role: "debtor",
-		contact_id: "c-elif",
+		contact_id: SEED_IDS.elif,
 		principal_minor: 250000,
 		down_payment_minor: 0,
 		down_payment_on: today,
@@ -93,13 +116,13 @@ export function seedState(seed: MockSeed, today: IsoDate): MockState {
 	});
 
 	insertAgreement(state, {
-		id: "ag-mert-sale",
+		id: SEED_IDS.mertSale,
 		kind: "installment_purchase",
 		title: "Bisiklet",
 		description: null,
 		notes: null,
 		my_role: "creditor",
-		contact_id: "c-mert",
+		contact_id: SEED_IDS.mert,
 		principal_minor: 900000,
 		down_payment_minor: 0,
 		down_payment_on: today,
@@ -109,13 +132,13 @@ export function seedState(seed: MockSeed, today: IsoDate): MockState {
 
 	const oldDue = addDays(today, -60);
 	const settled = insertAgreement(state, {
-		id: "ag-mert-loan",
+		id: SEED_IDS.mertLoan,
 		kind: "loan",
 		title: "Borç",
 		description: null,
 		notes: null,
 		my_role: "creditor",
-		contact_id: "c-mert",
+		contact_id: SEED_IDS.mert,
 		principal_minor: 100000,
 		down_payment_minor: 0,
 		down_payment_on: oldDue,

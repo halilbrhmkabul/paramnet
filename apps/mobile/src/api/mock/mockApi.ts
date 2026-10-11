@@ -1,11 +1,12 @@
-import { todayInIstanbul, type IsoDate } from "@paramnet/shared";
+import { createAgreementInputSchema, todayInIstanbul, type IsoDate } from "@paramnet/shared";
 
 import type { AgreementsApi } from "../AgreementsApi";
 import { ApiError } from "../errors";
 import type { CalendarMonth, ContactSummary, DueItem } from "../types";
 import { dueItems, inMonth, isOpen, toDetail, toSummary } from "./derive";
 import { seedState, type MockSeed } from "./seed";
-import type { MockContact, MockState } from "./store";
+import { insertAgreement, type MockContact, type MockState } from "./store";
+import { clock } from "@/lib/clock";
 
 export type MockApiOptions = {
 	now?: () => Date;
@@ -17,12 +18,18 @@ export type MockApiOptions = {
 const UPCOMING_LIMIT = 5;
 
 export function createMockApi({
-	now = () => new Date(),
+	now = () => clock.now(),
 	seed = "demo",
 	latencyMs = 300,
 }: MockApiOptions = {}) {
 	const today = (): IsoDate => todayInIstanbul(now());
 	const state: MockState = seedState(seed, today());
+	const createdByKey = new Map<string, string>();
+	let sequence = 0;
+	const nextId = () => {
+		sequence += 1;
+		return `00000000-0000-4000-9000-${String(sequence).padStart(12, "0")}`;
+	};
 
 	async function respond<T>(produce: () => T): Promise<T> {
 		if (latencyMs > 0) {
@@ -132,6 +139,44 @@ export function createMockApi({
 					}
 				}
 				return { month, days };
+			}),
+
+		createAgreement: (input, idempotencyKey) =>
+			respond(() => {
+				const existing = createdByKey.get(idempotencyKey);
+				if (existing !== undefined) {
+					return { agreement_id: existing, replayed: true };
+				}
+				// The server re-validates everything the client sent (create_agreement RPC).
+				const parsed = createAgreementInputSchema.safeParse(input);
+				if (!parsed.success) {
+					throw new ApiError("validation_error");
+				}
+				const { counterparty, terms, ...fields } = parsed.data;
+				let contactId: string;
+				if ("contact_id" in counterparty) {
+					contactId = contactOf(counterparty.contact_id).id;
+				} else {
+					contactId = nextId();
+					state.contacts.push({ id: contactId, ...counterparty.contact });
+				}
+				const id = nextId();
+				insertAgreement(state, {
+					id,
+					kind: fields.kind,
+					title: fields.title,
+					description: fields.description,
+					notes: terms.notes,
+					my_role: fields.creator_role,
+					contact_id: contactId,
+					principal_minor: terms.principal_minor,
+					down_payment_minor: terms.down_payment_minor,
+					down_payment_on: today(),
+					created_at: now().toISOString(),
+					plan: terms.plan,
+				});
+				createdByKey.set(idempotencyKey, id);
+				return { agreement_id: id, replayed: false };
 			}),
 	};
 

@@ -1,4 +1,4 @@
-import type { IsoDate } from "@paramnet/shared";
+import type { CreateAgreementInput, IsoDate } from "@paramnet/shared";
 
 import type {
 	AgreementDetail,
@@ -15,4 +15,9 @@ export interface AgreementsApi {
 	getContact(id: string): Promise<ContactDetail>;
 	getAgreement(id: string): Promise<AgreementDetail>;
 	getCalendar(month: IsoDate): Promise<CalendarMonth>;
+	// The key is generated once per draft and reused on retry (BR-09).
+	createAgreement(
+		input: CreateAgreementInput,
+		idempotencyKey: string,
+	): Promise<{ agreement_id: string; replayed: boolean }>;
 }

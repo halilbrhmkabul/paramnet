@@ -130,3 +130,13 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Bildirim izni `src/lib/notifications.ts` arkasında sahte ("granted"); F1-18'de expo-notifications.
 	- Form doğrulama kodları `src/features/forms/fieldError.ts`'de Türkçeye çevrilir. Yeni bileşenler: `TextField`, `Checkbox`. Shared'a `displayNameSchema`.
 	- Bekleyen davet varsa Talepler'e yönlendirme (spec 5.1 adım 6) davetler olmadan anlamsız; F2-10'da.
+
+## ADR-017 — Yeni kayıt akışı
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- Bağımlılıklar: `react-hook-form ~7.89.0` + `@hookform/resolvers ~5.9.1` (CLAUDE.md formlar), `@react-native-community/datetimepicker` (Expo SDK uyumlu sürüm, `timeZoneName: Europe/Istanbul`; gün ↔ an dönüşümü İstanbul öğlesiyle), `expo-contacts` (yalnızca `Contact.presentPicker`; tüm rehber okunmaz, izin istenmez). En yeni react-hook-form bugün yayımlandığı için bir önceki sürüm.
+	- Form kuralları `features/new/formModel.ts`'de: dört tür → `kind` + rol; plan `generatePlan` ile, plan hataları ilgili alana bağlanır. Borç kayıtlarının başlığı "Borç" (formda ürün alanı yalnızca taksitli türlerde). Tek seferlik borç vadesiz olabilir; taksitliye geçince ilk tarih otomatik dolar.
+	- Taslak (tür, form değerleri, idempotency anahtarı, son kullanılan kişi) Zustand'da; anahtar taslak başında bir kez üretilir ve tekrar denemede aynısı gider. Kaydedince taslak sıfırlanır, `router.replace` modalı kapatıp anlaşma ekranını açar.
+	- Kişi seçicide rehberden gelen numara kayıtlı bir kişiye aitse o kişi kullanılır; elle eklenen satıcı (Taksitle aldım) `merchant`.
+	- Tek uygulama saati `src/lib/clock.ts`; sahte adaptör ve ekranlar aynı "bugün"ü kullanır, testler `jest.setup.tsx`'te 2026-10-11'e sabitler. Jest'te tarih seçici ve rehber seçici mock'lanır.
+	- Mock seed ve yeni kayıt ID'leri UUID biçiminde (giriş şemaları `contact_id`'yi UUID olarak doğrular).

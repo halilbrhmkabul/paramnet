@@ -28,6 +28,10 @@ export default function RootLayout() {
 					<Stack.Protected guard={signedIn}>
 						<Stack.Screen name="(tabs)" />
 						<Stack.Screen name="new" options={{ presentation: "modal" }} />
+						<Stack.Screen
+							name="agreement/[id]/index"
+							options={{ headerShown: true, title: "" }}
+						/>
 					</Stack.Protected>
 					<Stack.Protected guard={!signedIn}>
 						<Stack.Screen name="(auth)" />

@@ -82,9 +82,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** Akış baştan sona tıklanabiliyor; hata durumları (yanlış kod, süre dolumu) görünüyor.
 - **Not (2026-10-11):** Karşılama (3 kart, atlanabilir) → telefon (+90 sabit, TR cep) → OTP (`123456`, 3 dk geçerlilik, 60 sn yeniden gönderme, hatalı/süresi dolmuş) → profil (ad + KVKK) → bildirim izni (sahte). `Stack.Protected` ile yönlendirme, oturum Zustand'da bellekte (ADR-016). Bekleyen davet varsa Talepler'e yönlendirme Faz 2'ye (F2-10) kaldı.
 
-### [ ] F1-07 Yeni kayıt akışı (S08–S10)
+### [x] F1-07 Yeni kayıt akışı (S08–S10)
 - Tür seçimi (4 seçenek), dinamik form, kişi seçici (rehber + elle), plan önizleme ve satır düzenleme.
 - **Kabul:** Mobilya örneği (28.000 / 8.000 peşinat / 5 taksit) önizlemede doğru; form doğrulama mesajları Türkçe.
+- **Not (2026-10-11):** S08 dört kart → S09 türe göre form (react-hook-form + `validateForm`, plan hataları ilgili alana) + kişi seçici (kayıtlı kişiler, son kullanılan önde, rehberden seçme, elle ekleme) → S10 plan önizleme (satır satır tutar/tarih düzenleme, fark mesajı, "Eşit dağıt") → kaydet → geçici anlaşma ekranı. Sahte adaptör `createAgreement` (idempotent, şemayla doğrular). "Verildiği tarih" alanı şemada olmadığı için formda yok (ADR-014 açık soru). (ADR-017)
 
 ### [ ] F1-08 Ana Sayfa, Kişiler, Kişi detay (S05–S07)
 - Özet kartları, yaklaşan vadeler, bekleyen işler bandı; kişi bazında net bakiye.

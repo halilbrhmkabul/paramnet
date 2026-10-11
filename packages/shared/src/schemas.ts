@@ -90,6 +90,10 @@ function optionalText(max: number) {
 		});
 }
 
+export const displayNameSchema = requiredText(NAME_MAX);
+export const titleSchema = requiredText(TITLE_MAX);
+export const termsNotesSchema = optionalText(TERMS_NOTES_MAX);
+
 const planRowSchema = z.strictObject({
 	seq: z
 		.number({ error: "invalid_seq" })
@@ -105,7 +109,7 @@ export const termsSchema = z
 		principal_minor: positiveMinorSchema,
 		down_payment_minor: nonNegativeMinorSchema,
 		plan: z.array(planRowSchema),
-		notes: optionalText(TERMS_NOTES_MAX),
+		notes: termsNotesSchema,
 	})
 	.superRefine((terms, ctx) => {
 		const badSeq = terms.plan.findIndex((row, index) => row.seq !== index + 1);
@@ -127,8 +131,6 @@ export const termsSchema = z
 
 export type Terms = z.output<typeof termsSchema>;
 
-export const displayNameSchema = requiredText(NAME_MAX);
-
 export const contactInputSchema = z.strictObject({
 	display_name: displayNameSchema,
 	phone_e164: optionalPhoneSchema,
@@ -140,7 +142,7 @@ export type ContactInput = z.output<typeof contactInputSchema>;
 export const createAgreementInputSchema = z.strictObject({
 	kind: z.enum(AGREEMENT_KINDS, { error: "invalid_option" }),
 	creator_role: z.enum(PARTY_ROLES, { error: "invalid_option" }),
-	title: requiredText(TITLE_MAX),
+	title: titleSchema,
 	description: optionalText(DESCRIPTION_MAX),
 	counterparty: z.union(
 		[
