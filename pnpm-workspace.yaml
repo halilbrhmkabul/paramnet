@@ -1,0 +1,7 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Native binding ships via optionalDependencies; the postinstall fallback is not needed.
+allowBuilds:
+  unrs-resolver: false

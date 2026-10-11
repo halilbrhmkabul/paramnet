@@ -1,0 +1,26 @@
+{
+	"name": "paramnet",
+	"private": true,
+	"packageManager": "pnpm@12.11.2",
+	"engines": {
+		"node": ">=20"
+	},
+	"scripts": {
+		"mobile": "pnpm --filter mobile start",
+		"typecheck": "pnpm -r typecheck",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"test": "pnpm -r test"
+	},
+	"devDependencies": {
+		"eslint": "^9.39.5",
+		"eslint-config-expo": "~57.0.2",
+		"eslint-config-prettier": "^10.1.8",
+		"globals": "^17.13.0",
+		"prettier": "^3.9.9",
+		"typescript": "~6.0.3",
+		"typescript-eslint": "^8.71.1"
+	}
+}
