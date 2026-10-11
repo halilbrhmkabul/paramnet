@@ -259,3 +259,16 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Turnstile: `TURNSTILE_SECRET_KEY` ile doğrulanır; yalnızca yerelde `TURNSTILE_DISABLED=1`. SMS: sağlayıcı F3-04'e kadar yok, `SMS_MODE=test` yalnızca test numaralarına izin verir; başka her yerde `sms_unavailable` (503).
 	- Deno testleri yerine: pgTAP (kurallar) + Vitest (saf mantık) + gerçek yerel yığına karşı entegrasyon testi (CI `integration` işi fonksiyonları `functions serve` ile çalıştırır).
 - **Bilinen sınır:** hesabı olmayan davetli web'den düzeltme önerir, oluşturan da karşı öneri yaparsa (pending), davetliye yeni bağlantı gerekir; bu, ADR-026'daki "pending iken yeniden paylaşım" sorusuna bağlı.
+
+## ADR-029 — Web onay sayfası
+- **Tarih:** 2026-10-12
+- **Karar:**
+	- `apps/web-confirm`: Next.js 16.3.6 (en yenisi 2 haftadan genç), React 19.2.3 (mobil ile aynı), `@paramnet/shared` kaynak olarak (`transpilePackages`). Tek rota `/i/[token]` (deep-links.md biçimi); kök 404.
+	- Tarayıcı Supabase'e hiç bağlanmaz: tüm çağrılar sunucuda (`src/lib/functions.ts`, `server-only`) edge function'lara; publishable anahtar ve fonksiyon adresi sunucu ortam değişkeni (`FUNCTIONS_URL`, `SUPABASE_PUBLISHABLE_KEY`).
+	- Durum geçişleri yalnızca POST (Server Actions): Next'in Origin kontrolüne ek olarak double-submit CSRF token (çerez `proxy.ts`'te, formda gizli alan, sabit süreli karşılaştırma). GET yalnızca okur (`invite-open`).
+	- Çerezler: `pn_phone` (10 dk), `pn_session` (onay oturumu, 15 dk), `pn_result` (1 saat) — HttpOnly, SameSite=Strict, `path=/i/<token>`, üretimde Secure. Yenilemede plan `invite-details` fonksiyonuyla oturumdan tekrar alınır.
+	- Güvenlik başlıkları (spec 11.2): istek başına nonce'lu CSP (`strict-dynamic`, yalnızca Turnstile dış kaynak, `frame-ancestors 'none'`, `form-action 'self'`), HSTS, `Referrer-Policy: no-referrer`, `X-Robots-Tag: noindex`, `X-Frame-Options: DENY`, `no-store`.
+	- Düzeltme önerisi web'de: satırların tarih ve tutarları düzenlenir, toplam ve peşinat sabit; `validatePlan` ile sunucuda kontrol, hatalar Türkçe.
+	- Turnstile yalnızca `NEXT_PUBLIC_TURNSTILE_SITE_KEY` varken çizilir; yerel testlerde yok (fonksiyon tarafında `TURNSTILE_DISABLED=1`).
+	- Playwright (Chromium, Pixel 7 görünümü) üretim derlemesiyle gerçek yerel yığına karşı; CI `integration` işinde.
+- **Bilinen sınır (F3-05):** fonksiyonlar IP'yi `cf-connecting-ip` / `x-forwarded-for` başlığından alıyor; doğrudan çağıran biri başlığı değiştirerek IP penceresini aşabilir (numara penceresi ve kilit yine geçerli). Web sunucusu ile fonksiyonlar arasında paylaşılan bir başlık sırrı veya platformun güvenilir istemci IP'si kötüye kullanım testlerinde ele alınacak.
