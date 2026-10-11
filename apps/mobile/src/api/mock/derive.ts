@@ -72,7 +72,16 @@ export function toDetail(
 		down_payment_minor: agreement.down_payment_minor,
 		created_at: agreement.created_at,
 		installments: installmentViews(agreement, today),
-		payments: [...agreement.payments].sort((a, b) => (a.created_at < b.created_at ? 1 : -1)),
+		// Newest payment date first, then newest record (same order as get_agreement_detail).
+		payments: [...agreement.payments].sort((a, b) =>
+			a.paid_on !== b.paid_on
+				? a.paid_on < b.paid_on
+					? 1
+					: -1
+				: a.created_at < b.created_at
+					? 1
+					: -1,
+		),
 		events: [...agreement.events],
 	};
 }

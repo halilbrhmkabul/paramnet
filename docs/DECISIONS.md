@@ -181,3 +181,14 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- `update_personal_agreement`: yeni versiyon `accepted`, eskisi `superseded`; peşinat değiştirilemez (kayıtlı bir ödeme); onaylı ödemeler (peşinat hariç) ödeme tarihi sırasıyla yeni taksitlere FIFO dağıtılır, eski dağıtımlar geçmiş olarak kalır; yeni toplam ödenenin altına inemez; kalan 0 olursa `settled`.
 	- Eşzamanlılık: anlaşma satırı `FOR UPDATE` ile kilitlenir; aynı `row_version` ile gelen ikinci yazma `conflict` alır.
 	- plpgsql_check (`supabase db lint`) temiz tutulur: yardımcılar `STABLE`, hata atma satır içi `raise`.
+
+## ADR-022 — Okuma RPC'leri
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- Okuma RPC'leri mobil görünüm modellerini (`apps/mobile/src/api/types.ts`) JSON olarak döndürür; Supabase adaptörü (F1-17) dönüştürme yapmadan kullanır. `get_contact_detail` ROADMAP'te yoktu, mobil `getContact` için eklendi.
+	- Bakış açısı: `my_role` çağırana göre (karşı taraf için oluşturanın rolünün tersi). Karşı taraf adı oluşturan için kendi kişi kaydından, karşı taraf için oluşturanın profilinden (ADR-020'deki profil kısıtı bu yolla aşılır); bu durumda `contact_id` null.
+	- Bakiyeye ve vadelere sayılan durumlar: `personal`, `active`, `amendment_pending`, `disputed`. `pending`/`countered` henüz kabul edilmemiş, `settled`/`cancelled`/`rejected` kapalı.
+	- Takvim, ay içindeki ödenmiş taksitleri de döndürür (durumuyla); Ana Sayfa yalnızca ödenmemişleri.
+	- Kişi sıralaması `tr-TR-x-icu` harmanlamasıyla.
+	- `private.today()` testlerde `paramnet.today` ayarıyla sabitlenebilir; yalnızca oturum kullanıcısı `postgres` iken geçerli, API istekleri (`authenticator`) için etkisiz.
+	- Olay türleri `created`, `payment_recorded`, `updated`, `cancelled`, `settled`; mobil geçmiş ekranı F1-17'de `updated`/`cancelled`'ı da gösterecek.
