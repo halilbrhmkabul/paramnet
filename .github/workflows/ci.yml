@@ -89,3 +89,9 @@ jobs:
           eval "$(pnpm --silent supabase status -o env)"
           PARAMNET_SUPABASE_URL="$API_URL" PARAMNET_SUPABASE_KEY="$PUBLISHABLE_KEY" PARAMNET_REQUIRE_INTEGRATION=1 \
             pnpm --filter mobile test:integration
+      # W01–W04 in a real browser against the same stack (apps/web-confirm/e2e).
+      - run: pnpm --filter web-confirm exec playwright install --with-deps chromium
+      - run: |
+          eval "$(pnpm --silent supabase status -o env)"
+          PARAMNET_SUPABASE_URL="$API_URL" PARAMNET_SUPABASE_KEY="$PUBLISHABLE_KEY" CI=1 \
+            pnpm --filter web-confirm test:e2e

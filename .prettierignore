@@ -10,3 +10,6 @@ apps/mobile/ios
 apps/mobile/android
 apps/mobile/expo-env.d.ts
 skills-lock.json
+.next/
+test-results/
+playwright-report/

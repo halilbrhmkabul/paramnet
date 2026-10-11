@@ -10,6 +10,10 @@ export default tseslint.config(
 			"**/dist/**",
 			"**/coverage/**",
 			"**/.expo/**",
+			"**/.next/**",
+			"**/test-results/**",
+			"**/playwright-report/**",
+			"apps/web-confirm/next-env.d.ts",
 			"**/expo-env.d.ts",
 			// `pnpm db:types` çıktısı; elle düzenlenmez.
 			"packages/shared/src/db.types.ts",

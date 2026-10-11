@@ -435,3 +435,6 @@ verify_jwt = false
 
 [functions.invite-decide]
 verify_jwt = false
+
+[functions.invite-details]
+verify_jwt = false
