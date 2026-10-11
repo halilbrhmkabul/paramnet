@@ -1,11 +1,17 @@
-import { createAgreementInputSchema, todayInIstanbul, type IsoDate } from "@paramnet/shared";
+import {
+	createAgreementInputSchema,
+	outstanding,
+	paymentInputSchema,
+	todayInIstanbul,
+	type IsoDate,
+} from "@paramnet/shared";
 
 import type { AgreementsApi } from "../AgreementsApi";
 import { ApiError } from "../errors";
 import type { CalendarMonth, ContactSummary, DueItem } from "../types";
 import { dueItems, inMonth, isOpen, toDetail, toSummary } from "./derive";
 import { seedState, type MockSeed } from "./seed";
-import { insertAgreement, type MockContact, type MockState } from "./store";
+import { applyPayment, insertAgreement, type MockContact, type MockState } from "./store";
 import { clock } from "@/lib/clock";
 
 export type MockApiOptions = {
@@ -25,6 +31,7 @@ export function createMockApi({
 	const today = (): IsoDate => todayInIstanbul(now());
 	const state: MockState = seedState(seed, today());
 	const createdByKey = new Map<string, string>();
+	const paymentByKey = new Map<string, string>();
 	let sequence = 0;
 	const nextId = () => {
 		sequence += 1;
@@ -177,6 +184,42 @@ export function createMockApi({
 				});
 				createdByKey.set(idempotencyKey, id);
 				return { agreement_id: id, replayed: false };
+			}),
+
+		recordPayment: (agreementId, input, rowVersion, idempotencyKey) =>
+			respond(() => {
+				const existing = paymentByKey.get(idempotencyKey);
+				if (existing !== undefined) {
+					return { payment_id: existing, replayed: true };
+				}
+				const agreement = state.agreements.find((a) => a.id === agreementId);
+				if (agreement === undefined) {
+					throw new ApiError("not_found");
+				}
+				const parsed = paymentInputSchema.safeParse(input);
+				if (!parsed.success) {
+					throw new ApiError("validation_error");
+				}
+				// BR-14: closed agreements take no new payments.
+				if (agreement.status !== "personal" && agreement.status !== "active") {
+					throw new ApiError("invalid_transition");
+				}
+				if (agreement.row_version !== rowVersion) {
+					throw new ApiError("conflict");
+				}
+				if (parsed.data.amount_minor > outstanding(agreement, agreement.payments)) {
+					throw new ApiError("amount_exceeds_outstanding");
+				}
+				const id = nextId();
+				applyPayment(agreement, {
+					id,
+					...parsed.data,
+					kind: "payment",
+					status: "confirmed",
+					created_at: now().toISOString(),
+				});
+				paymentByKey.set(idempotencyKey, id);
+				return { payment_id: id, replayed: false };
 			}),
 	};
 

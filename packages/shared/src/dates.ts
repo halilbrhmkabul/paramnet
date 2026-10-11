@@ -152,3 +152,13 @@ export function isoWeekday(date: IsoDate): number {
 	const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
 	return weekday === 0 ? 7 : weekday;
 }
+
+// Event times (timestamptz) shown as "10 Kas 2026, 14:05" in Istanbul time (ADR-011 fixed offset).
+export function formatDateTimeTR(timestamp: string): string {
+	const time = new Date(timestamp).getTime();
+	if (Number.isNaN(time)) {
+		throw new RangeError("invalid timestamp");
+	}
+	const local = new Date(time + ISTANBUL_OFFSET_MS).toISOString();
+	return `${formatDateTR(local.slice(0, 10), "short")}, ${local.slice(11, 16)}`;
+}

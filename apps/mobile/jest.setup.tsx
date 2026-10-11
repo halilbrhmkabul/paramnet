@@ -47,3 +47,7 @@ jest.mock("@/api/ApiProvider", () => {
 	}
 	return { ...actual, ApiProvider: MockApiProvider };
 });
+
+jest.mock("@react-native-community/netinfo", () =>
+	jest.requireActual<object>("@react-native-community/netinfo/jest/netinfo-mock.js"),
+);

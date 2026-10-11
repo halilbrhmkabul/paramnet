@@ -1,4 +1,4 @@
-import type { CreateAgreementInput, IsoDate } from "@paramnet/shared";
+import type { CreateAgreementInput, IsoDate, PaymentInput } from "@paramnet/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useApi } from "./ApiProvider";
@@ -49,5 +49,23 @@ export function useCreateAgreement() {
 		}) => api.createAgreement(input, idempotencyKey),
 		// A new agreement changes the dashboard, contacts and calendar at once.
 		onSuccess: () => queryClient.invalidateQueries(),
+	});
+}
+
+export function useRecordPayment(agreementId: string) {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			input,
+			rowVersion,
+			idempotencyKey,
+		}: {
+			input: PaymentInput;
+			rowVersion: number;
+			idempotencyKey: string;
+		}) => api.recordPayment(agreementId, input, rowVersion, idempotencyKey),
+		// Success changes balances everywhere; a conflict means our copy is stale. Both need fresh data.
+		onSettled: () => queryClient.invalidateQueries(),
 	});
 }
