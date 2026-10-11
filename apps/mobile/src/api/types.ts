@@ -11,7 +11,12 @@ import type {
 } from "@paramnet/shared";
 
 // View models returned by the API layer; the Supabase adapter (F1-17) maps RPC results to the same shapes.
-export type Counterparty = { contact_id: string; display_name: string; kind: ContactKind };
+export type Counterparty = {
+	contact_id: string;
+	display_name: string;
+	kind: ContactKind;
+	phone_e164: string | null;
+};
 
 export type NextInstallment = {
 	seq: number;
