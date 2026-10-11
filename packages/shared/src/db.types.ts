@@ -331,6 +331,9 @@ export type Database = {
 					expires_at: string;
 					id: string;
 					otp_attempts: number;
+					otp_expires_at: string | null;
+					otp_hash: string | null;
+					otp_last_sent_at: string | null;
 					status: Database["public"]["Enums"]["invite_status"];
 					target_phone_e164: string;
 					token_hash: string;
@@ -344,6 +347,9 @@ export type Database = {
 					expires_at: string;
 					id?: string;
 					otp_attempts?: number;
+					otp_expires_at?: string | null;
+					otp_hash?: string | null;
+					otp_last_sent_at?: string | null;
 					status?: Database["public"]["Enums"]["invite_status"];
 					target_phone_e164: string;
 					token_hash: string;
@@ -356,6 +362,9 @@ export type Database = {
 					expires_at?: string;
 					id?: string;
 					otp_attempts?: number;
+					otp_expires_at?: string | null;
+					otp_hash?: string | null;
+					otp_last_sent_at?: string | null;
 					status?: Database["public"]["Enums"]["invite_status"];
 					target_phone_e164?: string;
 					token_hash?: string;
@@ -591,6 +600,28 @@ export type Database = {
 					},
 				];
 			};
+			rate_limits: {
+				Row: {
+					count: number;
+					created_at: string;
+					key: string;
+					window_start: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					count?: number;
+					created_at?: string;
+					key: string;
+					window_start: string;
+				};
+				Update: {
+					count?: number;
+					created_at?: string;
+					key?: string;
+					window_start?: string;
+				};
+				Relationships: [];
+			};
 			reminders: {
 				Row: {
 					agreement_id: string;
@@ -684,6 +715,29 @@ export type Database = {
 			get_calendar: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
+			invite_decide: {
+				Args: {
+					p_counter_terms: Json;
+					p_decision: string;
+					p_invite_id: string;
+					p_ip_hash: string;
+					p_phone: string;
+					p_terms_hash: string;
+					p_user_agent: string;
+					p_version: number;
+				};
+				Returns: Json;
+			};
+			invite_details: { Args: { p_invite_id: string }; Returns: Json };
+			invite_open: { Args: { p_token: string }; Returns: Json };
+			invite_send_otp: {
+				Args: { p_code: string; p_ip_hash: string; p_phone: string; p_token: string };
+				Returns: Json;
+			};
+			invite_verify_otp: {
+				Args: { p_code: string; p_phone: string; p_token: string };
+				Returns: Json;
+			};
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
 			make_personal: { Args: { p_id: string }; Returns: Json };
 			record_payment: {

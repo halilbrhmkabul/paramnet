@@ -1,4 +1,6 @@
 {
 	"extends": "../../tsconfig.base.json",
-	"include": ["src/**/*.ts", "vitest.config.ts", "../../supabase/functions/_shared/**/*.ts"]
+	"include": ["src/**/*.ts", "vitest.config.ts", "../../supabase/functions/_shared/**/*.ts"],
+	// Deno-only (Deno.env, npm: imports); covered by the functions' own runtime.
+	"exclude": ["../../supabase/functions/_shared/server.ts"]
 }

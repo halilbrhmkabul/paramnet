@@ -166,10 +166,11 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** pgTAP: token hash, süre sonu, geri çekme, kendine paylaşım reddi (BR-12).
 - **Not (2026-10-12):** `invites` (istemciye kapalı), `share_agreement` (32 bayt token base64url, yalnızca sha256 saklanır, düz token bir kez döner; TR cep, kendine paylaşım yok; kişiye numara yazılır ve profile bağlanır), `withdraw_share` (pending/countered → personal), `expire_invites` + saatlik cron (7 gün → personal). Ek düzeltme: F1-14 kilit fonksiyonundaki NULL karşılaştırması (yabancı `forbidden` yerine `not_found` alır). pgTAP 32 test. **Açık soru:** pending iken "linki tekrar paylaş" yeni token gerektirir; durum makinesinde pending → pending geçişi yok (ADR-026).
 
-### [ ] F2-02 Davet edge function'ları
+### [x] F2-02 Davet edge function'ları
 - `invite-open`, `invite-otp-send` (rate limit, yalnızca +90), `invite-otp-verify` (5 deneme, 5 dk), `invite-decide`.
 - **Kabul:** Deno testleri; GET hiçbir durum değiştirmiyor; yanlış numara onaylayamıyor.
 - **Skill:** paramnet-domain (references/security.md)
+- **Not (2026-10-12):** `invite-open` (yalnızca GET, yan etkisiz, yalnızca oluşturanın adı), `invite-otp-send` (Turnstile, IP/numara pencereleri, hedef numaraya 60 sn bekleme; başka numaraya aynı yanıt ama kod yok), `invite-otp-verify` (5 dk kod, 5 hatada `locked`, 15 dk HMAC imzalı onay oturumu + plan ayrıntısı), `invite-decide` (web kanalı, numara + IP hash + user agent kanıtı). Kurallar servis rolüne açık RPC'lerde (pgTAP 34), saf mantık `_shared/invite.ts` (Vitest), akış gerçek yerel yığına karşı entegrasyon testiyle (CI `integration` işinde de). Deno testleri yerine bu üçlü (Deno kurulu değil). Gerçek SMS F3-04'e kadar yok: yalnızca test numaraları (ADR-028).
 
 ### [x] F2-03 Karar RPC'leri
 - `decide_agreement` (accept / counter / reject), versiyon + terms_hash kontrolü, karşı tarafın profile bağlanması.

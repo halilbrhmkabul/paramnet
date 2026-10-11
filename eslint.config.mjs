@@ -19,6 +19,7 @@ export default tseslint.config(
 			// Deno edge function entry points (npm: imports, Deno globals); their logic lives in
 			// supabase/functions/_shared and is linted/tested through packages/shared.
 			"supabase/functions/*/index.ts",
+			"supabase/functions/_shared/server.ts",
 			"docs/**",
 		],
 	},

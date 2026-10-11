@@ -422,3 +422,16 @@ enabled = true
 # The function checks the service role key itself (called by pg_cron, never by clients).
 [functions.dispatch-notifications]
 verify_jwt = false
+
+# Invite functions check their own credentials (OTP, signed approval session); public by design.
+[functions.invite-open]
+verify_jwt = false
+
+[functions.invite-otp-send]
+verify_jwt = false
+
+[functions.invite-otp-verify]
+verify_jwt = false
+
+[functions.invite-decide]
+verify_jwt = false

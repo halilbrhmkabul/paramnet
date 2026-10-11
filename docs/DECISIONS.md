@@ -246,3 +246,16 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- `reject`: anlaşma `rejected`, reddeden hesap bağlanmaz ("Bu plan bana ait değil"). Oluşturan `make_personal` ile kişisel moda döner.
 	- `decide_counter` yalnızca `accept` / `counter`; oluşturanın "hayır"ı `withdraw_share`.
 	- Her kararda aktif davet `consumed` olur; olay kaydında karar verenin doğrulanmış numarası (`actor_phone_e164`).
+
+## ADR-028 — Davet edge function'ları ve web OTP'si
+- **Tarih:** 2026-10-12
+- **Karar:**
+	- Web onayı Supabase Auth'u kullanmaz (davetli hesap açmaz); davete özel OTP: kodu edge function CSPRNG ile üretir (test modunda test numaralarına `123456`), DB yalnızca `sha256(invite_id:code)` saklar, 5 dk geçerli, tek kullanımlık. 5 başarısız doğrulamada davet `locked`.
+	- Doğrulama sonucu hata fırlatmak yerine `{ok, error}` döner: fırlatılan hata transaction'ı ve deneme sayacını geri alır, kilit hiç devreye girmezdi.
+	- Numara sızdırmama: hedef dışı numaraya da "gönderildi" denir ama kod saklanmaz; o numarayla denemeler yine kilide sayılır. 60 sn yeniden gönderme beklemesi yalnızca hedef numaraya uygulanır (başkası davetliyi geciktiremesin); diğer denemeler `rate_limits` (IP 10/saat, numara 5/saat) ile sınırlı.
+	- Onay oturumu: `{invite_id, phone, exp}` HMAC-SHA256 imzalı, 15 dk (`INVITE_SESSION_SECRET`). Çerezde saklamak ve CSRF web uygulamasının işi (F2-04). IP yalnızca anahtarlı hash olarak olay kaydına girer.
+	- Web kararı aynı karar çekirdeğinden (`private.apply_decision`) geçer: kanal `web`, aktör yok, doğrulanmış numara kayıtlı bir hesaba aitse hesap hemen bağlanır, değilse F2-10'da.
+	- Fonksiyonlar ince; kurallar servis rolüne açık RPC'lerde (`invite_open`, `invite_send_otp`, `invite_verify_otp`, `invite_details`, `invite_decide`). Deno-only yardımcılar `_shared/server.ts`; test edilebilir mantık `_shared/invite.ts`.
+	- Turnstile: `TURNSTILE_SECRET_KEY` ile doğrulanır; yalnızca yerelde `TURNSTILE_DISABLED=1`. SMS: sağlayıcı F3-04'e kadar yok, `SMS_MODE=test` yalnızca test numaralarına izin verir; başka her yerde `sms_unavailable` (503).
+	- Deno testleri yerine: pgTAP (kurallar) + Vitest (saf mantık) + gerçek yerel yığına karşı entegrasyon testi (CI `integration` işi fonksiyonları `functions serve` ile çalıştırır).
+- **Bilinen sınır:** hesabı olmayan davetli web'den düzeltme önerir, oluşturan da karşı öneri yaparsa (pending), davetliye yeni bağlantı gerekir; bu, ADR-026'daki "pending iken yeniden paylaşım" sorusuna bağlı.
