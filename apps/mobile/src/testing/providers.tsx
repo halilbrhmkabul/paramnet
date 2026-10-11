@@ -35,6 +35,18 @@ export function takeTestApi(): ReturnType<typeof createMockApi> {
 	return api;
 }
 
+let nextQueryClient: QueryClient | null = null;
+
+export function provideTestQueryClient(client: QueryClient): void {
+	nextQueryClient = client;
+}
+
+export function takeTestQueryClient(): QueryClient {
+	const client = nextQueryClient ?? createTestQueryClient();
+	nextQueryClient = null;
+	return client;
+}
+
 let nextAuthApi: AuthApi | null = null;
 
 export function provideTestAuthApi(api: AuthApi): void {

@@ -1,6 +1,7 @@
 import { fireEvent, renderRouter, screen, waitFor } from "expo-router/testing-library";
 
 import { useSession } from "@/features/auth/sessionStore";
+import { createTestQueryClient, provideTestQueryClient } from "@/testing/providers";
 import { tr } from "@/i18n/tr";
 import { appRoutes } from "@/testing/appRoutes";
 import { signInForTest } from "@/testing/session";
@@ -21,7 +22,9 @@ describe("Profile / settings (S20 skeleton)", () => {
 		expect(screen.getByText(tr.settings.deleteAccount)).toBeTruthy();
 	});
 
-	it("signs out back to welcome", async () => {
+	it("signs out back to welcome and forgets the cached data", async () => {
+		const queryClient = createTestQueryClient();
+		provideTestQueryClient(queryClient);
 		await renderRouter(appRoutes, { initialUrl: "/" });
 		await fireEvent.press(screen.getByTestId("home.profile.button"));
 		await waitFor(() => {
@@ -31,6 +34,7 @@ describe("Profile / settings (S20 skeleton)", () => {
 		await waitFor(() => {
 			expect(useSession.getState().user).toBeNull();
 		});
+		expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
 		await waitFor(() => {
 			expect(screen.getByTestId("welcome.screen")).toBeTruthy();
 		});

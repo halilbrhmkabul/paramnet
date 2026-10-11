@@ -6,6 +6,7 @@ import type { AuthApi } from "./auth/AuthApi";
 import { createMockAuthApi } from "./auth/mockAuth";
 import { createSupabaseAuthApi } from "./auth/supabaseAuth";
 import { createMockApi } from "./mock/mockApi";
+import { createSupabaseAgreementsApi } from "./supabase/supabaseAgreements";
 import { readConfig } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
 
@@ -13,10 +14,12 @@ type Apis = { agreements: AgreementsApi; auth: AuthApi };
 
 const ApiContext = createContext<Apis | null>(null);
 
-// EXPO_PUBLIC_API_MODE selects the adapters (paramnet-mobile skill); the agreements adapter for
-// Supabase arrives in F1-17.
+// EXPO_PUBLIC_API_MODE selects the adapters (paramnet-mobile skill); screens never know which one runs.
 export function createApi(): AgreementsApi {
-	return createMockApi();
+	const config = readConfig();
+	return config.mode === "supabase"
+		? createSupabaseAgreementsApi(getSupabase(config.supabaseUrl, config.supabaseKey))
+		: createMockApi();
 }
 
 export function createAuthApi(): AuthApi {

@@ -12,7 +12,8 @@ import type {
 
 // View models returned by the API layer; the Supabase adapter (F1-17) maps RPC results to the same shapes.
 export type Counterparty = {
-	contact_id: string;
+	// Null when I am the invited side: the creator's contact list is not mine (ADR-022).
+	contact_id: string | null;
 	display_name: string;
 	kind: ContactKind;
 	phone_e164: string | null;
@@ -61,7 +62,7 @@ export type PaymentView = {
 	created_at: string;
 };
 
-export type EventType = "created" | "payment_recorded" | "settled";
+export type EventType = "created" | "payment_recorded" | "updated" | "cancelled" | "settled";
 
 export type EventView = {
 	id: string;

@@ -140,9 +140,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** Simülatörde gerçek yerel auth ile giriş/çıkış.
 - **Not (2026-10-11):** `EXPO_PUBLIC_API_MODE=supabase` ile Supabase telefon OTP; oturum SecureStore'da parçalı (`chunkedSecureStorage`), açılışta geri yüklenir (splash açık kalır); `complete_profile` RPC profil + KVKK/koşullar onayı (`consents`). OTP/RPC protokolü yerel Supabase'e karşı Node ile doğrulandı; adaptör birim testli. **Cihazda doğrulanmadı:** `.env.local` ile Expo Go'da `+905550000001` / `123456` giriş-çıkış elle denenmeli (ADR-023).
 
-### [ ] F1-17 Sahte adaptörü gerçeğiyle değiştir
+### [x] F1-17 Sahte adaptörü gerçeğiyle değiştir
 - `src/api` gerçek Supabase RPC adaptörü; hata eşleme (409 conflict → yeniden çek), çevrimdışı davranış (yazma butonları devre dışı).
 - **Kabul:** F1-06…F1-10 akışları gerçek yerel backend ile çalışıyor.
+- **Not (2026-10-11):** `createSupabaseAgreementsApi` RPC'leri çağırır (okuma RPC'leri görünüm modelini döndürür); `EXPO_PUBLIC_API_MODE=supabase` ile seçilir. Hata eşleme (P0001 kodları, ağ hatası → çevrimdışı mesajı; conflict sonrası sorgular yenilenir). Çıkışta sorgu önbelleği temizlenir. Entegrasyon testi (`pnpm --filter mobile test:integration`, yerel Supabase) giriş, profil, kayıt, idempotent tekrar, ödeme, conflict, kalan aşımı, kişi, takvim, yetkisiz okuma akışını gerçek backend'le doğruladı. **Cihazda doğrulanmadı:** ekran akışlarını `.env.local` (supabase modu) ile Expo Go'da elle dene (ADR-024).
 
 ### [ ] F1-18 Push ve hatırlatmalar
 - Push token kaydı, `notification_outbox`, `dispatch-notifications` edge function, `schedule-reminders` pg_cron işi, sessiz saatler.
