@@ -53,3 +53,13 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 - **Tarih:** 2026-10-11
 - **Karar:** `.github/workflows/ci.yml`, her PR'da ve `main`'e push'ta tek iş: `pnpm install --frozen-lockfile` → `typecheck` → `lint` → `format:check` → `test`. Node sürümü `.nvmrc`'den, pnpm sürümü `packageManager` alanından okunur (tek kaynak). Yetki `contents: read`; aynı ref'te eski çalışma iptal edilir.
 - **Sonuç:** `format:check` görev tanımında yoktu, düşük maliyetli olduğu için eklendi. Veritabanı testleri (`supabase test db`) S-03 sonrası ayrı adım olarak eklenecek.
+
+## ADR-009 — Yerel Supabase ve veritabanı testleri
+- **Tarih:** 2026-10-11
+- **Karar:**
+	- Supabase CLI kökte sabit sürümlü devDependency (`supabase@2.120.0`, `allowBuilds` ile binary indirmesine izin). Global kurulum yok; yerel ve CI aynı sürümü kullanır.
+	- `config.toml`: e-posta kaydı kapalı, telefon kaydı ve doğrulaması açık. `[auth.sms.test_otp]`: `905550000001/2/3` → `123456`. Auth, test numaraları için bile etkin bir SMS sağlayıcısı istediğinden yerelde Twilio sahte değerlerle açık (gerçek anahtar yok; test dışı numaralar hata verir). Üretimde Send SMS Hook (spec 9). Yerelde `[analytics]` kapalı.
+	- pgTAP testleri `supabase/tests/database/`. `000_smoke` public şemada RLS'siz tablo kalmadığını kalıcı olarak denetler.
+	- Tipler `pnpm db:types` ile yalnızca `public` şemasından `packages/shared/src/db.types.ts`'e üretilir, prettier'dan geçirilip commit'lenir; ESLint dışında tutulur.
+	- CI'da ayrı `db` işi: `supabase db start` (yalnızca Postgres) + `supabase test db`.
+- **Sonuç:** Tiplerin şemayla güncel olup olmadığı CI'da denetlenmiyor; gerekirse F1-12'de eklenir.

@@ -25,12 +25,13 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** PR açıldığında iş akışı yeşil.
 - **Not (2026-10-11):** `.github/workflows/ci.yml`; `format:check` adımı da eklendi (ADR-008).
 
-### [ ] S-03 Yerel Supabase
+### [x] S-03 Yerel Supabase
 - `supabase init`, `config.toml` (auth: telefon girişi açık, yerel test OTP numaraları tanımlı), pgTAP etkin, `supabase test db` çalışıyor (örnek test).
 - DB tip üretimi script'i (`supabase gen types` → `packages/shared/src/db.types.ts`).
 - **Kabul:** `supabase start` ve `supabase test db` başarılı; tip üretimi çalışıyor. Komutlar CLAUDE.md'de.
 - **Skill:** supabase, supabase-postgres-best-practices
 - **Önkoşul:** Docker çalışıyor olmalı.
+- **Not (2026-10-11):** Supabase CLI 2.120.0 kök devDependency. Test telefonları ve sahte Twilio sağlayıcısı `config.toml`'da; pgTAP RLS koruma testi; CI'a `db` işi eklendi (ADR-009).
 
 ---
 
