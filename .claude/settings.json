@@ -1,0 +1,23 @@
+{
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "callstack-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "callstackincubator/agent-skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "supabase@claude-plugins-official": true,
+    "expo@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "building-react-native-apps@callstack-agent-skills": true
+  }
+}

@@ -5,7 +5,7 @@ description: Paramnet (borç ve taksit uygulaması) mobil (Expo / React Native) 
 
 # paramnet-mobile
 
-Bu skill `apps/mobile` için proje kurallarıdır. Genel Expo/React Native bilgisi için `expo` ve `react-native-best-practices` skill'lerini, platform tasarım kuralları için `platform-design-skills` (ios, android) skill'lerini kullan. Bu skill onların üstüne projeye özgü kararları ekler; çelişkide bu skill ve `docs/PRODUCT_SPEC.md` kazanır.
+Bu skill `apps/mobile` için proje kurallarıdır. Genel Expo/React Native bilgisi için `expo` ve `react-native-best-practices` skill'lerini, platform tasarım kuralları için `ios-design-guidelines` ve `android-design-guidelines` skill'lerini kullan. Bu skill onların üstüne projeye özgü kararları ekler; çelişkide bu skill ve `docs/PRODUCT_SPEC.md` kazanır.
 
 ## Ne zaman hangi referans
 

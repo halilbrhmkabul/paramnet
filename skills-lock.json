@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "android-design-guidelines": {
+      "source": "ehmo/platform-design-skills",
+      "sourceType": "github",
+      "skillPath": "skills/android/SKILL.md",
+      "computedHash": "4dd3502bf04dc3b81a58ca1af9a1a7fb08a0e35359db2a59530f9105331758b2"
+    },
+    "ios-design-guidelines": {
+      "source": "ehmo/platform-design-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ios/SKILL.md",
+      "computedHash": "4e61d1d5668179860746145d26b9e17179b4822e012a480d6c077656d0f9d324"
+    }
+  }
+}

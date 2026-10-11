@@ -68,11 +68,11 @@ claude plugin install code-review@claude-plugins-official --scope project
 
 # Callstack React Native
 claude plugin marketplace add callstackincubator/agent-skills
-claude plugin install react-native-best-practices@callstack-agent-skills --scope project
+claude plugin install building-react-native-apps@callstack-agent-skills --scope project  # react-native-best-practices skill'i bu pakette
 
 # Apple HIG ve Material Design (yalnızca ios ve android)
-npx skills add ehmo/platform-design-skills --skill ios --agent claude-code
-npx skills add ehmo/platform-design-skills --skill android --agent claude-code
+npx skills add ehmo/platform-design-skills --skill ios-design-guidelines --agent claude-code -y
+npx skills add ehmo/platform-design-skills --skill android-design-guidelines --agent claude-code -y
 ```
 
 - `npx skills` komutu nereye kurulacağını sorarsa: **Claude Code** ve **proje (project)** seç.

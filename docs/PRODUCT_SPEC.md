@@ -1305,11 +1305,11 @@ Faz 1 başında, proje kök dizininde:
 >
 > /plugin marketplace add callstackincubator/agent-skills
 >
-> /plugin install react-native-best-practices@callstack-agent-skills
+> /plugin install building-react-native-apps@callstack-agent-skills (react-native-best-practices skill'i bu pakette)
 >
 > \# Platform tasarım kuralları (yalnızca ios ve android)
 >
-> npx skills add ehmo/platform-design-skills --skill ios --skill android
+> npx skills add ehmo/platform-design-skills --skill ios-design-guidelines android-design-guidelines --agent claude-code -y
 >
 > /reload-plugins
 
