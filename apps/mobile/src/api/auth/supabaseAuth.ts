@@ -74,6 +74,25 @@ export function createSupabaseAuthApi(client: SupabaseClient): AuthApi {
 			await client.auth.signOut();
 		},
 
+		async registerPushToken(token, platform) {
+			const response: { error: unknown } = await client.rpc("register_push_token", {
+				p_token: token,
+				p_platform: platform,
+			});
+			if (response.error !== null) {
+				throw toApiError(response.error);
+			}
+		},
+
+		async unregisterPushToken(token) {
+			const response: { error: unknown } = await client.rpc("unregister_push_token", {
+				p_token: token,
+			});
+			if (response.error !== null) {
+				throw toApiError(response.error);
+			}
+		},
+
 		async restore() {
 			const { data } = await client.auth.getSession();
 			return data.session === null ? null : toAuthUser(data.session.user);

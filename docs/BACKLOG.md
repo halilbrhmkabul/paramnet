@@ -16,3 +16,5 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 
 - Ödemeyi belirli bir taksite yönlendirme (spec 5.5 gelişmiş seçenek; F1-03 sırasında, `allocatePayment` yalnızca FIFO).
 - Ödeme dekontu yükleme (S12; Storage + imzalı URL, spec 11) ve ödeme sonrası haptic/ilerleme animasyonu (design-tokens "Hareket") — F1-09 sırasında.
+- Hatırlatmaları anlaşma bazında kapatma/değiştirme (spec 5.9) — F1-18 sırasında; tercih tablosu + ayarlar ekranı gerekir.
+- Expo push receipt kontrolü (ticket sonrası teslim raporu) — F1-18 sırasında; şimdilik yalnızca ticket hataları işleniyor.

@@ -8,4 +8,6 @@ export interface AuthApi {
 	signOut(): Promise<void>;
 	// Session kept on the device from an earlier launch, or null.
 	restore(): Promise<AuthUser | null>;
+	registerPushToken(token: string, platform: "ios" | "android"): Promise<void>;
+	unregisterPushToken(token: string): Promise<void>;
 }

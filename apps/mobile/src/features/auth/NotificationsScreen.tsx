@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Text, View } from "react-native";
 
 import { useSession } from "./sessionStore";
+import { useAuthApi } from "@/api/ApiProvider";
+import { registerDevice } from "@/features/push/device";
 import { Button } from "@/components/Button";
 import { Screen } from "@/components/Screen";
 import { ScreenTitle } from "@/components/ScreenTitle";
@@ -15,6 +17,7 @@ import { useAppTheme } from "@/theme/useAppTheme";
 export function NotificationsScreen() {
 	const { colors, typography, spacing } = useAppTheme();
 	const completeOnboarding = useSession((state) => state.completeOnboarding);
+	const auth = useAuthApi();
 	const [asking, setAsking] = useState(false);
 
 	return (
@@ -28,9 +31,13 @@ export function NotificationsScreen() {
 						loading={asking}
 						onPress={() => {
 							setAsking(true);
-							void requestNotificationPermission().finally(() => {
-								completeOnboarding();
-							});
+							void requestNotificationPermission()
+								.then((permission) =>
+									permission === "granted" ? registerDevice(auth) : undefined,
+								)
+								.finally(() => {
+									completeOnboarding();
+								});
 						}}
 						testID="notifications.allow.button"
 					/>
