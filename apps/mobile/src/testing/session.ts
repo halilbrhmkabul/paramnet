@@ -4,6 +4,7 @@ export function signInForTest(): void {
 	useSession.setState({
 		user: { id: "u-test", phone_e164: "+905550000001", display_name: "Test" },
 		pendingPhone: null,
+		pendingInviteToken: null,
 		onboarded: true,
 		restored: true,
 	});

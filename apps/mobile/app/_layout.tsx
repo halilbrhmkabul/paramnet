@@ -43,6 +43,16 @@ function AppNavigator() {
 		}
 	}, [auth, signedIn]);
 
+	// An invite link opened while signed out continues once the user is in (F2-05).
+	const pendingInvite = useSession((state) => state.pendingInviteToken);
+	const setPendingInvite = useSession((state) => state.setPendingInvite);
+	useEffect(() => {
+		if (signedIn && pendingInvite !== null) {
+			setPendingInvite(null);
+			router.push({ pathname: "/invite/[token]", params: { token: pendingInvite } });
+		}
+	}, [signedIn, pendingInvite, setPendingInvite]);
+
 	// A tapped reminder opens its agreement (spec 5.9).
 	useEffect(() => {
 		if (!signedIn) {
@@ -78,6 +88,8 @@ function AppNavigator() {
 					options={{ ...detailHeader, title: tr.settings.title }}
 				/>
 			</Stack.Protected>
+			{/* Open whether signed in or not; the route sends signed-out users through sign-in first. */}
+			<Stack.Screen name="invite/[token]" options={detailHeader} />
 			<Stack.Protected guard={!signedIn}>
 				<Stack.Screen name="(auth)" />
 			</Stack.Protected>

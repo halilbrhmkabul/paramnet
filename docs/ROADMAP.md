@@ -182,10 +182,11 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul:** Playwright: tüm senaryolar; link önizleme botu simülasyonu daveti tüketmiyor.
 - **Not (2026-10-12):** Next.js 16 (App Router) tek rota `/i/[token]`: W01 (yalnızca ad, numara, Turnstile), W02 (kod), W03 (plan, önceki ödemeler, Onayla / Düzeltme öner (satır düzenleme, toplam sabit) / Bu plan bana ait değil), W04 (sonuç + uygulama çağrısı). Sunucu tarafı Server Actions + double-submit CSRF; onay oturumu ve adım çerezleri HttpOnly, SameSite=Strict, davet yoluna sınırlı. Başlıklar: nonce'lu CSP, HSTS, no-referrer, noindex, DENY. Yenilemede ayrıntı için `invite-details` fonksiyonu eklendi. Playwright 7 senaryo (gerçek yerel yığın; önizleme botu GET'leri daveti tüketmiyor) CI `integration` işinde (ADR-029).
 
-### [ ] F2-05 Derin bağlantılar
+### [x] F2-05 Derin bağlantılar
 - Universal Links (AASA) ve App Links (assetlinks.json), `app/invite/[token].tsx`.
 - **Kabul:** Uygulama yüklüyken link uygulamayı açıyor; değilse web sayfası.
 - **Skill:** expo (expo-app-clip — AASA bölümü), paramnet-mobile (deep-links.md)
+- **Not (2026-10-12):** Web: `/.well-known/apple-app-site-association` (yalnızca `/i/*`) ve `assetlinks.json`, ortam değişkenlerinden (`APPLE_TEAM_ID`, `ANDROID_SHA256_CERT_FINGERPRINTS`), yoksa 404. Mobil: `app.config.ts` (`EXPO_PUBLIC_APP_DOMAIN` varsa associatedDomains + autoVerify intent filtresi), `+native-intent` `/i/<token>` → `/invite/<token>`, oturumsuz açılışta token bellekte tutulur ve girişten sonra davete dönülür. **Doğrulanmadı:** alan adı, Apple Team ID, imza parmak izi yok; cihazda link → uygulama açılışı elle denenmeli. Davet ekranının içeriği F2-06'da.
 
 ### [ ] F2-06 Paylaşım ve gelen paylaşım ekranları (S13, S14)
 
