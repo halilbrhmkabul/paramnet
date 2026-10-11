@@ -13,8 +13,11 @@ import { createSupabaseAgreementsApi } from "../supabase/supabaseAgreements";
 
 // Runs only against a local Supabase (`pnpm supabase start`):
 //   PARAMNET_SUPABASE_URL=http://127.0.0.1:54321 PARAMNET_SUPABASE_KEY=<publishable> pnpm --filter mobile test:integration
-const url = process.env.PARAMNET_SUPABASE_URL;
-const key = process.env.PARAMNET_SUPABASE_KEY;
+// process.env is untyped in CI (no generated expo-env types), so narrow explicitly.
+const rawUrl: unknown = process.env.PARAMNET_SUPABASE_URL;
+const rawKey: unknown = process.env.PARAMNET_SUPABASE_KEY;
+const url = typeof rawUrl === "string" ? rawUrl : undefined;
+const key = typeof rawKey === "string" ? rawKey : undefined;
 const describeLocal = url !== undefined && key !== undefined ? describe : describe.skip;
 
 describeLocal("Supabase adapters against local Supabase (F1-17)", () => {
