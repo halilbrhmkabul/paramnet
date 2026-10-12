@@ -2,7 +2,8 @@ import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
 
 import { useAppTheme } from "@/theme/useAppTheme";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost";
+// "danger" is the primary action of an irreversible step (account deletion).
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
 export type ButtonProps = {
 	label: string;
@@ -27,8 +28,9 @@ export function Button({
 }: ButtonProps) {
 	const { colors, typography, radius, sizes, spacing } = useAppTheme();
 	const inactive = disabled || loading;
-	const isPrimary = variant === "primary";
-	const textColor = isPrimary ? colors.onPrimary : colors.primary;
+	const filled = variant === "primary" || variant === "danger";
+	const fill = variant === "danger" ? colors.overdue : colors.primary;
+	const textColor = filled ? colors.onPrimary : colors.primary;
 
 	return (
 		<Pressable
@@ -42,10 +44,10 @@ export function Button({
 			style={({ pressed }) => [
 				styles.base,
 				{
-					minHeight: isPrimary ? sizes.buttonPrimary : sizes.buttonSecondary,
+					minHeight: filled ? sizes.buttonPrimary : sizes.buttonSecondary,
 					borderRadius: radius.md,
 					paddingHorizontal: spacing.lg,
-					backgroundColor: isPrimary ? colors.primary : "transparent",
+					backgroundColor: filled ? fill : "transparent",
 					borderColor: variant === "secondary" ? colors.primary : "transparent",
 					opacity: inactive ? 0.5 : pressed ? 0.8 : 1,
 				},

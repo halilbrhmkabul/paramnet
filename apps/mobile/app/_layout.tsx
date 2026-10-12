@@ -122,12 +122,16 @@ function AppNavigator() {
 					name="settings/index"
 					options={{ ...detailHeader, title: tr.settings.title }}
 				/>
+				<Stack.Screen name="settings/delete" options={detailHeader} />
 			</Stack.Protected>
 			{/* Open whether signed in or not; the route sends signed-out users through sign-in first. */}
 			<Stack.Screen name="invite/[token]" options={detailHeader} />
 			<Stack.Protected guard={!signedIn}>
 				<Stack.Screen name="(auth)" />
 			</Stack.Protected>
+			{/* KVKK notice and terms are read before accepting them at sign-up, so they are public. Declared
+			last: a signed-out redirect lands on the first open screen, which must be (auth). */}
+			<Stack.Screen name="legal/[doc]" options={detailHeader} />
 		</Stack>
 	);
 }

@@ -256,6 +256,12 @@ describe("Supabase AgreementsApi", () => {
 			{ p_id: "a1", p_amount_minor: null, p_row_version: 4, p_idempotency_key: "k1" },
 		],
 		[
+			"exportMyData",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) => api.exportMyData(),
+			"export_my_data",
+			undefined,
+		],
+		[
 			"trackEvent",
 			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
 				api.trackEvent({ name: "reminder_opened", template: "dueToday" }),

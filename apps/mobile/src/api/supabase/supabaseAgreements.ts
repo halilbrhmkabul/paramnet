@@ -92,6 +92,7 @@ export function createSupabaseAgreementsApi(client: SupabaseClient): AgreementsA
 				p_row_version: rowVersion,
 				p_idempotency_key: idempotencyKey,
 			}),
+		exportMyData: () => call("export_my_data"),
 		trackEvent: async (event) => {
 			const props =
 				event.name === "reminder_opened"

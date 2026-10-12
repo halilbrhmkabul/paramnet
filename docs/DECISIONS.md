@@ -385,3 +385,23 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 - Metrikler `get_metrics(days)` ile hesaplanır, yalnızca servis rolüne açıktır. Oranlar iki ondalık, payda 0 ise `null`. "Haftalık aktif anlaşma" ödeme, onay, değişiklik, itiraz, iptal, indirim ve kapanış olaylarından sayılır.
 	- D7 için kaydın 7–14. günlerinde, D30 için 30–37. günlerinde açılış aranır. Yeterince eski kayıt yoksa değer `null`.
 	- "İlk kayıt süresi" kayıt anından ölçülür; spec açılıştan ölçer. Açılıştan ölçmek için kayıt öncesi anonim bir olay gerekir; bu, BACKLOG'da.
+
+## ADR-039 — Hesap silme ve veri dışa aktarma
+- **Tarih:** 2026-10-13
+- **Karar:**
+	- Silme iki adımdır:
+		1. `delete-account` edge function'ı oturumdaki kullanıcının JWT'sinden kimliği alır (`verify_jwt = true`).
+		2. Servis rolüyle `delete_account_data(uid)` çağrılır, ardından GoTrue soft delete yapılır (`auth.admin.deleteUser(id, true)`).
+		- Soft delete auth satırını korur, böylece `profiles` ve geçmişin yabancı anahtarları bozulmaz. Numara serbest kalır: aynı numarayla kayıt yeni bir hesaptır.
+	- Silinen ve anonimleşen veriler (security.md):
+		- Karşı tarafı hesaba bağlı olmayan anlaşmalar yalnızca bu kişinin verisidir; tamamen silinir.
+		- Rehber silinir. Korunan anlaşmanın arkasındaki kişi kaydının adı ve numarası silinir.
+		- Profil "Silinmiş kullanıcı" olur, numarası silinir (`deleted_at`).
+		- Kişinin ödeme notları, ekleri, öneri ve itiraz gerekçeleri silinir.
+		- Olay kaydındaki numara, IP ve cihaz izleri silinir.
+		- Push token, hatırlatma, bildirim kuyruğu, onay kayıtları ve sayaçlar silinir.
+		- Analitik olaylar anonimleşir.
+	- Korunanlar: karşı tarafın taraf olduğu anlaşmalar; tutar, tarih, durum, sürümler ve olay sırası. Karşı taraf kendi rehberindeki adı görmeye devam eder; uygulamayı kullanan taraf ise "Silinmiş kullanıcı"yı görür. Başkalarının bu kişi için kaydettiği kişi kayıtları onların verisidir; yalnızca hesap bağlantısı kalkar.
+	- BR-13 istisnası: append-only tetikleyicileri yalnızca `paramnet.erasure` transaction ayarı açıkken silme ve güncellemeye izin verir. Sürümlerdeki onaylanmış şartlar (`terms`, `terms_hash`) silmede de değişmez; yalnızca gerekçe boşaltılabilir.
+	- Dışa aktarma (KVKK m.11): `export_my_data()` uygulamanın okuduğu biçimde tüm veriyi döndürür. Mobil uygulama bunu sistem paylaşım sayfasıyla JSON metni olarak verir; yeni bağımlılık yok. Dosya olarak kaydetme BACKLOG'da.
+	- KVKK aydınlatma metni ve kullanım koşulları `tr.ts`'te taslak olarak duruyor; ekranda "taslak" uyarısı var. Metinler değişince `KVKK_VERSION` / `TERMS_VERSION` artırılır.

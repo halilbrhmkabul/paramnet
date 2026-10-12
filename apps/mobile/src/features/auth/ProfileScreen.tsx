@@ -78,6 +78,14 @@ export function ProfileScreen() {
 				onChange={setConsent}
 				testID="profile.consent.checkbox"
 			/>
+			<Button
+				label={tr.profile.readKvkk}
+				variant="ghost"
+				onPress={() => {
+					router.push({ pathname: "/legal/[doc]", params: { doc: "kvkk" } });
+				}}
+				testID="profile.readKvkk.button"
+			/>
 		</Screen>
 	);
 }

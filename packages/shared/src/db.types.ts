@@ -652,7 +652,7 @@ export type Database = {
 					display_name: string;
 					id: string;
 					locale: string;
-					phone_e164: string;
+					phone_e164: string | null;
 					timezone: string;
 				};
 				ComputedFields: never;
@@ -662,7 +662,7 @@ export type Database = {
 					display_name: string;
 					id: string;
 					locale?: string;
-					phone_e164: string;
+					phone_e164?: string | null;
 					timezone?: string;
 				};
 				Update: {
@@ -671,7 +671,7 @@ export type Database = {
 					display_name?: string;
 					id?: string;
 					locale?: string;
-					phone_e164?: string;
+					phone_e164?: string | null;
 					timezone?: string;
 				};
 				Relationships: [];
@@ -838,6 +838,8 @@ export type Database = {
 				Returns: Json;
 			};
 			decide_payment: { Args: { p_decision: string; p_payment_id: string }; Returns: Json };
+			delete_account_data: { Args: { p_uid: string }; Returns: Json };
+			export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
 			finish_notifications: { Args: { p_results: Json }; Returns: Json };
 			forgive_remaining: {
 				Args: {

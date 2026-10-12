@@ -22,3 +22,4 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - İptal talebini geri çekme (`withdraw_cancel`) ve iptal edilen anlaşmada bekleyen `reported` ödemeleri kapatma — F2-09 sırasında; state-machines.md'de olay tanımı yok.
 - Sentry source map / sürüm yükleme: `@sentry/react-native/expo` config plugin + `getSentryExpoConfig` (EAS), web için `withSentryConfig`, `@sentry/cli` kurulum betiğine izin; web tarayıcı hataları için ayrı ve PII'siz bir karar — F3-01 sırasında.
 - Kayıt öncesi anonim açılış olayı (spec 13.2 "uygulama açılışından ilk anlaşmaya" tam ölçümü) ve web panel; hazır huni/kohort ihtiyacı doğarsa PostHog — F3-02 sırasında.
+- Dışa aktarmayı dosya olarak kaydetme (expo-file-system + expo-sharing), metin sürümü değişince yeniden onay isteme, uygulama kilidi ve anlaşma bazında bildirim tercihleri (S20) — F3-03 sırasında.

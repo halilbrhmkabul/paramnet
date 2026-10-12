@@ -83,6 +83,8 @@ export interface AgreementsApi {
 		rowVersion: number,
 		idempotencyKey: string,
 	): Promise<{ payment_id: string; replayed: boolean; settled: boolean }>;
+	// KVKK m.11 (F3-03): everything kept about the signed-in user, as JSON.
+	exportMyData(): Promise<Record<string, unknown>>;
 	// Analytics (F3-02): best effort, never throws.
 	trackEvent(event: AnalyticsEvent): Promise<void>;
 }

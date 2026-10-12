@@ -270,7 +270,15 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 	- Panel: `pnpm metrics [gün]` (yerelde `supabase status`'tan, uzakta `METRICS_*` ortam değişkenleriyle).
 	- Mobil: `trackEvent` (mock'ta işlem yok, Supabase'de hataları yutar); açılış, bildirim açılışı ve davet açılışı.
 	- Testler: pgTAP 24, RNTL 4, adaptör testleri.
-### [ ] F3-03 KVKK: aydınlatma metni ekranları, hesap silme, veri dışa aktarma
+### [x] F3-03 KVKK: aydınlatma metni ekranları, hesap silme, veri dışa aktarma
+- **Not (2026-10-13):**
+	- **Metinler:** KVKK aydınlatma metni ve kullanım koşulları ekranı (`legal/[doc]`), oturum açmadan da okunabilir; kayıt adımından erişiliyor. Metinler taslak; avukat onayı gerekli, ekranda belirtiliyor.
+	- **Dışa aktarma:** `export_my_data` (profil, onaylar, rehber, anlaşmaların tamamı, cihazlar, analitik olaylar), sistem paylaşım sayfasıyla JSON olarak.
+	- **Hesap silme:** `delete-account` edge function → `delete_account_data` (servis rolü) + auth soft delete.
+		- Yalnızca kişiye ait anlaşmalar ve rehber silinir.
+		- Paylaşılmış anlaşmalar karşı tarafta "Silinmiş kullanıcı" ile korunur (spec 16/10). Kişinin notları, gerekçeleri ve numara/IP/cihaz izleri temizlenir.
+		- Aynı numarayla yeniden kayıt yeni ve temiz bir hesap açar (yerelde uçtan uca denendi).
+	- Testler: pgTAP 25, RNTL 5, adaptör testleri (ADR-039).
 ### [ ] F3-04 Yerli SMS sağlayıcı: Send SMS Hook
 ### [ ] F3-05 Kötüye kullanım testleri: OTP, rate limit, SMS bütçe alarmı; bağımlılık denetimi (supply-chain-risk-auditor, insecure-defaults)
 ### [ ] F3-06 EAS: build profilleri, TestFlight ve Play kapalı test (eas-app-stores, eas-workflows)

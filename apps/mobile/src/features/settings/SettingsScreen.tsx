@@ -1,8 +1,9 @@
 import { formatPhoneTR } from "@paramnet/shared";
-import { useQueryClient } from "@tanstack/react-query";
-import { View } from "react-native";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
+import { Share, Text, View } from "react-native";
 
-import { useAuthApi } from "@/api/ApiProvider";
+import { useApi, useAuthApi } from "@/api/ApiProvider";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { ListItem } from "@/components/ListItem";
@@ -14,19 +15,27 @@ import { unregisterDevice } from "@/features/push/device";
 import { tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
 
-// Items arrive with their roadmap tasks: notifications (F1-18), KVKK texts, export and account deletion (F3-03).
+// Not built yet: per-agreement notification preferences and the app lock (BACKLOG).
 const UPCOMING = [
 	{ key: "notifications", label: tr.settings.notifications },
 	{ key: "appLock", label: tr.settings.appLock },
-	{ key: "export", label: tr.settings.export },
-	{ key: "kvkk", label: tr.settings.kvkk },
-	{ key: "deleteAccount", label: tr.settings.deleteAccount },
 ] as const;
 
-// S20 skeleton
+// S20
 export function SettingsScreen() {
-	const { spacing } = useAppTheme();
+	const { colors, spacing, typography } = useAppTheme();
 	const auth = useAuthApi();
+	const api = useApi();
+	// KVKK m.11: the data goes out through the system share sheet (save to Files, mail it, ...).
+	const exportData = useMutation({
+		mutationFn: async () => {
+			const data = await api.exportMyData();
+			await Share.share({
+				title: tr.settings.exportTitle,
+				message: JSON.stringify(data, null, 2),
+			});
+		},
+	});
 	const user = useSession((state) => state.user);
 	const signOut = useSession((state) => state.signOut);
 	const queryClient = useQueryClient();
@@ -63,6 +72,44 @@ export function SettingsScreen() {
 				/>
 			</Card>
 			<View style={{ gap: spacing.xs }}>
+				<ListItem
+					title={tr.settings.export}
+					onPress={() => {
+						exportData.mutate();
+					}}
+					right={
+						exportData.isPending ? (
+							<Badge label={tr.common.loading} tone="textMuted" />
+						) : undefined
+					}
+					testID="settings.export.item"
+				/>
+				{exportData.isError ? (
+					<Text style={[typography.callout, { color: colors.overdue }]}>
+						{tr.settings.exportFailed}
+					</Text>
+				) : null}
+				<ListItem
+					title={tr.settings.kvkk}
+					onPress={() => {
+						router.push({ pathname: "/legal/[doc]", params: { doc: "kvkk" } });
+					}}
+					testID="settings.kvkk.item"
+				/>
+				<ListItem
+					title={tr.settings.terms}
+					onPress={() => {
+						router.push({ pathname: "/legal/[doc]", params: { doc: "terms" } });
+					}}
+					testID="settings.terms.item"
+				/>
+				<ListItem
+					title={tr.settings.deleteAccount}
+					onPress={() => {
+						router.push("/settings/delete");
+					}}
+					testID="settings.deleteAccount.item"
+				/>
 				{UPCOMING.map(({ key, label }) => (
 					<ListItem
 						key={key}
