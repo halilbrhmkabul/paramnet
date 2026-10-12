@@ -2,6 +2,8 @@
 // typecheck; the testable logic lives in invite.ts.
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.117.2";
 
+import { reportError } from "./sentry.ts";
+
 export function env(name: string): string | undefined {
 	const value = Deno.env.get(name);
 	return value === undefined || value === "" ? undefined : value;
@@ -71,9 +73,15 @@ const STATUS_BY_CODE: Record<string, number> = {
 export function rpcError(error: { code?: string; message?: string }): Response {
 	const code = error.code === "P0001" ? (error.message ?? "") : "";
 	const status = STATUS_BY_CODE[code];
-	return status === undefined
-		? json(500, { error: "server_error" })
-		: json(status, { error: code });
+	if (status === undefined) {
+		// Not a business answer (P0001 code) but a failure worth a report; the scrubber masks the message.
+		void reportError(
+			new Error(`rpc ${error.code ?? "unknown"}: ${error.message ?? ""}`),
+			"rpc",
+		);
+		return json(500, { error: "server_error" });
+	}
+	return json(status, { error: code });
 }
 
 export function errorStatus(code: string): number {

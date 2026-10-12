@@ -342,3 +342,24 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Ad, alıcının tanıdığı addır: oluşturan için kendi rehberindeki kişi adı, karşı taraf için oluşturanın profil adı (`private.event_payload`).
 	- Bildirilen ödeme hatırlatması (spec 5.9) alacaklıya bildirimden 7 gün sonra saat 10:00'da (İstanbul) bir kez gider. Sessiz saatler ve 12 saatlik pencere taksit hatırlatmalarıyla aynıdır. Tekrarı önlemek için `reminders.payment_id` sütunu ve tekil indeks eklendi.
 	- Push `data` alanı şablon adını da taşır. Uygulama `shareReceived`, `shareCountered` ve `amendmentProposed` için karar ekranını, `shareWithdrawn` için Talepler'i, diğerleri için anlaşma detayını açar.
+
+## ADR-037 — Hata izleme (Sentry)
+- **Tarih:** 2026-10-13
+- **Karar:**
+	- Bağımlılıklar:
+		- mobilde `@sentry/react-native` (`expo install` ile SDK 57 uyumlu `~7.11.0`);
+		- web'de `@sentry/nextjs` `11.7.0`;
+		- edge'de `npm:@sentry/deno@11.7.0`.
+		- Gerekçe: spec 8 "Hata izleme: Sentry (mobil + web + edge)".
+		- `@sentry/cli`'nin kurulum betiği (`allowBuilds: false`) şimdilik çalışmıyor; source map yükleme EAS/CI aşamasına kaldı.
+	- Kişisel veri: CLAUDE.md'deki kurala göre hiçbir olay telefon, ad, not veya tutar taşımaz.
+		- Tek bir saf temizleyici (`scrubTelemetryEvent`) üç ortamda `beforeSend` ve `beforeBreadcrumb` olarak çalışır.
+		- Desen maskeleri: telefon, TL tutarı, e-posta, uzun token/JWT. UUID'ler hata ayıklama için korunur.
+		- Kişisel/finansal anahtarların değeri `[Filtered]` olur. Kullanıcı yalnızca id'ye, istek yalnızca URL ve yönteme indirilir.
+		- Serbest metindeki adlar desenle yakalanamaz; bu yüzden kodda kullanıcı verisi hata mesajına yazılmaz.
+	- SDK'lar en dar ayarla açılır:
+		- Mobil: `sendDefaultPii: false`, ekran görüntüsü, görünüm hiyerarşisi ve izleme kapalı.
+		- Sentry 11'de (web, edge) `dataCollection` ile kullanıcı, çerez, başlık, gövde, sorgu, veritabanı verisi ve yerel değişkenler kapalı.
+	- Web onay sayfası telefon ve OTP topladığı için tarayıcıda Sentry yok: yalnızca sunucu hataları (`instrumentation.ts` + `onRequestError`). CSP `connect-src 'self'` olarak kalır.
+	- Edge'de `withSentry` yakalanmamış hataları raporlar ve `no-store` 500 döner. `rpcError` yalnızca iş kodu olmayan (P0001 dışı) hataları raporlar. Edge runtime tam Deno olmadığı için varsayılan entegrasyonlar kapalı.
+	- DSN yoksa (yerel geliştirme, testler) hiçbiri başlamaz. Değişkenler: `EXPO_PUBLIC_SENTRY_DSN`, `SENTRY_DSN` (web sunucusu ve edge), `*_ENV` / `SENTRY_ENVIRONMENT`. Proje AB bölgesinde açılmalıdır (KVKK yurt dışı aktarım, spec 12).

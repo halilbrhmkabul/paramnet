@@ -254,7 +254,14 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 
 ## Faz 3 — Pilot ve yayın
 
-### [ ] F3-01 Gözlemlenebilirlik: Sentry (mobil, web, edge)
+### [x] F3-01 Gözlemlenebilirlik: Sentry (mobil, web, edge)
+- **Not (2026-10-13):**
+	- Ortak temizleyici: `scrubTelemetryEvent` / `scrubText` (`packages/shared`), edge için birebir kopyası `supabase/functions/_shared/telemetry.ts` (testle eşitliği denetleniyor). Telefon, tutar, e-posta, token/JWT maskelenir; kişisel/finansal anahtarlar `[Filtered]`; kullanıcı yalnızca id, istek yalnızca URL + yöntem.
+	- Mobil: `@sentry/react-native` (`initSentry`, `EXPO_PUBLIC_SENTRY_DSN`); PII, ekran görüntüsü, görünüm hiyerarşisi, izleme kapalı.
+	- Web: `@sentry/nextjs` yalnızca sunucuda (`instrumentation.ts`, `onRequestError`); tarayıcıya script yok, CSP değişmedi.
+	- Edge: `npm:@sentry/deno` ile `withSentry` (6 fonksiyon) ve `rpcError`'daki beklenmeyen 500'ler.
+	- DSN yoksa üçü de kapalı. Source map yükleme ve `@sentry/cli` sonraya (BACKLOG).
+	- Testler: Vitest 15 (telemetry) + 3 (web), Jest 3 (mobil); edge, yerel `functions serve` ile DSN'li ve DSN'siz denendi (ADR-037).
 ### [ ] F3-02 Analitik olayları (spec 13.3) ve basit metrik paneli
 ### [ ] F3-03 KVKK: aydınlatma metni ekranları, hesap silme, veri dışa aktarma
 ### [ ] F3-04 Yerli SMS sağlayıcı: Send SMS Hook

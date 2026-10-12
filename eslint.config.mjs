@@ -24,6 +24,7 @@ export default tseslint.config(
 			// supabase/functions/_shared and is linted/tested through packages/shared.
 			"supabase/functions/*/index.ts",
 			"supabase/functions/_shared/server.ts",
+			"supabase/functions/_shared/sentry.ts",
 			"docs/**",
 		],
 	},
