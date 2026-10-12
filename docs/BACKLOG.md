@@ -20,3 +20,4 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Expo push receipt kontrolü (ticket sonrası teslim raporu) — F1-18 sırasında; şimdilik yalnızca ticket hataları işleniyor.
 - Edge function IP rate limit için güvenilir istemci IP kaynağı (web sunucusu–fonksiyon arası paylaşılan sır) — F2-04 sırasında; F3-05 ile birlikte.
 - İptal talebini geri çekme (`withdraw_cancel`) ve iptal edilen anlaşmada bekleyen `reported` ödemeleri kapatma — F2-09 sırasında; state-machines.md'de olay tanımı yok.
+- Sentry source map / sürüm yükleme: `@sentry/react-native/expo` config plugin + `getSentryExpoConfig` (EAS), web için `withSentryConfig`, `@sentry/cli` kurulum betiğine izin; web tarayıcı hataları için ayrı ve PII'siz bir karar — F3-01 sırasında.

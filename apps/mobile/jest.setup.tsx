@@ -52,6 +52,9 @@ jest.mock("@react-native-community/netinfo", () =>
 	jest.requireActual<object>("@react-native-community/netinfo/jest/netinfo-mock.js"),
 );
 
+// Error reporting is off in tests; src/lib/__tests__/sentry.test.ts checks the options.
+jest.mock("@sentry/react-native", () => ({ init: jest.fn() }));
+
 // Native notifications are not available in Jest; tests drive this wrapper instead.
 jest.mock("@/lib/notifications", () => ({
 	requestNotificationPermission: jest.fn(() => Promise.resolve("granted")),

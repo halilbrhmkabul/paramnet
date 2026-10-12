@@ -7,3 +7,23 @@ allowBuilds:
   unrs-resolver: false
   # Supabase CLI binary'si postinstall ile indirilir.
   supabase: true
+  # Sentry CLI binary is only for source map upload (EAS / CI release); not needed to run or test.
+  "@sentry/cli": false
+
+minimumReleaseAgeExclude:
+  - "@sentry/browser-utils@11.7.0"
+  - "@sentry/browser@11.7.0"
+  - "@sentry/bundler-plugins@11.7.0"
+  - "@sentry/cloudflare@11.7.0"
+  - "@sentry/conventions@0.27.0"
+  - "@sentry/core@11.7.0"
+  - "@sentry/feedback@11.7.0"
+  - "@sentry/nextjs@11.7.0"
+  - "@sentry/node@11.7.0"
+  - "@sentry/opentelemetry@11.7.0"
+  - "@sentry/react@11.7.0"
+  - "@sentry/replay-canvas@11.7.0"
+  - "@sentry/replay@11.7.0"
+  - "@sentry/server-runtime-injection@11.7.0"
+  - "@sentry/server-utils@11.7.0"
+  - "@sentry/vercel-edge@11.7.0"

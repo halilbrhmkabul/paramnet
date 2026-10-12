@@ -9,9 +9,12 @@ import { registerDevice } from "@/features/push/device";
 import { tr } from "@/i18n/tr";
 import { notificationRoute } from "@/features/push/notificationRoute";
 import { configureForegroundNotifications, onNotificationOpened } from "@/lib/notifications";
+import { initSentry } from "@/lib/sentry";
 import { useAppTheme } from "@/theme/useAppTheme";
 
 const detailHeader = { headerShown: true, title: "", headerShadowVisible: false };
+
+initSentry();
 
 // Keep the native splash until the stored session has been checked (no flash of the welcome screen).
 void SplashScreen.preventAutoHideAsync();
