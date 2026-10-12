@@ -43,6 +43,9 @@ minimumReleaseAgeExclude:
   - expo-router@57.0.26
   - expo-splash-screen@57.0.10
   - jest-expo@57.0.6
+  - expo-dev-client@57.0.20
+  - expo-dev-launcher@57.0.21
+  - expo-dev-menu@57.0.20
 
 # `pnpm audit` (CI fails on high): advisories accepted after review (F3-05, ADR-041). Each is in build or
 # test tooling only and never in the app bundle or a server; revisit when Expo/Metro update them.

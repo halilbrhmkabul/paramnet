@@ -1,3 +1,5 @@
+import permissions from "./permissions.json";
+
 // Every user-facing string lives here (paramnet-mobile copy-tr.md). Placeholders use {name}.
 export const tr = {
 	common: {
@@ -275,6 +277,8 @@ export const tr = {
 		comingSoon: "Yakında",
 		signOut: "Çıkış yap",
 	},
+	// Native permission prompts; JSON so app.config.ts (compiled on its own) can read them too.
+	permissions,
 	deleteAccount: {
 		title: "Hesabı sil",
 		intro: "Hesabını silersen:",
