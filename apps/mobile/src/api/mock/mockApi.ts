@@ -9,7 +9,14 @@ import {
 
 import type { AgreementsApi } from "../AgreementsApi";
 import { ApiError } from "../errors";
-import type { CalendarMonth, ContactSummary, DueItem, PendingDecision, TermsView } from "../types";
+import type {
+	CalendarMonth,
+	ContactSummary,
+	DueItem,
+	PendingDecision,
+	RequestItem,
+	TermsView,
+} from "../types";
 import { dueItems, inMonth, isOpen, toDetail, toSummary } from "./derive";
 import { seedState, type MockSeed } from "./seed";
 import { applyPayment, insertAgreement, type MockContact, type MockState } from "./store";
@@ -91,8 +98,12 @@ export function createMockApi({
 					overdue: items.filter((item) => item.state.status === "overdue"),
 					upcoming: items.filter((item) => item.due_date >= day).slice(0, UPCOMING_LIMIT),
 					// Plans shared with me that wait for my answer.
-					pending_count: state.incoming.filter((item) => item.status === "pending")
-						.length,
+					pending_count:
+						state.incoming.filter((item) => item.status === "pending").length +
+						state.agreements
+							.filter((a) => a.my_role === "creditor")
+							.flatMap((a) => a.payments)
+							.filter((p) => p.status === "reported" && !p.by_me).length,
 					has_agreements: state.agreements.length > 0,
 				};
 			}),
@@ -204,7 +215,7 @@ export function createMockApi({
 					throw new ApiError("validation_error");
 				}
 				// BR-14: closed agreements take no new payments.
-				if (agreement.status !== "personal" && agreement.status !== "active") {
+				if (!["personal", "active", "amendment_pending"].includes(agreement.status)) {
 					throw new ApiError("invalid_transition");
 				}
 				if (agreement.row_version !== rowVersion) {
@@ -214,14 +225,35 @@ export function createMockApi({
 					throw new ApiError("amount_exceeds_outstanding");
 				}
 				const id = nextId();
+				paymentByKey.set(idempotencyKey, id);
+				// Shared agreement, I am the debtor: my word waits for the creditor (BR-08).
+				if (agreement.status !== "personal" && agreement.my_role === "debtor") {
+					agreement.payments.push({
+						id,
+						...parsed.data,
+						kind: "payment",
+						status: "reported",
+						created_at: now().toISOString(),
+						by_me: true,
+					});
+					agreement.events.push({
+						id: `${id}-e`,
+						type: "payment_reported",
+						at: now().toISOString(),
+						actor: "me",
+						amount_minor: parsed.data.amount_minor,
+					});
+					agreement.row_version += 1;
+					return { payment_id: id, replayed: false };
+				}
 				applyPayment(agreement, {
 					id,
 					...parsed.data,
 					kind: "payment",
 					status: "confirmed",
 					created_at: now().toISOString(),
+					by_me: true,
 				});
-				paymentByKey.set(idempotencyKey, id);
 				return { payment_id: id, replayed: false };
 			}),
 
@@ -391,8 +423,8 @@ export function createMockApi({
 			}),
 
 		listRequests: () =>
-			respond(() =>
-				state.incoming
+			respond((): RequestItem[] => [
+				...state.incoming
 					.filter((item) => item.status === "pending")
 					.map((item) => ({
 						agreement_id: item.agreement_id,
@@ -402,7 +434,91 @@ export function createMockApi({
 						my_role: item.my_role,
 						principal_minor: item.principal_minor,
 					})),
-			),
+				...state.agreements
+					.filter(
+						(a) =>
+							a.my_role === "creditor" &&
+							(a.status === "active" || a.status === "amendment_pending"),
+					)
+					.flatMap((a) =>
+						a.payments
+							.filter((p) => p.status === "reported" && !p.by_me)
+							.map((p) => ({
+								agreement_id: a.id,
+								kind: "payment" as const,
+								payment_id: p.id,
+								title: a.title,
+								from_name: contactOf(a.contact_id).display_name,
+								my_role: "creditor" as const,
+								principal_minor: a.principal_minor,
+								amount_minor: p.amount_minor,
+								paid_on: p.paid_on,
+								note: p.note,
+							})),
+					),
+			]),
+
+		decidePayment: (paymentId, decision) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) =>
+					a.payments.some((p) => p.id === paymentId),
+				);
+				const payment = agreement?.payments.find((p) => p.id === paymentId);
+				if (agreement === undefined || payment === undefined) {
+					throw new ApiError("not_found");
+				}
+				if (agreement.my_role !== "creditor" || payment.by_me) {
+					throw new ApiError("forbidden");
+				}
+				if (payment.status !== "reported") {
+					throw new ApiError("invalid_transition");
+				}
+				if (decision === "reject") {
+					payment.status = "rejected";
+				} else {
+					// applyPayment appends; take the reported entry out first so it is not listed twice.
+					agreement.payments = agreement.payments.filter((p) => p !== payment);
+					applyPayment(agreement, { ...payment, status: "confirmed" });
+				}
+				agreement.events.push({
+					id: `${paymentId}-${decision}`,
+					type: decision === "confirm" ? "payment_confirmed" : "payment_rejected",
+					at: now().toISOString(),
+					actor: "me",
+					amount_minor: payment.amount_minor,
+				});
+				agreement.row_version += 1;
+				return {
+					status: decision === "confirm" ? "confirmed" : "rejected",
+					replayed: false,
+				};
+			}),
+
+		withdrawPayment: (paymentId) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) =>
+					a.payments.some((p) => p.id === paymentId),
+				);
+				const payment = agreement?.payments.find((p) => p.id === paymentId);
+				if (agreement === undefined || payment === undefined) {
+					throw new ApiError("not_found");
+				}
+				if (!payment.by_me) {
+					throw new ApiError("forbidden");
+				}
+				if (payment.status !== "reported") {
+					throw new ApiError("invalid_transition");
+				}
+				payment.status = "withdrawn";
+				agreement.events.push({
+					id: `${paymentId}-withdrawn`,
+					type: "payment_withdrawn",
+					at: now().toISOString(),
+					actor: "me",
+					amount_minor: payment.amount_minor,
+				});
+				agreement.row_version += 1;
+			}),
 	};
 
 	return Object.assign(api, {

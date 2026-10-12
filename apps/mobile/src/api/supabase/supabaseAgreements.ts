@@ -49,5 +49,10 @@ export function createSupabaseAgreementsApi(client: SupabaseClient): AgreementsA
 				p_counter_terms: counterTerms,
 			}),
 		listRequests: () => call("list_requests"),
+		decidePayment: (paymentId, decision) =>
+			call("decide_payment", { p_payment_id: paymentId, p_decision: decision }),
+		withdrawPayment: async (paymentId) => {
+			await call("withdraw_payment", { p_payment_id: paymentId });
+		},
 	};
 }

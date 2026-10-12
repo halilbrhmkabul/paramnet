@@ -171,6 +171,19 @@ describe("Supabase AgreementsApi", () => {
 			"list_requests",
 			undefined,
 		],
+		[
+			"decidePayment",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
+				api.decidePayment("p1", "confirm"),
+			"decide_payment",
+			{ p_payment_id: "p1", p_decision: "confirm" },
+		],
+		[
+			"withdrawPayment",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) => api.withdrawPayment("p1"),
+			"withdraw_payment",
+			{ p_payment_id: "p1" },
+		],
 	] as const)("%s calls %s", async (_, call, fn, args) => {
 		const { client, calls } = fakeClient({ data: [], error: null });
 		await call(createSupabaseAgreementsApi(client));
