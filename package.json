@@ -15,7 +15,8 @@
 		"test": "pnpm -r test",
 		"db:test": "supabase test db",
 		"db:types": "supabase gen types typescript --local --schema public > packages/shared/src/db.types.ts && prettier --write packages/shared/src/db.types.ts",
-		"db:vectors": "node scripts/db-vectors.mjs"
+		"db:vectors": "node scripts/db-vectors.mjs",
+		"metrics": "node scripts/metrics.mjs"
 	},
 	"devDependencies": {
 		"eslint": "^9.39.5",

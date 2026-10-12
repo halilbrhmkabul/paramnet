@@ -666,6 +666,9 @@ export function createMockApi({
 				);
 			}),
 
+		// The prototype records no analytics.
+		trackEvent: () => Promise.resolve(),
+
 		forgiveRemaining: (id, amountMinor, rowVersion, idempotencyKey) =>
 			respond(() => {
 				const existing = paymentByKey.get(idempotencyKey);

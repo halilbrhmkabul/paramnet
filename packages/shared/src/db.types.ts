@@ -215,6 +215,49 @@ export type Database = {
 					},
 				];
 			};
+			analytics_events: {
+				Row: {
+					created_at: string;
+					id: number;
+					invite_id: string | null;
+					name: string;
+					props: NonNullable<Json>;
+					user_id: string | null;
+				};
+				ComputedFields: never;
+				Insert: {
+					created_at?: string;
+					id?: never;
+					invite_id?: string | null;
+					name: string;
+					props?: NonNullable<Json>;
+					user_id?: string | null;
+				};
+				Update: {
+					created_at?: string;
+					id?: never;
+					invite_id?: string | null;
+					name?: string;
+					props?: NonNullable<Json>;
+					user_id?: string | null;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "analytics_events_invite_id_fkey";
+						columns: ["invite_id"];
+						isOneToOne: false;
+						referencedRelation: "invites";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "analytics_events_user_id_fkey";
+						columns: ["user_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+				];
+			};
 			consents: {
 				Row: {
 					accepted_at: string;
@@ -809,6 +852,7 @@ export type Database = {
 			get_calendar: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
+			get_metrics: { Args: { p_days: number }; Returns: Json };
 			get_pending_decision: { Args: { p_id: string }; Returns: Json };
 			invite_decide: {
 				Args: {
@@ -866,6 +910,7 @@ export type Database = {
 				Args: { p_id: string; p_phone: string; p_row_version: number };
 				Returns: Json;
 			};
+			track_event: { Args: { p_name: string; p_props: Json }; Returns: Json };
 			unregister_push_token: { Args: { p_token: string }; Returns: Json };
 			update_personal_agreement: {
 				Args: { p_id: string; p_row_version: number; p_terms: Json };

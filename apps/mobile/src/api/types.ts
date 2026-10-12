@@ -214,3 +214,10 @@ export type RequestItem = {
 	my_role: PartyRole;
 	principal_minor: number;
 };
+
+// The app's own analytics events (F3-02, spec 13.3); everything else is counted from server rows.
+// No personal data: only these names and fields reach track_event.
+export type AnalyticsEvent =
+	| { name: "app_opened" }
+	| { name: "reminder_opened"; template: string }
+	| { name: "invite_opened" };

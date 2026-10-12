@@ -4,6 +4,7 @@ import type {
 	AgreementDetail,
 	CalendarMonth,
 	ContactDetail,
+	AnalyticsEvent,
 	ContactSummary,
 	Dashboard,
 	Decision,
@@ -82,4 +83,6 @@ export interface AgreementsApi {
 		rowVersion: number,
 		idempotencyKey: string,
 	): Promise<{ payment_id: string; replayed: boolean; settled: boolean }>;
+	// Analytics (F3-02): best effort, never throws.
+	trackEvent(event: AnalyticsEvent): Promise<void>;
 }
