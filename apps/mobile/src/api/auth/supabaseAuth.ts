@@ -3,7 +3,7 @@ import type { SupabaseClient, User } from "@supabase/supabase-js";
 
 import { ApiError } from "../errors";
 import { toApiError } from "../supabase/toApiError";
-import type { AuthApi, AuthUser } from "./AuthApi";
+import type { AuthApi, AuthUser, ProfileResult } from "./AuthApi";
 import { KVKK_VERSION, TERMS_VERSION } from "@/lib/legal";
 
 const RESEND_AFTER_S = 60;
@@ -55,7 +55,7 @@ export function createSupabaseAuthApi(client: SupabaseClient): AuthApi {
 		},
 
 		async updateProfile(displayName) {
-			// complete_profile returns { id, display_name, phone_e164 } (060_profile.test.sql).
+			// complete_profile returns { id, display_name, phone_e164, pending_requests } (060, 150 tests).
 			const response: { data: unknown; error: unknown } = await client.rpc(
 				"complete_profile",
 				{
@@ -67,7 +67,7 @@ export function createSupabaseAuthApi(client: SupabaseClient): AuthApi {
 			if (response.error !== null) {
 				throw toApiError(response.error);
 			}
-			return response.data as AuthUser;
+			return response.data as ProfileResult;
 		},
 
 		async signOut() {

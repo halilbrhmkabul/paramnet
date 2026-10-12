@@ -318,3 +318,16 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 		- Tekrar eden kabul ilk sonucu döner (BR-09). Talebi geri çekmek bu sürümde yok (BACKLOG).
 	- `forgive_remaining(id, amount?)` yalnızca alacaklı içindir (kişisel modda sahip alacaklıysa da). Onaylı `discount` ödemesi olarak kaydedilir; FIFO dağıtılır ve kalan 0 olursa `settled` olur. Tutar boşsa kalanın tamamı alınır. İdempotency anahtarı zorunludur. Borçlunun onayı gerekmez, yalnızca `forgiven` bildirimi gider (spec 5.6). Mobil form kalanla dolu gelir; tutar kalana eşitse sunucuya `null` gider.
 	- Talepler'de karşı tarafın açık itirazı ve iptal talebi ayrı bölümlerde listelenir (dashboard sayacı `list_requests` uzunluğundan gelir).
+
+## ADR-035 — Bekleyen davetleri hesaba bağlama
+- **Tarih:** 2026-10-13
+- **Karar:**
+	- Spec 10.4'teki `link-pending-invites` ayrı bir edge function değil, `complete_profile` içinde çağrılan `private.link_pending_invites(uid, phone)` fonksiyonudur. Numara OTP ile doğrulanmış `auth.users` kaydından gelir; servis anahtarı veya ek gizli bilgi gerekmez. Kayıt ile bağlama aynı transaction'da olur, böylece arada bir pencere kalmaz. Fonksiyon idempotenttir; ad değiştirmek için tekrar çağrılması zararsızdır.
+	- Bağlanan kayıtlar:
+		- Bu numaraya gönderilmiş, kullanılmış davetle web'de onaylanmış veya düzeltme önerilmiş anlaşmaların `counterparty_profile_id` alanı. Web, olmayan bir hesabı bağlayamıyordu.
+		- Başka kullanıcıların bu numarayla kaydettiği kişilerin `linked_profile_id` alanı.
+	- Bağlanmayanlar:
+		- Reddedilen anlaşma ("Bu plan bana ait değil"): web kararındaki gibi bağsız kalır.
+		- Açık davetler: zaten numarayla eşleşir (`decision_actor`) ve karar anında bağlanır.
+	- Olay kaydı yazılmaz; bu bir durum geçişi değildir.
+	- `complete_profile` dönüşüne `pending_requests` (`list_requests` uzunluğu) eklendi. Mobil uygulama sayı 0'dan büyükse kayıt bitince Talepler sekmesini açar (spec 5.1 adım 6). Bekleyen bir davet linki varsa o önceliklidir. Bayrak yalnızca bellekte tutulur.

@@ -53,6 +53,16 @@ function AppNavigator() {
 		}
 	}, [signedIn, pendingInvite, setPendingInvite]);
 
+	// A new account whose number already has shared plans lands on Talepler (F2-10); an invite link wins.
+	const openRequests = useSession((state) => state.openRequestsAfterOnboarding);
+	const setOpenRequests = useSession((state) => state.setOpenRequestsAfterOnboarding);
+	useEffect(() => {
+		if (signedIn && openRequests && pendingInvite === null) {
+			setOpenRequests(false);
+			router.navigate("/requests");
+		}
+	}, [signedIn, openRequests, pendingInvite, setOpenRequests]);
+
 	// A tapped reminder opens its agreement (spec 5.9).
 	useEffect(() => {
 		if (!signedIn) {

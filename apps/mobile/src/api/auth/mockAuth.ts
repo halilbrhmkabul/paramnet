@@ -73,7 +73,8 @@ export function createMockAuthApi({
 			}
 			current = { ...current, display_name: displayName };
 			users.set(current.phone_e164, current);
-			return { ...current };
+			// The prototype's auth knows nothing of shared plans.
+			return { ...current, pending_requests: 0 };
 		},
 
 		async signOut() {

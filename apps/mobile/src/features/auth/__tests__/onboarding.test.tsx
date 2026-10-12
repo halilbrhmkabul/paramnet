@@ -4,6 +4,7 @@ import { MOCK_OTP_CODE } from "@/api/auth/mockAuth";
 import { resetSession, useSession } from "@/features/auth/sessionStore";
 import { tr } from "@/i18n/tr";
 import { appRoutes } from "@/testing/appRoutes";
+import { createTestAuthApi, provideTestAuthApi } from "@/testing/providers";
 
 beforeEach(() => {
 	resetSession();
@@ -64,6 +65,33 @@ describe("onboarding (S01–S04)", () => {
 			expect(screen.getByTestId("home.screen")).toBeTruthy();
 		});
 		expect(useSession.getState().user?.display_name).toBe("Halil");
+		expect(useSession.getState().user).not.toHaveProperty("pending_requests");
+	});
+
+	it("opens Talepler after sign-up when plans were shared with the number (F2-10)", async () => {
+		const auth = createTestAuthApi();
+		const updateProfile = auth.updateProfile.bind(auth);
+		auth.updateProfile = async (name) => ({
+			...(await updateProfile(name)),
+			pending_requests: 1,
+		});
+		provideTestAuthApi(auth);
+		await reachOtp();
+		await fireEvent.changeText(screen.getByTestId("otp.code.input"), MOCK_OTP_CODE);
+		await waitFor(() => {
+			expect(screen.getByTestId("profile.screen")).toBeTruthy();
+		});
+		await fireEvent.changeText(screen.getByTestId("profile.name.input"), "Bora");
+		await fireEvent.press(screen.getByTestId("profile.consent.checkbox"));
+		await fireEvent.press(screen.getByTestId("profile.save.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("notifications.screen")).toBeTruthy();
+		});
+		await fireEvent.press(screen.getByTestId("notifications.later.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("requests.screen")).toBeTruthy();
+		});
+		expect(useSession.getState().openRequestsAfterOnboarding).toBe(false);
 	});
 
 	it("shows the expiry error when the code is too old", async () => {

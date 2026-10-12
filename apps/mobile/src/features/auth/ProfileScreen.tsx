@@ -18,6 +18,7 @@ import { tr } from "@/i18n/tr";
 export function ProfileScreen() {
 	const auth = useAuthApi();
 	const setUser = useSession((state) => state.setUser);
+	const setOpenRequests = useSession((state) => state.setOpenRequestsAfterOnboarding);
 	const [name, setName] = useState("");
 	const [touched, setTouched] = useState(false);
 	const [consent, setConsent] = useState(false);
@@ -25,8 +26,9 @@ export function ProfileScreen() {
 
 	const save = useMutation({
 		mutationFn: (value: string) => auth.updateProfile(value),
-		onSuccess: (user) => {
+		onSuccess: ({ pending_requests, ...user }) => {
 			setUser(user);
+			setOpenRequests(pending_requests > 0);
 			router.push("/notifications");
 		},
 	});
