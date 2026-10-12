@@ -4,6 +4,7 @@
 	// Deno-only (Deno.env, npm: imports); covered by the functions' own runtime.
 	"exclude": [
 		"../../supabase/functions/_shared/server.ts",
-		"../../supabase/functions/_shared/sentry.ts"
+		"../../supabase/functions/_shared/sentry.ts",
+		"../../supabase/functions/_shared/smsSender.ts"
 	]
 }

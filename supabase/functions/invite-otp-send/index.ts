@@ -11,15 +11,8 @@ import {
 	text,
 } from "../_shared/server.ts";
 import { withSentry } from "../_shared/sentry.ts";
-
-// No SMS provider until F3-04: test mode only lets the local test numbers through, with code 123456.
-async function sendSms(phone: string, code: string): Promise<boolean> {
-	if (env("SMS_MODE") === "test") {
-		return code === "123456";
-	}
-	console.error("invite-otp-send: no SMS provider configured");
-	return false;
-}
+import { otpMessage } from "../_shared/sms.ts";
+import { sendOtpSms } from "../_shared/smsSender.ts";
 
 Deno.serve(
 	withSentry("invite-otp-send", async (request) => {
@@ -55,7 +48,7 @@ Deno.serve(
 			return rpcError(error);
 		}
 		const result = data as { send: boolean };
-		if (result.send && !(await sendSms(phone, code))) {
+		if (result.send && !(await sendOtpSms(phone, otpMessage(code)))) {
 			return json(503, { error: "sms_unavailable" });
 		}
 		// Same answer whether or not the number was the invite's target (no probing).

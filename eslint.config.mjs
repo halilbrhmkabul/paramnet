@@ -25,6 +25,7 @@ export default tseslint.config(
 			"supabase/functions/*/index.ts",
 			"supabase/functions/_shared/server.ts",
 			"supabase/functions/_shared/sentry.ts",
+			"supabase/functions/_shared/smsSender.ts",
 			"docs/**",
 		],
 	},
