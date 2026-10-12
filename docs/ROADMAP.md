@@ -195,8 +195,9 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - `record_payment` (borçlu → reported), `decide_payment`, `withdraw_payment`; Talepler ekranı (S19).
 - **Not (2026-10-12):** `record_payment` paylaşılmış anlaşmada: alacaklı → `confirmed` (borçluya bilgi), borçlu → `reported` (bakiyeden düşmez, alacaklıya onay isteği); `disputed`/kapalıda yok. `decide_payment` (confirm / reject, tekrar eden karar idempotent, onay anında kalan kontrolü), `withdraw_payment`; olaylar ve outbox bildirimleri (şablonlar `_shared/notifications.ts`). Talepler "Ödemeler" bölümü, Ana Sayfa bandı aynı listeden (çift sayım düzeltildi). Mobil: "Ödeme aldım / Ödeme yaptım", "… onay bekliyor", Onayla / Bu ödemeyi almadım / Bildirimi geri çek. pgTAP 36 + Vitest + RNTL (ADR-032).
 
-### [ ] F2-08 Değişiklik talepleri (S15)
+### [x] F2-08 Değişiklik talepleri (S15)
 - `propose_amendment`, `decide_amendment`, taksitlerin yeniden üretilmesi, geçmiş ödemelerin korunması.
+- **Not (2026-10-12):** `propose_amendment` (tam şartlar + isteğe bağlı gerekçe, tek açık talep BR-07, active → amendment_pending, itirazlıyken de), `decide_amendment` (diğer taraf; kabulde yeni taksitler ve onaylı ödemelerin yeniden dağıtımı, itirazı da çözer; redde eski versiyon), `withdraw_amendment` (öneren). Bildirimler ve olaylar; Talepler "Değişiklikler"; detayda `pending_by_me`. Mobil S15: plan satır satır düzenlenir, taksit eklenir/çıkarılır, yeni toplam satırlardan; karar ekranı değişiklik modunda gerekçe + mevcut/önerilen karşılaştırma, yalnızca kabul/red. pgTAP 32 + Vitest + RNTL (ADR-033).
 
 ### [ ] F2-09 İtiraz ve karşılıklı iptal (S16)
 - `open_dispute`, `resolve_dispute`, `request_cancel`, `decide_cancel`, `forgive_remaining`.

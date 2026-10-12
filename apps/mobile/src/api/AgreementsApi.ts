@@ -54,4 +54,12 @@ export interface AgreementsApi {
 		decision: "confirm" | "reject",
 	): Promise<{ status: string; replayed: boolean }>;
 	withdrawPayment(paymentId: string): Promise<void>;
+	// Amendments (F2-08).
+	proposeAmendment(
+		id: string,
+		terms: TermsView,
+		reason: string | null,
+		rowVersion: number,
+	): Promise<{ status: string; version: number }>;
+	withdrawAmendment(id: string): Promise<void>;
 }

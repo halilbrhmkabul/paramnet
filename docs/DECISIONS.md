@@ -297,3 +297,12 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Karşı tarafa outbox bildirimi: `paymentReported` (alacaklıya), `paymentRecorded` (alacaklı kaydettiğinde borçluya), `paymentConfirmed` / `paymentRejected` (bildirene). Yük: ad, tutar, kalan; not yok. Bağlı hesabı olmayan (yalnızca web'den onaylamış) karşı tarafa bildirim gitmez.
 	- `list_requests` artık ödeme taleplerini de döndürür; `get_dashboard.pending_count` = `list_requests` uzunluğu (aynı kalemler, çift sayım yok). Detaydaki ödemelerde `by_me`.
 	- "7 gün yanıtsız bildirilen ödeme" hatırlatması F2-11'de.
+
+## ADR-033 — Değişiklik talepleri
+- **Tarih:** 2026-10-12
+- **Karar:**
+	- Öneri tam şartlardır (`{principal, down_payment, plan, notes}`): BR-03 ve `terms_hash` her versiyonda aynı biçimde kalır. Spec'in "yeni plan kalan tutar üzerinden kurulur" kuralı, kabulde onaylı ödemelerin yeni taksitlere FIFO dağıtılmasıyla karşılanır; eski dağıtımlar eski versiyonun taksitlerinde geçmiş olarak kalır. Peşinat değişmez; yeni toplam ödenenin altına inemez.
+	- Tek ekran (S15) erteleme, yeniden düzenleme ve tutar düzeltmeyi kapsar: satırların tarih/tutarı değişir, satır eklenir/çıkarılır, yeni toplam = peşinat + satırlar; toplam değişirse kullanıcıya gösterilir. İndirim/af ayrı akış (`forgive_remaining`, F2-09).
+	- Tek açık talep (BR-07): `pending_version` doluyken yeni öneri yok. `active` → `amendment_pending`; `disputed` iken öneri durumu değiştirmez ve kabulü itirazı çözer (`active`). Red/geri çekmede `amendment_pending` → `active`, `disputed` aynen kalır. Geri çekilen öneri `superseded` (enum'da `withdrawn` yok).
+	- Kararı yalnızca önermeyen taraf verir (`decide_amendment`, versiyon + hash); değişikliğe karşı öneri yok (yeni talep açılır). `amendment_pending` iken ödeme kaydı sürer (eski şartlar geçerli).
+	- Bildirimler: `amendmentProposed` (diğer tarafa), `amendmentAccepted` / `amendmentRejected` (önerene).

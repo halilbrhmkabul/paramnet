@@ -36,6 +36,11 @@ export type MockAgreement = {
 	my_role: PartyRole;
 	// False only for plans someone else shared with me and I accepted.
 	is_creator: boolean;
+	// My open amendment (the prototype has no other side to propose one).
+	pending_proposal: {
+		principal_minor: number;
+		plan: { seq: number; due_date: IsoDate | null; amount_minor: number }[];
+	} | null;
 	contact_id: string;
 	status: AgreementStatus;
 	principal_minor: number;
@@ -72,7 +77,13 @@ export type MockState = {
 
 export type NewMockAgreement = Omit<
 	MockAgreement,
-	"installments" | "payments" | "events" | "status" | "row_version" | "is_creator"
+	| "installments"
+	| "payments"
+	| "events"
+	| "status"
+	| "row_version"
+	| "is_creator"
+	| "pending_proposal"
 > & {
 	status?: AgreementStatus;
 	is_creator?: boolean;
@@ -87,6 +98,7 @@ export function insertAgreement(state: MockState, input: NewMockAgreement): Mock
 		...fields,
 		status,
 		is_creator,
+		pending_proposal: null,
 		row_version: 1,
 		installments: plan.map((row) => ({
 			id: `${input.id}-i${String(row.seq)}`,

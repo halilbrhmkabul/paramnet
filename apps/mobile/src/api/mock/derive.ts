@@ -69,6 +69,7 @@ export function toDetail(
 		...toSummary(agreement, contact, today),
 		description: agreement.description,
 		started_on: agreement.started_on,
+		pending_by_me: agreement.pending_proposal === null ? null : true,
 		notes: agreement.notes,
 		down_payment_minor: agreement.down_payment_minor,
 		created_at: agreement.created_at,

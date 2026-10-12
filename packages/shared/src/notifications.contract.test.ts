@@ -62,6 +62,17 @@ describe("render (copy-tr.md notif.*)", () => {
 		});
 	});
 
+	it.each([
+		["amendmentProposed", "Bora planda bir değişiklik önerdi. Göz atar mısın?"],
+		["amendmentAccepted", "Bora değişiklik önerini kabul etti. Yeni plan geçerli."],
+		["amendmentRejected", "Bora değişiklik önerini kabul etmedi. Mevcut plan geçerli."],
+	])("%s (F2-08)", (template, body) => {
+		expect(render(template, { agreement_id: "a1", name: "Bora", amount_minor: 0 })).toEqual({
+			title: "Paramnet",
+			body,
+		});
+	});
+
 	it("unknown templates render nothing", () => {
 		expect(render("nope", payload)).toBeNull();
 	});

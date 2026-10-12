@@ -131,6 +131,21 @@ describe("Supabase AgreementsApi", () => {
 		);
 		expect(asCreator.calls[0]?.fn).toBe("decide_counter");
 		expect(asCreator.calls[0]?.args).toMatchObject({ p_counter_terms: terms });
+		const asReviewer = fakeClient({ data: { status: "active", version: 2 }, error: null });
+		await createSupabaseAgreementsApi(asReviewer.client).decide(
+			"a1",
+			"amendment",
+			2,
+			"h",
+			"reject",
+			null,
+		);
+		expect(asReviewer.calls).toEqual([
+			{
+				fn: "decide_amendment",
+				args: { p_id: "a1", p_version: 2, p_terms_hash: "h", p_decision: "reject" },
+			},
+		]);
 	});
 
 	it.each([
@@ -183,6 +198,29 @@ describe("Supabase AgreementsApi", () => {
 			(api: ReturnType<typeof createSupabaseAgreementsApi>) => api.withdrawPayment("p1"),
 			"withdraw_payment",
 			{ p_payment_id: "p1" },
+		],
+		[
+			"proposeAmendment",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
+				api.proposeAmendment(
+					"a1",
+					{ principal_minor: 1, down_payment_minor: 0, notes: null, plan: [] },
+					"neden",
+					4,
+				),
+			"propose_amendment",
+			{
+				p_id: "a1",
+				p_terms: { principal_minor: 1, down_payment_minor: 0, notes: null, plan: [] },
+				p_reason: "neden",
+				p_row_version: 4,
+			},
+		],
+		[
+			"withdrawAmendment",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) => api.withdrawAmendment("a1"),
+			"withdraw_amendment",
+			{ p_id: "a1" },
 		],
 	] as const)("%s calls %s", async (_, call, fn, args) => {
 		const { client, calls } = fakeClient({ data: [], error: null });

@@ -700,6 +700,10 @@ export type Database = {
 				};
 				Returns: Json;
 			};
+			decide_amendment: {
+				Args: { p_decision: string; p_id: string; p_terms_hash: string; p_version: number };
+				Returns: Json;
+			};
 			decide_counter: {
 				Args: {
 					p_counter_terms: Json;
@@ -743,6 +747,10 @@ export type Database = {
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_requests: { Args: Record<PropertyKey, never>; Returns: Json };
 			make_personal: { Args: { p_id: string }; Returns: Json };
+			propose_amendment: {
+				Args: { p_id: string; p_reason: string; p_row_version: number; p_terms: Json };
+				Returns: Json;
+			};
 			record_payment: {
 				Args: {
 					p_agreement_id: string;
@@ -763,6 +771,7 @@ export type Database = {
 				Args: { p_id: string; p_row_version: number; p_terms: Json };
 				Returns: Json;
 			};
+			withdraw_amendment: { Args: { p_id: string }; Returns: Json };
 			withdraw_payment: { Args: { p_payment_id: string }; Returns: Json };
 			withdraw_share: { Args: { p_id: string }; Returns: Json };
 		};

@@ -45,6 +45,14 @@ function describe(event: EventView): string {
 			});
 		case "payment_rejected":
 			return fill(tr.history.paymentRejected, { amount: formatTRY(event.amount_minor ?? 0) });
+		case "amendment_proposed":
+			return tr.history.amendmentProposed;
+		case "amendment_accepted":
+			return tr.history.amendmentAccepted;
+		case "amendment_rejected":
+			return tr.history.amendmentRejected;
+		case "amendment_withdrawn":
+			return tr.history.amendmentWithdrawn;
 		case "payment_withdrawn":
 			return fill(tr.history.paymentWithdrawn, {
 				amount: formatTRY(event.amount_minor ?? 0),

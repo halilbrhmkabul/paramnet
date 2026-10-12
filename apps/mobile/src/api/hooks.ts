@@ -152,3 +152,25 @@ export function useWithdrawPayment() {
 	const api = useApi();
 	return useSharingMutation((paymentId: string) => api.withdrawPayment(paymentId));
 }
+
+export function useProposeAmendment() {
+	const api = useApi();
+	return useSharingMutation(
+		({
+			id,
+			terms,
+			reason,
+			rowVersion,
+		}: {
+			id: string;
+			terms: TermsView;
+			reason: string | null;
+			rowVersion: number;
+		}) => api.proposeAmendment(id, terms, reason, rowVersion),
+	);
+}
+
+export function useWithdrawAmendment() {
+	const api = useApi();
+	return useSharingMutation((id: string) => api.withdrawAmendment(id));
+}

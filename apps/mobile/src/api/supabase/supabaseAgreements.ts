@@ -41,16 +41,33 @@ export function createSupabaseAgreementsApi(client: SupabaseClient): AgreementsA
 		getPendingDecision: (id) => call("get_pending_decision", { p_id: id }),
 		// The counterparty answers with decide_agreement, the creator a counter offer with decide_counter.
 		decide: (id, actor, version, termsHash, decision, counterTerms) =>
-			call(actor === "creator" ? "decide_counter" : "decide_agreement", {
-				p_id: id,
-				p_version: version,
-				p_terms_hash: termsHash,
-				p_decision: decision,
-				p_counter_terms: counterTerms,
-			}),
+			actor === "amendment"
+				? call("decide_amendment", {
+						p_id: id,
+						p_version: version,
+						p_terms_hash: termsHash,
+						p_decision: decision,
+					})
+				: call(actor === "creator" ? "decide_counter" : "decide_agreement", {
+						p_id: id,
+						p_version: version,
+						p_terms_hash: termsHash,
+						p_decision: decision,
+						p_counter_terms: counterTerms,
+					}),
 		listRequests: () => call("list_requests"),
 		decidePayment: (paymentId, decision) =>
 			call("decide_payment", { p_payment_id: paymentId, p_decision: decision }),
+		proposeAmendment: (id, terms, reason, rowVersion) =>
+			call("propose_amendment", {
+				p_id: id,
+				p_terms: terms,
+				p_reason: reason,
+				p_row_version: rowVersion,
+			}),
+		withdrawAmendment: async (id) => {
+			await call("withdraw_amendment", { p_id: id });
+		},
 		withdrawPayment: async (paymentId) => {
 			await call("withdraw_payment", { p_payment_id: paymentId });
 		},
