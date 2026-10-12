@@ -74,6 +74,7 @@ export function seedState(seed: MockSeed, today: IsoDate): MockState {
 		kind: "payment",
 		status: "confirmed",
 		note: null,
+		by_me: true,
 		created_at: at(lentStart),
 	});
 	applyPayment(lent, {
@@ -84,6 +85,7 @@ export function seedState(seed: MockSeed, today: IsoDate): MockState {
 		kind: "payment",
 		status: "confirmed",
 		note: null,
+		by_me: true,
 		created_at: at(addDays(today, -6)),
 	});
 
@@ -159,6 +161,7 @@ export function seedState(seed: MockSeed, today: IsoDate): MockState {
 		kind: "payment",
 		status: "confirmed",
 		note: null,
+		by_me: true,
 		created_at: at(oldDue),
 	});
 

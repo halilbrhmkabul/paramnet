@@ -48,4 +48,10 @@ export interface AgreementsApi {
 		counterTerms: TermsView | null,
 	): Promise<{ status: string; version: number }>;
 	listRequests(): Promise<RequestItem[]>;
+	// Payments on a shared agreement (F2-07).
+	decidePayment(
+		paymentId: string,
+		decision: "confirm" | "reject",
+	): Promise<{ status: string; replayed: boolean }>;
+	withdrawPayment(paymentId: string): Promise<void>;
 }

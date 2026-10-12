@@ -40,6 +40,28 @@ describe("render (copy-tr.md notif.*)", () => {
 		);
 	});
 
+	it.each([
+		["paymentReported", "Bora 1.000,00 TL ödeme yaptığını bildirdi. Aldın mı?"],
+		["paymentConfirmed", "Bora 1.000,00 TL ödemeni onayladı. Kalan: 2.000,00 TL."],
+		["paymentRecorded", "Bora 1.000,00 TL ödemeni kaydetti. Kalan: 2.000,00 TL."],
+		[
+			"paymentRejected",
+			"Bora 1.000,00 TL ödemeyi almadığını belirtti. Bir sorun varsa birlikte bakabilirsiniz.",
+		],
+	])("%s (F2-07)", (template, body) => {
+		expect(
+			render(template, {
+				agreement_id: "a1",
+				name: "Bora",
+				amount_minor: 100000,
+				remaining_minor: 200000,
+			}),
+		).toEqual({
+			title: "Paramnet",
+			body,
+		});
+	});
+
 	it("unknown templates render nothing", () => {
 		expect(render("nope", payload)).toBeNull();
 	});

@@ -710,6 +710,7 @@ export type Database = {
 				};
 				Returns: Json;
 			};
+			decide_payment: { Args: { p_decision: string; p_payment_id: string }; Returns: Json };
 			finish_notifications: { Args: { p_results: Json }; Returns: Json };
 			get_agreement_detail: { Args: { p_id: string }; Returns: Json };
 			get_calendar: { Args: { p_month: string }; Returns: Json };
@@ -762,6 +763,7 @@ export type Database = {
 				Args: { p_id: string; p_row_version: number; p_terms: Json };
 				Returns: Json;
 			};
+			withdraw_payment: { Args: { p_payment_id: string }; Returns: Json };
 			withdraw_share: { Args: { p_id: string }; Returns: Json };
 		};
 		Enums: {

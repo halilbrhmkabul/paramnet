@@ -2,13 +2,15 @@
 // Vitest (notifications.contract.test.ts). Texts follow copy-tr.md "Bildirim şablonları": they speak
 // for the app, never for the creditor (spec 5.9).
 
+// Reminders carry the installment fields; payment events carry the remaining balance instead.
 export type NotificationPayload = {
 	agreement_id: string;
 	name: string;
 	amount_minor: number;
-	due_date: string;
-	seq: number;
-	count: number;
+	due_date?: string;
+	seq?: number;
+	count?: number;
+	remaining_minor?: number;
 };
 
 export type ClaimedNotification = {
@@ -68,29 +70,58 @@ export function render(
 	p: NotificationPayload,
 ): { title: string; body: string } | null {
 	const amount = formatTRY(p.amount_minor);
+	const remaining = formatTRY(p.remaining_minor ?? 0);
 	const single = p.count === 1;
-	let body: string;
+	const seq = String(p.seq ?? 0);
 	switch (template) {
 		case "dueSoon":
-			body = `${dayMonth(p.due_date)} tarihinde ${p.name} için ${amount} ödemen var.`;
-			break;
+			return {
+				title: p.name,
+				body: `${dayMonth(p.due_date ?? "")} tarihinde ${p.name} için ${amount} ödemen var.`,
+			};
 		case "dueToday":
-			body = single
-				? `Bugün ödeme günü: ${amount}.`
-				: `Bugün ödeme günü: ${amount} (${String(p.seq)}/${String(p.count)}. taksit).`;
-			break;
+			return {
+				title: p.name,
+				body: single
+					? `Bugün ödeme günü: ${amount}.`
+					: `Bugün ödeme günü: ${amount} (${seq}/${String(p.count ?? 0)}. taksit).`,
+			};
 		case "overdue1":
-			body = `Dünkü ${amount} ödeme henüz kaydedilmedi. Ödediysen kaydet.`;
-			break;
+			return {
+				title: p.name,
+				body: `Dünkü ${amount} ödeme henüz kaydedilmedi. Ödediysen kaydet.`,
+			};
 		case "overdue7":
-			body = single
-				? "Ödeme 7 gündür açık görünüyor."
-				: `${String(p.seq)}. taksit 7 gündür açık görünüyor.`;
-			break;
+			return {
+				title: p.name,
+				body: single
+					? "Ödeme 7 gündür açık görünüyor."
+					: `${seq}. taksit 7 gündür açık görünüyor.`,
+			};
+		// Payment events on a shared agreement (F2-07); the other party's name is in the text.
+		case "paymentReported":
+			return {
+				title: "Paramnet",
+				body: `${p.name} ${amount} ödeme yaptığını bildirdi. Aldın mı?`,
+			};
+		case "paymentConfirmed":
+			return {
+				title: "Paramnet",
+				body: `${p.name} ${amount} ödemeni onayladı. Kalan: ${remaining}.`,
+			};
+		case "paymentRecorded":
+			return {
+				title: "Paramnet",
+				body: `${p.name} ${amount} ödemeni kaydetti. Kalan: ${remaining}.`,
+			};
+		case "paymentRejected":
+			return {
+				title: "Paramnet",
+				body: `${p.name} ${amount} ödemeyi almadığını belirtti. Bir sorun varsa birlikte bakabilirsiniz.`,
+			};
 		default:
 			return null;
 	}
-	return { title: p.name, body };
 }
 
 // One Expo message per device token; owners[i] is the outbox row of messages[i].

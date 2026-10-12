@@ -288,3 +288,12 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- `list_requests()` Talepler'in "Paylaşımlar" bölümünü ve Ana Sayfa'daki bekleyen iş sayısını besler (`get_dashboard.pending_count` = onay bekleyen bildirilmiş ödemeler + bekleyen paylaşım kararları).
 	- Görünüm modeline `is_creator` eklendi; S11 birincil aksiyonu durum + rol + oluşturan bilgisinden seçilir. `pending` iken oluşturana yeniden paylaşım yok (ADR-026 açık sorusu), yalnızca geri çekme.
 	- Paylaşım bağlantısının kökü: `EXPO_PUBLIC_INVITE_BASE_URL` (yerelde web-confirm geliştirme sunucusu) yoksa `https://EXPO_PUBLIC_APP_DOMAIN`; ikisi de yoksa paylaşım yapılır ama bağlantı gösterilemez ve kullanıcıya söylenir. Sahte modda prototip bağlantısı.
+
+## ADR-032 — Paylaşılmış anlaşmada ödemeler
+- **Tarih:** 2026-10-12
+- **Karar:**
+	- `record_payment` tek RPC: kişisel modda sahip ve paylaşılmışta alacaklı `confirmed` (FIFO dağıtım, kalan 0 ise `settled`); borçlu `reported` (dağıtım ve bakiye değişmez, BR-08). Kayıt yalnızca `personal`, `active`, `amendment_pending` iken; `disputed` ve kapalı durumlarda `invalid_transition` (BR-14). Bildirilen tutar da kalan borcu aşamaz.
+	- `decide_payment(payment_id, confirm|reject)`: yalnızca alacaklı, kendi bildirmediği `reported` ödeme; aynı karar tekrar gelirse ilk sonuç döner (`replayed`). Onay anında kalan yeniden kontrol edilir (iki bildirim aynı kalanı kapatmaya çalışırsa ikincisi reddedilir). `withdraw_payment`: yalnızca bildiren, yalnızca `reported` iken. Reddedilen/geri çekilen ödemeler silinmez.
+	- Karşı tarafa outbox bildirimi: `paymentReported` (alacaklıya), `paymentRecorded` (alacaklı kaydettiğinde borçluya), `paymentConfirmed` / `paymentRejected` (bildirene). Yük: ad, tutar, kalan; not yok. Bağlı hesabı olmayan (yalnızca web'den onaylamış) karşı tarafa bildirim gitmez.
+	- `list_requests` artık ödeme taleplerini de döndürür; `get_dashboard.pending_count` = `list_requests` uzunluğu (aynı kalemler, çift sayım yok). Detaydaki ödemelerde `by_me`.
+	- "7 gün yanıtsız bildirilen ödeme" hatırlatması F2-11'de.

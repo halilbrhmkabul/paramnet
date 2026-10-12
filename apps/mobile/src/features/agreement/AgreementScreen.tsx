@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
-import { useAgreement } from "@/api/hooks";
+import { useAgreement, useDecidePayment, useWithdrawPayment } from "@/api/hooks";
 import type { AgreementDetail, InstallmentView, PaymentView } from "@/api/types";
 import { AmountText } from "@/components/AmountText";
 import { Button } from "@/components/Button";
@@ -23,8 +23,17 @@ import { useIsOnline } from "@/lib/network";
 import { useAppTheme } from "@/theme/useAppTheme";
 
 // Personal mode is the only writable state in Faz 1; shared states get their actions in Faz 2.
+// BR-14: no new payments on closed or disputed agreements; amendment_pending keeps the old terms.
 function canAddPayment(agreement: AgreementDetail): boolean {
-	return agreement.status === "personal" || agreement.status === "active";
+	return ["personal", "active", "amendment_pending"].includes(agreement.status);
+}
+
+// screens.md: "Ödeme ekle" in personal mode; on a shared one the creditor received, the debtor paid.
+export function paymentActionLabel(agreement: AgreementDetail): string {
+	if (agreement.status === "personal") {
+		return tr.agreement.addPayment;
+	}
+	return agreement.my_role === "creditor" ? tr.payment.received : tr.payment.made;
 }
 
 function InstallmentRow({ installment, count }: { installment: InstallmentView; count: number }) {
@@ -62,25 +71,78 @@ function InstallmentRow({ installment, count }: { installment: InstallmentView; 
 	);
 }
 
-function PaymentRow({ payment }: { payment: PaymentView }) {
-	const { spacing } = useAppTheme();
+function PaymentRow({
+	payment,
+	myRole,
+}: {
+	payment: PaymentView;
+	myRole: AgreementDetail["my_role"];
+}) {
+	const { colors, typography, spacing } = useAppTheme();
+	const online = useIsOnline();
+	const decide = useDecidePayment();
+	const withdraw = useWithdrawPayment();
+	const reported = payment.status === "reported";
+	const error = decide.error ?? withdraw.error;
 	return (
-		<ListItem
-			title={`${formatDateTR(payment.paid_on, "short")} · ${tr.payment.kinds[payment.kind]}`}
-			subtitle={[tr.payment.methods[payment.method], payment.note]
-				.filter((part) => part !== null)
-				.join(" · ")}
-			right={
-				<View style={{ alignItems: "flex-end", gap: spacing.xs }}>
-					<AmountText minor={payment.amount_minor} variant="headline" />
-					<Badge
-						label={tr.payment.statuses[payment.status]}
-						tone={payment.status === "confirmed" ? "success" : "pending"}
+		<View style={{ gap: spacing.xs }}>
+			<ListItem
+				title={`${formatDateTR(payment.paid_on, "short")} · ${tr.payment.kinds[payment.kind]}`}
+				subtitle={[tr.payment.methods[payment.method], payment.note]
+					.filter((part) => part !== null)
+					.join(" · ")}
+				right={
+					<View style={{ alignItems: "flex-end", gap: spacing.xs }}>
+						<AmountText minor={payment.amount_minor} variant="headline" />
+						<Badge
+							label={tr.payment.statuses[payment.status]}
+							tone={payment.status === "confirmed" ? "success" : "pending"}
+						/>
+					</View>
+				}
+				testID={`agreement.payment.${payment.id}`}
+			/>
+			{/* spec 5.5: the creditor confirms or says "not received"; the reporter can take it back. */}
+			{reported && payment.by_me ? (
+				<Button
+					label={tr.payment.withdraw}
+					variant="ghost"
+					disabled={!online}
+					loading={withdraw.isPending}
+					onPress={() => {
+						withdraw.mutate(payment.id);
+					}}
+					testID={`agreement.payment.${payment.id}.withdraw`}
+				/>
+			) : null}
+			{reported && !payment.by_me && myRole === "creditor" ? (
+				<View style={styles.rowBetween}>
+					<Button
+						label={tr.payment.confirm}
+						disabled={!online}
+						loading={decide.isPending && decide.variables.decision === "confirm"}
+						onPress={() => {
+							decide.mutate({ paymentId: payment.id, decision: "confirm" });
+						}}
+						testID={`agreement.payment.${payment.id}.confirm`}
+					/>
+					<Button
+						label={tr.payment.notReceived}
+						variant="ghost"
+						disabled={!online}
+						onPress={() => {
+							decide.mutate({ paymentId: payment.id, decision: "reject" });
+						}}
+						testID={`agreement.payment.${payment.id}.reject`}
 					/>
 				</View>
-			}
-			testID={`agreement.payment.${payment.id}`}
-		/>
+			) : null}
+			{error === null ? null : (
+				<Text style={[typography.callout, { color: colors.overdue }]}>
+					{messageForError(error)}
+				</Text>
+			)}
+		</View>
 	);
 }
 
@@ -121,6 +183,14 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 					tone={tone}
 					testID="agreement.outstanding.text"
 				/>
+				{agreement.reported_minor > 0 ? (
+					<Text
+						testID="agreement.awaiting.text"
+						style={[typography.caption, { color: colors.pending }]}
+					>
+						{fill(tr.payment.awaiting, { amount: formatTRY(agreement.reported_minor) })}
+					</Text>
+				) : null}
 				<ProgressBar
 					value={agreement.principal_minor === 0 ? 0 : paid / agreement.principal_minor}
 					label={fill(tr.agreement.paidOf, {
@@ -173,7 +243,7 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 			{canAddPayment(agreement) ? (
 				<View style={{ gap: spacing.xs }}>
 					<Button
-						label={tr.agreement.addPayment}
+						label={paymentActionLabel(agreement)}
 						disabled={!online}
 						onPress={() => {
 							router.push({
@@ -225,7 +295,7 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 					</Text>
 				) : (
 					agreement.payments.map((payment) => (
-						<PaymentRow key={payment.id} payment={payment} />
+						<PaymentRow key={payment.id} payment={payment} myRole={agreement.my_role} />
 					))
 				)}
 			</View>

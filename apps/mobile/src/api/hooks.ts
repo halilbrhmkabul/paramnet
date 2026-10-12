@@ -139,3 +139,16 @@ export function useDecide() {
 			),
 	);
 }
+
+export function useDecidePayment() {
+	const api = useApi();
+	return useSharingMutation(
+		({ paymentId, decision }: { paymentId: string; decision: "confirm" | "reject" }) =>
+			api.decidePayment(paymentId, decision),
+	);
+}
+
+export function useWithdrawPayment() {
+	const api = useApi();
+	return useSharingMutation((paymentId: string) => api.withdrawPayment(paymentId));
+}

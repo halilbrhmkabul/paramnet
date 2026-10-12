@@ -115,6 +115,7 @@ export function insertAgreement(state: MockState, input: NewMockAgreement): Mock
 			status: "confirmed",
 			note: null,
 			created_at: input.created_at,
+			by_me: true,
 		});
 	}
 	state.agreements.push(agreement);

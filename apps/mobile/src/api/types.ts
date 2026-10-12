@@ -61,6 +61,8 @@ export type PaymentView = {
 	status: PaymentStatus;
 	note: string | null;
 	created_at: string;
+	// I reported it: a reported payment of mine can be withdrawn, someone else's confirmed or rejected.
+	by_me: boolean;
 };
 
 export type EventType =
@@ -75,7 +77,11 @@ export type EventType =
 	| "accepted"
 	| "countered"
 	| "rejected"
-	| "made_personal";
+	| "made_personal"
+	| "payment_reported"
+	| "payment_confirmed"
+	| "payment_rejected"
+	| "payment_withdrawn";
 
 export type EventView = {
 	id: string;
@@ -173,7 +179,12 @@ export type Decision = "accept" | "counter" | "reject";
 
 export type RequestItem = {
 	agreement_id: string;
-	kind: "share" | "counter";
+	kind: "share" | "counter" | "payment";
+	// Only for kind "payment": a payment the other side reported, waiting for my confirmation.
+	payment_id?: string;
+	amount_minor?: number;
+	paid_on?: IsoDate;
+	note?: string | null;
 	title: string;
 	from_name: string | null;
 	my_role: PartyRole;

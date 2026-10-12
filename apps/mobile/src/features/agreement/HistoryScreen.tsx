@@ -37,6 +37,18 @@ function describe(event: EventView): string {
 			return tr.history.rejected;
 		case "made_personal":
 			return tr.history.madePersonal;
+		case "payment_reported":
+			return fill(tr.history.paymentReported, { amount: formatTRY(event.amount_minor ?? 0) });
+		case "payment_confirmed":
+			return fill(tr.history.paymentConfirmed, {
+				amount: formatTRY(event.amount_minor ?? 0),
+			});
+		case "payment_rejected":
+			return fill(tr.history.paymentRejected, { amount: formatTRY(event.amount_minor ?? 0) });
+		case "payment_withdrawn":
+			return fill(tr.history.paymentWithdrawn, {
+				amount: formatTRY(event.amount_minor ?? 0),
+			});
 	}
 }
 

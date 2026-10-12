@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { paymentActionLabel } from "./AgreementScreen";
 import { messageForError } from "@/api/errors";
 import { useAgreement, useRecordPayment } from "@/api/hooks";
 import type { AgreementDetail } from "@/api/types";
@@ -85,7 +86,17 @@ function PaymentForm({ agreement }: { agreement: AgreementDetail }) {
 				/>
 			}
 		>
-			<ScreenTitle>{tr.payment.title}</ScreenTitle>
+			<ScreenTitle>
+				{agreement.status === "personal" ? tr.payment.title : paymentActionLabel(agreement)}
+			</ScreenTitle>
+			{agreement.status !== "personal" && agreement.my_role === "debtor" ? (
+				<Text
+					testID="payment.reportHelper"
+					style={[typography.caption, { color: colors.textMuted }]}
+				>
+					{tr.payment.reportHelper}
+				</Text>
+			) : null}
 			<Text style={[typography.callout, { color: colors.textMuted }]}>
 				{fill(tr.payment.remaining, { amount: formatTRY(agreement.outstanding_minor) })}
 			</Text>

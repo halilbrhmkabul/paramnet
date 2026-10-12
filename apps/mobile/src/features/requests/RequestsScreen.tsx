@@ -1,6 +1,6 @@
 import { formatTRY } from "@paramnet/shared";
 import { router } from "expo-router";
-import { RefreshControl } from "react-native";
+import { RefreshControl, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
 import { useRequests } from "@/api/hooks";
@@ -10,10 +10,10 @@ import { ListItem } from "@/components/ListItem";
 import { LoadingState } from "@/components/LoadingState";
 import { Screen } from "@/components/Screen";
 import { ScreenTitle } from "@/components/ScreenTitle";
+import { SectionHeader } from "@/components/SectionHeader";
 import { fill, tr } from "@/i18n/tr";
 
-// S19 "Paylaşımlar": plans shared with me and counter offers waiting for my answer. Payments and
-// amendments join with F2-07 / F2-08.
+// S19: plans shared with me / counter offers, and payments waiting for my confirmation.
 export function RequestsScreen() {
 	const requests = useRequests();
 	return (
@@ -46,20 +46,57 @@ export function RequestsScreen() {
 					testID="requests.empty"
 				/>
 			) : (
-				requests.data.map((item) => (
-					<ListItem
-						key={item.agreement_id}
-						title={item.title}
-						subtitle={`${fill(item.kind === "counter" ? tr.requests.countered : tr.requests.shared, { name: item.from_name ?? "" })} · ${formatTRY(item.principal_minor)}`}
-						onPress={() => {
-							router.push({
-								pathname: "/agreement/[id]/decide",
-								params: { id: item.agreement_id },
-							});
-						}}
-						testID={`requests.item.${item.agreement_id}`}
-					/>
-				))
+				<>
+					{(["share", "payment"] as const).map((section) => {
+						const items = requests.data.filter((item) =>
+							section === "payment"
+								? item.kind === "payment"
+								: item.kind !== "payment",
+						);
+						return items.length === 0 ? null : (
+							<View
+								key={section}
+								style={{ gap: 4 }}
+								testID={`requests.section.${section}`}
+							>
+								<SectionHeader>
+									{section === "payment"
+										? tr.requests.sectionPayments
+										: tr.requests.sectionShares}
+								</SectionHeader>
+								{items.map((item) => (
+									<ListItem
+										key={item.payment_id ?? item.agreement_id}
+										title={item.title}
+										subtitle={
+											item.kind === "payment"
+												? fill(tr.requests.paymentReported, {
+														name: item.from_name ?? "",
+														amount: formatTRY(item.amount_minor ?? 0),
+													})
+												: `${fill(item.kind === "counter" ? tr.requests.countered : tr.requests.shared, { name: item.from_name ?? "" })} · ${formatTRY(item.principal_minor)}`
+										}
+										onPress={() => {
+											// Payments are answered on the agreement, plans on the decision screen.
+											router.push(
+												item.kind === "payment"
+													? {
+															pathname: "/agreement/[id]",
+															params: { id: item.agreement_id },
+														}
+													: {
+															pathname: "/agreement/[id]/decide",
+															params: { id: item.agreement_id },
+														},
+											);
+										}}
+										testID={`requests.item.${item.payment_id ?? item.agreement_id}`}
+									/>
+								))}
+							</View>
+						);
+					})}
+				</>
 			)}
 		</Screen>
 	);

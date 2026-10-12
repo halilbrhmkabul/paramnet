@@ -191,8 +191,9 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 ### [x] F2-06 Paylaşım ve gelen paylaşım ekranları (S13, S14)
 - **Not (2026-10-12):** S13 gerçek paylaşım (`share_agreement`, bağlantı `EXPO_PUBLIC_INVITE_BASE_URL` / `EXPO_PUBLIC_APP_DOMAIN` ile, sistem paylaşım menüsü); S14 karar ekranı (`get_pending_decision`: önerilen ve mevcut şartlar, önceki ödemeler; Onayla / satır düzenleyerek Düzeltme öner / Reddet; oluşturan için Öneriyi kabul et / Düzeltme / Paylaşımı geri çek); uygulamadaki davet bağlantısı `resolve_invite` (başka numaraya ayrıntı yok); Talepler "Paylaşımlar" (`list_requests`) ve Ana Sayfa bandı; anlaşma detayında pending/countered/rejected aksiyonları (`is_creator`). Sahte adaptörde gelen paylaşım demosu (Zeynep Arslan). pgTAP 23 + RNTL (ADR-031).
 
-### [ ] F2-07 Ödeme bildirimi ve doğrulama
+### [x] F2-07 Ödeme bildirimi ve doğrulama
 - `record_payment` (borçlu → reported), `decide_payment`, `withdraw_payment`; Talepler ekranı (S19).
+- **Not (2026-10-12):** `record_payment` paylaşılmış anlaşmada: alacaklı → `confirmed` (borçluya bilgi), borçlu → `reported` (bakiyeden düşmez, alacaklıya onay isteği); `disputed`/kapalıda yok. `decide_payment` (confirm / reject, tekrar eden karar idempotent, onay anında kalan kontrolü), `withdraw_payment`; olaylar ve outbox bildirimleri (şablonlar `_shared/notifications.ts`). Talepler "Ödemeler" bölümü, Ana Sayfa bandı aynı listeden (çift sayım düzeltildi). Mobil: "Ödeme aldım / Ödeme yaptım", "… onay bekliyor", Onayla / Bu ödemeyi almadım / Bildirimi geri çek. pgTAP 36 + Vitest + RNTL (ADR-032).
 
 ### [ ] F2-08 Değişiklik talepleri (S15)
 - `propose_amendment`, `decide_amendment`, taksitlerin yeniden üretilmesi, geçmiş ödemelerin korunması.
