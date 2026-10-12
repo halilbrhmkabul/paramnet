@@ -71,5 +71,26 @@ export function createSupabaseAgreementsApi(client: SupabaseClient): AgreementsA
 		withdrawPayment: async (paymentId) => {
 			await call("withdraw_payment", { p_payment_id: paymentId });
 		},
+		openDispute: (id, reason, paymentId, rowVersion) =>
+			call("open_dispute", {
+				p_id: id,
+				p_reason: reason,
+				p_payment_id: paymentId,
+				p_row_version: rowVersion,
+			}),
+		resolveDispute: async (id) => {
+			await call("resolve_dispute", { p_id: id });
+		},
+		requestCancel: async (id, rowVersion) => {
+			await call("request_cancel", { p_id: id, p_row_version: rowVersion });
+		},
+		decideCancel: (id, decision) => call("decide_cancel", { p_id: id, p_decision: decision }),
+		forgiveRemaining: (id, amountMinor, rowVersion, idempotencyKey) =>
+			call("forgive_remaining", {
+				p_id: id,
+				p_amount_minor: amountMinor,
+				p_row_version: rowVersion,
+				p_idempotency_key: idempotencyKey,
+			}),
 	};
 }

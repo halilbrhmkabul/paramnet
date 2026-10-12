@@ -62,4 +62,24 @@ export interface AgreementsApi {
 		rowVersion: number,
 	): Promise<{ status: string; version: number }>;
 	withdrawAmendment(id: string): Promise<void>;
+	// Disputes, mutual cancellation and forgiveness (F2-09).
+	openDispute(
+		id: string,
+		reason: string,
+		paymentId: string | null,
+		rowVersion: number,
+	): Promise<{ status: string }>;
+	resolveDispute(id: string): Promise<void>;
+	requestCancel(id: string, rowVersion: number): Promise<void>;
+	decideCancel(
+		id: string,
+		decision: "accept" | "reject",
+	): Promise<{ status: string; replayed: boolean }>;
+	// amountMinor null forgives everything that is left; the key makes retries safe (BR-09).
+	forgiveRemaining(
+		id: string,
+		amountMinor: number | null,
+		rowVersion: number,
+		idempotencyKey: string,
+	): Promise<{ payment_id: string; replayed: boolean; settled: boolean }>;
 }

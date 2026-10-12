@@ -306,3 +306,15 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Tek açık talep (BR-07): `pending_version` doluyken yeni öneri yok. `active` → `amendment_pending`; `disputed` iken öneri durumu değiştirmez ve kabulü itirazı çözer (`active`). Red/geri çekmede `amendment_pending` → `active`, `disputed` aynen kalır. Geri çekilen öneri `superseded` (enum'da `withdrawn` yok).
 	- Kararı yalnızca önermeyen taraf verir (`decide_amendment`, versiyon + hash); değişikliğe karşı öneri yok (yeni talep açılır). `amendment_pending` iken ödeme kaydı sürer (eski şartlar geçerli).
 	- Bildirimler: `amendmentProposed` (diğer tarafa), `amendmentAccepted` / `amendmentRejected` (önerene).
+
+## ADR-034 — İtiraz, karşılıklı iptal ve indirim
+- **Tarih:** 2026-10-12
+- **Karar:**
+	- İtiraz `disputes` tablosunda tutulur: açan, gerekçe (zorunlu, ≤500), isteğe bağlı ödeme, durum (`open`, `resolved`, `amended`, `closed`). Anlaşma başına tek açık itiraz (kısmi tekil indeks). Tablo istemciye kapalıdır; okumalar `get_agreement_detail` ve `list_requests` üzerinden yapılır.
+	- `open_dispute` `active` ve `amendment_pending` iken açılır. Açık öneri yerinde kalır; kabul edilirse itiraz `amended` olarak kapanır ve `dispute_resolved` olayı (`via: amendment`) yazılır. Geri çekmeyi yalnızca açan yapar. Geri çekilince anlaşma `active` olur, açık öneri varsa `amendment_pending`. İtirazlıyken ödeme ve indirim yapılmaz (BR-14); hatırlatma filtresi zaten `disputed` durumunu dışarıda bırakır.
+	- Karşılıklı iptal ayrı bir durum değil, anlaşmadaki talep sütunlarıdır (`cancel_requested_by/at`); geçmiş olaylardadır.
+		- Talep `active`, `amendment_pending` ve `disputed` iken açılabilir: birlikte iptal, itirazdan çıkış yollarından biridir (spec 5.7 "taraflar uzlaşır").
+		- Kararı talep etmeyen taraf verir. Kabul açık itirazı `closed`, açık öneriyi `superseded` yapar ve `cancel_accepted` ile `cancelled` olaylarını yazar.
+		- Tekrar eden kabul ilk sonucu döner (BR-09). Talebi geri çekmek bu sürümde yok (BACKLOG).
+	- `forgive_remaining(id, amount?)` yalnızca alacaklı içindir (kişisel modda sahip alacaklıysa da). Onaylı `discount` ödemesi olarak kaydedilir; FIFO dağıtılır ve kalan 0 olursa `settled` olur. Tutar boşsa kalanın tamamı alınır. İdempotency anahtarı zorunludur. Borçlunun onayı gerekmez, yalnızca `forgiven` bildirimi gider (spec 5.6). Mobil form kalanla dolu gelir; tutar kalana eşitse sunucuya `null` gider.
+	- Talepler'de karşı tarafın açık itirazı ve iptal talebi ayrı bölümlerde listelenir (dashboard sayacı `list_requests` uzunluğundan gelir).

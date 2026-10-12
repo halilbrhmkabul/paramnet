@@ -13,13 +13,20 @@ import type {
 	CalendarMonth,
 	ContactSummary,
 	DueItem,
+	EventType,
 	PendingDecision,
 	RequestItem,
 	TermsView,
 } from "../types";
 import { dueItems, inMonth, isOpen, toDetail, toSummary } from "./derive";
 import { seedState, type MockSeed } from "./seed";
-import { applyPayment, insertAgreement, type MockContact, type MockState } from "./store";
+import {
+	applyPayment,
+	insertAgreement,
+	type MockAgreement,
+	type MockContact,
+	type MockState,
+} from "./store";
 import { clock } from "@/lib/clock";
 
 export type MockApiOptions = {
@@ -52,6 +59,17 @@ export function createMockApi({
 		}
 		// Callers must never mutate the in-memory store through returned objects.
 		return JSON.parse(JSON.stringify(produce())) as T;
+	}
+
+	function event(agreement: MockAgreement, type: EventType) {
+		agreement.row_version += 1;
+		agreement.events.push({
+			id: `${agreement.id}-${type}-${String(agreement.row_version)}`,
+			type,
+			at: now().toISOString(),
+			actor: "me",
+			amount_minor: null,
+		});
 	}
 
 	function contactOf(id: string): MockContact {
@@ -574,6 +592,129 @@ export function createMockApi({
 					actor: "me",
 					amount_minor: null,
 				});
+			}),
+
+		// Disputes, cancellation, forgiveness (F2-09): only my side exists in the prototype.
+		openDispute: (id, reason, paymentId, rowVersion) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) => a.id === id);
+				if (agreement === undefined) {
+					throw new ApiError("not_found");
+				}
+				if (!["active", "amendment_pending"].includes(agreement.status)) {
+					throw new ApiError("invalid_transition");
+				}
+				if (agreement.row_version !== rowVersion) {
+					throw new ApiError("conflict");
+				}
+				if (reason.trim() === "") {
+					throw new ApiError("validation_error");
+				}
+				agreement.dispute = {
+					by_me: true,
+					reason,
+					payment_id: paymentId,
+					opened_at: now().toISOString(),
+				};
+				agreement.status = "disputed";
+				event(agreement, "dispute_opened");
+				return { status: agreement.status };
+			}),
+
+		resolveDispute: (id) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) => a.id === id);
+				if (agreement?.dispute == null) {
+					throw new ApiError(
+						agreement === undefined ? "not_found" : "invalid_transition",
+					);
+				}
+				agreement.dispute = null;
+				agreement.status =
+					agreement.pending_proposal === null ? "active" : "amendment_pending";
+				event(agreement, "dispute_resolved");
+			}),
+
+		requestCancel: (id, rowVersion) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) => a.id === id);
+				if (agreement === undefined) {
+					throw new ApiError("not_found");
+				}
+				if (
+					!["active", "amendment_pending", "disputed"].includes(agreement.status) ||
+					agreement.cancel_request !== null
+				) {
+					throw new ApiError("invalid_transition");
+				}
+				if (agreement.row_version !== rowVersion) {
+					throw new ApiError("conflict");
+				}
+				agreement.cancel_request = { by_me: true, requested_at: now().toISOString() };
+				event(agreement, "cancel_requested");
+			}),
+
+		decideCancel: (id) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) => a.id === id);
+				if (agreement === undefined) {
+					throw new ApiError("not_found");
+				}
+				// My own request is the only kind the prototype has, and I cannot answer it.
+				throw new ApiError(
+					agreement.cancel_request === null ? "invalid_transition" : "forbidden",
+				);
+			}),
+
+		forgiveRemaining: (id, amountMinor, rowVersion, idempotencyKey) =>
+			respond(() => {
+				const existing = paymentByKey.get(idempotencyKey);
+				if (existing !== undefined) {
+					return { payment_id: existing, replayed: true, settled: false };
+				}
+				const agreement = state.agreements.find((a) => a.id === id);
+				if (agreement === undefined) {
+					throw new ApiError("not_found");
+				}
+				if (agreement.my_role !== "creditor") {
+					throw new ApiError("forbidden");
+				}
+				if (!["personal", "active", "amendment_pending"].includes(agreement.status)) {
+					throw new ApiError("invalid_transition");
+				}
+				if (agreement.row_version !== rowVersion) {
+					throw new ApiError("conflict");
+				}
+				const left = outstanding(agreement, agreement.payments);
+				const amount = amountMinor ?? left;
+				if (amount <= 0) {
+					throw new ApiError("validation_error");
+				}
+				if (amount > left) {
+					throw new ApiError("amount_exceeds_outstanding");
+				}
+				const paymentId = nextId();
+				paymentByKey.set(idempotencyKey, paymentId);
+				applyPayment(agreement, {
+					id: paymentId,
+					amount_minor: amount,
+					paid_on: today(),
+					method: "other",
+					kind: "discount",
+					status: "confirmed",
+					note: null,
+					created_at: now().toISOString(),
+					by_me: true,
+				});
+				const recorded = agreement.events.find((e) => e.id === `${paymentId}-e`);
+				if (recorded !== undefined) {
+					recorded.type = "forgiven";
+				}
+				return {
+					payment_id: paymentId,
+					replayed: false,
+					settled: agreement.status === "settled",
+				};
 			}),
 	};
 

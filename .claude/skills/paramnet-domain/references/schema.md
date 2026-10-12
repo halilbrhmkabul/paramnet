@@ -136,6 +136,8 @@ create type event_channel    as enum ('app','web','system');
 - `notification_outbox`: id, user_id, template text, payload jsonb, status (pending, sent, failed), attempts int, next_attempt_at.
 - `push_tokens`: user_id, expo_token unique, platform, last_seen_at.
 - `consents`: user_id, document (kvkk, terms), version, accepted_at.
+- `disputes`: id, agreement_id, opened_by, payment_id null, reason (zorunlu, ≤500), status (open, resolved, amended, closed), resolved_at; anlaşma başına tek açık itiraz (ADR-034).
+- `agreements.cancel_requested_by` / `cancel_requested_at`: açık karşılıklı iptal talebi (ADR-034).
 - `rate_limits`: key text, window_start timestamptz, count int (RPC/edge rate limit sayaçları).
 
 ## RLS ilkeleri

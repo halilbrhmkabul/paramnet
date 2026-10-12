@@ -135,6 +135,40 @@ export function render(
 				title: "Paramnet",
 				body: `${p.name} değişiklik önerini kabul etmedi. Mevcut plan geçerli.`,
 			};
+		// Disputes, mutual cancellation and forgiveness (F2-09).
+		case "disputeOpened":
+			return {
+				title: "Paramnet",
+				body: `${p.name} bu anlaşmaya itiraz etti. Gerekçesine göz atabilirsin.`,
+			};
+		case "disputeResolved":
+			return {
+				title: "Paramnet",
+				body: `${p.name} itirazını geri çekti. Anlaşma yeniden yürürlükte.`,
+			};
+		case "cancelRequested":
+			return {
+				title: "Paramnet",
+				body: `${p.name} anlaşmayı birlikte iptal etmek istiyor. Göz atar mısın?`,
+			};
+		case "cancelAccepted":
+			return {
+				title: "Paramnet",
+				body: `${p.name} iptal talebini kabul etti. Anlaşma iptal edildi.`,
+			};
+		case "cancelRejected":
+			return {
+				title: "Paramnet",
+				body: `${p.name} iptal talebini kabul etmedi. Anlaşma sürüyor.`,
+			};
+		case "forgiven":
+			return {
+				title: "Paramnet",
+				body:
+					p.remaining_minor === 0
+						? `${p.name} kalan ${amount} borcunu sildi. Anlaşma kapandı.`
+						: `${p.name} borcundan ${amount} indirdi. Kalan: ${remaining}.`,
+			};
 		default:
 			return null;
 	}

@@ -73,6 +73,44 @@ describe("render (copy-tr.md notif.*)", () => {
 		});
 	});
 
+	it.each([
+		["disputeOpened", "Bora bu anlaşmaya itiraz etti. Gerekçesine göz atabilirsin."],
+		["disputeResolved", "Bora itirazını geri çekti. Anlaşma yeniden yürürlükte."],
+		["cancelRequested", "Bora anlaşmayı birlikte iptal etmek istiyor. Göz atar mısın?"],
+		["cancelAccepted", "Bora iptal talebini kabul etti. Anlaşma iptal edildi."],
+		["cancelRejected", "Bora iptal talebini kabul etmedi. Anlaşma sürüyor."],
+	])("%s (F2-09)", (template, body) => {
+		expect(render(template, { agreement_id: "a1", name: "Bora", amount_minor: 0 })).toEqual({
+			title: "Paramnet",
+			body,
+		});
+	});
+
+	it("forgiven tells the debtor the discount and what is left (F2-09)", () => {
+		expect(
+			render("forgiven", {
+				agreement_id: "a1",
+				name: "Ayşe",
+				amount_minor: 50000,
+				remaining_minor: 150000,
+			}),
+		).toEqual({
+			title: "Paramnet",
+			body: "Ayşe borcundan 500,00 TL indirdi. Kalan: 1.500,00 TL.",
+		});
+		expect(
+			render("forgiven", {
+				agreement_id: "a1",
+				name: "Ayşe",
+				amount_minor: 50000,
+				remaining_minor: 0,
+			}),
+		).toEqual({
+			title: "Paramnet",
+			body: "Ayşe kalan 500,00 TL borcunu sildi. Anlaşma kapandı.",
+		});
+	});
+
 	it("unknown templates render nothing", () => {
 		expect(render("nope", payload)).toBeNull();
 	});

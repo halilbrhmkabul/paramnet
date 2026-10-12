@@ -174,3 +174,56 @@ export function useWithdrawAmendment() {
 	const api = useApi();
 	return useSharingMutation((id: string) => api.withdrawAmendment(id));
 }
+
+export function useOpenDispute() {
+	const api = useApi();
+	return useSharingMutation(
+		({
+			id,
+			reason,
+			paymentId,
+			rowVersion,
+		}: {
+			id: string;
+			reason: string;
+			paymentId: string | null;
+			rowVersion: number;
+		}) => api.openDispute(id, reason, paymentId, rowVersion),
+	);
+}
+
+export function useResolveDispute() {
+	const api = useApi();
+	return useSharingMutation((id: string) => api.resolveDispute(id));
+}
+
+export function useRequestCancel() {
+	const api = useApi();
+	return useSharingMutation(({ id, rowVersion }: { id: string; rowVersion: number }) =>
+		api.requestCancel(id, rowVersion),
+	);
+}
+
+export function useDecideCancel() {
+	const api = useApi();
+	return useSharingMutation(({ id, decision }: { id: string; decision: "accept" | "reject" }) =>
+		api.decideCancel(id, decision),
+	);
+}
+
+export function useForgiveRemaining() {
+	const api = useApi();
+	return useSharingMutation(
+		({
+			id,
+			amountMinor,
+			rowVersion,
+			idempotencyKey,
+		}: {
+			id: string;
+			amountMinor: number | null;
+			rowVersion: number;
+			idempotencyKey: string;
+		}) => api.forgiveRemaining(id, amountMinor, rowVersion, idempotencyKey),
+	);
+}

@@ -199,8 +199,19 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - `propose_amendment`, `decide_amendment`, taksitlerin yeniden üretilmesi, geçmiş ödemelerin korunması.
 - **Not (2026-10-12):** `propose_amendment` (tam şartlar + isteğe bağlı gerekçe, tek açık talep BR-07, active → amendment_pending, itirazlıyken de), `decide_amendment` (diğer taraf; kabulde yeni taksitler ve onaylı ödemelerin yeniden dağıtımı, itirazı da çözer; redde eski versiyon), `withdraw_amendment` (öneren). Bildirimler ve olaylar; Talepler "Değişiklikler"; detayda `pending_by_me`. Mobil S15: plan satır satır düzenlenir, taksit eklenir/çıkarılır, yeni toplam satırlardan; karar ekranı değişiklik modunda gerekçe + mevcut/önerilen karşılaştırma, yalnızca kabul/red. pgTAP 32 + Vitest + RNTL (ADR-033).
 
-### [ ] F2-09 İtiraz ve karşılıklı iptal (S16)
+### [x] F2-09 İtiraz ve karşılıklı iptal (S16)
 - `open_dispute`, `resolve_dispute`, `request_cancel`, `decide_cancel`, `forgive_remaining`.
+- **Not (2026-10-12):**
+	- Veritabanı: `disputes` tablosu (gerekçe zorunlu, isteğe bağlı ödeme, anlaşma başına tek açık itiraz) ve `agreements.cancel_requested_by/at`.
+	- `open_dispute`: `active`/`amendment_pending` → `disputed`.
+	- `resolve_dispute`: yalnızca itirazı açan; anlaşma `active` olur, açık öneri varsa `amendment_pending`.
+	- Kabul edilen değişiklik itirazı `amended` olarak kapatır.
+	- `request_cancel` / `decide_cancel`: itirazlıyken de istenebilir; kabul anlaşmayı `cancelled` yapar, açık itirazı ve öneriyi kapatır; tekrar eden kabul ilk sonucu döner.
+	- `forgive_remaining`: yalnızca alacaklı, `discount` ödemesi; tutar boşsa kalanın tamamı (`settled`); idempotent; borçlu yalnızca bilgilendirilir.
+	- Detayda `dispute` ve `cancel_request`; Talepler'de "İtirazlar" ve "İptal talepleri".
+	- Bildirim şablonları: `disputeOpened`, `disputeResolved`, `cancelRequested`, `cancelAccepted`, `cancelRejected`, `forgiven`.
+	- Mobil: S16 ekranı (gerekçe + ilgili ödeme seçimi); detayda itiraz kartı, iptal talebi kabul/red, "İndirim yap" formu (tutar kalanla dolu gelir).
+	- Testler: pgTAP 61, Vitest, RNTL 9 (ADR-034).
 
 ### [ ] F2-10 Bekleyen davetleri hesaba bağlama
 - `link-pending-invites` (yeni kayıtta numaraya bekleyen davetler).

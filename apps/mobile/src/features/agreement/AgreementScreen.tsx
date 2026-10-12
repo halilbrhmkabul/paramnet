@@ -16,6 +16,7 @@ import { Screen } from "@/components/Screen";
 import { ScreenTitle } from "@/components/ScreenTitle";
 import { SectionHeader } from "@/components/SectionHeader";
 import { AgreementStatusBadge, Badge, InstallmentStatusBadge } from "@/components/StatusBadge";
+import { DisputeCancelActions } from "./DisputeCancelActions";
 import { SharedStateActions } from "./SharedStateActions";
 import { installmentPosition } from "@/features/agreements/DueItemRow";
 import { fill, tr } from "@/i18n/tr";
@@ -275,6 +276,7 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 			) : null}
 
 			<SharedStateActions agreement={agreement} />
+			<DisputeCancelActions agreement={agreement} />
 
 			<View style={{ gap: spacing.xs }}>
 				<SectionHeader>{tr.agreement.installments}</SectionHeader>
