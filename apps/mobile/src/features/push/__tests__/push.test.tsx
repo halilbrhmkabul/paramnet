@@ -86,11 +86,31 @@ describe("push (F1-18)", () => {
 		});
 		const listener = mocked.onNotificationOpened.mock.calls[0]?.[0];
 		await act(async () => {
-			listener?.(SEED_IDS.ahmetLoan);
+			listener?.(SEED_IDS.ahmetLoan, "dueToday");
 			await Promise.resolve();
 		});
 		await waitFor(() => {
 			expect(screen.getByTestId("agreement.screen")).toBeTruthy();
+		});
+	});
+
+	it.each([
+		["shareReceived", "decide.screen"],
+		["shareWithdrawn", "requests.screen"],
+	])("opening %s shows %s (F2-11)", async (template, screenId) => {
+		signInForTest();
+		spyAuth();
+		await renderRouter(appRoutes, { initialUrl: "/" });
+		await waitFor(() => {
+			expect(mocked.onNotificationOpened).toHaveBeenCalled();
+		});
+		const listener = mocked.onNotificationOpened.mock.calls[0]?.[0];
+		await act(async () => {
+			listener?.(SEED_IDS.zeynepShare, template);
+			await Promise.resolve();
+		});
+		await waitFor(() => {
+			expect(screen.getByTestId(screenId)).toBeTruthy();
 		});
 	});
 });

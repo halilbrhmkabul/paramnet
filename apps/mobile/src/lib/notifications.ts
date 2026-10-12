@@ -89,7 +89,9 @@ export async function getPushToken(): Promise<PushToken | null> {
 }
 
 // Calls back with the agreement of a tapped reminder, including the one that cold-started the app.
-export function onNotificationOpened(listener: (agreementId: string) => void): () => void {
+export function onNotificationOpened(
+	listener: (agreementId: string, template: string | null) => void,
+): () => void {
 	let stopped = false;
 	let remove: (() => void) | null = null;
 	const handle = (response: NotificationResponse | null) => {
@@ -100,7 +102,10 @@ export function onNotificationOpened(listener: (agreementId: string) => void): (
 			"agreement_id" in data &&
 			typeof data.agreement_id === "string"
 		) {
-			listener(data.agreement_id);
+			listener(
+				data.agreement_id,
+				"template" in data && typeof data.template === "string" ? data.template : null,
+			);
 		}
 	};
 	void load().then((Notifications) => {

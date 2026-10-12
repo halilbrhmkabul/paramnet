@@ -25,7 +25,8 @@ export type PushMessage = {
 	to: string;
 	title: string;
 	body: string;
-	data: { agreement_id: string };
+	// The template lets the app open the right screen (decide vs. agreement).
+	data: { agreement_id: string; template: string };
 	sound: "default";
 };
 
@@ -169,6 +170,40 @@ export function render(
 						? `${p.name} kalan ${amount} borcunu sildi. Anlaşma kapandı.`
 						: `${p.name} borcundan ${amount} indirdi. Kalan: ${remaining}.`,
 			};
+		// The sharing flow and the reported-payment reminder (F2-11); amount_minor is the plan total.
+		case "shareReceived":
+			return {
+				title: "Paramnet",
+				body: `${p.name} seninle ${amount} tutarında bir ödeme planı paylaştı. Göz atar mısın?`,
+			};
+		case "shareAccepted":
+			return { title: "Paramnet", body: `${p.name} ödeme planını onayladı.` };
+		case "shareCountered":
+			return { title: "Paramnet", body: `${p.name} planda bir düzeltme önerdi.` };
+		case "shareRejected":
+			return {
+				title: "Paramnet",
+				body: `${p.name} bu planın kendisine ait olmadığını belirtti.`,
+			};
+		case "counterAccepted":
+			return {
+				title: "Paramnet",
+				body: `${p.name} düzeltmeni kabul etti. Plan yürürlükte.`,
+			};
+		case "shareWithdrawn":
+			return { title: "Paramnet", body: `${p.name} paylaştığı planı geri çekti.` };
+		case "inviteExpired":
+			return {
+				title: "Paramnet",
+				body: `${p.name} için paylaştığın bağlantının süresi doldu. İstersen yeniden paylaşabilirsin.`,
+			};
+		case "settled":
+			return { title: "Paramnet", body: `${p.name} ile planınız tamamlandı.` };
+		case "paymentPending":
+			return {
+				title: "Paramnet",
+				body: `${p.name} ${amount} ödeme bildirdi. Onaylıyor musun?`,
+			};
 		default:
 			return null;
 	}
@@ -190,7 +225,7 @@ export function buildMessages(rows: ClaimedNotification[]): {
 			messages.push({
 				to: token,
 				...text,
-				data: { agreement_id: row.payload.agreement_id },
+				data: { agreement_id: row.payload.agreement_id, template: row.template },
 				sound: "default",
 			});
 			owners.push(row.id);
