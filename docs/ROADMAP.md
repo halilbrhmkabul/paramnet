@@ -305,6 +305,13 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 	- **Güvensiz varsayılan taraması:** çerezler `httpOnly` + `secure` + `strict`; e-posta ve anonim giriş kapalı; token rotasyonu açık. Üretim için SMS OTP süresi ve diğer ayarlar `supabase/README.md`'deki "Üretim kontrol listesi"nde.
 	- Bu ortamda supply-chain-risk-auditor ve insecure-defaults skill'leri yok; denetim elle yapıldı (ADR-041).
 ### [ ] F3-06 EAS: build profilleri, TestFlight ve Play kapalı test (eas-app-stores, eas-workflows)
+- **Durum (2026-10-13):** Kod ve yapılandırma hazır; hesap gerektiren adımlar kullanıcıda (`docs/RELEASE.md`).
+	- `eas.json`: `development` / `preview` / `production` profilleri, her biri kendi EAS ortamıyla. Sürüm numarası EAS'ta (`remote`, `autoIncrement`). Android gönderimi kapalı test kanalına (`alpha`) taslak olarak.
+	- `expo-dev-client` (Android'de uzak push için development build). `pnpm mobile` Expo Go ile açılmaya devam ediyor.
+	- iOS: şifreleme beyanı (`usesNonExemptEncryption: false`) ve Türkçe rehber izni metni (`src/i18n/permissions.json`). Android: rehbere yazma izni engellendi.
+	- Testler: RNTL/Jest 6 (`release.test.ts`). `expo config` çözümlemesi doğrulandı, expo-doctor 21/21.
+	- **Kapatmak için (kullanıcı):** `eas login` + `eas init`; EAS ortam değişkenleri; App Store Connect ve Play Console'da uygulama kaydı; ilk TestFlight ve kapalı test build'i.
+	- EAS Workflows (otomatik yayın) BACKLOG'da.
 ### [ ] F3-07 Mağaza materyalleri: metinler, ekran görüntüleri, gizlilik bildirimleri (aso-skills)
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
 ### [ ] F3-09 Faz 3 kapısı: mağaza yayını

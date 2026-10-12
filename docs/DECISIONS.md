@@ -435,3 +435,15 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- `pnpm audit --audit-level high` CI'da çalışır. Yaması olmayan veya uyumsuz bulgular `pnpm-workspace.yaml` `auditConfig.ignoreGhsas`'ta gerekçeleriyle tutulur ve Expo/Metro güncellendiğinde yeniden değerlendirilir.
 		- node-forge, braces, sprintf-js, uuid: yalnızca derleme/test araçları.
 		- decode-uri-component uygulamada (expo-router/query-string); düzeltmesi yalnızca ESM olduğu için bozar. Bu yüzden `+native-intent` 512 karakterden uzun linkleri router'a vermez.
+
+## ADR-042 — EAS build ve mağaza yapılandırması
+- **Tarih:** 2026-10-13
+- **Karar:**
+	- Üç profil: `development` (dev client, dahili dağıtım), `preview` (dahili dağıtım, mağaza dışı deneme) ve `production` (mağaza). Her profil EAS ortamını adıyla kullanır (`environment`).
+		- Tüm `EXPO_PUBLIC_*` değerleri EAS ortam değişkenlerindedir; `eas.json`'da değer ya da sır yoktur (test bunu denetler).
+		- Sürüm numaraları EAS'ta tutulur (`appVersionSource: remote`); production build numarasını kendisi artırır.
+	- Android gönderimi `alpha` (kapalı test) kanalına `draft` olarak yapılır; yayına alma kararı Play Console'da kalır. İlk AAB'nin Play'e elle yüklenmesi gerekir.
+	- `expo-dev-client` eklendi. Gerekçe: Android'de uzak push ve uygulama derin bağlantıları development build ister. Varsayılan geliştirme akışı Expo Go olarak kalır (`expo start --go`).
+	- iOS export compliance: uygulama yalnızca standart HTTPS/TLS kullanır → `usesNonExemptEncryption: false`.
+	- Rehber yalnızca okunur. Türkçe izin metni `src/i18n/permissions.json`'da: `app.config.ts` başka TS dosyası içe aktaramadığı için JSON, `tr.ts` aynı dosyayı kullanır. Android'de `WRITE_CONTACTS` engellenir.
+	- EAS Update ve EAS Workflows kurulmadı (BACKLOG). Sentry source map yükleme de EAS hesabı açılınca eklenecek (F3-01 BACKLOG maddesi).
