@@ -1,7 +1,8 @@
 import type { CreateAgreementInput, IsoDate, PaymentInput } from "@paramnet/shared";
 
-import type { Decision, PendingDecision, TermsView } from "./types";
+import type { AnalyticsEvent, Decision, PendingDecision, TermsView } from "./types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 import { useApi } from "./ApiProvider";
 
@@ -225,5 +226,16 @@ export function useForgiveRemaining() {
 			rowVersion: number;
 			idempotencyKey: string;
 		}) => api.forgiveRemaining(id, amountMinor, rowVersion, idempotencyKey),
+	);
+}
+
+// Fire and forget: analytics never blocks or fails a screen.
+export function useTrack(): (event: AnalyticsEvent) => void {
+	const api = useApi();
+	return useCallback(
+		(event: AnalyticsEvent) => {
+			api.trackEvent(event).catch(() => undefined);
+		},
+		[api],
 	);
 }

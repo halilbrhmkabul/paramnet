@@ -363,3 +363,25 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Web onay sayfası telefon ve OTP topladığı için tarayıcıda Sentry yok: yalnızca sunucu hataları (`instrumentation.ts` + `onRequestError`). CSP `connect-src 'self'` olarak kalır.
 	- Edge'de `withSentry` yakalanmamış hataları raporlar ve `no-store` 500 döner. `rpcError` yalnızca iş kodu olmayan (P0001 dışı) hataları raporlar. Edge runtime tam Deno olmadığı için varsayılan entegrasyonlar kapalı.
 	- DSN yoksa (yerel geliştirme, testler) hiçbiri başlamaz. Değişkenler: `EXPO_PUBLIC_SENTRY_DSN`, `SENTRY_DSN` (web sunucusu ve edge), `*_ENV` / `SENTRY_ENVIRONMENT`. Proje AB bölgesinde açılmalıdır (KVKK yurt dışı aktarım, spec 12).
+
+## ADR-038 — Ürün analitiği kendi veritabanımızda
+- **Tarih:** 2026-10-13
+- **Karar:** Spec 8 "PostHog (AB bölgesi) veya kendi olay tablosu" seçeneklerinden kendi tablomuz seçildi (kullanıcı kararı). Gerekçe:
+	- Yeni hizmet, hesap ve ücret yok.
+	- Yurt dışı aktarımı için ek bir sağlayıcı yok.
+	- Veri ana veriyle aynı yerde kalıyor ve barındırma Türkiye'ye taşınırsa onunla birlikte taşınıyor.
+	- Pilot için hazır huni/kohort araçları gerekmiyor. İleride gerekirse PostHog eklenebilir.
+- Spec 13.3 olaylarının kaynağı:
+	- `agreement_created`: `agreements`. Türü, taksit sayısı ve modu satırdan.
+	- `agreement_shared` / `agreement_decided` / `amendment_*` / `dispute_opened` / `agreement_settled`: `agreement_events`. Kanal (app/web) olay satırında.
+	- `payment_recorded` / `payment_decided`: `payments` (kimin bildirdiği, durumu).
+	- `signup_completed`: `profiles.created_at`. `reminder_sent`: `reminders` (`status = sent`).
+	- `app_opened`, `reminder_opened`, `invite_opened`, `invite_otp_verified`: yeni `analytics_events` tablosu.
+- Kişisel veri:
+	- Olaylarda yalnızca beyaz listedeki ad ve alanlar var: şablon adı (`^[A-Za-z0-9]{1,40}$`) ve kanal.
+	- `user_id` takma adlı hesap kimliği; hesap silinince `null` olur (F3-03).
+	- Web olayları hesaba değil davete bağlıdır.
+- `invite_open` artık davet başına bir analitik satırı yazar (`stable` değil). Davete dokunmadığı için spec 11.2 korunur. İlk açılış bir önizleme botuna ait olabilir; sayı, yaklaşık bir değer olarak okunmalıdır.
+- Metrikler `get_metrics(days)` ile hesaplanır, yalnızca servis rolüne açıktır. Oranlar iki ondalık, payda 0 ise `null`. "Haftalık aktif anlaşma" ödeme, onay, değişiklik, itiraz, iptal, indirim ve kapanış olaylarından sayılır.
+	- D7 için kaydın 7–14. günlerinde, D30 için 30–37. günlerinde açılış aranır. Yeterince eski kayıt yoksa değer `null`.
+	- "İlk kayıt süresi" kayıt anından ölçülür; spec açılıştan ölçer. Açılıştan ölçmek için kayıt öncesi anonim bir olay gerekir; bu, BACKLOG'da.

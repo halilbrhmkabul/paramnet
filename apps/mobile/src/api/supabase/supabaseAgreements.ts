@@ -92,5 +92,18 @@ export function createSupabaseAgreementsApi(client: SupabaseClient): AgreementsA
 				p_row_version: rowVersion,
 				p_idempotency_key: idempotencyKey,
 			}),
+		trackEvent: async (event) => {
+			const props =
+				event.name === "reminder_opened"
+					? { template: event.template }
+					: event.name === "invite_opened"
+						? { channel: "app" }
+						: {};
+			try {
+				await call("track_event", { p_name: event.name, p_props: props });
+			} catch {
+				// Analytics must never surface as an error to the user.
+			}
+		},
 	};
 }

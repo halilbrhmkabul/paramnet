@@ -262,7 +262,14 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 	- Edge: `npm:@sentry/deno` ile `withSentry` (6 fonksiyon) ve `rpcError`'daki beklenmeyen 500'ler.
 	- DSN yoksa üçü de kapalı. Source map yükleme ve `@sentry/cli` sonraya (BACKLOG).
 	- Testler: Vitest 15 (telemetry) + 3 (web), Jest 3 (mobil); edge, yerel `functions serve` ile DSN'li ve DSN'siz denendi (ADR-037).
-### [ ] F3-02 Analitik olayları (spec 13.3) ve basit metrik paneli
+### [x] F3-02 Analitik olayları (spec 13.3) ve basit metrik paneli
+- **Not (2026-10-13):** Kullanıcı kararıyla PostHog yerine kendi tablomuz (ADR-038).
+	- `analytics_events` yalnızca sunucuda zaten satırı olmayan olaylar için: `app_opened`, `reminder_opened {template}`, `invite_opened {channel}` ve `invite_otp_verified`. Web olayları davet başına bir kez sayılır; önizleme botları daveti tüketmez.
+	- `track_event` RPC: beyaz liste, alan ve değer kontrolü; saatte 60 olay, aşan sessizce düşer.
+	- `get_metrics(days)`: yalnızca servis rolü. Spec 13.1–13.2'yi mevcut tablolardan hesaplar.
+	- Panel: `pnpm metrics [gün]` (yerelde `supabase status`'tan, uzakta `METRICS_*` ortam değişkenleriyle).
+	- Mobil: `trackEvent` (mock'ta işlem yok, Supabase'de hataları yutar); açılış, bildirim açılışı ve davet açılışı.
+	- Testler: pgTAP 24, RNTL 4, adaptör testleri.
 ### [ ] F3-03 KVKK: aydınlatma metni ekranları, hesap silme, veri dışa aktarma
 ### [ ] F3-04 Yerli SMS sağlayıcı: Send SMS Hook
 ### [ ] F3-05 Kötüye kullanım testleri: OTP, rate limit, SMS bütçe alarmı; bağımlılık denetimi (supply-chain-risk-auditor, insecure-defaults)

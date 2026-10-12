@@ -1,9 +1,10 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider, router, type Theme } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { ApiProvider, useAuthApi } from "@/api/ApiProvider";
+import { useTrack } from "@/api/hooks";
 import { useIsSignedIn, useSession } from "@/features/auth/sessionStore";
 import { registerDevice } from "@/features/push/device";
 import { tr } from "@/i18n/tr";
@@ -40,6 +41,16 @@ function AppNavigator() {
 			});
 	}, [auth, restored, finishRestore]);
 
+	// One app_opened per start of a signed-in session (spec 13.3, retention).
+	const track = useTrack();
+	const counted = useRef(false);
+	useEffect(() => {
+		if (signedIn && !counted.current) {
+			counted.current = true;
+			track({ name: "app_opened" });
+		}
+	}, [signedIn, track]);
+
 	// Refresh this device's push token for the signed-in account (best effort, F1-18).
 	useEffect(() => {
 		if (signedIn) {
@@ -73,9 +84,10 @@ function AppNavigator() {
 			return;
 		}
 		return onNotificationOpened((agreementId, template) => {
+			track({ name: "reminder_opened", template: template ?? "unknown" });
 			router.push(notificationRoute(agreementId, template));
 		});
-	}, [signedIn]);
+	}, [signedIn, track]);
 
 	if (!restored) {
 		return null;

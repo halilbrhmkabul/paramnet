@@ -255,10 +255,34 @@ describe("Supabase AgreementsApi", () => {
 			"forgive_remaining",
 			{ p_id: "a1", p_amount_minor: null, p_row_version: 4, p_idempotency_key: "k1" },
 		],
+		[
+			"trackEvent",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
+				api.trackEvent({ name: "reminder_opened", template: "dueToday" }),
+			"track_event",
+			{ p_name: "reminder_opened", p_props: { template: "dueToday" } },
+		],
+		[
+			"trackEvent",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
+				api.trackEvent({ name: "invite_opened" }),
+			"track_event",
+			{ p_name: "invite_opened", p_props: { channel: "app" } },
+		],
 	] as const)("%s calls %s", async (_, call, fn, args) => {
 		const { client, calls } = fakeClient({ data: [], error: null });
 		await call(createSupabaseAgreementsApi(client));
 		expect(calls).toEqual([{ fn, args }]);
+	});
+
+	it("analytics errors are swallowed (F3-02)", async () => {
+		const { client } = fakeClient({
+			data: null,
+			error: { code: "P0001", message: "validation_error" },
+		});
+		await expect(
+			createSupabaseAgreementsApi(client).trackEvent({ name: "app_opened" }),
+		).resolves.toBeUndefined();
 	});
 
 	it("maps RPC error codes", async () => {
