@@ -371,6 +371,7 @@ export function createMockApi({
 					current: terms,
 					proposed: terms,
 					can_reject: true,
+					reason: null,
 					payments: [],
 				};
 			}),
@@ -518,6 +519,61 @@ export function createMockApi({
 					amount_minor: payment.amount_minor,
 				});
 				agreement.row_version += 1;
+			}),
+
+		proposeAmendment: (id, terms, _reason, rowVersion) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) => a.id === id);
+				if (agreement === undefined) {
+					throw new ApiError("not_found");
+				}
+				if (
+					!["active", "disputed"].includes(agreement.status) ||
+					agreement.pending_proposal !== null
+				) {
+					throw new ApiError("invalid_transition");
+				}
+				if (agreement.row_version !== rowVersion) {
+					throw new ApiError("conflict");
+				}
+				agreement.pending_proposal = {
+					principal_minor: terms.principal_minor,
+					plan: terms.plan,
+				};
+				if (agreement.status === "active") {
+					agreement.status = "amendment_pending";
+				}
+				agreement.row_version += 1;
+				agreement.events.push({
+					id: `${id}-amend-${String(agreement.row_version)}`,
+					type: "amendment_proposed",
+					at: now().toISOString(),
+					actor: "me",
+					amount_minor: null,
+				});
+				return { status: agreement.status, version: 2 };
+			}),
+
+		withdrawAmendment: (id) =>
+			respond(() => {
+				const agreement = state.agreements.find((a) => a.id === id);
+				if (agreement?.pending_proposal == null) {
+					throw new ApiError(
+						agreement === undefined ? "not_found" : "invalid_transition",
+					);
+				}
+				agreement.pending_proposal = null;
+				if (agreement.status === "amendment_pending") {
+					agreement.status = "active";
+				}
+				agreement.row_version += 1;
+				agreement.events.push({
+					id: `${id}-amend-w-${String(agreement.row_version)}`,
+					type: "amendment_withdrawn",
+					at: now().toISOString(),
+					actor: "me",
+					amount_minor: null,
+				});
 			}),
 	};
 

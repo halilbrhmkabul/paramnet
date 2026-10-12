@@ -173,7 +173,7 @@ function DecisionView({ pending }: { pending: PendingDecision }) {
 			{
 				onSuccess: () => {
 					// After a rejection the agreement is no longer mine to see.
-					if (decision === "reject") {
+					if (decision === "reject" && pending.actor !== "amendment") {
 						router.dismissTo("/(tabs)");
 					} else {
 						router.replace({
@@ -191,8 +191,18 @@ function DecisionView({ pending }: { pending: PendingDecision }) {
 			<ScreenTitle>
 				{pending.actor === "creator"
 					? fill(tr.decide.counterTitle, { name })
-					: fill(tr.invite.title, { name })}
+					: pending.actor === "amendment"
+						? fill(tr.decide.amendmentTitle, { name })
+						: fill(tr.invite.title, { name })}
 			</ScreenTitle>
+			{pending.reason === null ? null : (
+				<Card testID="decide.reason">
+					<Text style={[typography.caption, { color: colors.textMuted }]}>
+						{tr.decide.reason}
+					</Text>
+					<Text style={[typography.body, { color: colors.text }]}>{pending.reason}</Text>
+				</Card>
+			)}
 			<Text style={[typography.headline, { color: colors.text }]}>{pending.title}</Text>
 			<Text testID="decide.role" style={[typography.callout, { color: colors.textMuted }]}>
 				{pending.my_role === "debtor" ? tr.agreement.youOwe : tr.agreement.owesYou}
@@ -264,18 +274,25 @@ function DecisionView({ pending }: { pending: PendingDecision }) {
 						}}
 						testID="decide.accept.button"
 					/>
-					<Button
-						label={tr.invite.counter}
-						variant="secondary"
-						disabled={!online}
-						onPress={() => {
-							setEditing(true);
-						}}
-						testID="decide.counter.button"
-					/>
+					{/* An amendment is answered yes or no; a different change is a new request. */}
+					{pending.actor === "amendment" ? null : (
+						<Button
+							label={tr.invite.counter}
+							variant="secondary"
+							disabled={!online}
+							onPress={() => {
+								setEditing(true);
+							}}
+							testID="decide.counter.button"
+						/>
+					)}
 					{pending.can_reject ? (
 						<Button
-							label={tr.invite.reject}
+							label={
+								pending.actor === "amendment"
+									? tr.decide.rejectAmendment
+									: tr.invite.reject
+							}
 							variant="ghost"
 							disabled={!online}
 							onPress={() => {

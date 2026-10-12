@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
-import { useMakePersonal, useWithdrawShare } from "@/api/hooks";
+import { useMakePersonal, useWithdrawAmendment, useWithdrawShare } from "@/api/hooks";
 import type { AgreementDetail } from "@/api/types";
 import { Button } from "@/components/Button";
 import { tr } from "@/i18n/tr";
@@ -15,6 +15,7 @@ export function SharedStateActions({ agreement }: { agreement: AgreementDetail }
 	const online = useIsOnline();
 	const withdraw = useWithdrawShare();
 	const makePersonal = useMakePersonal();
+	const withdrawAmendment = useWithdrawAmendment();
 	const openDecision = () => {
 		router.push({ pathname: "/agreement/[id]/decide", params: { id: agreement.id } });
 	};
@@ -62,6 +63,48 @@ export function SharedStateActions({ agreement }: { agreement: AgreementDetail }
 		) : (
 			info(tr.agreementActions.counteredWaiting)
 		);
+	} else if (
+		agreement.pending_by_me !== null &&
+		(agreement.status === "amendment_pending" || agreement.status === "disputed")
+	) {
+		content = agreement.pending_by_me ? (
+			<>
+				{info(tr.agreementActions.amendmentWaiting)}
+				<Button
+					label={tr.agreementActions.withdrawAmendment}
+					variant="secondary"
+					disabled={!online}
+					loading={withdrawAmendment.isPending}
+					onPress={() => {
+						withdrawAmendment.mutate(agreement.id);
+					}}
+					testID="agreement.withdrawAmendment.button"
+				/>
+			</>
+		) : (
+			<Button
+				label={tr.agreementActions.reviewAmendment}
+				disabled={!online}
+				onPress={openDecision}
+				testID="agreement.reviewAmendment.button"
+			/>
+		);
+	} else if (agreement.status === "active" || agreement.status === "disputed") {
+		// Shared agreements change only through a request the other side accepts (BR-05).
+		content = (
+			<Button
+				label={tr.agreementActions.proposeAmendment}
+				variant="secondary"
+				disabled={!online}
+				onPress={() => {
+					router.push({
+						pathname: "/agreement/[id]/amend",
+						params: { id: agreement.id },
+					});
+				}}
+				testID="agreement.amend.button"
+			/>
+		);
 	} else if (agreement.status === "rejected" && agreement.is_creator) {
 		content = (
 			<>
@@ -81,7 +124,7 @@ export function SharedStateActions({ agreement }: { agreement: AgreementDetail }
 	if (content === null) {
 		return null;
 	}
-	const error = withdraw.error ?? makePersonal.error;
+	const error = withdraw.error ?? makePersonal.error ?? withdrawAmendment.error;
 	return (
 		<View style={{ gap: spacing.xs }}>
 			{content}

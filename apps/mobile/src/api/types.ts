@@ -81,7 +81,11 @@ export type EventType =
 	| "payment_reported"
 	| "payment_confirmed"
 	| "payment_rejected"
-	| "payment_withdrawn";
+	| "payment_withdrawn"
+	| "amendment_proposed"
+	| "amendment_accepted"
+	| "amendment_rejected"
+	| "amendment_withdrawn";
 
 export type EventView = {
 	id: string;
@@ -94,6 +98,8 @@ export type EventView = {
 export type AgreementDetail = AgreementSummary & {
 	description: string | null;
 	started_on: IsoDate | null;
+	// An open counter offer / amendment: true if I proposed it, false if it waits for me, null if none.
+	pending_by_me: boolean | null;
 	notes: string | null;
 	down_payment_minor: number;
 	created_at: string;
@@ -164,11 +170,12 @@ export type TermsView = {
 export type PendingDecision = {
 	agreement_id: string;
 	title: string;
-	actor: "creator" | "counterparty";
+	actor: "creator" | "counterparty" | "amendment";
 	other_name: string | null;
 	my_role: PartyRole;
 	version: number;
 	terms_hash: string;
+	reason: string | null;
 	current: TermsView;
 	proposed: TermsView;
 	can_reject: boolean;
@@ -179,7 +186,7 @@ export type Decision = "accept" | "counter" | "reject";
 
 export type RequestItem = {
 	agreement_id: string;
-	kind: "share" | "counter" | "payment";
+	kind: "share" | "counter" | "payment" | "amendment";
 	// Only for kind "payment": a payment the other side reported, waiting for my confirmation.
 	payment_id?: string;
 	amount_minor?: number;

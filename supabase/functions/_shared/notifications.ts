@@ -119,6 +119,22 @@ export function render(
 				title: "Paramnet",
 				body: `${p.name} ${amount} ödemeyi almadığını belirtti. Bir sorun varsa birlikte bakabilirsiniz.`,
 			};
+		// Amendments (F2-08).
+		case "amendmentProposed":
+			return {
+				title: "Paramnet",
+				body: `${p.name} planda bir değişiklik önerdi. Göz atar mısın?`,
+			};
+		case "amendmentAccepted":
+			return {
+				title: "Paramnet",
+				body: `${p.name} değişiklik önerini kabul etti. Yeni plan geçerli.`,
+			};
+		case "amendmentRejected":
+			return {
+				title: "Paramnet",
+				body: `${p.name} değişiklik önerini kabul etmedi. Mevcut plan geçerli.`,
+			};
 		default:
 			return null;
 	}

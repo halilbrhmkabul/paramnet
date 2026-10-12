@@ -47,11 +47,11 @@ export function RequestsScreen() {
 				/>
 			) : (
 				<>
-					{(["share", "payment"] as const).map((section) => {
+					{(["share", "payment", "amendment"] as const).map((section) => {
 						const items = requests.data.filter((item) =>
-							section === "payment"
-								? item.kind === "payment"
-								: item.kind !== "payment",
+							section === "share"
+								? item.kind === "share" || item.kind === "counter"
+								: item.kind === section,
 						);
 						return items.length === 0 ? null : (
 							<View
@@ -69,12 +69,18 @@ export function RequestsScreen() {
 										key={item.payment_id ?? item.agreement_id}
 										title={item.title}
 										subtitle={
-											item.kind === "payment"
-												? fill(tr.requests.paymentReported, {
+											item.kind === "amendment"
+												? fill(tr.requests.amendment, {
 														name: item.from_name ?? "",
-														amount: formatTRY(item.amount_minor ?? 0),
 													})
-												: `${fill(item.kind === "counter" ? tr.requests.countered : tr.requests.shared, { name: item.from_name ?? "" })} · ${formatTRY(item.principal_minor)}`
+												: item.kind === "payment"
+													? fill(tr.requests.paymentReported, {
+															name: item.from_name ?? "",
+															amount: formatTRY(
+																item.amount_minor ?? 0,
+															),
+														})
+													: `${fill(item.kind === "counter" ? tr.requests.countered : tr.requests.shared, { name: item.from_name ?? "" })} · ${formatTRY(item.principal_minor)}`
 										}
 										onPress={() => {
 											// Payments are answered on the agreement, plans on the decision screen.
