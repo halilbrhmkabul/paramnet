@@ -1,11 +1,11 @@
 begin;
-select plan(49);
+select plan(50);
 
 -- Tablolar ve enum'lar (spec 10.1, paramnet-domain schema.md)
 select has_table('public', t, format('%s tablosu var', t))
 from unnest(array[
 	'profiles', 'contacts', 'agreements', 'agreement_versions', 'installments', 'payments',
-	'payment_allocations', 'agreement_events', 'reminders', 'notification_outbox', 'push_tokens', 'consents'
+	'payment_allocations', 'agreement_events', 'reminders', 'notification_outbox', 'push_tokens', 'consents', 'disputes'
 ]) as t;
 
 select has_enum('public', e, format('%s enum''u var', e))

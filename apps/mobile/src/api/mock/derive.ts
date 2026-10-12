@@ -70,6 +70,8 @@ export function toDetail(
 		description: agreement.description,
 		started_on: agreement.started_on,
 		pending_by_me: agreement.pending_proposal === null ? null : true,
+		dispute: agreement.dispute,
+		cancel_request: agreement.cancel_request,
 		notes: agreement.notes,
 		down_payment_minor: agreement.down_payment_minor,
 		created_at: agreement.created_at,

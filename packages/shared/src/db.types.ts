@@ -113,6 +113,8 @@ export type Database = {
 			agreements: {
 				Row: {
 					active_version: number;
+					cancel_requested_at: string | null;
+					cancel_requested_by: string | null;
 					cancelled_at: string | null;
 					counterparty_contact_id: string;
 					counterparty_profile_id: string | null;
@@ -136,6 +138,8 @@ export type Database = {
 				ComputedFields: never;
 				Insert: {
 					active_version?: number;
+					cancel_requested_at?: string | null;
+					cancel_requested_by?: string | null;
 					cancelled_at?: string | null;
 					counterparty_contact_id: string;
 					counterparty_profile_id?: string | null;
@@ -158,6 +162,8 @@ export type Database = {
 				};
 				Update: {
 					active_version?: number;
+					cancel_requested_at?: string | null;
+					cancel_requested_by?: string | null;
 					cancelled_at?: string | null;
 					counterparty_contact_id?: string;
 					counterparty_profile_id?: string | null;
@@ -179,6 +185,13 @@ export type Database = {
 					title?: string;
 				};
 				Relationships: [
+					{
+						foreignKeyName: "agreements_cancel_requested_by_fkey";
+						columns: ["cancel_requested_by"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
 					{
 						foreignKeyName: "agreements_counterparty_contact_id_fkey";
 						columns: ["counterparty_contact_id"];
@@ -277,6 +290,62 @@ export type Database = {
 						columns: ["owner_id"];
 						isOneToOne: false;
 						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+				];
+			};
+			disputes: {
+				Row: {
+					agreement_id: string;
+					created_at: string;
+					id: string;
+					opened_by: string;
+					payment_id: string | null;
+					reason: string;
+					resolved_at: string | null;
+					status: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					agreement_id: string;
+					created_at?: string;
+					id?: string;
+					opened_by: string;
+					payment_id?: string | null;
+					reason: string;
+					resolved_at?: string | null;
+					status?: string;
+				};
+				Update: {
+					agreement_id?: string;
+					created_at?: string;
+					id?: string;
+					opened_by?: string;
+					payment_id?: string | null;
+					reason?: string;
+					resolved_at?: string | null;
+					status?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "disputes_agreement_id_fkey";
+						columns: ["agreement_id"];
+						isOneToOne: false;
+						referencedRelation: "agreements";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "disputes_opened_by_fkey";
+						columns: ["opened_by"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "disputes_payment_id_fkey";
+						columns: ["payment_id"];
+						isOneToOne: false;
+						referencedRelation: "payments";
 						referencedColumns: ["id"];
 					},
 				];
@@ -704,6 +773,7 @@ export type Database = {
 				Args: { p_decision: string; p_id: string; p_terms_hash: string; p_version: number };
 				Returns: Json;
 			};
+			decide_cancel: { Args: { p_decision: string; p_id: string }; Returns: Json };
 			decide_counter: {
 				Args: {
 					p_counter_terms: Json;
@@ -716,6 +786,15 @@ export type Database = {
 			};
 			decide_payment: { Args: { p_decision: string; p_payment_id: string }; Returns: Json };
 			finish_notifications: { Args: { p_results: Json }; Returns: Json };
+			forgive_remaining: {
+				Args: {
+					p_amount_minor: number;
+					p_id: string;
+					p_idempotency_key: string;
+					p_row_version: number;
+				};
+				Returns: Json;
+			};
 			get_agreement_detail: { Args: { p_id: string }; Returns: Json };
 			get_calendar: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
@@ -747,6 +826,15 @@ export type Database = {
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_requests: { Args: Record<PropertyKey, never>; Returns: Json };
 			make_personal: { Args: { p_id: string }; Returns: Json };
+			open_dispute: {
+				Args: {
+					p_id: string;
+					p_payment_id: string;
+					p_reason: string;
+					p_row_version: number;
+				};
+				Returns: Json;
+			};
 			propose_amendment: {
 				Args: { p_id: string; p_reason: string; p_row_version: number; p_terms: Json };
 				Returns: Json;
@@ -761,6 +849,8 @@ export type Database = {
 				Returns: Json;
 			};
 			register_push_token: { Args: { p_platform: string; p_token: string }; Returns: Json };
+			request_cancel: { Args: { p_id: string; p_row_version: number }; Returns: Json };
+			resolve_dispute: { Args: { p_id: string }; Returns: Json };
 			resolve_invite: { Args: { p_token: string }; Returns: Json };
 			share_agreement: {
 				Args: { p_id: string; p_phone: string; p_row_version: number };

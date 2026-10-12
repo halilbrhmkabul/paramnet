@@ -222,6 +222,39 @@ describe("Supabase AgreementsApi", () => {
 			"withdraw_amendment",
 			{ p_id: "a1" },
 		],
+		[
+			"openDispute",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
+				api.openDispute("a1", "neden", "p1", 4),
+			"open_dispute",
+			{ p_id: "a1", p_reason: "neden", p_payment_id: "p1", p_row_version: 4 },
+		],
+		[
+			"resolveDispute",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) => api.resolveDispute("a1"),
+			"resolve_dispute",
+			{ p_id: "a1" },
+		],
+		[
+			"requestCancel",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) => api.requestCancel("a1", 4),
+			"request_cancel",
+			{ p_id: "a1", p_row_version: 4 },
+		],
+		[
+			"decideCancel",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
+				api.decideCancel("a1", "reject"),
+			"decide_cancel",
+			{ p_id: "a1", p_decision: "reject" },
+		],
+		[
+			"forgiveRemaining",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
+				api.forgiveRemaining("a1", null, 4, "k1"),
+			"forgive_remaining",
+			{ p_id: "a1", p_amount_minor: null, p_row_version: 4, p_idempotency_key: "k1" },
+		],
 	] as const)("%s calls %s", async (_, call, fn, args) => {
 		const { client, calls } = fakeClient({ data: [], error: null });
 		await call(createSupabaseAgreementsApi(client));

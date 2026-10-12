@@ -14,6 +14,7 @@ import Requests from "../../app/(tabs)/requests";
 import Index from "../../app/index";
 import Invite from "../../app/invite/[token]";
 import AgreementAmend from "../../app/agreement/[id]/amend";
+import AgreementDispute from "../../app/agreement/[id]/dispute";
 import AgreementDecide from "../../app/agreement/[id]/decide";
 import AgreementHistory from "../../app/agreement/[id]/history";
 import AgreementDetail from "../../app/agreement/[id]/index";
@@ -52,6 +53,7 @@ export const appRoutes = {
 	"agreement/[id]/history": AgreementHistory,
 	"agreement/[id]/decide": AgreementDecide,
 	"agreement/[id]/amend": AgreementAmend,
+	"agreement/[id]/dispute": AgreementDispute,
 	"agreement/[id]/share": AgreementShare,
 	"agreement/[id]/invite-preview": AgreementInvitePreview,
 	"contact/[id]": ContactDetail,

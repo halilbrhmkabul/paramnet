@@ -57,6 +57,18 @@ function describe(event: EventView): string {
 			return fill(tr.history.paymentWithdrawn, {
 				amount: formatTRY(event.amount_minor ?? 0),
 			});
+		case "dispute_opened":
+			return tr.history.disputeOpened;
+		case "dispute_resolved":
+			return tr.history.disputeResolved;
+		case "cancel_requested":
+			return tr.history.cancelRequested;
+		case "cancel_accepted":
+			return tr.history.cancelAccepted;
+		case "cancel_rejected":
+			return tr.history.cancelRejected;
+		case "forgiven":
+			return fill(tr.history.forgiven, { amount: formatTRY(event.amount_minor ?? 0) });
 	}
 }
 

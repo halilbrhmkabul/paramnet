@@ -85,7 +85,13 @@ export type EventType =
 	| "amendment_proposed"
 	| "amendment_accepted"
 	| "amendment_rejected"
-	| "amendment_withdrawn";
+	| "amendment_withdrawn"
+	| "dispute_opened"
+	| "dispute_resolved"
+	| "cancel_requested"
+	| "cancel_accepted"
+	| "cancel_rejected"
+	| "forgiven";
 
 export type EventView = {
 	id: string;
@@ -100,6 +106,15 @@ export type AgreementDetail = AgreementSummary & {
 	started_on: IsoDate | null;
 	// An open counter offer / amendment: true if I proposed it, false if it waits for me, null if none.
 	pending_by_me: boolean | null;
+	// The open dispute (S16), if any; only its opener may withdraw it.
+	dispute: {
+		by_me: boolean;
+		reason: string;
+		payment_id: string | null;
+		opened_at: string;
+	} | null;
+	// An open request to cancel together; the other side answers it.
+	cancel_request: { by_me: boolean; requested_at: string } | null;
 	notes: string | null;
 	down_payment_minor: number;
 	created_at: string;
@@ -186,12 +201,14 @@ export type Decision = "accept" | "counter" | "reject";
 
 export type RequestItem = {
 	agreement_id: string;
-	kind: "share" | "counter" | "payment" | "amendment";
+	kind: "share" | "counter" | "payment" | "amendment" | "dispute" | "cancel";
 	// Only for kind "payment": a payment the other side reported, waiting for my confirmation.
 	payment_id?: string;
 	amount_minor?: number;
 	paid_on?: IsoDate;
 	note?: string | null;
+	// Only for kind "dispute".
+	reason?: string;
 	title: string;
 	from_name: string | null;
 	my_role: PartyRole;

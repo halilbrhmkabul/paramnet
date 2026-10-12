@@ -10,7 +10,7 @@ import {
 	type PlanPeriod,
 } from "@paramnet/shared";
 
-import type { EventView, PaymentView } from "../types";
+import type { AgreementDetail, EventView, PaymentView } from "../types";
 
 export type MockContact = {
 	id: string;
@@ -41,6 +41,9 @@ export type MockAgreement = {
 		principal_minor: number;
 		plan: { seq: number; due_date: IsoDate | null; amount_minor: number }[];
 	} | null;
+	// Only mine in the prototype, so by_me is always true.
+	dispute: AgreementDetail["dispute"];
+	cancel_request: AgreementDetail["cancel_request"];
 	contact_id: string;
 	status: AgreementStatus;
 	principal_minor: number;
@@ -84,6 +87,8 @@ export type NewMockAgreement = Omit<
 	| "row_version"
 	| "is_creator"
 	| "pending_proposal"
+	| "dispute"
+	| "cancel_request"
 > & {
 	status?: AgreementStatus;
 	is_creator?: boolean;
@@ -99,6 +104,8 @@ export function insertAgreement(state: MockState, input: NewMockAgreement): Mock
 		status,
 		is_creator,
 		pending_proposal: null,
+		dispute: null,
+		cancel_request: null,
 		row_version: 1,
 		installments: plan.map((row) => ({
 			id: `${input.id}-i${String(row.seq)}`,

@@ -19,3 +19,4 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Hatırlatmaları anlaşma bazında kapatma/değiştirme (spec 5.9) — F1-18 sırasında; tercih tablosu + ayarlar ekranı gerekir.
 - Expo push receipt kontrolü (ticket sonrası teslim raporu) — F1-18 sırasında; şimdilik yalnızca ticket hataları işleniyor.
 - Edge function IP rate limit için güvenilir istemci IP kaynağı (web sunucusu–fonksiyon arası paylaşılan sır) — F2-04 sırasında; F3-05 ile birlikte.
+- İptal talebini geri çekme (`withdraw_cancel`) ve iptal edilen anlaşmada bekleyen `reported` ödemeleri kapatma — F2-09 sırasında; state-machines.md'de olay tanımı yok.
