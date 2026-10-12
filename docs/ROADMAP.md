@@ -217,8 +217,9 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - `link-pending-invites` (yeni kayıtta numaraya bekleyen davetler).
 - **Not (2026-10-13):** `private.link_pending_invites`, `complete_profile` içinde çalışır (ayrı edge function yok, ADR-035): web'de onaylanan/düzeltme önerilen anlaşmalara karşı taraf hesabı ve başkalarının bu numarayla kaydettiği kişiler bağlanır; reddedilen ("bana ait değil") bağlanmaz, açık davetler kararda bağlanır. `complete_profile` artık `pending_requests` döner; mobil, sayı > 0 ise kayıt bitince Talepler'i açar (davet linki önceliklidir). pgTAP 13 (+060 güncellendi), RNTL onboarding.
 
-### [ ] F2-11 Bildirim şablonları
+### [x] F2-11 Bildirim şablonları
 - Tüm olay bildirimleri, copy-tr.md tonunda.
+- **Not (2026-10-13):** Paylaşım akışı olayları (`shared`, `share_withdrawn`, `invite_expired`, `accepted`, `countered`, `rejected`, `settled`) `agreement_events` trigger'ıyla outbox'a düşer: `shareReceived` (hesabı olan davetli numaraya), `shareAccepted`/`shareCountered`/`shareRejected`/`inviteExpired` (oluşturana; web kararları dahil), `counterAccepted`/`shareWithdrawn`, `settled` (paylaşılmışsa iki tarafa). 7 gündür yanıtsız bildirilen ödeme için alacaklıya `paymentPending` (`enqueue_payment_reminders`, pg_cron 15 dk, ödeme başına bir kez, sessiz saatler). Push verisi şablonu taşır; uygulama karar isteyen bildirimlerde karar ekranını, geri çekilen paylaşımda Talepler'i açar. copy-tr.md tablosu tüm şablonlarla güncellendi. pgTAP 17, Vitest sözleşme, RNTL push (ADR-036).
 
 ### [ ] F2-12 Faz 2 kapısı
 - Güvenlik taraması (claude-security), iki cihazla (biri uygulamasız) uçtan uca senaryolar, Maestro + Playwright.

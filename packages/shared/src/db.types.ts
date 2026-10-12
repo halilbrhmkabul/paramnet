@@ -699,6 +699,7 @@ export type Database = {
 					id: string;
 					installment_id: string | null;
 					kind: string;
+					payment_id: string | null;
 					status: string;
 					user_id: string;
 				};
@@ -710,6 +711,7 @@ export type Database = {
 					id?: string;
 					installment_id?: string | null;
 					kind: string;
+					payment_id?: string | null;
 					status?: string;
 					user_id: string;
 				};
@@ -720,6 +722,7 @@ export type Database = {
 					id?: string;
 					installment_id?: string | null;
 					kind?: string;
+					payment_id?: string | null;
 					status?: string;
 					user_id?: string;
 				};
@@ -736,6 +739,13 @@ export type Database = {
 						columns: ["installment_id"];
 						isOneToOne: false;
 						referencedRelation: "installments";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "reminders_payment_id_fkey";
+						columns: ["payment_id"];
+						isOneToOne: false;
+						referencedRelation: "payments";
 						referencedColumns: ["id"];
 					},
 					{

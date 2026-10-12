@@ -7,6 +7,7 @@ import { ApiProvider, useAuthApi } from "@/api/ApiProvider";
 import { useIsSignedIn, useSession } from "@/features/auth/sessionStore";
 import { registerDevice } from "@/features/push/device";
 import { tr } from "@/i18n/tr";
+import { notificationRoute } from "@/features/push/notificationRoute";
 import { configureForegroundNotifications, onNotificationOpened } from "@/lib/notifications";
 import { useAppTheme } from "@/theme/useAppTheme";
 
@@ -68,8 +69,8 @@ function AppNavigator() {
 		if (!signedIn) {
 			return;
 		}
-		return onNotificationOpened((agreementId) => {
-			router.push({ pathname: "/agreement/[id]", params: { id: agreementId } });
+		return onNotificationOpened((agreementId, template) => {
+			router.push(notificationRoute(agreementId, template));
 		});
 	}, [signedIn]);
 

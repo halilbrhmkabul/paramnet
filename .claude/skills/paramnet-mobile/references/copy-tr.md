@@ -92,6 +92,25 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 3.4 ve 5.9.
 | `notif.overdue7` | {seq}. taksit 7 gündür açık görünüyor. |
 | `notif.paymentReported` | {name} {amount} ödeme yaptığını bildirdi. Aldın mı? |
 | `notif.paymentConfirmed` | {name} {amount} ödemeni onayladı. Kalan: {remaining}. |
+| `notif.paymentRecorded` | {name} {amount} ödemeni kaydetti. Kalan: {remaining}. |
+| `notif.paymentRejected` | {name} {amount} ödemeyi almadığını belirtti. Bir sorun varsa birlikte bakabilirsiniz. |
+| `notif.paymentPending` | {name} {amount} ödeme bildirdi. Onaylıyor musun? (7 gün yanıtsız kalınca, alacaklıya) |
+| `notif.shareReceived` | {name} seninle {amount} tutarında bir ödeme planı paylaştı. Göz atar mısın? |
 | `notif.shareAccepted` | {name} ödeme planını onayladı. |
 | `notif.shareCountered` | {name} planda bir düzeltme önerdi. |
+| `notif.shareRejected` | {name} bu planın kendisine ait olmadığını belirtti. |
+| `notif.counterAccepted` | {name} düzeltmeni kabul etti. Plan yürürlükte. |
+| `notif.shareWithdrawn` | {name} paylaştığı planı geri çekti. |
+| `notif.inviteExpired` | {name} için paylaştığın bağlantının süresi doldu. İstersen yeniden paylaşabilirsin. |
+| `notif.amendmentProposed` | {name} planda bir değişiklik önerdi. Göz atar mısın? |
+| `notif.amendmentAccepted` | {name} değişiklik önerini kabul etti. Yeni plan geçerli. |
+| `notif.amendmentRejected` | {name} değişiklik önerini kabul etmedi. Mevcut plan geçerli. |
+| `notif.disputeOpened` | {name} bu anlaşmaya itiraz etti. Gerekçesine göz atabilirsin. |
+| `notif.disputeResolved` | {name} itirazını geri çekti. Anlaşma yeniden yürürlükte. |
+| `notif.cancelRequested` | {name} anlaşmayı birlikte iptal etmek istiyor. Göz atar mısın? |
+| `notif.cancelAccepted` | {name} iptal talebini kabul etti. Anlaşma iptal edildi. |
+| `notif.cancelRejected` | {name} iptal talebini kabul etmedi. Anlaşma sürüyor. |
+| `notif.forgiven` | {name} borcundan {amount} indirdi. Kalan: {remaining}. / Kalanın tamamında: {name} kalan {amount} borcunu sildi. Anlaşma kapandı. |
 | `notif.settled` | {name} ile planınız tamamlandı. |
+
+Metinler `supabase/functions/_shared/notifications.ts` `render()` ile üretilir; `packages/shared/src/notifications.contract.test.ts` bu tabloyla birebir aynı olduğunu doğrular.

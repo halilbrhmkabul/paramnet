@@ -331,3 +331,14 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 		- Açık davetler: zaten numarayla eşleşir (`decision_actor`) ve karar anında bağlanır.
 	- Olay kaydı yazılmaz; bu bir durum geçişi değildir.
 	- `complete_profile` dönüşüne `pending_requests` (`list_requests` uzunluğu) eklendi. Mobil uygulama sayı 0'dan büyükse kayıt bitince Talepler sekmesini açar (spec 5.1 adım 6). Bekleyen bir davet linki varsa o önceliklidir. Bayrak yalnızca bellekte tutulur.
+
+## ADR-036 — Olay bildirimleri
+- **Tarih:** 2026-10-13
+- **Karar:**
+	- Paylaşım akışı olayları birçok yerden yazılır: uygulama ve web kararları, üç farklı kapanış yolu, süre dolumu işi. Bu yüzden bildirim, `agreement_events` üzerindeki `AFTER INSERT` trigger'ında (`private.notify_agreement_event`) tek yerde üretilir. Kural şu: oluşturanın yaptığı işlemi karşı taraf, diğer her şeyi (uygulama, web, sistem) oluşturan duyar.
+	- `settled` olayında, anlaşma paylaşılmışsa iki tarafa da tebrik gider (spec 5.8); kişisel kayıtta bildirim gitmez.
+	- Ödeme, değişiklik ve itiraz bildirimleri kendi RPC'lerinde kalır, çünkü tutar ve kalan gibi işleme özgü bilgiler taşırlar.
+	- Karar vermemiş karşı tarafın hesabı, davetin gönderildiği numaraya kayıtlı profildir. Hesap yoksa push gitmez; kişi SMS/WhatsApp ile paylaşılan linkle gelir.
+	- Ad, alıcının tanıdığı addır: oluşturan için kendi rehberindeki kişi adı, karşı taraf için oluşturanın profil adı (`private.event_payload`).
+	- Bildirilen ödeme hatırlatması (spec 5.9) alacaklıya bildirimden 7 gün sonra saat 10:00'da (İstanbul) bir kez gider. Sessiz saatler ve 12 saatlik pencere taksit hatırlatmalarıyla aynıdır. Tekrarı önlemek için `reminders.payment_id` sütunu ve tekil indeks eklendi.
+	- Push `data` alanı şablon adını da taşır. Uygulama `shareReceived`, `shareCountered` ve `amendmentProposed` için karar ekranını, `shareWithdrawn` için Talepler'i, diğerleri için anlaşma detayını açar.

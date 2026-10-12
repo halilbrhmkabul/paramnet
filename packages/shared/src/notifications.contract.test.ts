@@ -111,6 +111,63 @@ describe("render (copy-tr.md notif.*)", () => {
 		});
 	});
 
+	it.each([
+		[
+			"shareReceived",
+			"Ayşe seninle 1.000,00 TL tutarında bir ödeme planı paylaştı. Göz atar mısın?",
+		],
+		["shareAccepted", "Ayşe ödeme planını onayladı."],
+		["shareCountered", "Ayşe planda bir düzeltme önerdi."],
+		["shareRejected", "Ayşe bu planın kendisine ait olmadığını belirtti."],
+		["counterAccepted", "Ayşe düzeltmeni kabul etti. Plan yürürlükte."],
+		["shareWithdrawn", "Ayşe paylaştığı planı geri çekti."],
+		[
+			"inviteExpired",
+			"Ayşe için paylaştığın bağlantının süresi doldu. İstersen yeniden paylaşabilirsin.",
+		],
+		["settled", "Ayşe ile planınız tamamlandı."],
+		["paymentPending", "Ayşe 1.000,00 TL ödeme bildirdi. Onaylıyor musun?"],
+	])("%s (F2-11)", (template, body) => {
+		expect(
+			render(template, { agreement_id: "a1", name: "Ayşe", amount_minor: 100000 }),
+		).toEqual({
+			title: "Paramnet",
+			body,
+		});
+	});
+
+	// Every template the database queues (supabase/migrations: notify(...) and the reminder jobs).
+	it.each([
+		"dueSoon",
+		"dueToday",
+		"overdue1",
+		"overdue7",
+		"paymentReported",
+		"paymentConfirmed",
+		"paymentRecorded",
+		"paymentRejected",
+		"paymentPending",
+		"amendmentProposed",
+		"amendmentAccepted",
+		"amendmentRejected",
+		"disputeOpened",
+		"disputeResolved",
+		"cancelRequested",
+		"cancelAccepted",
+		"cancelRejected",
+		"forgiven",
+		"shareReceived",
+		"shareAccepted",
+		"shareCountered",
+		"shareRejected",
+		"counterAccepted",
+		"shareWithdrawn",
+		"inviteExpired",
+		"settled",
+	])("%s has a text", (template) => {
+		expect(render(template, { ...payload, name: "Bora" })).not.toBeNull();
+	});
+
 	it("unknown templates render nothing", () => {
 		expect(render("nope", payload)).toBeNull();
 	});
@@ -138,14 +195,14 @@ describe("buildMessages / interpretTickets", () => {
 		{ id: 4, template: "nope", payload, attempts: 1, tokens: ["ExponentPushToken[d]"] },
 	];
 
-	it("one message per token, carrying the agreement for the deep link", () => {
+	it("one message per token, carrying the agreement and template for the deep link", () => {
 		const { messages, owners } = buildMessages(rows);
 		expect(messages).toHaveLength(3);
 		expect(messages[0]).toEqual({
 			to: "ExponentPushToken[a]",
 			title: "Yıldız Mobilya",
 			body: "Bugün ödeme günü: 4.000,00 TL (2/5. taksit).",
-			data: { agreement_id: "a1" },
+			data: { agreement_id: "a1", template: "dueToday" },
 			sound: "default",
 		});
 		expect(owners).toEqual([1, 1, 3]);
