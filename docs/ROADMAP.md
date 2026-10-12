@@ -224,6 +224,31 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 ### [ ] F2-12 Faz 2 kapısı
 - Güvenlik taraması (claude-security), iki cihazla (biri uygulamasız) uçtan uca senaryolar, Maestro + Playwright.
 - **Kabul (spec 15):** İki taraf aynı bakiyeyi görüyor; spec 16 "Kritik test senaryoları"nın tamamı geçiyor.
+- **Durum (2026-10-13):** Kapı açık; kullanıcı kararıyla ertelendi, Faz 3'e geçildi. Yapılanlar:
+	- Güvenlik invariantları kalıcı pgTAP testi oldu (`170_security_invariants`):
+		- her tabloda RLS açık;
+		- istemcinin hiçbir tabloya yazma yetkisi yok, anon hiçbir tabloyu okuyamıyor ve hiçbir RPC'yi çalıştıramıyor;
+		- her security definer fonksiyonun `search_path`'i sabit;
+		- `private` şemasından yalnızca `can_view_agreement` çağrılabiliyor;
+		- web onayı ve outbox RPC'leri yalnızca servis rolüne açık;
+		- geçmiş tabloları yalnızca eklemeye açık.
+	- İstemci kodunda servis anahtarı referansı ve commit edilmiş `.env` dosyası yok.
+	- Spec 16 senaryolarının karşılığı:
+		1. → `180_concurrent_payments` (yeni);
+		2. → `040`, `120`;
+		3. → `090`;
+		4. → Playwright `invite.spec.ts`;
+		5. → `100`;
+		6. → `040`, `120`;
+		7. → `dates.test`, vektörler;
+		8. → `130`;
+		9. → `150`;
+		10. hesap silme → F3-03 (henüz yok).
+- **Kapıyı kapatmak için (kullanıcı):**
+	- İki cihazla uçtan uca deneme (biri uygulamasız, web onayı): paylaş → web'de onayla → kaydol → bağlandı → ödeme bildir/onayla → değişiklik → itiraz → iptal.
+	- Faz 2 için Maestro akışları (F1-19 ile aynı önkoşullar).
+	- Senaryo 10, F3-03'ten sonra.
+	- claude-security skill'i bu ortamda yok; elle tarama, yukarıdaki invariant testleriyle yapıldı.
 
 ---
 
