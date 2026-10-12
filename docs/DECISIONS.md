@@ -405,3 +405,19 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- BR-13 istisnası: append-only tetikleyicileri yalnızca `paramnet.erasure` transaction ayarı açıkken silme ve güncellemeye izin verir. Sürümlerdeki onaylanmış şartlar (`terms`, `terms_hash`) silmede de değişmez; yalnızca gerekçe boşaltılabilir.
 	- Dışa aktarma (KVKK m.11): `export_my_data()` uygulamanın okuduğu biçimde tüm veriyi döndürür. Mobil uygulama bunu sistem paylaşım sayfasıyla JSON metni olarak verir; yeni bağımlılık yok. Dosya olarak kaydetme BACKLOG'da.
 	- KVKK aydınlatma metni ve kullanım koşulları `tr.ts`'te taslak olarak duruyor; ekranda "taslak" uyarısı var. Metinler değişince `KVKK_VERSION` / `TERMS_VERSION` artırılır.
+
+## ADR-040 — SMS katmanı ve Send SMS Hook
+- **Tarih:** 2026-10-13
+- **Karar:**
+	- Giriş kodu Supabase Auth Send SMS Hook (HTTP) ile `send-sms-hook` edge function'ına gelir. İstek Standard Webhooks imzasıyla doğrulanır (`npm:standardwebhooks@1.0.0`, Supabase'in önerdiği kütüphane); sır `SEND_SMS_HOOK_SECRET`. Web onayındaki OTP de aynı gönderim katmanını kullanır. Böylece tek sağlayıcı, tek bütçe ve tek log politikası olur.
+	- Sağlayıcı değiştirilebilir (spec 8): saf `_shared/sms.ts` her sağlayıcı için istek kurar ve yanıtı çözer; `smsSender.ts` `SMS_MODE`'a göre seçer.
+		- İlk adaptör Netgsm (Türkiye'de yaygın, OTP'ye özel uç noktası var). Uç nokta, alan adları ve yanıt kodları sağlayıcının entegrasyon rehberine göre yazıldı, ama herkese açık kaynaklarda tam teyit edilemedi.
+		- Bu yüzden ilk gerçek hesapla, canlıdan önce doğrulanacak; değişiklik yalnızca `sms.ts`'teki adaptörü ve testlerini etkiler.
+		- Başka sağlayıcı (ör. İleti Merkezi) aynı arayüzle eklenir.
+	- Modlar:
+		- `test`: SMS yok; yalnızca yerel test numaraları.
+		- `log`: kod fonksiyon log'una yazılır. Yalnızca yerel yığında (`SUPABASE_URL` yerel değilse reddedilir), böylece üretimde kod log'a düşemez.
+		- `netgsm`: gerçek gönderim.
+	- Loglarda numara maskeli (`+90******1234`). Sağlayıcı hataları Sentry'ye yalnızca hata koduyla gider. 80 (limit) ve 100 (sistem) yeniden denenebilir sayılır; tekrar denemeyi Auth/kullanıcı yapar, fonksiyon kendisi denemez.
+	- CLI, telefonla girişi yalnızca bir sağlayıcı bloğu etkinse açtığından, yerel `config.toml`'da Twilio yer tutucusu kalıyor. Hook etkinken Auth onu hiç çağırmaz.
+	- Yerel hook sırrı yalnızca bu makine için üretilmiş bir değerdir (`config.toml` ve `.env.example`'da aynı). Üretimde Dashboard yeni bir sır üretir.

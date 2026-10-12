@@ -279,7 +279,13 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 		- Paylaşılmış anlaşmalar karşı tarafta "Silinmiş kullanıcı" ile korunur (spec 16/10). Kişinin notları, gerekçeleri ve numara/IP/cihaz izleri temizlenir.
 		- Aynı numarayla yeniden kayıt yeni ve temiz bir hesap açar (yerelde uçtan uca denendi).
 	- Testler: pgTAP 25, RNTL 5, adaptör testleri (ADR-039).
-### [ ] F3-04 Yerli SMS sağlayıcı: Send SMS Hook
+### [x] F3-04 Yerli SMS sağlayıcı: Send SMS Hook
+- **Not (2026-10-13):**
+	- Sağlayıcıdan bağımsız SMS katmanı: `_shared/sms.ts` (saf, Vitest) + `smsSender.ts` (Deno). Modlar: `test`, `log` (yalnızca yerel), `netgsm`.
+	- `send-sms-hook`: Standard Webhooks imzası doğrulanır, imzasız istek 401 alır.
+	- Davet OTP'si (`invite-otp-send`) aynı katmana geçti. Numara loglarda maskeli; hatalar Sentry'ye numara ve kod olmadan gider.
+	- Yerelde Auth hook'u açık; test numaraları hook'a uğramıyor. Gerçek numarayla `log` modunda giriş uçtan uca denendi: kod log'a düştü, doğrulama başarılı.
+	- **Açık:** Netgsm adaptörü sağlayıcının OTP uç noktasına göre yazıldı; alan adları ve yanıt kodları ilk gerçek Netgsm hesabıyla doğrulanacak (ADR-040).
 ### [ ] F3-05 Kötüye kullanım testleri: OTP, rate limit, SMS bütçe alarmı; bağımlılık denetimi (supply-chain-risk-auditor, insecure-defaults)
 ### [ ] F3-06 EAS: build profilleri, TestFlight ve Play kapalı test (eas-app-stores, eas-workflows)
 ### [ ] F3-07 Mağaza materyalleri: metinler, ekran görüntüleri, gizlilik bildirimleri (aso-skills)

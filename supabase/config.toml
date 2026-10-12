@@ -289,14 +289,21 @@ max_frequency = "5s"
 # enabled = true
 # uri = "pg-functions://<database>/<schema>/<hook_name>"
 
-# Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
-# Auth, test_otp numaraları için bile etkin bir sağlayıcı ister. Yerelde sahte değerlerle açık;
-# test numaralarına SMS gitmez, diğer numaralar hata verir. Üretimde Send SMS Hook kullanılacak (spec 9).
+# Kod, Send SMS Hook ile yerli sağlayıcıdan gider (F3-04, ADR-040). test_otp numaraları hook'a hiç uğramaz.
+# Yerel sır yalnızca bu makine içindir (supabase/functions/.env.example ile aynı); üretimde Dashboard'da
+# hook URL'si ve yeni bir sır tanımlanır, fonksiyona `supabase secrets set SEND_SMS_HOOK_SECRET=...` ile verilir.
+# The CLI turns phone sign-in on only when a provider block is enabled; with the hook enabled Auth never
+# calls it, so these placeholders stay (locally and in CI).
 [auth.sms.twilio]
 enabled = true
 account_sid = "local-placeholder"
 message_service_sid = "local-placeholder"
 auth_token = "local-placeholder"
+
+[auth.hook.send_sms]
+enabled = true
+uri = "http://host.docker.internal:54321/functions/v1/send-sms-hook"
+secrets = "v1,whsec_LEDfQQdoH7a7+NnMNb9ZAmFeq5aRiucyLD4yLr2LEow="
 
 # Multi-factor-authentication is available to Supabase Pro plan.
 [auth.mfa]
@@ -421,6 +428,10 @@ enabled = true
 
 # The function checks the service role key itself (called by pg_cron, never by clients).
 [functions.dispatch-notifications]
+verify_jwt = false
+
+# Called by Auth, authenticated by the Standard Webhooks signature instead of a user JWT.
+[functions.send-sms-hook]
 verify_jwt = false
 
 # Signed-in users only: the platform verifies the JWT, the function reads the user from it.
