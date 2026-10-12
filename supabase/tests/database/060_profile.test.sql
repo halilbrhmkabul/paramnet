@@ -16,7 +16,7 @@ select ok(not has_function_privilege('anon', 'public.complete_profile(text, text
 select pg_temp.act_as('11111111-1111-4111-8111-111111111111');
 select is(
 	public.complete_profile('Ayşe', '2026-10', '2026-10'),
-	'{"id": "11111111-1111-4111-8111-111111111111", "display_name": "Ayşe", "phone_e164": "+905550000001"}'::jsonb,
+	'{"id": "11111111-1111-4111-8111-111111111111", "display_name": "Ayşe", "phone_e164": "+905550000001", "pending_requests": 0}'::jsonb,
 	'profil auth numarasıyla oluşur'
 );
 select results_eq(

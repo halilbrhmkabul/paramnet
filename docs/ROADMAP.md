@@ -213,8 +213,9 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 	- Mobil: S16 ekranı (gerekçe + ilgili ödeme seçimi); detayda itiraz kartı, iptal talebi kabul/red, "İndirim yap" formu (tutar kalanla dolu gelir).
 	- Testler: pgTAP 61, Vitest, RNTL 9 (ADR-034).
 
-### [ ] F2-10 Bekleyen davetleri hesaba bağlama
+### [x] F2-10 Bekleyen davetleri hesaba bağlama
 - `link-pending-invites` (yeni kayıtta numaraya bekleyen davetler).
+- **Not (2026-10-13):** `private.link_pending_invites`, `complete_profile` içinde çalışır (ayrı edge function yok, ADR-035): web'de onaylanan/düzeltme önerilen anlaşmalara karşı taraf hesabı ve başkalarının bu numarayla kaydettiği kişiler bağlanır; reddedilen ("bana ait değil") bağlanmaz, açık davetler kararda bağlanır. `complete_profile` artık `pending_requests` döner; mobil, sayı > 0 ise kayıt bitince Talepler'i açar (davet linki önceliklidir). pgTAP 13 (+060 güncellendi), RNTL onboarding.
 
 ### [ ] F2-11 Bildirim şablonları
 - Tüm olay bildirimleri, copy-tr.md tonunda.

@@ -183,7 +183,7 @@ create type event_channel    as enum ('app','web','system');
 | `invite-otp-send` | Turnstile + rate limit; hedef numaraya OTP |
 | `invite-otp-verify` | OTP doğrula; 15 dk'lık onay oturumu |
 | `invite-decide` | Onay oturumuyla karar; olay kaydına channel=web, ip_hash, user_agent |
-| `link-pending-invites` | Yeni kayıtta bekleyen davetleri bağla |
+| `link-pending-invites` | Yeni kayıtta bekleyen davetleri bağla — `complete_profile` içinde `private.link_pending_invites` (ADR-035) |
 | `dispatch-notifications` | Outbox → Expo Push; geçersiz token temizliği |
 | `schedule-reminders` | pg_cron, her gün 08:00 |
 | `expire-invites` | pg_cron |

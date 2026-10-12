@@ -8,6 +8,9 @@ type SessionState = {
 	pendingPhone: string | null;
 	// Invite link opened while signed out; reopened after sign-in. Memory only (never persisted).
 	pendingInviteToken: string | null;
+	// Plans were already shared with the new account's number: open Talepler once in (spec 5.1 step 6).
+	openRequestsAfterOnboarding: boolean;
+	setOpenRequestsAfterOnboarding: (value: boolean) => void;
 	setPendingInvite: (token: string | null) => void;
 	// Profile and notification steps done; only then the tabs open (spec 5.1).
 	onboarded: boolean;
@@ -21,7 +24,13 @@ type SessionState = {
 	signOut: () => void;
 };
 
-const initial = { user: null, pendingPhone: null, onboarded: false, pendingInviteToken: null };
+const initial = {
+	user: null,
+	pendingPhone: null,
+	onboarded: false,
+	pendingInviteToken: null,
+	openRequestsAfterOnboarding: false,
+};
 
 // Persistence lives in the auth adapter (Supabase session in SecureStore, F1-16); the store only mirrors it.
 export const useSession = create<SessionState>()((set) => ({
@@ -32,6 +41,9 @@ export const useSession = create<SessionState>()((set) => ({
 	},
 	setPendingPhone: (pendingPhone) => {
 		set({ pendingPhone });
+	},
+	setOpenRequestsAfterOnboarding: (openRequestsAfterOnboarding) => {
+		set({ openRequestsAfterOnboarding });
 	},
 	setPendingInvite: (pendingInviteToken) => {
 		set({ pendingInviteToken });
