@@ -1,0 +1,62 @@
+{
+	"configVersion": 0,
+	"apple": {
+		"copyright": "2026 Paramnet",
+		"categories": ["FINANCE", "PRODUCTIVITY"],
+		"info": {
+			"tr-TR": {
+				"title": "Paramnet: Borç ve Taksit",
+				"subtitle": "Elden borç, birlikte takip",
+				"description": "Elden verilen borçları ve taksitle yapılan alışverişleri iki taraf birlikte takip etsin. Paramnet'te kimse \"ne kadar kalmıştı?\" diye sormak zorunda kalmaz.\n\nBORCU YAZ, PLANI KUR\n• Borç verdim, borç aldım ya da taksitle aldım: kaydı saniyeler içinde oluştur.\n• Peşinat, eşit taksitler veya kendi belirlediğin tarih ve tutarlar.\n• Kısmi ödeme ekle; kalan tutar ve gecikenler kendiliğinden güncellenir.\n\nİKİ TARAF AYNI RAKAMI GÖRSÜN\n• Planı bir bağlantıyla paylaş. Karşı taraf uygulamayı indirmeden, telefonuna gelen kodla web'den onaylayabilir.\n• Onaylanan plan tek taraflı değişmez. Değişiklik önerilir, karşı taraf kabul eder.\n• Borçlunun bildirdiği ödeme, alacaklı onaylayınca bakiyeden düşer.\n• Anlaşmaya ya da bir ödemeye itiraz edilebilir; her adım geçmişte kayıtlı kalır.\n\nHATIRLATMAYI PARAMNET YAPAR\n• Vadeden önce, vade günü ve gecikince bildirim.\n• Hatırlatmalar senin adına değil, uygulama adına yazılır; para istemenin mahcubiyeti ortadan kalkar.\n\nTAKVİM VE ÖZET\n• Bu ay ödeyeceklerin ve tahsil edeceklerin tek ekranda.\n• Kişi bazında toplam alacak ve borç.\n\nGİZLİLİK\n• Rehberin sunucuya yüklenmez; yalnızca seçtiğin kişi kaydedilir.\n• Verilerini dışa aktarabilir, hesabını istediğin zaman silebilirsin.\n\nParamnet bir kayıt ve takip aracıdır: faiz hesaplamaz, para tutmaz, ödeme başlatmaz. Kayıtlar tarafların kendi kullanımı içindir.",
+				"keywords": [
+					"alacak",
+					"veresiye",
+					"ödeme",
+					"hatırlatma",
+					"defter",
+					"plan",
+					"kira",
+					"arkadaş",
+					"elden",
+					"vade",
+					"hesap"
+				],
+				"releaseNotes": "Paramnet'in ilk sürümü: borç ve taksit planlarını kaydet, paylaş, birlikte takip et.",
+				"promoText": "Borcu yaz, planı paylaş, iki taraf aynı rakamı görsün. Hatırlatmayı Paramnet yapar; senin para istemene gerek kalmaz.",
+				"privacyPolicyUrl": "https://example.com/gizlilik",
+				"supportUrl": "https://example.com/destek"
+			}
+		},
+		"advisory": {
+			"alcoholTobaccoOrDrugUseOrReferences": "NONE",
+			"gamblingSimulated": "NONE",
+			"medicalOrTreatmentInformation": "NONE",
+			"profanityOrCrudeHumor": "NONE",
+			"sexualContentGraphicAndNudity": "NONE",
+			"sexualContentOrNudity": "NONE",
+			"horrorOrFearThemes": "NONE",
+			"matureOrSuggestiveThemes": "NONE",
+			"violenceCartoonOrFantasy": "NONE",
+			"violenceRealistic": "NONE",
+			"violenceRealisticProlongedGraphicOrSadistic": "NONE",
+			"contests": "NONE",
+			"gambling": false,
+			"unrestrictedWebAccess": false,
+			"seventeenPlus": false
+		},
+		"release": {
+			"automaticRelease": false,
+			"phasedRelease": true
+		},
+		"review": {
+			"firstName": "Paramnet",
+			"lastName": "Review",
+			"email": "review@example.com",
+			"phone": "+90 555 000 00 00",
+			"demoUsername": "+905550000001",
+			"demoPassword": "123456",
+			"demoRequired": true,
+			"notes": "Giriş telefon numarası ve SMS koduyla yapılır. İnceleme için Supabase Auth'ta tanımlı test numarası: +90 555 000 00 01, kod 123456 (SMS gönderilmez). Uygulama para tutmaz, ödeme veya transfer başlatmaz; yalnızca iki kişi arasındaki borç planını kaydeder."
+		}
+	}
+}
