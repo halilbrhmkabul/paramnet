@@ -27,3 +27,35 @@ minimumReleaseAgeExclude:
   - "@sentry/server-runtime-injection@11.7.0"
   - "@sentry/server-utils@11.7.0"
   - "@sentry/vercel-edge@11.7.0"
+  - "@expo/cli@57.0.29"
+  - "@expo/fingerprint@0.20.14"
+  - "@expo/inline-modules@0.1.8"
+  - "@expo/local-build-cache-provider@57.0.9"
+  - "@expo/prebuild-config@57.0.18"
+  - babel-preset-expo@57.0.15
+  - expo-modules-autolinking@57.0.15
+  - expo-modules-core@57.0.22
+  - expo-modules-jsi@57.1.2
+  - expo@57.0.28
+  - "@expo/ui@57.0.23"
+  - expo-contacts@57.0.7
+  - expo-crypto@57.0.4
+  - expo-router@57.0.26
+  - expo-splash-screen@57.0.10
+  - jest-expo@57.0.6
+
+# `pnpm audit` (CI fails on high): advisories accepted after review (F3-05, ADR-041). Each is in build or
+# test tooling only and never in the app bundle or a server; revisit when Expo/Metro update them.
+auditConfig:
+  ignoreGhsas:
+    # node-forge via @expo/cli (code signing during builds); no patched version.
+    - GHSA-86w9-cpqp-85rv
+    # braces via metro / jest file globbing on our own sources; no patched version.
+    - GHSA-vfj7-8cjw-p6xm
+    # sprintf-js via jest / babel tooling; no patched version.
+    - GHSA-hp3w-g68c-fv3c
+    # uuid v3/v5/v6 with a caller-supplied buffer, via @expo/config-plugins (xcode project files at build time).
+    - GHSA-w5hq-g745-h8pq
+    # decode-uri-component via expo-router's query-string, in the app; the fix is ESM-only and breaks
+    # query-string. Mitigated: links over 512 characters never reach the router (app/+native-intent.tsx).
+    - GHSA-vcc3-ghjq-m6fr

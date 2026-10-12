@@ -48,8 +48,14 @@ Deno.serve(
 			return rpcError(error);
 		}
 		const result = data as { send: boolean };
-		if (result.send && !(await sendOtpSms(phone, otpMessage(code)))) {
-			return json(503, { error: "sms_unavailable" });
+		if (result.send) {
+			const outcome = await sendOtpSms(phone, otpMessage(code), "invite");
+			if (outcome === "limited") {
+				return json(429, { error: "rate_limited" });
+			}
+			if (outcome === "failed") {
+				return json(503, { error: "sms_unavailable" });
+			}
 		}
 		// Same answer whether or not the number was the invite's target (no probing).
 		return json(200, { sent: true });

@@ -421,3 +421,17 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Loglarda numara maskeli (`+90******1234`). Sağlayıcı hataları Sentry'ye yalnızca hata koduyla gider. 80 (limit) ve 100 (sistem) yeniden denenebilir sayılır; tekrar denemeyi Auth/kullanıcı yapar, fonksiyon kendisi denemez.
 	- CLI, telefonla girişi yalnızca bir sağlayıcı bloğu etkinse açtığından, yerel `config.toml`'da Twilio yer tutucusu kalıyor. Hook etkinken Auth onu hiç çağırmaz.
 	- Yerel hook sırrı yalnızca bu makine için üretilmiş bir değerdir (`config.toml` ve `.env.example`'da aynı). Üretimde Dashboard yeni bir sır üretir.
+
+## ADR-041 — SMS bütçesi ve bağımlılık denetimi
+- **Tarih:** 2026-10-13
+- **Karar:**
+	- Her SMS göndermeden önce `take_sms_budget(channel, phone, daily_limit)` (yalnızca servis rolü) çağrılır.
+		- Numara başına saatte 5 SMS. Auth ve davet ortak; SMS pumping ve tek numaraya taciz için. Anahtar numaranın SHA-256'sı.
+		- İstanbul gününe göre günlük toplam sayaç (`sms_usage`). Sınırı geçen istek reddedilir.
+		- Alarm Sentry'ye günde iki kez gider: sınırın %80'inde ve ilk retteki (`sms-budget` etiketi).
+		- Bütçe yanıtı alınamazsa gönderim yapılmaz (kapalı kalır).
+		- `test` modunda SMS gitmediği için bütçe sorulmaz.
+	- Sınıra takılan davet isteği 429 alır. Auth hook'un 429'u istemciye GoTrue tarafından genel hata (500) olarak iletilir; uygulama genel hata mesajı gösterir.
+	- `pnpm audit --audit-level high` CI'da çalışır. Yaması olmayan veya uyumsuz bulgular `pnpm-workspace.yaml` `auditConfig.ignoreGhsas`'ta gerekçeleriyle tutulur ve Expo/Metro güncellendiğinde yeniden değerlendirilir.
+		- node-forge, braces, sprintf-js, uuid: yalnızca derleme/test araçları.
+		- decode-uri-component uygulamada (expo-router/query-string); düzeltmesi yalnızca ESM olduğu için bozar. Bu yüzden `+native-intent` 512 karakterden uzun linkleri router'a vermez.

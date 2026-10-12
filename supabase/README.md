@@ -50,3 +50,17 @@ pnpm supabase functions serve --env-file /tmp/fn.env
 - Üretilen sırrı `supabase secrets set SEND_SMS_HOOK_SECRET=v1,whsec_...` ile fonksiyona ver.
 - `SMS_MODE=netgsm` ve Netgsm bilgilerini de aynı şekilde sır olarak tanımla.
 - Netgsm OTP alan adları ve yanıt kodları ilk gerçek hesapla, sağlayıcı dokümanından doğrulanmalı (ADR-040).
+
+## Üretim kontrol listesi (F3-05)
+
+Yerel `config.toml` üretime taşınmaz; şunlar Dashboard'da / sırlarda ayarlanır:
+
+- **Auth → SMS OTP süresi:** 300 sn. Yerel CLI varsayılanı 6000 sn (100 dk) ve uzun.
+- **Auth → Rate limits:** SMS gönderimi proje geneli saatlik sınır; pilot için 30–60.
+- **Auth → Hooks → Send SMS:** `send-sms-hook` URL'si; sırrı `SEND_SMS_HOOK_SECRET`.
+- **Fonksiyon sırları:**
+  - `SMS_MODE=netgsm`, `NETGSM_*`
+  - `SMS_DAILY_LIMIT`: günlük SMS üst sınırı, varsayılan 500. %80'de ve ilk retteki Sentry alarmı (`sms-budget` etiketi) için Sentry'de bir uyarı kuralı kur.
+  - `SENTRY_DSN`, `TURNSTILE_SECRET_KEY`. `TURNSTILE_DISABLED` üretimde tanımlanmaz.
+- **Auth → Providers → Email** kapalı kalır; anonim giriş kapalı.
+- **`pnpm audit --audit-level high`** CI'da çalışır; kabul edilen bulgular `pnpm-workspace.yaml` `auditConfig`'te gerekçeleriyle durur.

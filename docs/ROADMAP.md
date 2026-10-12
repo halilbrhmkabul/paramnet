@@ -286,7 +286,24 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 	- Davet OTP'si (`invite-otp-send`) aynı katmana geçti. Numara loglarda maskeli; hatalar Sentry'ye numara ve kod olmadan gider.
 	- Yerelde Auth hook'u açık; test numaraları hook'a uğramıyor. Gerçek numarayla `log` modunda giriş uçtan uca denendi: kod log'a düştü, doğrulama başarılı.
 	- **Açık:** Netgsm adaptörü sağlayıcının OTP uç noktasına göre yazıldı; alan adları ve yanıt kodları ilk gerçek Netgsm hesabıyla doğrulanacak (ADR-040).
-### [ ] F3-05 Kötüye kullanım testleri: OTP, rate limit, SMS bütçe alarmı; bağımlılık denetimi (supply-chain-risk-auditor, insecure-defaults)
+### [x] F3-05 Kötüye kullanım testleri: OTP, rate limit, SMS bütçe alarmı; bağımlılık denetimi (supply-chain-risk-auditor, insecure-defaults)
+- **Not (2026-10-13):**
+	- **SMS bütçesi:** `take_sms_budget`, Auth ve davet SMS'lerinin her biri için.
+		- Numara başına saatte 5 SMS; sayaçta numaranın yalnızca hash'i tutulur.
+		- Günlük toplam `SMS_DAILY_LIMIT`; dolunca gönderim durur. Alarm %80'de ve ilk retteki Sentry'ye gider.
+		- Bütçe sorgusu başarısız olursa SMS gönderilmez. Uçtan uca denendi: aynı numaraya 6. kod reddedildi.
+	- **Mevcut korumalar testli:**
+		- davet OTP'si: IP 10/sa, numara 5/sa, 60 sn bekleme, 5 hatada kilit (`100`);
+		- olay yazma sınırı (`190`);
+		- güvenlik invariantları (`170`).
+	- **Bağımlılık denetimi (`pnpm audit`):**
+		- `next` 16.3.8'e yükseltildi (SSRF ve önbellek zehirlenmesi).
+		- Expo yama sürümleri güncellendi (expo-doctor 21/21).
+		- Kalan 5 bulgu derleme/test araçlarında ve yaması yok veya uyumsuz; `auditConfig`'te gerekçeli.
+		- Uygulamaya giren `decode-uri-component` açığına 512 karakter link sınırı.
+		- CI artık yeni yüksek seviye açıkta kırılıyor.
+	- **Güvensiz varsayılan taraması:** çerezler `httpOnly` + `secure` + `strict`; e-posta ve anonim giriş kapalı; token rotasyonu açık. Üretim için SMS OTP süresi ve diğer ayarlar `supabase/README.md`'deki "Üretim kontrol listesi"nde.
+	- Bu ortamda supply-chain-risk-auditor ve insecure-defaults skill'leri yok; denetim elle yapıldı (ADR-041).
 ### [ ] F3-06 EAS: build profilleri, TestFlight ve Play kapalı test (eas-app-stores, eas-workflows)
 ### [ ] F3-07 Mağaza materyalleri: metinler, ekran görüntüleri, gizlilik bildirimleri (aso-skills)
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
