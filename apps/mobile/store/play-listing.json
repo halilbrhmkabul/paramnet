@@ -1,0 +1,9 @@
+{
+	"title": "Paramnet: Borç ve Taksit",
+	"shortDescription": "Elden borç ve taksitleri birlikte takip edin, hatırlatmayı Paramnet yapsın.",
+	"fullDescription": "Elden verilen borçları ve taksitle yapılan alışverişleri iki taraf birlikte takip etsin. Paramnet'te kimse \"ne kadar kalmıştı?\" diye sormak zorunda kalmaz.\n\nBORCU YAZ, PLANI KUR\n• Borç verdim, borç aldım ya da taksitle aldım: kaydı saniyeler içinde oluştur.\n• Peşinat, eşit taksitler veya kendi belirlediğin tarih ve tutarlar.\n• Kısmi ödeme ekle; kalan tutar ve gecikenler kendiliğinden güncellenir.\n\nİKİ TARAF AYNI RAKAMI GÖRSÜN\n• Planı bir bağlantıyla paylaş. Karşı taraf uygulamayı indirmeden, telefonuna gelen kodla web'den onaylayabilir.\n• Onaylanan plan tek taraflı değişmez. Değişiklik önerilir, karşı taraf kabul eder.\n• Borçlunun bildirdiği ödeme, alacaklı onaylayınca bakiyeden düşer.\n• Anlaşmaya ya da bir ödemeye itiraz edilebilir; her adım geçmişte kayıtlı kalır.\n\nHATIRLATMAYI PARAMNET YAPAR\n• Vadeden önce, vade günü ve gecikince bildirim.\n• Hatırlatmalar senin adına değil, uygulama adına yazılır; para istemenin mahcubiyeti ortadan kalkar.\n\nTAKVİM VE ÖZET\n• Bu ay ödeyeceklerin ve tahsil edeceklerin tek ekranda.\n• Kişi bazında toplam alacak ve borç.\n\nGİZLİLİK\n• Rehberin sunucuya yüklenmez; yalnızca seçtiğin kişi kaydedilir.\n• Verilerini dışa aktarabilir, hesabını istediğin zaman silebilirsin.\n\nParamnet bir kayıt ve takip aracıdır: faiz hesaplamaz, para tutmaz, ödeme başlatmaz. Kayıtlar tarafların kendi kullanımı içindir.",
+	"category": "Finance",
+	"contactEmail": "destek@example.com",
+	"privacyPolicyUrl": "https://example.com/gizlilik",
+	"accountDeletionUrl": "https://example.com/hesap-silme"
+}

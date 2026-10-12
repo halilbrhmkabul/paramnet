@@ -313,5 +313,15 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 	- **Kapatmak için (kullanıcı):** `eas login` + `eas init`; EAS ortam değişkenleri; App Store Connect ve Play Console'da uygulama kaydı; ilk TestFlight ve kapalı test build'i.
 	- EAS Workflows (otomatik yayın) BACKLOG'da.
 ### [ ] F3-07 Mağaza materyalleri: metinler, ekran görüntüleri, gizlilik bildirimleri (aso-skills)
+- **Durum (2026-10-13):** Metinler ve gizlilik beyanları hazır; ekran görüntüleri tasarıma ve cihaza bağlı.
+	- `apps/mobile/store.config.json` (EAS Metadata, App Store tr-TR) ve `store/play-listing.json`. Karakter sınırları ve ürün sınırları (faiz, resmi belge, para transferi iddiası yok) `storeListing.test.ts` ile denetleniyor.
+	- `docs/store/privacy.md`: Apple App Privacy ve Google Veri güvenliği cevapları, gerçek veri akışına göre.
+	- `docs/store/screenshots.md`: 6 ekranlık plan, boyutlar, üst yazılar.
+	- **Kapatmak için:**
+		- tasarım uygulandıktan sonra ekran görüntüleri;
+		- gizlilik politikası ve hesap silme web sayfası (alan adı ve destek e-postası kararı);
+		- inceleme için üretimde test OTP numarası;
+		- `example.com` yer tutucularının gerçek adreslerle değiştirilmesi.
+	- aso-skills bu ortamda yok; metinler Expo `eas-app-stores` rehberine göre yazıldı.
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
 ### [ ] F3-09 Faz 3 kapısı: mağaza yayını
