@@ -36,8 +36,11 @@ Deno.serve(
 		if (parsed === null) {
 			return hookError(400, "invalid_phone");
 		}
-		return (await sendOtpSms(parsed.phone, otpMessage(parsed.otp)))
+		const outcome = await sendOtpSms(parsed.phone, otpMessage(parsed.otp), "auth");
+		return outcome === "sent"
 			? json(200, {})
-			: hookError(503, "sms_unavailable");
+			: outcome === "limited"
+				? hookError(429, "rate_limited")
+				: hookError(503, "sms_unavailable");
 	}),
 );

@@ -16,6 +16,16 @@ describe("invite links (F2-05)", () => {
 		expect(redirectSystemPath({ path: input, initial: true })).toBe(output);
 	});
 
+	// GHSA-vcc3-ghjq-m6fr: expo-router's query-string decodes with a vulnerable decode-uri-component;
+	// an oversized link never reaches it (F3-05).
+	it("drops oversized links before the router parses them", () => {
+		const evil = `/agreement/x?q=${"%".repeat(5000)}`;
+		expect(redirectSystemPath({ path: evil, initial: false })).toBe("/");
+		expect(redirectSystemPath({ path: `/agreement/${"a".repeat(36)}`, initial: false })).toBe(
+			`/agreement/${"a".repeat(36)}`,
+		);
+	});
+
 	it("signed in: the invite opens directly", async () => {
 		signInForTest();
 		await renderRouter(appRoutes, { initialUrl: "/invite/tok123" });

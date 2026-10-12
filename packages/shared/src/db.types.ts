@@ -800,6 +800,25 @@ export type Database = {
 					},
 				];
 			};
+			sms_usage: {
+				Row: {
+					count: number;
+					day: string;
+					updated_at: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					count?: number;
+					day: string;
+					updated_at?: string;
+				};
+				Update: {
+					count?: number;
+					day?: string;
+					updated_at?: string;
+				};
+				Relationships: [];
+			};
 		};
 		Views: {
 			[_ in never]: never;
@@ -910,6 +929,10 @@ export type Database = {
 			resolve_invite: { Args: { p_token: string }; Returns: Json };
 			share_agreement: {
 				Args: { p_id: string; p_phone: string; p_row_version: number };
+				Returns: Json;
+			};
+			take_sms_budget: {
+				Args: { p_channel: string; p_daily_limit: number; p_phone: string };
 				Returns: Json;
 			};
 			track_event: { Args: { p_name: string; p_props: Json }; Returns: Json };
