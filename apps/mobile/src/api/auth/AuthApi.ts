@@ -9,6 +9,8 @@ export interface AuthApi {
 	verifyOtp(phone: string, code: string): Promise<AuthUser>;
 	updateProfile(displayName: string): Promise<ProfileResult>;
 	signOut(): Promise<void>;
+	// F3-03: erases the account on the server (delete-account edge function) and ends the session.
+	deleteAccount(): Promise<void>;
 	// Session kept on the device from an earlier launch, or null.
 	restore(): Promise<AuthUser | null>;
 	registerPushToken(token: string, platform: "ios" | "android"): Promise<void>;

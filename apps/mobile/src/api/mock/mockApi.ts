@@ -666,6 +666,14 @@ export function createMockApi({
 				);
 			}),
 
+		// The prototype keeps everything in memory; that snapshot is the export.
+		exportMyData: () =>
+			respond(() => ({
+				exported_at: now().toISOString(),
+				contacts: state.contacts,
+				agreements: state.agreements,
+			})),
+
 		// The prototype records no analytics.
 		trackEvent: () => Promise.resolve(),
 

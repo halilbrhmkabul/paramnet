@@ -82,6 +82,15 @@ export function createMockAuthApi({
 			current = null;
 		},
 
+		async deleteAccount() {
+			await delay();
+			if (current === null) {
+				throw new ApiError("forbidden");
+			}
+			users.delete(current.phone_e164);
+			current = null;
+		},
+
 		// The prototype keeps nothing between launches (ADR-016).
 		restore() {
 			return Promise.resolve(null);

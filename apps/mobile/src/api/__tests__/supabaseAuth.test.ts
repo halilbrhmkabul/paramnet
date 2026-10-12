@@ -11,6 +11,7 @@ function fakeClient(overrides: {
 	getSession?: Result;
 	profile?: Result;
 	rpc?: Result;
+	invoke?: Result;
 }) {
 	const calls: { method: string; args: unknown[] }[] = [];
 	const record =
@@ -31,6 +32,7 @@ function fakeClient(overrides: {
 			select: () => ({ maybeSingle: record("profile", overrides.profile) }),
 		}),
 		rpc: record("rpc", overrides.rpc),
+		functions: { invoke: record("invoke", overrides.invoke) },
 	};
 	return { client: client as unknown as SupabaseClient, calls };
 }
@@ -122,5 +124,20 @@ describe("Supabase AuthApi", () => {
 			phone_e164: "+905550000001",
 			display_name: "Ayşe",
 		});
+	});
+
+	it("deletes the account through the edge function, then forgets the local session (F3-03)", async () => {
+		const { client, calls } = fakeClient({ invoke: { data: { deleted: true }, error: null } });
+		await createSupabaseAuthApi(client).deleteAccount();
+		expect(calls).toEqual([
+			{ method: "invoke", args: ["delete-account", { method: "POST" }] },
+			{ method: "signOut", args: [{ scope: "local" }] },
+		]);
+	});
+
+	it("keeps the session when deletion fails", async () => {
+		const { client, calls } = fakeClient({ invoke: { data: null, error: new Error("boom") } });
+		await expect(createSupabaseAuthApi(client).deleteAccount()).rejects.toBeInstanceOf(Error);
+		expect(calls.map((c) => c.method)).toEqual(["invoke"]);
 	});
 });

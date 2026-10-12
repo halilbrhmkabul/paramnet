@@ -66,6 +66,7 @@ export const tr = {
 		nameLabel: "Görünen ad",
 		nameHelper: "Planı paylaştığın kişiler seni bu adla görür.",
 		consent: "KVKK Aydınlatma Metni'ni okudum, kabul ediyorum.",
+		readKvkk: "Aydınlatma metnini oku",
 		notificationsTitle: "Hatırlatmalar",
 		notificationsReason: "Ödeme günlerini hatırlatabilmemiz için bildirim izni gerekiyor.",
 		notificationsAllow: "Bildirimlere izin ver",
@@ -268,8 +269,72 @@ export const tr = {
 		export: "Verilerimi dışa aktar",
 		deleteAccount: "Hesabı sil",
 		kvkk: "KVKK Aydınlatma Metni",
+		terms: "Kullanım koşulları",
+		exportTitle: "Paramnet verilerim",
+		exportFailed: "Veriler hazırlanamadı. Tekrar dener misin?",
 		comingSoon: "Yakında",
 		signOut: "Çıkış yap",
+	},
+	deleteAccount: {
+		title: "Hesabı sil",
+		intro: "Hesabını silersen:",
+		removed: "Adın, numaran, rehberindeki kişiler ve yalnızca sana ait kayıtlar silinir.",
+		keptForOthers:
+			'Başka biriyle paylaştığın anlaşmalar onun tarafında kalır; orada "Silinmiş kullanıcı" olarak görünürsün. Yazdığın notlar silinir.',
+		irreversible: "Bu işlem geri alınamaz. İstersen önce verilerini dışa aktarabilirsin.",
+		ack: "Anladım, hesabımı silmek istiyorum.",
+		confirm: "Hesabımı sil",
+	},
+	legal: {
+		draft: "Taslak metin: yayından önce hukuki inceleme ile kesinleşecek.",
+		version: "Sürüm {version}",
+		kvkk: {
+			title: "KVKK Aydınlatma Metni",
+			sections: [
+				{
+					heading: "Veri sorumlusu",
+					body: "Paramnet uygulamasını işleten şirket, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında veri sorumlusudur. İletişim bilgileri yayından önce bu metne eklenecektir.",
+				},
+				{
+					heading: "Hangi verileri işliyoruz?",
+					body: "Telefon numaran ve görünen adın; oluşturduğun anlaşmalar, ödeme planları, ödeme kayıtları, notlar ve olay geçmişi; karşı taraf olarak eklediğin kişinin adı ve (girersen) numarası; bildirim gönderebilmek için cihaz bildirim anahtarı; uygulamanın açılması gibi kişisel bilgi içermeyen kullanım olayları ve hata kayıtları.",
+				},
+				{
+					heading: "Hangi amaçla ve hangi hukuki sebeple?",
+					body: "Hesabını oluşturmak ve doğrulamak, anlaşmalarını kaydetmek ve karşı tarafla paylaşmak, hatırlatma göndermek, uygulamanın güvenliğini ve çalışmasını sağlamak. Hukuki sebepler: sözleşmenin kurulması ve ifası (KVKK m.5/2-c), hukuki yükümlülükler (m.5/2-ç) ve temel hak ve özgürlüklerine zarar vermemek kaydıyla meşru menfaat (m.5/2-f).",
+				},
+				{
+					heading: "Kimlere aktarıyoruz?",
+					body: "Verilerin, barındırma, kimlik doğrulama, SMS, bildirim ve hata izleme hizmeti aldığımız sağlayıcıların sunucularında işlenir. Bu sunucuların bir kısmı yurt dışında (Avrupa Birliği) bulunabilir; aktarım KVKK m.9'daki güvencelerle yapılır. Paylaştığın anlaşmalar yalnızca karşı tarafa gösterilir. Uygulama para tutmaz ve ödeme başlatmaz.",
+				},
+				{
+					heading: "Hakların (KVKK m.11)",
+					body: "Verilerinin işlenip işlenmediğini öğrenme, bilgi isteme, düzeltilmesini veya silinmesini isteme, aktarıldığı kişileri öğrenme ve itiraz etme haklarına sahipsin. Profil ekranından verilerini dışa aktarabilir ve hesabını silebilirsin.",
+				},
+			],
+		},
+		terms: {
+			title: "Kullanım koşulları",
+			sections: [
+				{
+					heading: "Uygulama ne yapar?",
+					body: "Paramnet, kişiler arasındaki borç ve taksit anlaşmalarını iki tarafın birlikte takip etmesi için bir kayıt aracıdır. Faiz hesaplamaz, para tutmaz, ödeme veya transfer başlatmaz.",
+				},
+				{
+					heading: "Kayıtların niteliği",
+					body: "Anlaşmalar ve olay geçmişi tarafların kendi kullanımı içindir; resmi belge, senet veya ödeme kanıtı yerine geçtiği iddia edilmez.",
+				},
+				{
+					heading: "Kötüye kullanım",
+					body: "Başkasını rahatsız etmek, taciz etmek veya yanıltmak amacıyla kayıt oluşturmak, paylaşmak veya hatırlatma göndermek yasaktır. Bu durumda hesabını kapatabiliriz.",
+				},
+				{
+					heading: "Hesabın",
+					body: 'Hesabını istediğin zaman profil ekranından silebilirsin. Başkasıyla paylaştığın anlaşmalar onun tarafında "Silinmiş kullanıcı" adıyla korunur.',
+				},
+			],
+		},
+		notFound: "Bu metin bulunamadı.",
 	},
 	agreementActions: {
 		pendingInfo: "Karşı tarafın yanıtı bekleniyor.",

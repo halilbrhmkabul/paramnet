@@ -74,6 +74,18 @@ export function createSupabaseAuthApi(client: SupabaseClient): AuthApi {
 			await client.auth.signOut();
 		},
 
+		async deleteAccount() {
+			// The function reads the user from the session's JWT; supabase-js attaches it.
+			const response: { error: unknown } = await client.functions.invoke("delete-account", {
+				method: "POST",
+			});
+			if (response.error !== null) {
+				throw toApiError(response.error);
+			}
+			// The server session is gone with the account; only the local copy remains to clear.
+			await client.auth.signOut({ scope: "local" });
+		},
+
 		async registerPushToken(token, platform) {
 			const response: { error: unknown } = await client.rpc("register_push_token", {
 				p_token: token,

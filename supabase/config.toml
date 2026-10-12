@@ -423,6 +423,10 @@ enabled = true
 [functions.dispatch-notifications]
 verify_jwt = false
 
+# Signed-in users only: the platform verifies the JWT, the function reads the user from it.
+[functions.delete-account]
+verify_jwt = true
+
 # Invite functions check their own credentials (OTP, signed approval session); public by design.
 [functions.invite-open]
 verify_jwt = false
