@@ -55,7 +55,7 @@ export function DateField({
 
 	return (
 		<View style={{ gap: spacing.xs }}>
-			<Text style={[typography.callout, { color: colors.textMuted }]}>{label}</Text>
+			<Text style={[typography.label, { color: colors.textMuted }]}>{label}</Text>
 			<Pressable
 				testID={testID}
 				accessibilityRole="button"
@@ -68,9 +68,9 @@ export function DateField({
 				style={[
 					styles.field,
 					{
-						minHeight: sizes.minTouch,
+						minHeight: sizes.buttonPrimary,
 						borderRadius: radius.sm,
-						borderColor: error === undefined ? colors.border : colors.overdue,
+						borderColor: error === undefined ? colors.borderStrong : colors.overdue,
 						backgroundColor: colors.surface,
 						paddingHorizontal: spacing.md,
 						opacity: disabled ? 0.5 : 1,

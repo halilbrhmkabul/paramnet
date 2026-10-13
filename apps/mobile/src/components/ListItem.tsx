@@ -20,11 +20,11 @@ export function ListItem({
 	accessibilityLabel,
 	testID,
 }: ListItemProps) {
-	const { colors, typography, spacing, sizes } = useAppTheme();
+	const { colors, typography, spacing } = useAppTheme();
 	const content = (
 		<>
 			<View style={styles.text}>
-				<Text style={[typography.headline, { color: colors.text }]} numberOfLines={1}>
+				<Text style={[typography.rowTitle, { color: colors.text }]} numberOfLines={1}>
 					{title}
 				</Text>
 				{subtitle !== undefined ? (
@@ -39,10 +39,7 @@ export function ListItem({
 			{right}
 		</>
 	);
-	const rowStyle = [
-		styles.row,
-		{ minHeight: sizes.minTouch, gap: spacing.md, paddingVertical: spacing.sm },
-	];
+	const rowStyle = [styles.row, { minHeight: 64, gap: spacing.md, paddingVertical: spacing.md }];
 
 	if (onPress === undefined) {
 		return (

@@ -28,9 +28,28 @@ export function Button({
 }: ButtonProps) {
 	const { colors, typography, radius, sizes, spacing } = useAppTheme();
 	const inactive = disabled || loading;
-	const filled = variant === "primary" || variant === "danger";
-	const fill = variant === "danger" ? colors.overdue : colors.primary;
-	const textColor = filled ? colors.onPrimary : colors.primary;
+	// Design "Butonlar": filled primary; secondary and destructive are outlined on the surface.
+	const filled = variant === "primary";
+	const textColor =
+		variant === "primary"
+			? colors.onPrimary
+			: variant === "danger"
+				? colors.overdue
+				: variant === "ghost"
+					? colors.accent
+					: colors.primary;
+	const background =
+		variant === "primary"
+			? colors.primary
+			: variant === "ghost"
+				? "transparent"
+				: colors.surface;
+	const borderColor =
+		variant === "secondary"
+			? colors.borderStrong
+			: variant === "danger"
+				? colors.dangerBorder
+				: "transparent";
 
 	return (
 		<Pressable
@@ -44,11 +63,14 @@ export function Button({
 			style={({ pressed }) => [
 				styles.base,
 				{
-					minHeight: filled ? sizes.buttonPrimary : sizes.buttonSecondary,
+					minHeight:
+						filled || variant === "danger"
+							? sizes.buttonPrimary
+							: sizes.buttonSecondary,
 					borderRadius: radius.md,
 					paddingHorizontal: spacing.lg,
-					backgroundColor: filled ? fill : "transparent",
-					borderColor: variant === "secondary" ? colors.primary : "transparent",
+					backgroundColor: background,
+					borderColor,
 					opacity: inactive ? 0.5 : pressed ? 0.8 : 1,
 				},
 			]}
@@ -56,7 +78,7 @@ export function Button({
 			{loading ? (
 				<ActivityIndicator color={textColor} />
 			) : (
-				<Text style={[typography.headline, { color: textColor }]}>{label}</Text>
+				<Text style={[typography.button, { color: textColor }]}>{label}</Text>
 			)}
 		</Pressable>
 	);

@@ -11,8 +11,8 @@ export type ProgressBarProps = {
 	testID?: string;
 };
 
-export function ProgressBar({ value, label, tone = "primary", testID }: ProgressBarProps) {
-	const { colors, radius } = useAppTheme();
+export function ProgressBar({ value, label, tone = "accent", testID }: ProgressBarProps) {
+	const { colors } = useAppTheme();
 	const ratio = Math.min(Math.max(value, 0), 1);
 	return (
 		<View
@@ -22,12 +22,12 @@ export function ProgressBar({ value, label, tone = "primary", testID }: Progress
 			accessibilityValue={{ min: 0, max: 100, now: Math.floor(ratio * 100) }}
 			style={{
 				height: 8,
-				borderRadius: radius.sm,
-				backgroundColor: colors.border,
+				borderRadius: 4,
+				backgroundColor: colors.track,
 				overflow: "hidden",
 			}}
 		>
-			<View style={{ flex: ratio, backgroundColor: colors[tone] }} />
+			<View style={{ flex: ratio, backgroundColor: colors[tone], borderRadius: 4 }} />
 			<View style={{ flex: 1 - ratio }} />
 		</View>
 	);

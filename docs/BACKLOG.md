@@ -24,3 +24,6 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Kayıt öncesi anonim açılış olayı (spec 13.2 "uygulama açılışından ilk anlaşmaya" tam ölçümü) ve web panel; hazır huni/kohort ihtiyacı doğarsa PostHog — F3-02 sırasında.
 - Dışa aktarmayı dosya olarak kaydetme (expo-file-system + expo-sharing), metin sürümü değişince yeniden onay isteme, uygulama kilidi ve anlaşma bazında bildirim tercihleri (S20) — F3-03 sırasında.
 - EAS Workflows ile otomatik build/submit ve EAS Update (OTA) kanalları — F3-06 sırasında; önce hesaplar açılmalı.
+- Tasarım kanvasındaki kapsam dışı modüller (ADR-043): Kartlarım/ekstre/kart ödemesi, banka kredileri, hesaplar ve cüzdan, gelir-gider girişi, tekrarlayan işlem, bütçe kategorileri, aylık rapor, hesap bölme (kare kod/davet). Faiz simülasyonu kesin kural gereği yapılmaz.
+- Tasarımdaki yeni kavramlar için ürün kararı: ParamNet ID (PN-xxxxxx) ile kişi bulma, "para teslimi bekleniyor" durumu (kabulden sonra paranın verildiğinin iki tarafça işaretlenmesi), "Para iste" akışı, nazik hatırlatma gönderme butonu.
+- Marka ikonu, Android adaptive ikon katmanları ve açılış görseli (tasarımdaki logodan 1024 px PNG).

@@ -15,7 +15,9 @@ export function Card({ children, onPress, accessibilityLabel, style, testID }: C
 	const { colors, radius, sizes, spacing } = useAppTheme();
 	const cardStyle = {
 		backgroundColor: colors.surface,
-		borderRadius: radius.md,
+		borderColor: colors.border,
+		borderWidth: 1,
+		borderRadius: radius.lg,
 		padding: sizes.cardPadding,
 		gap: spacing.sm,
 	};

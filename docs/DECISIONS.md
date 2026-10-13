@@ -447,3 +447,22 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- iOS export compliance: uygulama yalnızca standart HTTPS/TLS kullanır → `usesNonExemptEncryption: false`.
 	- Rehber yalnızca okunur. Türkçe izin metni `src/i18n/permissions.json`'da: `app.config.ts` başka TS dosyası içe aktaramadığı için JSON, `tr.ts` aynı dosyayı kullanır. Android'de `WRITE_CONTACTS` engellenir.
 	- EAS Update ve EAS Workflows kurulmadı (BACKLOG). Sentry source map yükleme de EAS hesabı açılınca eklenecek (F3-01 BACKLOG maddesi).
+
+## ADR-043 — Tasarım ("Orman Defteri") ve kapsam
+- **Tarih:** 2026-10-13
+- **Karar:**
+	- Kullanıcının tasarım kanvası (43 ekran) görsel dilin kaynağıdır: renkler, Manrope ve IBM Plex Mono, bileşen ölçüleri. Kanvastaki "30 · Tasarım Sistemi" `tokens.ts` ve `design-tokens.md` ile birebir eşlenir.
+	- Kapsam spec'te kalır (kullanıcı kararı). Tasarımdaki kişisel finans modülleri spec 15'e göre sonraki sürümlerin işi; BACKLOG'a yazıldı:
+		- kartlar, ekstre ve kart ödemesi;
+		- banka kredileri ve hesaplar/cüzdan;
+		- gelir-gider, tekrarlayan işlem, bütçe, aylık rapor;
+		- hesap bölme.
+	- "Faiz Simülasyonu" ekranı uygulanmaz: kesin kural ("Faiz yok", BR-15).
+	- Tasarımdaki ama veri modelinde olmayan kavramlar bu sürümde yok; ayrı karar ister (BACKLOG):
+		- ParamNet ID (PN-xxxxxx);
+		- kabulden sonra "para teslimi bekleniyor" durumu;
+		- karşı taraftan "Para iste";
+		- ödemelerin bir banka hesabının bakiyesine yazılması.
+	- Koyu tema tasarımda yok; spec ve mobil skill'i gereği aynı tonlardan türetildi ve kontrastı testle doğrulandı.
+	- Sekmeler: Ana · Borçlarım · (+) · Talepler · Takvim (F3-11). Kişiler ayrı sekme olmaktan çıkar.
+	- Marka ikonu ve açılış görseli tasarımdaki logodan üretilecek (1024 px PNG); şimdilik yalnızca arka plan renkleri markada.

@@ -22,7 +22,7 @@ export function SegmentedControl<T extends string>({
 	const { colors, typography, radius, spacing, sizes } = useAppTheme();
 	return (
 		<View style={{ gap: spacing.xs }}>
-			<Text style={[typography.callout, { color: colors.textMuted }]}>{label}</Text>
+			<Text style={[typography.label, { color: colors.textMuted }]}>{label}</Text>
 			<View
 				accessibilityRole="radiogroup"
 				accessibilityLabel={label}
@@ -30,7 +30,7 @@ export function SegmentedControl<T extends string>({
 					styles.row,
 					{
 						borderRadius: radius.sm,
-						borderColor: colors.border,
+						backgroundColor: colors.track,
 						gap: spacing.xs,
 						padding: spacing.xs,
 					},
@@ -51,16 +51,16 @@ export function SegmentedControl<T extends string>({
 							style={[
 								styles.segment,
 								{
-									minHeight: sizes.minTouch - 8,
-									borderRadius: radius.sm,
-									backgroundColor: selected ? colors.primary : "transparent",
+									minHeight: sizes.minTouch,
+									borderRadius: 11,
+									backgroundColor: selected ? colors.surface : "transparent",
 								},
 							]}
 						>
 							<Text
 								style={[
-									typography.callout,
-									{ color: selected ? colors.onPrimary : colors.text },
+									typography.rowTitle,
+									{ color: selected ? colors.primary : colors.neutral },
 								]}
 							>
 								{option.label}
@@ -76,7 +76,6 @@ export function SegmentedControl<T extends string>({
 const styles = StyleSheet.create({
 	row: {
 		flexDirection: "row",
-		borderWidth: 1,
 	},
 	segment: {
 		flex: 1,

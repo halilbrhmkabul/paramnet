@@ -79,7 +79,7 @@ export function SettingsScreen() {
 					}}
 					right={
 						exportData.isPending ? (
-							<Badge label={tr.common.loading} tone="textMuted" />
+							<Badge label={tr.common.loading} tone="neutral" />
 						) : undefined
 					}
 					testID="settings.export.item"
@@ -114,7 +114,7 @@ export function SettingsScreen() {
 					<ListItem
 						key={key}
 						title={label}
-						right={<Badge label={tr.settings.comingSoon} tone="textMuted" />}
+						right={<Badge label={tr.settings.comingSoon} tone="neutral" />}
 						testID={`settings.${key}.item`}
 					/>
 				))}

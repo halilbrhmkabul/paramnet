@@ -1,55 +1,64 @@
-# Tasarım Token'ları
+# Tasarım Token'ları — "Orman Defteri"
 
-Başlangıç değerleridir; marka kimliği netleşince yalnızca bu dosya ve `src/theme/tokens.ts` değişir. Bileşenlerde sabit renk/ölçü yazılmaz.
+Kaynak: kullanıcının tasarım kanvası (ParamNet, "30 · Tasarım Sistemi"), F3-10, ADR-043. Kod tarafında tek kaynak `apps/mobile/src/theme/tokens.ts`; bileşenlerde sabit renk, font ya da ölçü yazılmaz. Açık palet tasarımdan birebir alındı; koyu palet aynı orman tonlarından türetildi (tasarımda koyu tema yok). İki temanın kontrastı `theme.test.tsx` ile denetlenir.
+
+İlke (tasarımdan): renk anlam taşır, süs değildir; her durum rengi bir etiket veya ikonla birlikte kullanılır.
 
 ## Renkler
 
 | Token | Açık | Koyu | Kullanım |
 |---|---|---|---|
-| `bg` | `#FFFFFF` | `#0B0F14` | Ekran arka planı |
-| `surface` | `#F6F7F9` | `#151A21` | Kart, liste arka planı |
-| `surfaceRaised` | `#FFFFFF` | `#1C222B` | Modal, sheet |
-| `border` | `#E5E7EB` | `#262C35` | Ayırıcı, kenarlık |
-| `text` | `#111827` | `#F3F4F6` | Birincil metin |
-| `textMuted` | `#6B7280` | `#9CA3AF` | İkincil metin |
-| `primary` | `#1F4E79` | `#6FA8DC` | Birincil buton, bağlantı |
-| `onPrimary` | `#FFFFFF` | `#0B0F14` | Birincil buton metni |
-| `receivable` | `#15803D` | `#4ADE80` | Alacak (bana borçlu) |
-| `payable` | `#C2410C` | `#FB923C` | Borç (borçluyum) |
-| `overdue` | `#B91C1C` | `#F87171` | Gecikme |
-| `pending` | `#6B7280` | `#9CA3AF` | Onay bekleyen |
-| `warning` | `#B45309` | `#FBBF24` | İtiraz, değişiklik bekliyor |
-| `success` | `#15803D` | `#4ADE80` | Kapandı, onaylandı |
+| `bg` | `#F5F7F4` Zemin | `#0D1411` | Ekran arka planı |
+| `surface` / `surfaceRaised` | `#FFFFFF` Yüzey | `#151E1A` / `#1B2621` | Kart, giriş alanı, sekme çubuğu / sheet |
+| `surfaceSunken` | `#F1F4F0` | `#111915` | Tarih kutusu gibi gömük alanlar |
+| `track` | `#E8ECE8` | `#24302A` | İlerleme çubuğu zemini, segment zemini |
+| `border` / `borderStrong` / `divider` | `#E2E7E2` / `#D5DCD6` / `#EDF0EC` | `#26332C` / `#34433B` / `#1F2A24` | Kart kenarı / giriş ve ikincil buton / satır ayırıcı |
+| `text` | `#13221B` Mürekkep | `#E6EEE9` | Birincil metin |
+| `textMuted` | `#56645D` | `#9AABA1` | İkincil metin |
+| `tabInactive` | `#5E6B64` | `#8A9A91` | Seçili olmayan sekme |
+| `primary` / `onPrimary` | `#0F3A2E` Orman / `#FFFFFF` | `#7FD3AE` / `#0B1F17` | Birincil buton, seçili sekme |
+| `primarySoft` | `#DDEFE4` Nane | `#1C3A2D` | Seçili sekme hapı, başarı halkası |
+| `accent` | `#146A4E` Zümrüt | `#7FD3AE` | Bağlantı, ilerleme dolgusu |
+| `receivable` | `#11613F` | `#6FCF9A` | Alacak tutarı |
+| `payable` | `#13221B` | `#E6EEE9` | Borç tutarı (mürekkep; kırmızı yalnızca gecikme) |
+| `success` / `successSoft` | `#11613F` / `#E1F1E7` | `#6FCF9A` / `#163526` | Onaylı, ödendi |
+| `pending` / `pendingSoft` | `#24507D` / `#E3ECF6` | `#8FB6E3` / `#1B2A3B` | Talep, bilgi, yanıt bekleniyor |
+| `warning` / `warningSoft` | `#7A4E00` / `#FBEFD5` | `#E3B65E` / `#352A12` | Yaklaşan, onay bekliyor |
+| `overdue` / `overdueSoft` / `dangerBorder` | `#A1291F` / `#FBE4E1` / `#EDC1BB` | `#F08C82` / `#3A1D1A` / `#5C2C27` | Gecikmiş, itiraz, yıkıcı eylem |
+| `neutral` / `neutralSoft` | `#46534C` / `#ECEFEC` | `#B3C0B8` / `#26302B` | Planlı, manuel kayıt, iptal |
 
-Durum etiketi eşlemesi: Kişisel → `textMuted`, Onay bekliyor → `pending`, Aktif → `primary`, Değişiklik bekliyor / İtirazlı → `warning`, Kapandı → `success`, İptal → `textMuted`. Renk her zaman etiket metniyle birlikte.
+Rozet tonları (`Badge`): `success`, `pending`, `warning`, `overdue`, `neutral`, `primary`; her biri yumuşak zemin + koyu metin, hap biçiminde.
 
-Kontrast: metin/arka plan en az WCAG AA (4.5:1). Yeni renk eklerken iki temada da kontrol et.
+Anlaşma durumu: Kişisel → `neutral`, Onay bekliyor / Düzeltme → `pending`, Aktif / Kapandı → `success`, Değişiklik bekliyor → `warning`, İtirazlı → `overdue`, Reddedildi / İptal → `neutral`. Taksit: Planlı → `neutral`, Bugün → `warning`, Gecikti → `overdue`, Ödendi → `success`.
 
 ## Tipografi
 
-Sistem fontu (iOS SF Pro, Android Roboto). Tüm tutarlarda `fontVariant: ['tabular-nums']`.
+Manrope (500–800) ve kimlikler için IBM Plex Mono 500; `@expo-google-fonts`, açılış ekranı fontlar yüklenene kadar kalır. Her ağırlık ayrı bir font ailesidir; `fontWeight` yazılmaz (Android özel fontta yok sayar). Tutarlarda `fontVariant: ['tabular-nums']`.
 
-| Token | Boyut / satır | Ağırlık | Kullanım |
+| Token | Font | Boyut / satır | Kullanım |
 |---|---|---|---|
-| `amountXL` | 34 / 40 | 700 | Anlaşma detayında kalan tutar |
-| `amountL` | 24 / 30 | 700 | Ana sayfa özet kartları |
-| `title` | 22 / 28 | 700 | Ekran başlığı |
-| `headline` | 17 / 22 | 600 | Kart başlığı, liste birincil |
-| `body` | 16 / 22 | 400 | Gövde |
-| `callout` | 15 / 20 | 400 | Form etiketleri |
-| `caption` | 13 / 18 | 400 | Yardımcı metin, tarih |
-| `micro` | 11 / 14 | 600 | Rozet, durum etiketi (büyük harf değil) |
+| `amountXL` | Manrope 800 | 34 / 40 | Detayda kalan tutar |
+| `amountL` | Manrope 800 | 28 / 34 | Özet kartları |
+| `title` | Manrope 800 | 26 / 32 | Sayfa başlığı |
+| `headline` | Manrope 800 | 17 / 22 | Bölüm başlığı |
+| `rowTitle` | Manrope 700 | 15 / 20 | Satır başlığı, segment |
+| `body` | Manrope 500 | 16 / 22 | Gövde |
+| `callout` | Manrope 500 | 15 / 20 | İkincil gövde |
+| `label` | Manrope 700 | 13 / 18 | Form etiketi |
+| `caption` | Manrope 600 | 13 / 18 | Açıklama, tarih |
+| `badge` | Manrope 700 | 12 / 16 | Durum rozeti |
+| `micro` | Manrope 700 | 11 / 14 | Sekme etiketi |
+| `button` | Manrope 800 | 16 / 20 | Buton |
+| `mono` | IBM Plex Mono 500 | 12 / 16 | Kimlik, kayıt no |
 
 Yazı ölçeği (Dynamic Type) desteklenir; `maxFontSizeMultiplier` yalnızca tutar ve rozetlerde 1.4.
 
 ## Boşluk, köşe, boyut
 
-- Boşluk ölçeği (4 tabanlı): `xs 4`, `sm 8`, `md 12`, `lg 16`, `xl 24`, `xxl 32`.
-- Ekran yatay kenar boşluğu: 16.
-- Köşe: `sm 8` (input, rozet), `md 12` (kart), `lg 16` (sheet, modal).
-- Minimum dokunma alanı: 44×44.
-- Birincil buton yüksekliği: 52; ikincil: 44.
-- Kart iç boşluğu: 16.
+- Boşluk ölçeği: `xs 4`, `sm 8`, `md 12`, `lg 16`, `xl 24`, `xxl 32`; ekran kenarı 16, kart iç boşluğu 16.
+- Köşe: `sm 14` (giriş alanı), `md 16` (buton), `lg 20` (kart), `xl 24` (büyük panel), `pill 999` (rozet, sekme hapı).
+- Birincil buton 54; ikincil 48; ikon butonu 44×44; minimum dokunma alanı 44×44.
+- Butonlar: birincil dolu (Orman); ikincil yüzey + `borderStrong` kenar; yıkıcı yüzey + `dangerBorder` kenar + `overdue` metin; hayalet `accent` metin.
 
 ## Hareket
 

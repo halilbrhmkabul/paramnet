@@ -1,4 +1,11 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider, router, type Theme } from "expo-router";
+// Per-weight imports: the package root would bundle every weight of both families.
+import { IBMPlexMono_500Medium } from "@expo-google-fonts/ibm-plex-mono/500Medium";
+import { Manrope_500Medium } from "@expo-google-fonts/manrope/500Medium";
+import { Manrope_600SemiBold } from "@expo-google-fonts/manrope/600SemiBold";
+import { Manrope_700Bold } from "@expo-google-fonts/manrope/700Bold";
+import { Manrope_800ExtraBold } from "@expo-google-fonts/manrope/800ExtraBold";
+import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
@@ -138,6 +145,15 @@ function AppNavigator() {
 
 export default function RootLayout() {
 	const { scheme, colors } = useAppTheme();
+	// The splash stays up until the fonts are in (no flash of the system font); a font that fails to
+	// load falls back to the system font rather than blocking the app.
+	const [fontsLoaded, fontError] = useFonts({
+		Manrope_500Medium,
+		Manrope_600SemiBold,
+		Manrope_700Bold,
+		Manrope_800ExtraBold,
+		IBMPlexMono_500Medium,
+	});
 	const base = scheme === "dark" ? DarkTheme : DefaultTheme;
 	const navigationTheme: Theme = {
 		...base,
@@ -151,6 +167,9 @@ export default function RootLayout() {
 		},
 	};
 
+	if (!fontsLoaded && fontError === null) {
+		return null;
+	}
 	return (
 		<ApiProvider>
 			<ThemeProvider value={navigationTheme}>
