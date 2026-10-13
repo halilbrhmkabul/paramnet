@@ -10,7 +10,6 @@ import { ErrorState } from "@/components/ErrorState";
 import { ListItem } from "@/components/ListItem";
 import { LoadingState } from "@/components/LoadingState";
 import { Screen } from "@/components/Screen";
-import { ScreenTitle } from "@/components/ScreenTitle";
 import { TextField } from "@/components/TextField";
 import { fill, tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
@@ -28,6 +27,7 @@ export function ContactsScreen() {
 	return (
 		<Screen
 			testID="contacts.screen"
+			edges={["bottom"]}
 			refreshControl={
 				<RefreshControl
 					refreshing={contacts.isRefetching}
@@ -37,7 +37,6 @@ export function ContactsScreen() {
 				/>
 			}
 		>
-			<ScreenTitle>{tr.tabs.contacts}</ScreenTitle>
 			{contacts.isPending ? (
 				<LoadingState testID="contacts.loading" />
 			) : contacts.isError ? (

@@ -124,6 +124,10 @@ function AppNavigator() {
 					options={{ ...detailHeader, presentation: "modal" }}
 				/>
 				<Stack.Screen name="agreement/[id]/invite-preview" options={detailHeader} />
+				<Stack.Screen
+					name="contacts"
+					options={{ ...detailHeader, title: tr.tabs.contacts }}
+				/>
 				<Stack.Screen name="contact/[id]" options={detailHeader} />
 				<Stack.Screen
 					name="settings/index"

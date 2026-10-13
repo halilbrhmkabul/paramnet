@@ -11,6 +11,7 @@ export const queryKeys = {
 	contacts: ["contacts"] as const,
 	contact: (id: string) => ["contact", id] as const,
 	agreement: (id: string) => ["agreement", id] as const,
+	agreements: ["agreements"] as const,
 	calendar: (month: IsoDate) => ["calendar", month] as const,
 	invite: (token: string) => ["invite", token] as const,
 	decision: (id: string) => ["decision", id] as const,
@@ -35,6 +36,11 @@ export function useContact(id: string) {
 export function useAgreement(id: string) {
 	const api = useApi();
 	return useQuery({ queryKey: queryKeys.agreement(id), queryFn: () => api.getAgreement(id) });
+}
+
+export function useAgreements() {
+	const api = useApi();
+	return useQuery({ queryKey: queryKeys.agreements, queryFn: () => api.listAgreements() });
 }
 
 export function useCalendar(month: IsoDate) {

@@ -898,6 +898,7 @@ export type Database = {
 				Args: { p_code: string; p_phone: string; p_token: string };
 				Returns: Json;
 			};
+			list_agreements: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_requests: { Args: Record<PropertyKey, never>; Returns: Json };
 			make_personal: { Args: { p_id: string }; Returns: Json };

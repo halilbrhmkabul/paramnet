@@ -13,8 +13,8 @@ describe("navigation (signed in)", () => {
 		await renderRouter(appRoutes, { initialUrl: "/" });
 		expect(screen.getByTestId("home.screen")).toBeTruthy();
 
-		await fireEvent.press(screen.getByTestId("tabs.contacts"));
-		expect(screen.getByTestId("contacts.screen")).toBeTruthy();
+		await fireEvent.press(screen.getByTestId("tabs.debts"));
+		expect(screen.getByTestId("debts.screen")).toBeTruthy();
 
 		await fireEvent.press(screen.getByTestId("tabs.calendar"));
 		expect(screen.getByTestId("calendar.screen")).toBeTruthy();
@@ -36,11 +36,11 @@ describe("navigation (signed out)", () => {
 	});
 
 	it("starts on welcome and cannot open the tabs", async () => {
-		await renderRouter(appRoutes, { initialUrl: "/contacts" });
+		await renderRouter(appRoutes, { initialUrl: "/debts" });
 		expect(screen.getByTestId("welcome.screen")).toBeTruthy();
 	});
 
-	it.each(["/agreement/00000000-0000-4000-8000-0000000000b1", "/settings", "/new"])(
+	it.each(["/agreement/00000000-0000-4000-8000-0000000000b1", "/settings", "/new", "/contacts"])(
 		"cannot open %s without a session",
 		async (url) => {
 			await renderRouter(appRoutes, { initialUrl: url });

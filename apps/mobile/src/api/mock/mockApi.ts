@@ -144,6 +144,13 @@ export function createMockApi({
 				};
 			}),
 
+		listAgreements: () =>
+			respond(() =>
+				[...state.agreements]
+					.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+					.map((a) => toSummary(a, contactOf(a.contact_id), today())),
+			),
+
 		getAgreement: (id) =>
 			respond(() => {
 				const agreement = state.agreements.find((a) => a.id === id);

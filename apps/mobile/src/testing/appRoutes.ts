@@ -8,7 +8,8 @@ import Welcome from "../../app/(auth)/welcome";
 import TabsLayout from "../../app/(tabs)/_layout";
 import Add from "../../app/(tabs)/add";
 import Calendar from "../../app/(tabs)/calendar";
-import Contacts from "../../app/(tabs)/contacts";
+import Contacts from "../../app/contacts";
+import Debts from "../../app/(tabs)/debts";
 import Home from "../../app/(tabs)/index";
 import Requests from "../../app/(tabs)/requests";
 import Index from "../../app/index";
@@ -42,7 +43,8 @@ export const appRoutes = {
 	"(auth)/notifications": Notifications,
 	"(tabs)/_layout": TabsLayout,
 	"(tabs)/index": Home,
-	"(tabs)/contacts": Contacts,
+	"(tabs)/debts": Debts,
+	contacts: Contacts,
 	"(tabs)/add": Add,
 	"(tabs)/calendar": Calendar,
 	"(tabs)/requests": Requests,

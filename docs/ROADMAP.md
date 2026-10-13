@@ -345,6 +345,15 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 	- Profil ve profili düzenle (04, 35);
 	- Hoş geldin, giriş ve onboarding (01, 02, 31).
 - Kapsam içi ama veri modelinde olmayanlar (ParamNet ID, "para teslimi bekleniyor", "para iste") uygulanmaz; tasarımdaki yerleri spec'teki akışla doldurulur.
+- **İlerleme (2026-10-13):**
+	- [x] Parça 1:
+		- Sekmeler Ana · Borçlarım · (+) · Talepler · Takvim; Kişiler, Borçlarım'dan açılan bir ekran.
+		- `list_agreements` RPC (pgTAP 6).
+		- Borçlarım/Alacaklarım ekranı (12): toplam, ilerleme çubuklu satırlar, kapananlar ayrı.
+		- Ana Sayfa (03): logo, bekleyen sayılı zil, selamlama, toplam kartları, amber bekleyenler bandı, hızlı işlem kutucukları, tarih kutulu vade satırları.
+		- `Avatar` bileşeni.
+	- [ ] Parça 2: anlaşma detayı, ödeme kaydı ve onayı, kısmi ödeme, ödeme kaydedildi (11, 13–15).
+	- [ ] Parça 3: oluşturma akışı, takvim, talepler, profil, giriş ekranları (01, 02, 04, 06, 16, 23–26, 31, 35).
 
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
 ### [ ] F3-09 Faz 3 kapısı: mağaza yayını

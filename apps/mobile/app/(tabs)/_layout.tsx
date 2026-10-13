@@ -61,38 +61,23 @@ export default function TabsLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="contacts"
+				name="debts"
 				options={{
-					title: tr.tabs.contacts,
+					title: tr.tabs.debts,
 					tabBarIcon: ({ color, size, focused }) => (
 						<TabIcon
-							name="people-outline"
+							name="swap-horizontal-outline"
 							color={color}
 							size={size}
 							focused={focused}
 						/>
 					),
-					tabBarButtonTestID: "tabs.contacts",
+					tabBarButtonTestID: "tabs.debts",
 				}}
 			/>
 			<Tabs.Screen
 				name="add"
 				options={{ title: tr.tabs.new, tabBarButton: () => <AddTabButton /> }}
-			/>
-			<Tabs.Screen
-				name="calendar"
-				options={{
-					title: tr.tabs.calendar,
-					tabBarIcon: ({ color, size, focused }) => (
-						<TabIcon
-							name="calendar-outline"
-							color={color}
-							size={size}
-							focused={focused}
-						/>
-					),
-					tabBarButtonTestID: "tabs.calendar",
-				}}
 			/>
 			<Tabs.Screen
 				name="requests"
@@ -107,6 +92,21 @@ export default function TabsLayout() {
 						/>
 					),
 					tabBarButtonTestID: "tabs.requests",
+				}}
+			/>
+			<Tabs.Screen
+				name="calendar"
+				options={{
+					title: tr.tabs.calendar,
+					tabBarIcon: ({ color, size, focused }) => (
+						<TabIcon
+							name="calendar-outline"
+							color={color}
+							size={size}
+							focused={focused}
+						/>
+					),
+					tabBarButtonTestID: "tabs.calendar",
 				}}
 			/>
 		</Tabs>
