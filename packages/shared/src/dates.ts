@@ -67,6 +67,16 @@ export function addDays(date: IsoDate, days: number): IsoDate {
 	return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
 }
 
+// Calendar days from `from` to `to` (negative when `to` is earlier), e.g. "19 gün kaldı".
+export function daysBetween(from: IsoDate, to: IsoDate): number {
+	const a = parseOrThrow(from);
+	const b = parseOrThrow(to);
+	const DAY_MS = 24 * 60 * 60 * 1000;
+	return Math.round(
+		(Date.UTC(b.year, b.month - 1, b.day) - Date.UTC(a.year, a.month - 1, a.day)) / DAY_MS,
+	);
+}
+
 // Always pass the plan's first due date with the installment offset, not the previous due date;
 // otherwise a clamp (31 Jan → 28 Feb) would drift every later month to the 28th.
 export function addMonthsClamped(date: IsoDate, months: number): IsoDate {

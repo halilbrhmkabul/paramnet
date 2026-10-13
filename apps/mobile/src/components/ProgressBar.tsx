@@ -8,10 +8,18 @@ export type ProgressBarProps = {
 	value: number;
 	label: string;
 	tone?: ColorToken;
+	// Design ".bar" is 6 pt in lists; detail headers use 8.
+	height?: number;
 	testID?: string;
 };
 
-export function ProgressBar({ value, label, tone = "accent", testID }: ProgressBarProps) {
+export function ProgressBar({
+	value,
+	label,
+	tone = "accent",
+	height = 6,
+	testID,
+}: ProgressBarProps) {
 	const { colors } = useAppTheme();
 	const ratio = Math.min(Math.max(value, 0), 1);
 	return (
@@ -21,13 +29,16 @@ export function ProgressBar({ value, label, tone = "accent", testID }: ProgressB
 			accessibilityLabel={label}
 			accessibilityValue={{ min: 0, max: 100, now: Math.floor(ratio * 100) }}
 			style={{
-				height: 8,
-				borderRadius: 4,
+				height,
+				flexDirection: "row",
+				borderRadius: height / 2,
 				backgroundColor: colors.track,
 				overflow: "hidden",
 			}}
 		>
-			<View style={{ flex: ratio, backgroundColor: colors[tone], borderRadius: 4 }} />
+			<View
+				style={{ flex: ratio, backgroundColor: colors[tone], borderRadius: height / 2 }}
+			/>
 			<View style={{ flex: 1 - ratio }} />
 		</View>
 	);

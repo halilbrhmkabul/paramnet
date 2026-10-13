@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
 	addDays,
+	daysBetween,
 	addMonthsClamped,
 	daysOfMonth,
 	formatDateTR,
@@ -93,6 +94,22 @@ describe("addDays", () => {
 	it("rejects invalid input", () => {
 		expect(() => addDays("2026-02-30", 1)).toThrow(RangeError);
 		expect(() => addDays("2026-02-01", 0.5)).toThrow(RangeError);
+	});
+});
+
+describe("daysBetween", () => {
+	it.each([
+		["2026-10-12", "2026-10-31", 19],
+		["2026-10-12", "2026-10-12", 0],
+		["2026-10-12", "2026-10-03", -9],
+		["2026-12-30", "2027-01-02", 3],
+		["2028-02-28", "2028-03-01", 2],
+	])("%s → %s = %d", (from, to, expected) => {
+		expect(daysBetween(from, to)).toBe(expected);
+	});
+
+	it("rejects invalid dates", () => {
+		expect(() => daysBetween("2026-02-30", "2026-03-01")).toThrow(RangeError);
 	});
 });
 

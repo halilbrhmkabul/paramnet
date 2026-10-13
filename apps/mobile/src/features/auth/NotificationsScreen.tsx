@@ -1,8 +1,8 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Text, View } from "react-native";
 
 import { useSession } from "./sessionStore";
+import { Icon } from "@/components/Icon";
 import { useAuthApi } from "@/api/ApiProvider";
 import { registerDevice } from "@/features/push/device";
 import { Button } from "@/components/Button";
@@ -50,7 +50,7 @@ export function NotificationsScreen() {
 				</View>
 			}
 		>
-			<Ionicons name="notifications-outline" size={48} color={colors.primary} />
+			<Icon name="bell" size={48} tone="primary" strokeWidth={1.6} />
 			<ScreenTitle>{tr.profile.notificationsTitle}</ScreenTitle>
 			<Text style={[typography.body, { color: colors.textMuted }]}>
 				{tr.profile.notificationsReason}

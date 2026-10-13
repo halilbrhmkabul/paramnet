@@ -39,7 +39,7 @@ Onay oturumu: OTP doğrulanınca kısa ömürlü (15 dk), davete ve numaraya ba�
 
 ## Girdi doğrulama (her RPC)
 
-- Tutar > 0 ve ≤ makul üst sınır (ör. 1.000.000.000,00 TL = 100_000_000_000 kuruş).
+- Tutar > 0 ve ≤ makul üst sınır (ör. ₺1.000.000.000,00 = 100_000_000_000 kuruş).
 - Metin alanları uzunluk sınırı (başlık 80, not 500, gerekçe 500).
 - Tarihler makul aralıkta (bugün −10 yıl, +30 yıl).
 - Telefon E.164, ilk sürümde yalnızca +90.

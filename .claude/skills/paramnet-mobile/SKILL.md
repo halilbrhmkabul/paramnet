@@ -42,7 +42,7 @@ apps/mobile/
 
 1. **Tek birincil aksiyon** her ekranda (ör. anlaşma detayında duruma göre: Ödeme ekle / Paylaş / Onayla).
 2. **Dört durum zorunlu:** yükleniyor (skeleton), boş (açıklama + buton), hata (Türkçe mesaj + Tekrar dene), veri. Çevrimdışıyken yazma butonları devre dışı ve nedeni yazılı.
-3. **Tutar:** giriş `AmountInput` (sayısal klavye, kuruş tam sayı tutar, Türk biçimi), gösterim `AmountText` (`12.000,00 TL`, tabular rakamlar). Elle biçimlendirme yasak.
+3. **Tutar:** giriş `AmountInput` (sayısal klavye, kuruş tam sayı tutar, Türk biçimi), gösterim `AmountText` (`₺12.000,00`, tabular rakamlar). Elle biçimlendirme yasak.
 4. **Tarih:** gösterim `10 Kas 2026` / uzun `10 Kasım 2026`; `packages/shared` tarih yardımcıları; Europe/Istanbul.
 5. **Durum renkleri** yalnızca token'lardan ve her zaman metin etiketiyle birlikte (renk tek başına anlam taşımaz).
 6. **Erişilebilirlik:** her etkileşimli öğede `accessibilityRole`, `accessibilityLabel` (Türkçe) ve `testID`; minimum dokunma alanı 44×44 pt; Dynamic Type/yazı ölçeği bozulmadan çalışır; koyu tema.

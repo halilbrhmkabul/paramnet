@@ -30,7 +30,7 @@ describe("Incoming share (S14)", () => {
 		await openFromRequests();
 		expect(screen.getByText(fill(tr.invite.title, { name: "Zeynep Arslan" }))).toBeTruthy();
 		expect(screen.getByTestId("decide.role")).toHaveTextContent(tr.agreement.youOwe);
-		expect(screen.getByTestId("decide.proposed.total")).toHaveTextContent("6.000,00 TL");
+		expect(screen.getByTestId("decide.proposed.total")).toHaveTextContent("₺6.000,00");
 		expect(screen.getAllByTestId(/^decide\.proposed\.row\./)).toHaveLength(3);
 		expect(screen.queryByTestId("decide.current")).toBeNull();
 
@@ -43,7 +43,7 @@ describe("Incoming share (S14)", () => {
 		expect(screen.getByTestId("agreement.counterparty.text")).toHaveTextContent(
 			"Zeynep Arslan",
 		);
-		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("6.000,00 TL");
+		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("₺6.000,00");
 	});
 
 	it("a counter offer must keep the total", async () => {

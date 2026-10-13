@@ -1,9 +1,9 @@
 import { formatDateTR, formatTRY, validatePlan } from "@paramnet/shared";
-import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { Icon } from "@/components/Icon";
 import { messageForError } from "@/api/errors";
 import { useDecide, usePendingDecision, useWithdrawShare } from "@/api/hooks";
 import type { Decision, PendingDecision, TermsView } from "@/api/types";
@@ -216,7 +216,7 @@ function DecisionView({ pending }: { pending: PendingDecision }) {
 				testID="decide.amount"
 			/>
 			<View style={[styles.info, { backgroundColor: colors.pendingSoft, gap: spacing.sm }]}>
-				<Ionicons name="information-circle-outline" size={18} color={colors.pending} />
+				<Icon name="info" size={18} tone="pending" strokeWidth={2} />
 				<Text style={[typography.caption, styles.infoText, { color: colors.pending }]}>
 					{tr.decide.noMoneyMoves}
 				</Text>

@@ -14,6 +14,9 @@ describe("scrubText (CLAUDE.md: no phone, name, note or amount in telemetry)", (
 		["(0555) 123-45-67", "[phone]"],
 		["Kalan: 12.000,00 TL", "Kalan: [amount]"],
 		["4.000 TL ödeme", "[amount] ödeme"],
+		["Kalan: ₺12.000,00", "Kalan: [amount]"],
+		["₺ 4.000 ödeme", "[amount] ödeme"],
+		["Fark -₺1.500,00", "Fark -[amount]"],
 		["ayse@example.com yazdı", "[email] yazdı"],
 	])("%s", (input, expected) => {
 		expect(scrubText(input)).toBe(expected);

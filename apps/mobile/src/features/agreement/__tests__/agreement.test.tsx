@@ -13,16 +13,67 @@ beforeEach(() => {
 async function openAhmet() {
 	await renderRouter(appRoutes, { initialUrl: `/agreement/${SEED_IDS.ahmetLoan}` });
 	await waitFor(() => {
-		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("6.500,00 TL");
+		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("₺6.500,00");
 	});
 }
+
+describe("Agreement detail layout (design 13, 25, F4-01c)", () => {
+	it("my debt: pay in full opens the payment with the rest filled in; partial opens empty", async () => {
+		await renderRouter(appRoutes, { initialUrl: `/agreement/${SEED_IDS.elifLoan}` });
+		await waitFor(() => {
+			expect(screen.getByTestId("agreement.role.text")).toHaveTextContent(
+				tr.agreement.remainingDebt,
+			);
+		});
+		expect(screen.getByText(tr.agreement.titleDebt)).toBeTruthy();
+		expect(screen.getByTestId("agreement.primaryAction.button")).toHaveTextContent(
+			tr.agreement.payFull,
+		);
+		await fireEvent.press(screen.getByTestId("agreement.primaryAction.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("payment.amount.input")).toHaveDisplayValue("2.500");
+		});
+	});
+
+	it("my debt: partial payment opens an empty amount", async () => {
+		await renderRouter(appRoutes, { initialUrl: `/agreement/${SEED_IDS.elifLoan}` });
+		await fireEvent.press(await screen.findByTestId("agreement.partialPayment.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("payment.amount.input")).toHaveDisplayValue("");
+		});
+	});
+
+	it("installment purchase: the next installment card records exactly that installment", async () => {
+		await renderRouter(appRoutes, { initialUrl: `/agreement/${SEED_IDS.yildizFurniture}` });
+		const next = await screen.findByTestId("agreement.next");
+		expect(within(next).getByText("Sıradaki · 1. taksit")).toBeTruthy();
+		expect(screen.getByText(tr.agreement.planSection)).toBeTruthy();
+		expect(
+			screen.getByText(tr.agreement.paidWithDown.replace(" {amount}", ""), { exact: false }),
+		).toBeTruthy();
+		await fireEvent.press(within(next).getByTestId("agreement.primaryAction.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("payment.amount.input")).toHaveDisplayValue("4.000");
+		});
+	});
+
+	it("keeps the tab bar under the detail and leaves to a tab", async () => {
+		await renderRouter(appRoutes, { initialUrl: `/agreement/${SEED_IDS.ahmetLoan}` });
+		await fireEvent.press(await screen.findByTestId("detailTabs.home"));
+		await waitFor(() => {
+			expect(screen.getByTestId("home.screen")).toBeTruthy();
+		});
+	});
+});
 
 describe("Agreement detail (S11)", () => {
 	it("shows the top card, installments with derived states and payments", async () => {
 		await openAhmet();
 		expect(screen.getByTestId("agreement.counterparty.text")).toHaveTextContent("Ahmet Yılmaz");
-		expect(screen.getByTestId("agreement.role.text")).toHaveTextContent(tr.agreement.owesYou);
-		expect(screen.getByTestId("agreement.total.text")).toHaveTextContent("12.000,00 TL");
+		expect(screen.getByTestId("agreement.role.text")).toHaveTextContent(
+			tr.agreement.remainingReceivable,
+		);
+		expect(screen.getByTestId("agreement.total.text")).toHaveTextContent("₺12.000,00");
 		expect(screen.getByTestId("agreement.status.badge")).toHaveTextContent(
 			tr.agreement.status.personal,
 		);
@@ -59,11 +110,10 @@ describe("Agreement detail (S11)", () => {
 
 		await fireEvent.changeText(screen.getByTestId("payment.amount.input"), "3000");
 		const preview = screen.getByTestId("payment.allocation.list");
-		expect(within(preview).getByTestId("payment.allocation.2")).toHaveTextContent(
-			"2.500,00 TL",
-			{ exact: false },
-		);
-		expect(within(preview).getByTestId("payment.allocation.3")).toHaveTextContent("500,00 TL", {
+		expect(within(preview).getByTestId("payment.allocation.2")).toHaveTextContent("₺2.500,00", {
+			exact: false,
+		});
+		expect(within(preview).getByTestId("payment.allocation.3")).toHaveTextContent("₺500,00", {
 			exact: false,
 		});
 
@@ -74,9 +124,7 @@ describe("Agreement detail (S11)", () => {
 		});
 		await fireEvent.press(screen.getByTestId("payment.done.button"));
 		await waitFor(() => {
-			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent(
-				"3.500,00 TL",
-			);
+			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("₺3.500,00");
 		});
 		expect(
 			within(screen.getByTestId("agreement.installment.2.row")).getByText(
@@ -127,7 +175,7 @@ describe("Agreement detail (S11)", () => {
 		const events = screen.getAllByTestId(/^history\.event\./);
 		expect(events).toHaveLength(3);
 		expect(events[0]).toHaveTextContent(tr.history.created, { exact: false });
-		expect(events[1]).toHaveTextContent("4.000,00 TL", { exact: false });
+		expect(events[1]).toHaveTextContent("₺4.000,00", { exact: false });
 	});
 
 	it("disables writing while offline and says why", async () => {

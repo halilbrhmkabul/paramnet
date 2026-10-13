@@ -30,5 +30,5 @@ appId: com.paramnet.app
     visible:
       id: agreement.outstanding.text
     timeout: 10000
-- assertVisible: "2.500,00 TL"
+- assertVisible: "₺2.500,00"
 - assertVisible: "Kişisel"

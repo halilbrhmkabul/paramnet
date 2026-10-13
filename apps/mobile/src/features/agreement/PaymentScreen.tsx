@@ -1,5 +1,4 @@
 import { allocatePayment, formatTRY, type IsoDate, type PaymentMethod } from "@paramnet/shared";
-import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -14,6 +13,7 @@ import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { DateField } from "@/components/DateField";
 import { ErrorState } from "@/components/ErrorState";
+import { Icon } from "@/components/Icon";
 import { LoadingState } from "@/components/LoadingState";
 import { Screen } from "@/components/Screen";
 import { ScreenTitle } from "@/components/ScreenTitle";
@@ -72,10 +72,11 @@ function PaymentResult({
 							{ backgroundColor: reported ? colors.warning : colors.accent },
 						]}
 					>
-						<Ionicons
-							name={reported ? "time-outline" : "checkmark"}
+						<Icon
+							name={reported ? "clock" : "check"}
 							size={30}
-							color={colors.onPrimary}
+							tone="onPrimary"
+							strokeWidth={2.4}
 						/>
 					</View>
 				</View>
@@ -109,14 +110,24 @@ function PaymentResult({
 	);
 }
 
-function PaymentForm({ agreement }: { agreement: AgreementDetail }) {
+type Prefill = "all" | "next" | undefined;
+
+function PaymentForm({ agreement, prefill }: { agreement: AgreementDetail; prefill: Prefill }) {
 	const { colors, typography, spacing } = useAppTheme();
 	const today = useToday();
 	const online = useIsOnline();
 	const record = useRecordPayment(agreement.id);
 	// One key per screen visit: a retry after a network error must not record twice (BR-09).
 	const [idempotencyKey] = useState(newIdempotencyKey);
-	const [amount, setAmount] = useState<number | null>(null);
+	const next = agreement.installments.find((row) => row.state.status !== "paid");
+	// "Tamamını öde" / "Ödendi kaydet" on the detail open with the amount already filled in.
+	const [amount, setAmount] = useState<number | null>(() =>
+		prefill === "all"
+			? agreement.outstanding_minor
+			: prefill === "next" && next !== undefined
+				? next.amount_minor - next.paid_minor
+				: null,
+	);
 	const [paidOn, setPaidOn] = useState<IsoDate>(today);
 	const [method, setMethod] = useState<PaymentMethod>("cash");
 	const [note, setNote] = useState("");
@@ -127,7 +138,6 @@ function PaymentForm({ agreement }: { agreement: AgreementDetail }) {
 	} | null>(null);
 	// The debtor of a shared agreement reports; everyone else records at once (BR-08).
 	const reports = agreement.status !== "personal" && agreement.my_role === "debtor";
-	const next = agreement.installments.find((row) => row.state.status !== "paid");
 	const shortcuts = [
 		...(next === undefined
 			? []
@@ -327,7 +337,7 @@ function PaymentForm({ agreement }: { agreement: AgreementDetail }) {
 
 // S12
 export function PaymentScreen() {
-	const { id } = useLocalSearchParams<{ id: string }>();
+	const { id, prefill } = useLocalSearchParams<{ id: string; prefill?: string }>();
 	const agreement = useAgreement(id);
 	if (agreement.isPending) {
 		return (
@@ -349,7 +359,12 @@ export function PaymentScreen() {
 			</Screen>
 		);
 	}
-	return <PaymentForm agreement={agreement.data} />;
+	return (
+		<PaymentForm
+			agreement={agreement.data}
+			prefill={prefill === "all" || prefill === "next" ? prefill : undefined}
+		/>
+	);
 }
 
 const styles = StyleSheet.create({

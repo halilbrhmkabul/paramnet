@@ -34,7 +34,7 @@ appId: com.paramnet.app
     id: plan.screen
 - assertVisible:
     id: plan.remaining.text
-    text: "20.000,00 TL"
+    text: "₺20.000,00"
 - assertVisible:
     id: plan.row.5.amount.input
     text: "4.000"
@@ -44,4 +44,4 @@ appId: com.paramnet.app
     visible:
       id: agreement.outstanding.text
     timeout: 10000
-- assertVisible: "20.000,00 TL"
+- assertVisible: "₺20.000,00"

@@ -12,7 +12,7 @@ appId: com.paramnet.app
 - extendedWaitUntil:
     visible:
       id: agreement.outstanding.text
-      text: "1.500,00 TL"
+      text: "₺1.500,00"
     timeout: 10000
 - assertVisible: ".*Kısmen ödendi.*"
 - tapOn:

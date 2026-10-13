@@ -38,7 +38,7 @@ invite.accept.button
 - Her ekran için: yükleniyor, boş, hata, veri durumları render testi.
 - Birincil aksiyonun doğru durumda görünür/etkin olduğu test edilir (screens.md "birincil aksiyon" tablosu).
 - API katmanı sahte adaptörle verilir (`EXPO_PUBLIC_API_MODE=mock` veya test sağlayıcısı); ağ çağrısı yok.
-- Tutar ve tarih biçimi için anlık görüntü (snapshot) yerine açık metin beklentisi (`12.000,00 TL`).
+- Tutar ve tarih biçimi için anlık görüntü (snapshot) yerine açık metin beklentisi (`₺12.000,00`).
 
 ## Maestro akışları
 

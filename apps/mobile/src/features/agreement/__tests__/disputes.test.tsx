@@ -168,9 +168,7 @@ describe("Disputes, cancellation and forgiveness (S16, F2-09)", () => {
 		await fireEvent.changeText(screen.getByTestId("forgive.amount.input"), "1000");
 		await fireEvent.press(screen.getByTestId("forgive.save.button"));
 		await waitFor(() => {
-			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent(
-				"5.500,00 TL",
-			);
+			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("₺5.500,00");
 		});
 		expect(screen.queryByTestId("forgive.amount.input")).toBeNull();
 	});
@@ -218,7 +216,7 @@ describe("Disputes, cancellation and forgiveness (S16, F2-09)", () => {
 		provideTestApi(api);
 		await renderRouter(appRoutes, { initialUrl: "/requests" });
 		await waitFor(() => {
-			expect(screen.getByTestId("requests.section.dispute")).toBeTruthy();
+			expect(screen.getByTestId("requests.section.actions")).toBeTruthy();
 		});
 		expect(screen.getByTestId("requests.item.dispute.a-dispute")).toHaveTextContent(
 			fill(tr.requests.dispute, { name: "Ahmet" }),

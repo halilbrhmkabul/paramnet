@@ -8,7 +8,8 @@ const LONG_TOKEN = /[A-Za-z0-9_-]{32,}/g;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // Turkish mobile numbers in the shapes people and the app write them (+90 / 0 / bare, spaced or not).
 const PHONE = /(?<!\d)(?:\+?90[\s-]?)?\(?0?5\d{2}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}(?!\d)/g;
-const AMOUNT = /(?<![\d.,])\d{1,3}(?:\.\d{3})*(?:,\d{2})?\s?TL\b/g;
+// "₺12.000,00" (ADR-047) and the legacy "12.000,00 TL".
+const AMOUNT = /₺\s?\d[\d.]*(?:,\d+)?|(?<![\d.,])\d{1,3}(?:\.\d{3})*(?:,\d{2})?\s?TL\b/g;
 
 // Keys whose values are personal or financial, wherever they appear (payloads, extras, contexts).
 const FILTERED_KEY =

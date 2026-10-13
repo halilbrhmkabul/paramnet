@@ -118,7 +118,7 @@ test("the right number sees the plan and accepts; the link is then used up", asy
 	await verify(page, token, "0555 000 00 02");
 	await expect(page.getByTestId("decision")).toBeVisible();
 	await expect(page.getByTestId("role")).toHaveText("Borçlusun");
-	await expect(page.getByTestId("total")).toHaveText("3.000,00 TL");
+	await expect(page.getByTestId("total")).toHaveText("₺3.000,00");
 	await expect(page.getByTestId("plan-row-1")).toContainText("10 Kasım 2030");
 	await expect(page.locator("body")).toContainText("Elden verildi");
 	await page.getByTestId("accept").click();

@@ -52,6 +52,9 @@ export function AmountInput({
 					},
 				]}
 			>
+				<Text style={[typography.headline, { color: colors.textMuted }]}>
+					{tr.amountInput.currency}
+				</Text>
 				<TextInput
 					testID={testID}
 					accessibilityLabel={label}
@@ -74,9 +77,6 @@ export function AmountInput({
 						{ color: colors.text, fontVariant: ["tabular-nums"] },
 					]}
 				/>
-				<Text style={[typography.headline, { color: colors.textMuted }]}>
-					{tr.amountInput.currency}
-				</Text>
 			</View>
 			{error !== undefined ? (
 				<Text
