@@ -11,7 +11,8 @@ import { Screen } from "@/components/Screen";
 import { ScreenTitle } from "@/components/ScreenTitle";
 import { fill, tr } from "@/i18n/tr";
 
-function describe(event: EventView): string {
+// Also used by the short timeline on the agreement screen.
+export function describeEvent(event: EventView): string {
 	switch (event.type) {
 		case "created":
 			return tr.history.created;
@@ -93,7 +94,7 @@ export function HistoryScreen() {
 				agreement.data.events.map((event) => (
 					<ListItem
 						key={event.id}
-						title={describe(event)}
+						title={describeEvent(event)}
 						subtitle={`${formatDateTimeTR(event.at)} · ${tr.history.actors[event.actor]}`}
 						testID={`history.event.${event.id}`}
 					/>
