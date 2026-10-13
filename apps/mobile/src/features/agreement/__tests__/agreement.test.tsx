@@ -70,6 +70,10 @@ describe("Agreement detail (S11)", () => {
 		await fireEvent.press(screen.getByTestId("payment.method.transfer"));
 		await fireEvent.press(screen.getByTestId("payment.save.button"));
 		await waitFor(() => {
+			expect(screen.getByTestId("payment.done.button")).toBeTruthy();
+		});
+		await fireEvent.press(screen.getByTestId("payment.done.button"));
+		await waitFor(() => {
 			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent(
 				"3.500,00 TL",
 			);
@@ -101,6 +105,10 @@ describe("Agreement detail (S11)", () => {
 		});
 		await fireEvent.changeText(screen.getByTestId("payment.amount.input"), "6500");
 		await fireEvent.press(screen.getByTestId("payment.save.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("payment.done.button")).toBeTruthy();
+		});
+		await fireEvent.press(screen.getByTestId("payment.done.button"));
 		await waitFor(() => {
 			expect(screen.getByText(tr.settled.title)).toBeTruthy();
 		});

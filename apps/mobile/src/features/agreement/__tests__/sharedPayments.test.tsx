@@ -54,6 +54,10 @@ describe("Payments on a shared agreement (F2-07)", () => {
 		});
 		await fireEvent.changeText(screen.getByTestId("payment.amount.input"), "2000");
 		await fireEvent.press(screen.getByTestId("payment.save.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("payment.done.button")).toBeTruthy();
+		});
+		await fireEvent.press(screen.getByTestId("payment.done.button"));
 
 		await waitFor(() => {
 			expect(screen.getByTestId("agreement.awaiting.text")).toHaveTextContent(

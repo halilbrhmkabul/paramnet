@@ -352,7 +352,10 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 		- Borçlarım/Alacaklarım ekranı (12): toplam, ilerleme çubuklu satırlar, kapananlar ayrı.
 		- Ana Sayfa (03): logo, bekleyen sayılı zil, selamlama, toplam kartları, amber bekleyenler bandı, hızlı işlem kutucukları, tarih kutulu vade satırları.
 		- `Avatar` bileşeni.
-	- [ ] Parça 2: anlaşma detayı, ödeme kaydı ve onayı, kısmi ödeme, ödeme kaydedildi (11, 13–15).
+	- [x] Parça 2:
+		- Anlaşma detayı (13, 15): üst kart (avatar, kalan / toplam, ilerleme, birincil eylem), "Anlaşma" bilgi satırları, kartlı taksit ve ödeme listeleri, kısa zaman çizelgesi.
+		- Ödeme ekranı (14): sıradaki taksit / kalanın tamamı kısayolları, "ödemeden sonra kalan".
+		- Sonuç görünümü (11): kaydedildi ya da onay bekleniyor, yeni kalan.
 	- [ ] Parça 3: oluşturma akışı, takvim, talepler, profil, giriş ekranları (01, 02, 04, 06, 16, 23–26, 31, 35).
 
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
