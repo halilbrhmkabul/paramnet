@@ -365,5 +365,44 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 		- Takvim (26) ve oluşturma formu (23–24) yalnızca yeni bileşenlerle güncellendi; tasarımdaki nakit projeksiyonu ve kredi/ekstre olayları kapsam dışı (ADR-043).
 	- **Kullanıcı kontrolü:** Expo Go'da açık ve koyu temada ekranlara bakılmalı; bu makinede Xcode olmadığı için görsel kontrol yapılamadı.
 
+## Faz 4 — Tasarımın tamamı, birebir (kullanıcı kararı, 2026-10-13)
+
+Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekranlar tasarımdaki gibi birebir; kapsam ADR-043'teki sınırlamadan çıkıp genişler (ADR-044). Her görevde ekran, `scratchpad/design` altında yerelde çizdirilen referans görüntüyle simülatörde yan yana karşılaştırılır.
+
+### [ ] F4-01 Birebir görsel temel
+- Tasarımdaki üst çubuk (44 px beyaz kenarlıklı ikon butonları, ortada 17/800 başlık) ve alt menü: Ana Sayfa · Kartlarım · İşlem (+) · Borçlarım · Takvim.
+- Talepler, Bildirimler'e (06) taşınır; zil buradan açılır.
+- Karşılama (01), Giriş (02), Onboarding (31) birebir.
+
+### [ ] F4-02 ParamNet ID, Profil (04), Profili düzenle (35), Ana menü (05), Bildirimler (06)
+
+### [ ] F4-03 Hesaplar ve işlemler
+- Hesaplar/cüzdan (29), Hesap ekle (33), İşlem merkezi (21), Gider/Gelir/Transfer (22), İşlem geçmişi (36), İşlem detayı (37).
+- Toplam Nakit.
+
+### [ ] F4-04 Tekrarlayan işlem (38), Bütçe (39), Aylık rapor (27)
+
+### [ ] F4-05 Kartlar
+- Kartlarım (07), Kart detayı ve ekstre (08), Kart ödemesi (09), Kart ekle (32), Ödeme kaydedildi (11).
+
+### [ ] F4-06 Banka kredileri: Kredi detayı (28), Kredi ekle (34)
+- **Açık karar:** banka kredisi taksit ve faiz hesabı CLAUDE.md "Faiz yok" kuralıyla çelişir. Kullanıcı kuralı değiştirmeden yapılmaz.
+
+### [ ] F4-07 Faiz simülasyonu (10)
+- **Açık karar:** aynı çelişki (F4-06).
+
+### [ ] F4-08 Borç talepleri ve teslim
+- Para iste (18), Talep önizleme (19), Talep gönderildi (20), Gelen talep (16), Para teslimi bekleniyor (17).
+- Borçlarım (12) ve detaylar (13, 15) birebir; kısmi ödeme (14).
+
+### [ ] F4-09 Elden taksit birebir: oluştur (23), önizleme (24), detay (25)
+
+### [ ] F4-10 Takvim (26) ve Ana Sayfa (03) tüm modüllerle birebir
+
+### [ ] F4-11 Hesap bölme: oluştur (40), kişi ekle/QR/link (41), ortak hesap (42), davet edilen kişinin ekranı (43)
+
+### [ ] F4-12 Faz 4 kapısı
+- Her ekranın referansla karşılaştırması, açık ve koyu tema, testler.
+
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
 ### [ ] F3-09 Faz 3 kapısı: mağaza yayını
