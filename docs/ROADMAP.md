@@ -370,6 +370,7 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekranlar tasarımdaki gibi birebir; kapsam ADR-043'teki sınırlamadan çıkıp genişler (ADR-044). Her görevde ekran, `scratchpad/design` altında yerelde çizdirilen referans görüntüyle simülatörde yan yana karşılaştırılır.
 
 ### [ ] F4-01 Birebir görsel temel
+- **İlerleme (2026-10-13):** [x] F4-01a: tasarımdaki alt menü (`AppTabBar`), üst çubuk (`TopBar`, tüm itilen ekranlarda), Kartlarım sekmesi (boş durum), Bildirimler ekranı (eski Talepler), mock modda hazır oturum ayarı. [ ] F4-01b: karşılama, onboarding, giriş + PIN.
 - Tasarımdaki üst çubuk (44 px beyaz kenarlıklı ikon butonları, ortada 17/800 başlık) ve alt menü: Ana Sayfa · Kartlarım · İşlem (+) · Borçlarım · Takvim.
 - Talepler, Bildirimler'e (06) taşınır; zil buradan açılır.
 - Karşılama (01), Giriş (02), Onboarding (31) birebir.

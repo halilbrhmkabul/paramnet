@@ -8,11 +8,19 @@ export const MOCK_OTP_CODE = "123456";
 const OTP_TTL_MS = 3 * 60 * 1000;
 const RESEND_AFTER_S = 60;
 
-export type MockAuthOptions = { now?: () => Date; latencyMs?: number };
+// signedIn: the prototype starts with a demo account (design QA in the simulator, F4-01).
+export type MockAuthOptions = { now?: () => Date; latencyMs?: number; signedIn?: boolean };
+
+export const DEMO_USER: AuthUser = {
+	id: "u-demo",
+	phone_e164: "+905550000001",
+	display_name: "Deniz Yılmaz",
+};
 
 export function createMockAuthApi({
 	now = () => new Date(),
 	latencyMs = 300,
+	signedIn = false,
 }: MockAuthOptions = {}): AuthApi {
 	const sentAt = new Map<string, number>();
 	const users = new Map<string, AuthUser>();
@@ -93,7 +101,11 @@ export function createMockAuthApi({
 
 		// The prototype keeps nothing between launches (ADR-016).
 		restore() {
-			return Promise.resolve(null);
+			if (signedIn) {
+				current = DEMO_USER;
+				users.set(DEMO_USER.phone_e164, DEMO_USER);
+			}
+			return Promise.resolve(current === null ? null : { ...current });
 		},
 
 		// The prototype sends no pushes.

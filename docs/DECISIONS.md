@@ -473,3 +473,15 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Kişisel finans modülleri, ParamNet ID, borç talebi ve teslim onayı, hesap bölme Faz 4'te görev görev eklenir. Her modül kendi şeması, RPC'leri, pgTAP testleri ve ekranlarıyla gelir; spec'teki ilgili bölüm o görevde güncellenir.
 	- Spec ve CLAUDE.md'deki "Faiz yok" kesin kuralı banka kredisi (28, 34) ve faiz simülasyonu (10) ekranlarıyla çelişir. Bu iki görev, kullanıcı kuralı açıkça değiştirmeden başlamaz.
 	- Görsel doğrulama: tasarım dosyaları kendi çalışma zamanıyla yerelde çizdirilir ve simülatördeki ekranla karşılaştırılır. Koyu tema tasarımda yok; açık tema birebir, koyu tema aynı tonlardan türetilir (ADR-043).
+
+## ADR-045 — Faiz kuralı daraltıldı
+- **Tarih:** 2026-10-13
+- **Karar (kullanıcı):** "Faiz yok" kuralı kişiler arası borç ve taksit anlaşmaları için geçerli kalır. Kullanıcının kendi banka kredisi (tasarım 28, 34) ve kredi kartı faiz simülasyonu (10) için faiz yalnızca hesaplama ve gösterim amacıyla kullanılır; bu hesaplar bir anlaşmaya, bakiyeye ya da karşı tarafa yansımaz. CLAUDE.md güncellendi. Spec 12'deki "Kişiler arası faizli borç kaydı ve hesaplaması sunulmaz" maddesi aynen geçerli.
+
+## ADR-046 — 6 haneli PIN ile giriş
+- **Tarih:** 2026-10-13
+- **Karar (kullanıcı):** Tasarım 02'deki "6 haneli şifre" gerçek bir PIN'dir.
+	- Kayıtta numara SMS koduyla doğrulanır, ardından kullanıcı 6 haneli PIN belirler (Supabase Auth telefon + parola; parola GoTrue'da hash'li tutulur).
+	- Sonraki girişler telefon + PIN ile yapılır. "Şifremi unuttum" SMS koduyla yeni PIN belirletir. Yüz tanıma, PIN'in yerine cihazda kilit açma kolaylığıdır.
+	- 6 haneli PIN çevrimiçi denemeye karşı zayıftır; GoTrue'nun giriş hız sınırları ve uygulama tarafında art arda hatalı denemede bekleme uygulanır (F4-01b ayrıntıları).
+- **Not:** F4-01a'da yalnızca mock modda, geliştirme kolaylığı olarak `EXPO_PUBLIC_MOCK_SIGNED_IN=1` ile hazır oturum açılır; gerçek moda etkisi yoktur.

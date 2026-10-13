@@ -10,6 +10,7 @@ export const tr = {
 		cancel: "Vazgeç",
 		continue: "Devam",
 		close: "Kapat",
+		back: "Geri",
 		edit: "Düzenle",
 		seeAll: "Tümünü gör",
 		saved: "Kaydedildi",
@@ -18,6 +19,9 @@ export const tr = {
 		home: "Ana Sayfa",
 		contacts: "Kişiler",
 		debts: "Borçlarım",
+		cards: "Kartlarım",
+		action: "İşlem",
+		notifications: "Bildirimler",
 		new: "Yeni kayıt",
 		calendar: "Takvim",
 		requests: "Talepler",
@@ -101,6 +105,12 @@ export const tr = {
 	brand: {
 		first: "Param",
 		second: "net",
+	},
+	cards: {
+		title: "Kartlarım",
+		emptyTitle: "Henüz kart eklemedin",
+		emptyBody: "Ekstre ve son ödeme tarihlerini takip etmek için kartını ekle.",
+		add: "Kart ekle",
 	},
 	debts: {
 		title: "Borç & Alacak",
