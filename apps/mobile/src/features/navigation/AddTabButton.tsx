@@ -6,7 +6,7 @@ import { tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
 
 export function AddTabButton() {
-	const { colors, sizes } = useAppTheme();
+	const { colors } = useAppTheme();
 	return (
 		<View style={styles.slot}>
 			<Pressable
@@ -19,15 +19,16 @@ export function AddTabButton() {
 				style={({ pressed }) => [
 					styles.button,
 					{
-						width: sizes.buttonPrimary,
-						height: sizes.buttonPrimary,
-						borderRadius: sizes.buttonPrimary / 2,
+						// Design "İşlem" FAB: a rounded square in the tab bar.
+						width: 52,
+						height: 40,
+						borderRadius: 13,
 						backgroundColor: colors.primary,
 						opacity: pressed ? 0.85 : 1,
 					},
 				]}
 			>
-				<Ionicons name="add" size={28} color={colors.onPrimary} />
+				<Ionicons name="add" size={24} color={colors.onPrimary} />
 			</Pressable>
 		</View>
 	);

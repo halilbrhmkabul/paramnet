@@ -11,7 +11,7 @@ export type CheckboxProps = {
 };
 
 export function Checkbox({ label, checked, onChange, testID }: CheckboxProps) {
-	const { colors, typography, radius, spacing, sizes } = useAppTheme();
+	const { colors, typography, spacing, sizes } = useAppTheme();
 	return (
 		<Pressable
 			testID={testID}
@@ -27,8 +27,8 @@ export function Checkbox({ label, checked, onChange, testID }: CheckboxProps) {
 				style={[
 					styles.box,
 					{
-						borderRadius: radius.sm / 2,
-						borderColor: checked ? colors.primary : colors.border,
+						borderRadius: 7,
+						borderColor: checked ? colors.primary : colors.borderStrong,
 						backgroundColor: checked ? colors.primary : "transparent",
 					},
 				]}

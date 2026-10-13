@@ -38,14 +38,15 @@ export function TextField({
 	const { colors, typography, radius, spacing, sizes } = useAppTheme();
 	return (
 		<View style={{ gap: spacing.xs }}>
-			<Text style={[typography.callout, { color: colors.textMuted }]}>{label}</Text>
+			<Text style={[typography.label, { color: colors.textMuted }]}>{label}</Text>
 			<View
 				style={[
 					styles.field,
 					{
-						minHeight: multiline === true ? sizes.minTouch * 2 : sizes.minTouch,
+						minHeight:
+							multiline === true ? sizes.buttonPrimary * 2 : sizes.buttonPrimary,
 						borderRadius: radius.sm,
-						borderColor: error === undefined ? colors.border : colors.overdue,
+						borderColor: error === undefined ? colors.borderStrong : colors.overdue,
 						backgroundColor: colors.surface,
 						paddingHorizontal: spacing.md,
 						gap: spacing.sm,

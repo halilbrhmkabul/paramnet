@@ -323,5 +323,28 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 		- inceleme için üretimde test OTP numarası;
 		- `example.com` yer tutucularının gerçek adreslerle değiştirilmesi.
 	- aso-skills bu ortamda yok; metinler Expo `eas-app-stores` rehberine göre yazıldı.
+### [x] F3-10 Tasarım sistemi: "Orman Defteri" (kullanıcının tasarım kanvası)
+- **Not (2026-10-13):**
+	- Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: görsel dil ve kapsamdaki ekranlar uygulanır; kapsam dışı modüller BACKLOG'da (ADR-043).
+	- Token'lar: tasarımın açık paleti, aynı tonlardan türetilmiş koyu palet. Her iki temada 15 metin/zemin çifti WCAG AA ile testli.
+	- Manrope 500–800 ve IBM Plex Mono (`@expo-google-fonts`); açılış ekranı fontlar yüklenene kadar kalıyor.
+	- Bileşenler: kart (kenarlıklı, 20), rozet (yumuşak zeminli hap), buton (54; ikincil ve yıkıcı çerçeveli), giriş alanları (54, 14), segment, ilerleme çubuğu, liste satırı. Sekme çubuğu (etkin sekme hapı, yuvarlak köşeli + butonu).
+	- Açılış ve Android ikon arka planı marka renginde. `design-tokens.md` yeniden yazıldı.
+
+### [ ] F3-11 Ekran düzenleri (tasarıma göre)
+- Sekmeler: Ana · Borçlarım · (+) · Talepler · Takvim (kullanıcı kararı; Kişiler, Borçlarım içinden).
+- Tasarımdaki karşılıklar:
+	- Ana Sayfa (03);
+	- Borçlarım/Alacaklarım (12);
+	- Borç/Alacak detayı ve ödeme onayı (13, 15);
+	- Kısmi ödeme (14) ve ödeme kaydedildi (11);
+	- Gelen talep (16);
+	- Elden taksit oluştur, plan önizleme ve taksit detayı (23–25);
+	- Takvim (26);
+	- Bildirimler (06);
+	- Profil ve profili düzenle (04, 35);
+	- Hoş geldin, giriş ve onboarding (01, 02, 31).
+- Kapsam içi ama veri modelinde olmayanlar (ParamNet ID, "para teslimi bekleniyor", "para iste") uygulanmaz; tasarımdaki yerleri spec'teki akışla doldurulur.
+
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
 ### [ ] F3-09 Faz 3 kapısı: mağaza yayını

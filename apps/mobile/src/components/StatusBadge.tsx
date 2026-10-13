@@ -2,48 +2,53 @@ import type { AgreementStatus, InstallmentStatus } from "@paramnet/shared";
 import { StyleSheet, Text, View } from "react-native";
 
 import { tr } from "@/i18n/tr";
-import type { ColorToken } from "@/theme/tokens";
 import { useAppTheme } from "@/theme/useAppTheme";
 
-const AGREEMENT_TONE: Record<AgreementStatus, ColorToken> = {
-	personal: "textMuted",
+// Design system "Durum rozetleri": approved green, request/info blue, upcoming amber, overdue red.
+export type BadgeTone = "success" | "pending" | "warning" | "overdue" | "neutral" | "primary";
+
+const TONE_COLORS = {
+	success: ["success", "successSoft"],
+	pending: ["pending", "pendingSoft"],
+	warning: ["warning", "warningSoft"],
+	overdue: ["overdue", "overdueSoft"],
+	neutral: ["neutral", "neutralSoft"],
+	primary: ["primary", "primarySoft"],
+} as const;
+
+const AGREEMENT_TONE: Record<AgreementStatus, BadgeTone> = {
+	personal: "neutral",
 	pending: "pending",
-	countered: "warning",
-	active: "primary",
+	countered: "pending",
+	active: "success",
 	amendment_pending: "warning",
-	disputed: "warning",
-	rejected: "textMuted",
+	disputed: "overdue",
+	rejected: "neutral",
 	settled: "success",
-	cancelled: "textMuted",
+	cancelled: "neutral",
 };
 
-const INSTALLMENT_TONE: Record<InstallmentStatus, ColorToken> = {
-	upcoming: "textMuted",
+const INSTALLMENT_TONE: Record<InstallmentStatus, BadgeTone> = {
+	upcoming: "neutral",
 	due_today: "warning",
 	overdue: "overdue",
 	paid: "success",
 };
 
-type BadgeProps = { label: string; tone: ColorToken; testID?: string };
+type BadgeProps = { label: string; tone: BadgeTone; testID?: string };
 
 // Colour never carries meaning alone: the label is always shown.
 export function Badge({ label, tone, testID }: BadgeProps) {
-	const { colors, typography, radius, spacing, sizes } = useAppTheme();
+	const { colors, typography, radius, sizes } = useAppTheme();
+	const [fg, bg] = TONE_COLORS[tone];
 	return (
 		<View
 			testID={testID}
-			style={[
-				styles.badge,
-				{
-					borderColor: colors[tone],
-					borderRadius: radius.sm,
-					paddingHorizontal: spacing.sm,
-				},
-			]}
+			style={[styles.badge, { backgroundColor: colors[bg], borderRadius: radius.pill }]}
 		>
 			<Text
 				maxFontSizeMultiplier={sizes.maxAmountFontScale}
-				style={[typography.micro, { color: colors[tone] }]}
+				style={[typography.badge, { color: colors[fg] }]}
 			>
 				{label}
 			</Text>
@@ -81,7 +86,9 @@ export function InstallmentStatusBadge({
 const styles = StyleSheet.create({
 	badge: {
 		alignSelf: "flex-start",
-		borderWidth: 1,
-		paddingVertical: 2,
+		minHeight: 24,
+		justifyContent: "center",
+		paddingHorizontal: 9,
+		paddingVertical: 3,
 	},
 });

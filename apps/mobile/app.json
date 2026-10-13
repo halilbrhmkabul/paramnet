@@ -18,7 +18,7 @@
 		"android": {
 			"package": "com.paramnet.app",
 			"adaptiveIcon": {
-				"backgroundColor": "#E6F4FE",
+				"backgroundColor": "#0F3A2E",
 				"foregroundImage": "./assets/images/android-icon-foreground.png",
 				"backgroundImage": "./assets/images/android-icon-background.png",
 				"monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -31,9 +31,12 @@
 			[
 				"expo-splash-screen",
 				{
-					"backgroundColor": "#208AEF",
+					"backgroundColor": "#F5F7F4",
 					"image": "./assets/images/splash-icon.png",
-					"imageWidth": 76
+					"imageWidth": 76,
+					"dark": {
+						"backgroundColor": "#0D1411"
+					}
 				}
 			],
 			"expo-font",
