@@ -466,3 +466,10 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Koyu tema tasarımda yok; spec ve mobil skill'i gereği aynı tonlardan türetildi ve kontrastı testle doğrulandı.
 	- Sekmeler: Ana · Borçlarım · (+) · Talepler · Takvim (F3-11). Kişiler ayrı sekme olmaktan çıkar.
 	- Marka ikonu ve açılış görseli tasarımdaki logodan üretilecek (1024 px PNG); şimdilik yalnızca arka plan renkleri markada.
+
+## ADR-044 — Kapsam genişlemesi: tasarımın tamamı (Faz 4)
+- **Tarih:** 2026-10-13
+- **Karar:** Kullanıcı, tasarım kanvasındaki tüm ekranların birebir uygulanmasını istedi. ADR-043'teki kapsam sınırlaması kaldırıldı.
+	- Kişisel finans modülleri, ParamNet ID, borç talebi ve teslim onayı, hesap bölme Faz 4'te görev görev eklenir. Her modül kendi şeması, RPC'leri, pgTAP testleri ve ekranlarıyla gelir; spec'teki ilgili bölüm o görevde güncellenir.
+	- Spec ve CLAUDE.md'deki "Faiz yok" kesin kuralı banka kredisi (28, 34) ve faiz simülasyonu (10) ekranlarıyla çelişir. Bu iki görev, kullanıcı kuralı açıkça değiştirmeden başlamaz.
+	- Görsel doğrulama: tasarım dosyaları kendi çalışma zamanıyla yerelde çizdirilir ve simülatördeki ekranla karşılaştırılır. Koyu tema tasarımda yok; açık tema birebir, koyu tema aynı tonlardan türetilir (ADR-043).
