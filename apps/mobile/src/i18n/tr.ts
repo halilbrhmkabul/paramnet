@@ -43,6 +43,8 @@ export const tr = {
 			},
 		],
 		cardPosition: "{current} / {total}",
+		disclaimer:
+			"Paramnet para tutmaz ve transfer yapmaz; kayıtlarını düzenler, hatırlatır ve iki tarafa aynı rakamı gösterir.",
 	},
 	phone: {
 		title: "Telefon numaran",
@@ -52,6 +54,7 @@ export const tr = {
 		placeholder: "5XX XXX XX XX",
 		errorInvalid: "Bu bir Türkiye cep numarası gibi görünmüyor.",
 		legal: "Devam ederek Kullanım Koşulları'nı kabul etmiş ve KVKK Aydınlatma Metni'ni okumuş olursun.",
+		trustNote: "Banka şifreni ya da kart bilgini hiçbir zaman istemeyiz.",
 	},
 	otp: {
 		title: "Kodu gir",
@@ -443,6 +446,9 @@ export const tr = {
 		countered: "{name} düzeltme önerdi",
 		emptyTitle: "Bekleyen talep yok",
 		emptyBody: "Bir planı paylaştığında onaylar ve ödeme bildirimleri burada görünür.",
+		actionAnswer: "Yanıtla",
+		actionConfirm: "Onayla",
+		actionReview: "İncele",
 	},
 	invitePreview: {
 		before: "Doğrulamadan önce",
@@ -464,6 +470,7 @@ export const tr = {
 		totalChanged: "Toplam değişiyor (şu an {amount}).",
 	},
 	decide: {
+		noMoneyMoves: "Onaylamak para göndermez; planı ikiniz için aynı şekilde kayda geçirir.",
 		counterTitle: "{name} bir düzeltme önerdi",
 		amendmentTitle: "{name} planda değişiklik önerdi",
 		reason: "Gerekçe",

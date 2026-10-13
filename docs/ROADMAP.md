@@ -331,7 +331,7 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 	- Bileşenler: kart (kenarlıklı, 20), rozet (yumuşak zeminli hap), buton (54; ikincil ve yıkıcı çerçeveli), giriş alanları (54, 14), segment, ilerleme çubuğu, liste satırı. Sekme çubuğu (etkin sekme hapı, yuvarlak köşeli + butonu).
 	- Açılış ve Android ikon arka planı marka renginde. `design-tokens.md` yeniden yazıldı.
 
-### [ ] F3-11 Ekran düzenleri (tasarıma göre)
+### [x] F3-11 Ekran düzenleri (tasarıma göre)
 - Sekmeler: Ana · Borçlarım · (+) · Talepler · Takvim (kullanıcı kararı; Kişiler, Borçlarım içinden).
 - Tasarımdaki karşılıklar:
 	- Ana Sayfa (03);
@@ -356,7 +356,14 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 		- Anlaşma detayı (13, 15): üst kart (avatar, kalan / toplam, ilerleme, birincil eylem), "Anlaşma" bilgi satırları, kartlı taksit ve ödeme listeleri, kısa zaman çizelgesi.
 		- Ödeme ekranı (14): sıradaki taksit / kalanın tamamı kısayolları, "ödemeden sonra kalan".
 		- Sonuç görünümü (11): kaydedildi ya da onay bekleniyor, yeni kalan.
-	- [ ] Parça 3: oluşturma akışı, takvim, talepler, profil, giriş ekranları (01, 02, 04, 06, 16, 23–26, 31, 35).
+	- [x] Parça 3:
+		- Karşılama (01, 31): logo, simgeli tanıtım kartları, nokta göstergesi, "para tutmaz, transfer yapmaz" notu.
+		- Telefon girişi (02): banka şifresi istenmez güven notu.
+		- Talepler (06): avatarlı, eylem rozetli ("Yanıtla / Onayla / İncele") satırlar.
+		- Karar ekranı (16): avatar, büyük tutar, "onaylamak para göndermez" kutusu.
+		- Profil (04): avatarlı başlık.
+		- Takvim (26) ve oluşturma formu (23–24) yalnızca yeni bileşenlerle güncellendi; tasarımdaki nakit projeksiyonu ve kredi/ekstre olayları kapsam dışı (ADR-043).
+	- **Kullanıcı kontrolü:** Expo Go'da açık ve koyu temada ekranlara bakılmalı; bu makinede Xcode olmadığı için görsel kontrol yapılamadı.
 
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
 ### [ ] F3-09 Faz 3 kapısı: mağaza yayını

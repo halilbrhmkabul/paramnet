@@ -1,8 +1,9 @@
+import { Ionicons } from "@expo/vector-icons";
 import { normalizePhoneTR } from "@paramnet/shared";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { formatPhoneDigits, phoneDigits } from "./phoneInput";
 import { useSession } from "./sessionStore";
@@ -78,6 +79,17 @@ export function PhoneScreen() {
 				testID="phone.number.input"
 			/>
 			<Text style={[typography.caption, { color: colors.textMuted }]}>{tr.phone.legal}</Text>
+			<View style={[styles.trust, { backgroundColor: colors.successSoft }]}>
+				<Ionicons name="shield-checkmark-outline" size={18} color={colors.success} />
+				<Text style={[typography.caption, styles.trustText, { color: colors.success }]}>
+					{tr.phone.trustNote}
+				</Text>
+			</View>
 		</Screen>
 	);
 }
+
+const styles = StyleSheet.create({
+	trust: { flexDirection: "row", alignItems: "center", gap: 8, borderRadius: 14, padding: 12 },
+	trustText: { flex: 1 },
+});

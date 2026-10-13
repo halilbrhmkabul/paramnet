@@ -6,6 +6,7 @@ import { useAppTheme } from "@/theme/useAppTheme";
 export type ListItemProps = {
 	title: string;
 	subtitle?: string;
+	left?: ReactNode;
 	right?: ReactNode;
 	onPress?: () => void;
 	accessibilityLabel?: string;
@@ -15,6 +16,7 @@ export type ListItemProps = {
 export function ListItem({
 	title,
 	subtitle,
+	left,
 	right,
 	onPress,
 	accessibilityLabel,
@@ -23,6 +25,7 @@ export function ListItem({
 	const { colors, typography, spacing } = useAppTheme();
 	const content = (
 		<>
+			{left}
 			<View style={styles.text}>
 				<Text style={[typography.rowTitle, { color: colors.text }]} numberOfLines={1}>
 					{title}

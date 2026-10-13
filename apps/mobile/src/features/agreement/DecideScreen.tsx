@@ -1,4 +1,5 @@
 import { formatDateTR, formatTRY, validatePlan } from "@paramnet/shared";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -8,6 +9,7 @@ import { useDecide, usePendingDecision, useWithdrawShare } from "@/api/hooks";
 import type { Decision, PendingDecision, TermsView } from "@/api/types";
 import { AmountInput } from "@/components/AmountInput";
 import { AmountText } from "@/components/AmountText";
+import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { DateField } from "@/components/DateField";
@@ -188,6 +190,9 @@ function DecisionView({ pending }: { pending: PendingDecision }) {
 
 	return (
 		<Screen testID="decide.screen" edges={["bottom"]}>
+			<View style={[styles.hero, { gap: spacing.sm }]}>
+				<Avatar name={name === "" ? pending.title : name} size={72} />
+			</View>
 			<ScreenTitle>
 				{pending.actor === "creator"
 					? fill(tr.decide.counterTitle, { name })
@@ -204,6 +209,18 @@ function DecisionView({ pending }: { pending: PendingDecision }) {
 				</Card>
 			)}
 			<Text style={[typography.headline, { color: colors.text }]}>{pending.title}</Text>
+			<AmountText
+				minor={pending.proposed.principal_minor}
+				variant="amountXL"
+				tone="primary"
+				testID="decide.amount"
+			/>
+			<View style={[styles.info, { backgroundColor: colors.pendingSoft, gap: spacing.sm }]}>
+				<Ionicons name="information-circle-outline" size={18} color={colors.pending} />
+				<Text style={[typography.caption, styles.infoText, { color: colors.pending }]}>
+					{tr.decide.noMoneyMoves}
+				</Text>
+			</View>
 			<Text testID="decide.role" style={[typography.callout, { color: colors.textMuted }]}>
 				{pending.my_role === "debtor" ? tr.agreement.youOwe : tr.agreement.owesYou}
 			</Text>
@@ -353,6 +370,9 @@ export function DecideScreen() {
 }
 
 const styles = StyleSheet.create({
+	hero: { alignItems: "center", paddingTop: 8 },
+	info: { flexDirection: "row", alignItems: "flex-start", borderRadius: 14, padding: 12 },
+	infoText: { flex: 1 },
 	row: {
 		flexDirection: "row",
 		justifyContent: "space-between",

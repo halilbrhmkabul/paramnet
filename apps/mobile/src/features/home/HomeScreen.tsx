@@ -7,6 +7,7 @@ import { useDashboard } from "@/api/hooks";
 import type { Dashboard, DueItem } from "@/api/types";
 import { AmountText } from "@/components/AmountText";
 import { Avatar } from "@/components/Avatar";
+import { Brand } from "@/components/Brand";
 import { Card } from "@/components/Card";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
@@ -49,23 +50,6 @@ const TEMPLATES: {
 		tone: ["warning", "warningSoft"],
 	},
 ];
-
-function Brand() {
-	const { colors, fonts } = useAppTheme();
-	return (
-		<View testID="home.brand" style={styles.brand} accessibilityRole="header">
-			<View style={[styles.mark, { backgroundColor: colors.primary }]}>
-				<Ionicons name="leaf-outline" size={15} color={colors.onPrimary} />
-			</View>
-			<Text style={{ fontFamily: fonts.extrabold, fontSize: 18, color: colors.primary }}>
-				{tr.brand.first}
-				<Text style={{ fontFamily: fonts.medium, color: colors.accent }}>
-					{tr.brand.second}
-				</Text>
-			</Text>
-		</View>
-	);
-}
 
 // Design 03: the bell carries what waits for me; Talepler is where it is answered.
 function NotificationsButton({ count }: { count: number }) {
@@ -376,7 +360,7 @@ export function HomeScreen() {
 			}
 		>
 			<View style={styles.between}>
-				<Brand />
+				<Brand testID="home.brand" />
 				<NotificationsButton count={dashboard.data?.pending_count ?? 0} />
 			</View>
 			<Greeting />
