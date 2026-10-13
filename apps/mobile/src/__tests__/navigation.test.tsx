@@ -9,7 +9,7 @@ describe("navigation (signed in)", () => {
 		signInForTest();
 	});
 
-	it("opens on the home tab and switches between the four tabs", async () => {
+	it("opens on the home tab and switches between the tabs (design .nav)", async () => {
 		await renderRouter(appRoutes, { initialUrl: "/" });
 		expect(screen.getByTestId("home.screen")).toBeTruthy();
 
@@ -19,8 +19,8 @@ describe("navigation (signed in)", () => {
 		await fireEvent.press(screen.getByTestId("tabs.calendar"));
 		expect(screen.getByTestId("calendar.screen")).toBeTruthy();
 
-		await fireEvent.press(screen.getByTestId("tabs.requests"));
-		expect(screen.getByTestId("requests.screen")).toBeTruthy();
+		await fireEvent.press(screen.getByTestId("tabs.cards"));
+		expect(screen.getByTestId("cards.screen")).toBeTruthy();
 	});
 
 	it("the centre + button opens the new-record modal", async () => {

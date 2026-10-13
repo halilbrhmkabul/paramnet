@@ -12,6 +12,7 @@ import { useEffect, useRef } from "react";
 
 import { ApiProvider, useAuthApi } from "@/api/ApiProvider";
 import { useTrack } from "@/api/hooks";
+import { TopBar } from "@/components/TopBar";
 import { useIsSignedIn, useSession } from "@/features/auth/sessionStore";
 import { registerDevice } from "@/features/push/device";
 import { tr } from "@/i18n/tr";
@@ -20,7 +21,30 @@ import { configureForegroundNotifications, onNotificationOpened } from "@/lib/no
 import { initSentry } from "@/lib/sentry";
 import { useAppTheme } from "@/theme/useAppTheme";
 
-const detailHeader = { headerShown: true, title: "", headerShadowVisible: false };
+type HeaderProps = {
+	navigation: { goBack: () => void };
+	options: { title?: string; presentation?: string };
+	back?: unknown;
+};
+
+// Design ".top" for every pushed screen: back (or close on a modal) and a centred title.
+const detailHeader = {
+	headerShown: true,
+	title: "",
+	header: ({ navigation, options, back }: HeaderProps) => (
+		<TopBar
+			title={typeof options.title === "string" ? options.title : ""}
+			close={options.presentation === "modal"}
+			onBack={
+				back === undefined
+					? undefined
+					: () => {
+							navigation.goBack();
+						}
+			}
+		/>
+	),
+};
 
 initSentry();
 
@@ -124,6 +148,10 @@ function AppNavigator() {
 					options={{ ...detailHeader, presentation: "modal" }}
 				/>
 				<Stack.Screen name="agreement/[id]/invite-preview" options={detailHeader} />
+				<Stack.Screen
+					name="requests"
+					options={{ ...detailHeader, title: tr.tabs.notifications }}
+				/>
 				<Stack.Screen
 					name="contacts"
 					options={{ ...detailHeader, title: tr.tabs.contacts }}

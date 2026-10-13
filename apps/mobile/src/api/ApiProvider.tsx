@@ -26,7 +26,7 @@ export function createAuthApi(): AuthApi {
 	const config = readConfig();
 	return config.mode === "supabase"
 		? createSupabaseAuthApi(getSupabase(config.supabaseUrl, config.supabaseKey))
-		: createMockAuthApi();
+		: createMockAuthApi({ signedIn: process.env.EXPO_PUBLIC_MOCK_SIGNED_IN === "1" });
 }
 
 export function createQueryClient(): QueryClient {

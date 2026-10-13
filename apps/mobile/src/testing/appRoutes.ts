@@ -11,7 +11,8 @@ import Calendar from "../../app/(tabs)/calendar";
 import Contacts from "../../app/contacts";
 import Debts from "../../app/(tabs)/debts";
 import Home from "../../app/(tabs)/index";
-import Requests from "../../app/(tabs)/requests";
+import Requests from "../../app/requests";
+import Cards from "../../app/(tabs)/cards";
 import Index from "../../app/index";
 import Invite from "../../app/invite/[token]";
 import AgreementAmend from "../../app/agreement/[id]/amend";
@@ -47,7 +48,8 @@ export const appRoutes = {
 	contacts: Contacts,
 	"(tabs)/add": Add,
 	"(tabs)/calendar": Calendar,
-	"(tabs)/requests": Requests,
+	requests: Requests,
+	"(tabs)/cards": Cards,
 	"new/_layout": NewLayout,
 	"new/index": NewIndex,
 	"new/form": NewForm,

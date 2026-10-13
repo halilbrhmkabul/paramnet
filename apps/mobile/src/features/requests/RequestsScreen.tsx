@@ -11,7 +11,6 @@ import { ErrorState } from "@/components/ErrorState";
 import { ListItem } from "@/components/ListItem";
 import { LoadingState } from "@/components/LoadingState";
 import { Screen } from "@/components/Screen";
-import { ScreenTitle } from "@/components/ScreenTitle";
 import { SectionHeader } from "@/components/SectionHeader";
 import { Badge, type BadgeTone } from "@/components/StatusBadge";
 import type { RequestItem } from "@/api/types";
@@ -44,6 +43,7 @@ export function RequestsScreen() {
 	return (
 		<Screen
 			testID="requests.screen"
+			edges={["bottom"]}
 			refreshControl={
 				<RefreshControl
 					refreshing={requests.isRefetching}
@@ -53,7 +53,6 @@ export function RequestsScreen() {
 				/>
 			}
 		>
-			<ScreenTitle>{tr.tabs.requests}</ScreenTitle>
 			{requests.isPending ? (
 				<LoadingState testID="requests.loading" />
 			) : requests.isError ? (

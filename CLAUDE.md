@@ -49,7 +49,7 @@ Faz sonundaki "Faz kapısı" görevi tamamlanmadan sonraki faza başlanmaz.
 - **Versiyon:** Onaylar `version` + `terms_hash` ile verilir. Kabul edilmiş anlaşma tek taraflı değişmez.
 - **Değiştirilemez geçmiş:** `agreement_versions` ve `agreement_events` yalnızca eklenir.
 - **Tarih/saat:** Vade tarihleri `date`, olaylar `timestamptz`. Saat dilimi `Europe/Istanbul`.
-- **Faiz yok, para hareketi yok:** Uygulama faiz hesaplamaz, para tutmaz, transfer başlatmaz.
+- **Kişiler arası borçta faiz yok, para hareketi yok:** Kişiler arası borç ve taksit anlaşmalarında faiz kaydı ve hesaplaması yoktur. Kullanıcının kendi banka kredisi ve kredi kartı için faiz yalnızca hesaplama ve gösterim (simülasyon) amacıyla kullanılabilir (ADR-045). Uygulama para tutmaz, transfer başlatmaz.
 - **Kişisel veri:** Loglarda ve analitik olaylarında telefon, ad, not, tutar (aralık hariç) yok.
 
 ## Kod stili
