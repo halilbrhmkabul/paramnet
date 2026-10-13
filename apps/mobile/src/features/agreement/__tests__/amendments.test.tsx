@@ -29,7 +29,7 @@ describe("Amendments (S15, F2-08)", () => {
 		await waitFor(() => {
 			expect(screen.getByTestId("amend.row.3")).toBeTruthy();
 		});
-		expect(screen.getByTestId("amend.total.text")).toHaveTextContent("6.000,00 TL");
+		expect(screen.getByTestId("amend.total.text")).toHaveTextContent("₺6.000,00");
 
 		await fireEvent.press(screen.getByTestId("amend.addRow.button"));
 		expect(screen.getByTestId("amend.error")).toHaveTextContent(tr.form.nonPositiveInstallment);
@@ -38,7 +38,7 @@ describe("Amendments (S15, F2-08)", () => {
 		// 3 rows of 2.000 → 2.000 / 2.000 / 1.000 / 1.000 (same total, one more month).
 		await fireEvent.changeText(screen.getByTestId("amend.row.3.amount"), "1000");
 		await fireEvent.changeText(screen.getByTestId("amend.row.4.amount"), "1000");
-		expect(screen.getByTestId("amend.total.text")).toHaveTextContent("6.000,00 TL");
+		expect(screen.getByTestId("amend.total.text")).toHaveTextContent("₺6.000,00");
 		expect(screen.queryByTestId("amend.totalChanged")).toBeNull();
 		await fireEvent.changeText(
 			screen.getByTestId("amend.reason.input"),
@@ -56,7 +56,7 @@ describe("Amendments (S15, F2-08)", () => {
 		);
 		// Old terms remain: payments are still possible.
 		expect(screen.getByTestId("agreement.primaryAction.button")).toHaveTextContent(
-			tr.payment.made,
+			tr.agreement.payFull,
 		);
 
 		await fireEvent.press(screen.getByTestId("agreement.withdrawAmendment.button"));
@@ -74,9 +74,9 @@ describe("Amendments (S15, F2-08)", () => {
 			expect(screen.getByTestId("amend.row.1")).toBeTruthy();
 		});
 		await fireEvent.changeText(screen.getByTestId("amend.row.1.amount"), "1500");
-		expect(screen.getByTestId("amend.total.text")).toHaveTextContent("5.500,00 TL");
+		expect(screen.getByTestId("amend.total.text")).toHaveTextContent("₺5.500,00");
 		expect(screen.getByTestId("amend.totalChanged")).toHaveTextContent(
-			fill(tr.amend.totalChanged, { amount: "6.000,00 TL" }),
+			fill(tr.amend.totalChanged, { amount: "₺6.000,00" }),
 		);
 	});
 

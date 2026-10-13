@@ -16,7 +16,7 @@ async function openCalendar() {
 	});
 }
 
-describe("Calendar (S18)", () => {
+describe("Calendar (S18, design 26)", () => {
 	it("shows the current month with Monday-first weeks and marks due days", async () => {
 		await openCalendar();
 		expect(screen.getByTestId("calendar.month.text")).toHaveTextContent("Ekim 2026");
@@ -39,11 +39,15 @@ describe("Calendar (S18)", () => {
 	it("lists today's items by default and another day after selecting it", async () => {
 		await openCalendar();
 		const today = screen.getByTestId("calendar.dayList");
-		expect(within(today).getByText("Yıldız Mobilya · Mobilya")).toBeTruthy();
+		expect(within(today).getByText("11 Ekim Pazar · Bugün")).toBeTruthy();
+		expect(within(today).getByText("Mobilya 1/5")).toBeTruthy();
+		expect(within(today).getByText("Yıldız Mobilya")).toBeTruthy();
 
 		await fireEvent.press(screen.getByTestId("calendar.day.2026-10-01"));
+		const first = screen.getByTestId("calendar.dayList");
+		expect(within(first).getByText("Borç 2/3")).toBeTruthy();
 		expect(
-			within(screen.getByTestId("calendar.dayList")).getByText("Ahmet Yılmaz · Borç"),
+			within(first).getByText(tr.installment.status.overdue, { exact: false }),
 		).toBeTruthy();
 
 		await fireEvent.press(screen.getByTestId("calendar.day.2026-10-02"));
@@ -75,5 +79,22 @@ describe("Calendar (S18)", () => {
 		await waitFor(() => {
 			expect(screen.getByTestId("agreement.screen")).toBeTruthy();
 		});
+	});
+
+	it("7 gün / 30 gün / Geciken list what falls in that window", async () => {
+		await openCalendar();
+		await fireEvent.press(screen.getByTestId("calendar.mode.week"));
+		await waitFor(() => {
+			expect(screen.getByTestId(`calendar.item.${SEED_IDS.yildizFurniture}.1`)).toBeTruthy();
+		});
+		// Mert's first installment is in 5 days, Ahmet's overdue one is not in the window.
+		expect(screen.getByTestId(`calendar.item.${SEED_IDS.mertSale}.1`)).toBeTruthy();
+		expect(screen.queryByTestId(`calendar.item.${SEED_IDS.ahmetLoan}.2`)).toBeNull();
+
+		await fireEvent.press(screen.getByTestId("calendar.mode.overdue"));
+		await waitFor(() => {
+			expect(screen.getByTestId(`calendar.item.${SEED_IDS.ahmetLoan}.2`)).toBeTruthy();
+		});
+		expect(screen.queryByTestId(`calendar.item.${SEED_IDS.yildizFurniture}.1`)).toBeNull();
 	});
 });

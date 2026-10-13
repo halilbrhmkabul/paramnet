@@ -35,20 +35,37 @@ const INSTALLMENT_TONE: Record<InstallmentStatus, BadgeTone> = {
 	paid: "success",
 };
 
-type BadgeProps = { label: string; tone: BadgeTone; testID?: string };
+// Design ".bd" comes in three heights: 20 (dense rows), 22 (lists), 24 (headers).
+export type BadgeSize = "sm" | "md" | "lg";
+const SIZES = {
+	sm: { minHeight: 20, paddingHorizontal: 7, fontSize: 11 },
+	md: { minHeight: 22, paddingHorizontal: 8, fontSize: 12 },
+	lg: { minHeight: 24, paddingHorizontal: 9, fontSize: 12 },
+} as const;
+
+type BadgeProps = { label: string; tone: BadgeTone; size?: BadgeSize; testID?: string };
 
 // Colour never carries meaning alone: the label is always shown.
-export function Badge({ label, tone, testID }: BadgeProps) {
+export function Badge({ label, tone, size = "md", testID }: BadgeProps) {
 	const { colors, typography, radius, sizes } = useAppTheme();
 	const [fg, bg] = TONE_COLORS[tone];
+	const { minHeight, paddingHorizontal, fontSize } = SIZES[size];
 	return (
 		<View
 			testID={testID}
-			style={[styles.badge, { backgroundColor: colors[bg], borderRadius: radius.pill }]}
+			style={[
+				styles.badge,
+				{
+					minHeight,
+					paddingHorizontal,
+					backgroundColor: colors[bg],
+					borderRadius: radius.pill,
+				},
+			]}
 		>
 			<Text
 				maxFontSizeMultiplier={sizes.maxAmountFontScale}
-				style={[typography.badge, { color: colors[fg] }]}
+				style={[typography.badge, { fontSize, color: colors[fg] }]}
 			>
 				{label}
 			</Text>
@@ -58,37 +75,44 @@ export function Badge({ label, tone, testID }: BadgeProps) {
 
 export function AgreementStatusBadge({
 	status,
+	size,
 	testID,
 }: {
 	status: AgreementStatus;
+	size?: BadgeSize;
 	testID?: string;
 }) {
 	return (
-		<Badge label={tr.agreement.status[status]} tone={AGREEMENT_TONE[status]} testID={testID} />
+		<Badge
+			label={tr.agreement.status[status]}
+			tone={AGREEMENT_TONE[status]}
+			size={size}
+			testID={testID}
+		/>
 	);
 }
 
 export function InstallmentStatusBadge({
 	status,
 	partial,
+	size,
 	testID,
 }: {
 	status: InstallmentStatus;
 	partial: boolean;
+	size?: BadgeSize;
 	testID?: string;
 }) {
 	const label = partial
 		? `${tr.installment.status[status]} · ${tr.installment.partial}`
 		: tr.installment.status[status];
-	return <Badge label={label} tone={INSTALLMENT_TONE[status]} testID={testID} />;
+	return <Badge label={label} tone={INSTALLMENT_TONE[status]} size={size} testID={testID} />;
 }
 
 const styles = StyleSheet.create({
 	badge: {
 		alignSelf: "flex-start",
-		minHeight: 24,
 		justifyContent: "center",
-		paddingHorizontal: 9,
-		paddingVertical: 3,
+		paddingVertical: 2,
 	},
 });

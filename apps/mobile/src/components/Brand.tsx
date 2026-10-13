@@ -1,10 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
+import { Icon } from "@/components/Icon";
 import { tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
 
-// The wordmark from the design: a forest mark, "Param" heavy, "net" light in emerald.
+// The wordmark from the design: a forest mark with a mint "R", "Param" heavy, "Net" light in emerald.
 export function Brand({ size = 18, testID }: { size?: number; testID?: string }) {
 	const { colors, fonts } = useAppTheme();
 	const mark = Math.round(size * 1.45);
@@ -26,7 +26,7 @@ export function Brand({ size = 18, testID }: { size?: number; testID?: string })
 					},
 				]}
 			>
-				<Ionicons name="leaf-outline" size={mark * 0.58} color={colors.onPrimary} />
+				<Icon name="brand" size={mark * 0.62} tone="brandMark" strokeWidth={2.4} />
 			</View>
 			<Text style={{ fontFamily: fonts.extrabold, fontSize: size, color: colors.primary }}>
 				{tr.brand.first}

@@ -27,3 +27,6 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Tasarım kanvasındaki kapsam dışı modüller (ADR-043): Kartlarım/ekstre/kart ödemesi, banka kredileri, hesaplar ve cüzdan, gelir-gider girişi, tekrarlayan işlem, bütçe kategorileri, aylık rapor, hesap bölme (kare kod/davet). Faiz simülasyonu kesin kural gereği yapılmaz.
 - Tasarımdaki yeni kavramlar için ürün kararı: ParamNet ID (PN-xxxxxx) ile kişi bulma, "para teslimi bekleniyor" durumu (kabulden sonra paranın verildiğinin iki tarafça işaretlenmesi), "Para iste" akışı, nazik hatırlatma gönderme butonu.
 - Marka ikonu, Android adaptive ikon katmanları ve açılış görseli (tasarımdaki logodan 1024 px PNG).
+- Bildirimlerde okundu durumu ve "Tümünü okundu işaretle", zaman damgalı gruplar (Bugün / Bu hafta), "Tamamlanan" filtresi; talep satırlarına oluşturulma zamanı gerekir — F4-01c sırasında.
+- Bildirimlerdeki "Ödeme hatırlatmaları" tercihleri (7 / 3 / 1 gün önce, vade günü) — sunucuda kullanıcı bazında hatırlatma tercihi gerekir; F4-01c sırasında.
+- Anlaşma detayındaki ödeme satırlarında ve planda taksitin ödendiği tarih ("15 Ağu’da ödendi") — taksit görünümüne ödeme tarihi eklenmeli; F4-01c sırasında.

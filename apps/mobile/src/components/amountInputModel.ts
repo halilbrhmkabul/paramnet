@@ -39,7 +39,7 @@ export function textForValue(value: MinorAmount | null): string {
 	if (value === null) {
 		return "";
 	}
-	const formatted = formatTRY(value).replace(/ TL$/, "");
+	const formatted = formatTRY(value).replace(/^₺/, "");
 	// Show whole liras without ",00" so editing feels natural.
 	return formatted.endsWith(",00") ? formatted.slice(0, -3) : formatted;
 }

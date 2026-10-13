@@ -19,10 +19,10 @@ describe("Contacts (S06)", () => {
 		});
 		const ahmet = screen.getByTestId(`contacts.item.${SEED_IDS.ahmet}`);
 		expect(within(ahmet).getByText(tr.agreement.owesYou)).toBeTruthy();
-		expect(within(ahmet).getByText("6.500,00 TL")).toBeTruthy();
+		expect(within(ahmet).getByText("₺6.500,00")).toBeTruthy();
 		const yildiz = screen.getByTestId(`contacts.item.${SEED_IDS.yildiz}`);
 		expect(within(yildiz).getByText(tr.agreement.youOwe)).toBeTruthy();
-		expect(within(yildiz).getByText("20.000,00 TL")).toBeTruthy();
+		expect(within(yildiz).getByText("₺20.000,00")).toBeTruthy();
 
 		await fireEvent.changeText(screen.getByTestId("contacts.search.input"), "eli");
 		expect(screen.queryByTestId(`contacts.item.${SEED_IDS.ahmet}`)).toBeNull();
@@ -46,7 +46,7 @@ describe("Contact detail (S07)", () => {
 		});
 		await fireEvent.press(screen.getByTestId(`contacts.item.${SEED_IDS.mert}`));
 		await waitFor(() => {
-			expect(screen.getByTestId("contact.net.amount")).toHaveTextContent("9.000,00 TL");
+			expect(screen.getByTestId("contact.net.amount")).toHaveTextContent("₺9.000,00");
 		});
 		expect(screen.getByTestId("contact.name.text")).toHaveTextContent("Mert Demir");
 		expect(screen.getByTestId(`contact.agreement.${SEED_IDS.mertSale}`)).toBeTruthy();

@@ -25,9 +25,9 @@ describe("Payment form and result (design 11, 14)", () => {
 		await openPayment();
 		await fireEvent.press(screen.getByTestId("payment.chip.all"));
 		expect(screen.getByTestId("payment.amount.input")).toHaveDisplayValue("6.500");
-		expect(screen.getByTestId("payment.after")).toHaveTextContent("0,00 TL");
+		expect(screen.getByTestId("payment.after")).toHaveTextContent("₺0,00");
 		await fireEvent.press(screen.getByTestId("payment.chip.next"));
-		expect(screen.getByTestId("payment.after")).not.toHaveTextContent("0,00 TL");
+		expect(screen.getByTestId("payment.after")).not.toHaveTextContent("₺0,00");
 	});
 
 	it("confirms the saved payment with the new balance, then goes back", async () => {
@@ -38,12 +38,10 @@ describe("Payment form and result (design 11, 14)", () => {
 			expect(screen.getByTestId("payment.result")).toBeTruthy();
 		});
 		expect(screen.getByText(tr.payment.savedTitle)).toBeTruthy();
-		expect(screen.getByTestId("payment.result.remaining")).toHaveTextContent("5.500,00 TL");
+		expect(screen.getByTestId("payment.result.remaining")).toHaveTextContent("₺5.500,00");
 		await fireEvent.press(screen.getByTestId("payment.done.button"));
 		await waitFor(() => {
-			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent(
-				"5.500,00 TL",
-			);
+			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("₺5.500,00");
 		});
 	});
 });

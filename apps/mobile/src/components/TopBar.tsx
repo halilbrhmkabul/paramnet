@@ -1,8 +1,8 @@
-import { Ionicons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Icon, type IconName } from "@/components/Icon";
 import { tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
 
@@ -14,7 +14,7 @@ export function IconButton({
 	testID,
 	badge,
 }: {
-	icon: keyof typeof Ionicons.glyphMap;
+	icon: IconName;
 	label: string;
 	onPress: () => void;
 	testID?: string;
@@ -38,7 +38,7 @@ export function IconButton({
 				},
 			]}
 		>
-			<Ionicons name={icon} size={21} color={colors.text} />
+			<Icon name={icon} size={22} />
 			{badge}
 		</Pressable>
 	);
@@ -64,7 +64,7 @@ export function TopBar({
 				<View style={styles.slot} />
 			) : (
 				<IconButton
-					icon={close ? "close" : "chevron-back"}
+					icon={close ? "close" : "back"}
 					label={close ? tr.common.close : tr.common.back}
 					onPress={onBack}
 					testID="topbar.back"

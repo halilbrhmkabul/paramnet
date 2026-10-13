@@ -58,9 +58,9 @@ describe("new record flow (S08–S10)", () => {
 			expect(screen.getByTestId("plan.screen")).toBeTruthy();
 		});
 
-		expect(screen.getByTestId("plan.total.text")).toHaveTextContent("28.000,00 TL");
-		expect(screen.getByTestId("plan.downPayment.text")).toHaveTextContent("8.000,00 TL");
-		expect(screen.getByTestId("plan.remaining.text")).toHaveTextContent("20.000,00 TL");
+		expect(screen.getByTestId("plan.total.text")).toHaveTextContent("₺28.000,00");
+		expect(screen.getByTestId("plan.downPayment.text")).toHaveTextContent("₺8.000,00");
+		expect(screen.getByTestId("plan.remaining.text")).toHaveTextContent("₺20.000,00");
 		const expectedDates = [
 			"10 Kasım 2026",
 			"10 Aralık 2026",
@@ -80,7 +80,7 @@ describe("new record flow (S08–S10)", () => {
 
 		await fireEvent.changeText(screen.getByTestId("plan.row.5.amount.input"), "3000");
 		expect(screen.getByTestId("plan.mismatch.text")).toHaveTextContent(
-			"Taksitlerin toplamı kalan tutara eşit olmalı. Fark: -1.000,00 TL",
+			"Taksitlerin toplamı kalan tutara eşit olmalı. Fark: -₺1.000,00",
 		);
 		expect(screen.getByTestId("plan.save.button")).toBeDisabled();
 
@@ -88,10 +88,15 @@ describe("new record flow (S08–S10)", () => {
 		expect(screen.queryByTestId("plan.mismatch.text")).toBeNull();
 		await fireEvent.press(screen.getByTestId("plan.save.button"));
 
+		// Design 25: an installment purchase is titled by what was bought, in the header.
 		await waitFor(() => {
-			expect(screen.getByTestId("agreement.title.text")).toHaveTextContent("Mobilya");
+			expect(screen.getByTestId("agreement.counterparty.text")).toHaveTextContent(
+				tr.debts.installmentPurchase,
+				{ exact: false },
+			);
 		});
-		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("20.000,00 TL");
+		expect(screen.getAllByText("Mobilya").length).toBeGreaterThan(0);
+		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("₺20.000,00");
 		expect(screen.getByTestId("agreement.status.badge")).toHaveTextContent(
 			tr.agreement.status.personal,
 		);

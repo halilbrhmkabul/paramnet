@@ -42,7 +42,7 @@ describe("Payments on a shared agreement (F2-07)", () => {
 		await fireEvent.press(screen.getByTestId("decide.accept.button"));
 		await waitFor(() => {
 			expect(screen.getByTestId("agreement.primaryAction.button")).toHaveTextContent(
-				tr.payment.made,
+				tr.agreement.payFull,
 			);
 		});
 
@@ -61,10 +61,10 @@ describe("Payments on a shared agreement (F2-07)", () => {
 
 		await waitFor(() => {
 			expect(screen.getByTestId("agreement.awaiting.text")).toHaveTextContent(
-				fill(tr.payment.awaiting, { amount: "2.000,00 TL" }),
+				fill(tr.payment.awaiting, { amount: "₺2.000,00" }),
 			);
 		});
-		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("6.000,00 TL");
+		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("₺6.000,00");
 		const withdraw = screen.getByTestId(/^agreement\.payment\..+\.withdraw$/);
 		await fireEvent.press(withdraw);
 		await waitFor(() => {
@@ -77,12 +77,15 @@ describe("Payments on a shared agreement (F2-07)", () => {
 		apiWithReportedPayment();
 		await renderRouter(appRoutes, { initialUrl: "/requests" });
 		await waitFor(() => {
-			expect(screen.getByTestId("requests.section.payment")).toBeTruthy();
+			expect(screen.getByTestId("requests.section.actions")).toBeTruthy();
 		});
 		expect(screen.getByTestId("requests.item.reported-1")).toHaveTextContent(
-			fill(tr.requests.paymentReported, { name: "Ahmet Yılmaz", amount: "1.000,00 TL" }),
+			fill(tr.requests.paymentReportedShort, { name: "Ahmet Yılmaz" }),
 			{ exact: false },
 		);
+		expect(screen.getByTestId("requests.item.reported-1")).toHaveTextContent("₺1.000,00", {
+			exact: false,
+		});
 		await fireEvent.press(screen.getByTestId("requests.item.reported-1"));
 		await waitFor(() => {
 			expect(screen.getByTestId("agreement.awaiting.text")).toBeTruthy();
@@ -93,9 +96,7 @@ describe("Payments on a shared agreement (F2-07)", () => {
 
 		await fireEvent.press(screen.getByTestId("agreement.payment.reported-1.confirm"));
 		await waitFor(() => {
-			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent(
-				"5.500,00 TL",
-			);
+			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("₺5.500,00");
 		});
 		expect(screen.queryByTestId("agreement.awaiting.text")).toBeNull();
 	});
@@ -110,7 +111,7 @@ describe("Payments on a shared agreement (F2-07)", () => {
 		await waitFor(() => {
 			expect(screen.getByText(tr.payment.statuses.rejected)).toBeTruthy();
 		});
-		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("6.500,00 TL");
+		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("₺6.500,00");
 		expect((await api.listRequests()).filter((item) => item.kind === "payment")).toEqual([]);
 	});
 });

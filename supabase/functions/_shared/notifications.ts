@@ -53,12 +53,12 @@ const MONTHS = [
 	"Aralık",
 ];
 
-// Same output as packages/shared formatTRY (ADR-010); the contract test compares them.
+// Same output as packages/shared formatTRY (ADR-047); the contract test compares them.
 export function formatTRY(minor: number): string {
 	const sign = minor < 0 ? "-" : "";
 	const digits = String(Math.abs(minor)).padStart(3, "0");
 	const lira = digits.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-	return `${sign}${lira},${digits.slice(-2)} TL`;
+	return `${sign}₺${lira},${digits.slice(-2)}`;
 }
 
 function dayMonth(isoDay: string): string {

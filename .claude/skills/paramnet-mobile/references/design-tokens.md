@@ -26,6 +26,12 @@ Kaynak: kullanıcının tasarım kanvası (ParamNet, "30 · Tasarım Sistemi"), 
 | `warning` / `warningSoft` | `#7A4E00` / `#FBEFD5` | `#E3B65E` / `#352A12` | Yaklaşan, onay bekliyor |
 | `overdue` / `overdueSoft` / `dangerBorder` | `#A1291F` / `#FBE4E1` / `#EDC1BB` | `#F08C82` / `#3A1D1A` / `#5C2C27` | Gecikmiş, itiraz, yıkıcı eylem |
 | `neutral` / `neutralSoft` | `#46534C` / `#ECEFEC` | `#B3C0B8` / `#26302B` | Planlı, manuel kayıt, iptal |
+| `amber` / `warningSurface` / `warningBorder` | `#D9A847` / `#FDF6E6` / `#EBD9AE` | `#C9A04A` / `#211B0E` / `#4A3A18` | Sıradaki taksit dilimi; amber kartlar (sıradaki taksit, bekleyenler, bildirilen ödeme) |
+| `expense` / `expenseSoft` | `#8A3B2C` / `#F6ECE8` | `#F0A08F` / `#3A221D` | Gider (hızlı işlem) |
+| `violet` / `violetSoft` | `#4E3F86` / `#ECE8F4` | `#B7AAF0` / `#272240` | Borç ver (hızlı işlem), kredi |
+| `calPayment` / `calIncoming` / `calDone` | `#C98A12` / `#2F6CA8` / `#9AA69F` | `#E0A93A` / `#6FA3DA` / `#5E6B64` | Takvim noktaları ve renk çubukları |
+| `brandMark` | `#7FD3AE` | `#0B1F17` | Logo kutusundaki "R" |
+| `shadow` | `#10281E` | `#000000` | Seçili segmentin ince gölgesi |
 
 Rozet tonları (`Badge`): `success`, `pending`, `warning`, `overdue`, `neutral`, `primary`; her biri yumuşak zemin + koyu metin, hap biçiminde.
 
@@ -68,4 +74,4 @@ Yazı ölçeği (Dynamic Type) desteklenir; `maxFontSizeMultiplier` yalnızca tu
 
 ## İkonlar
 
-- iOS'ta SF Symbols, Android'de Material Symbols karşılığı (expo-native-ui önerisine göre) veya tek bir ikon seti; karışık set kullanma.
+- Tasarımın kendi çizgi ikonları, yol yol `src/components/Icon.tsx`'te (react-native-svg, ADR-048). Yeni ikon gerekirse tasarım dosyasındaki SVG yolu buraya eklenir; Ionicons ya da başka set kullanılmaz.

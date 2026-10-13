@@ -23,9 +23,9 @@ const payload = {
 
 describe("render (copy-tr.md notif.*)", () => {
 	it.each([
-		["dueSoon", "10 Kasım tarihinde Yıldız Mobilya için 4.000,00 TL ödemen var."],
-		["dueToday", "Bugün ödeme günü: 4.000,00 TL (2/5. taksit)."],
-		["overdue1", "Dünkü 4.000,00 TL ödeme henüz kaydedilmedi. Ödediysen kaydet."],
+		["dueSoon", "10 Kasım tarihinde Yıldız Mobilya için ₺4.000,00 ödemen var."],
+		["dueToday", "Bugün ödeme günü: ₺4.000,00 (2/5. taksit)."],
+		["overdue1", "Dünkü ₺4.000,00 ödeme henüz kaydedilmedi. Ödediysen kaydet."],
 		["overdue7", "2. taksit 7 gündür açık görünüyor."],
 	])("%s", (template, body) => {
 		expect(render(template, payload)).toEqual({ title: "Yıldız Mobilya", body });
@@ -33,7 +33,7 @@ describe("render (copy-tr.md notif.*)", () => {
 
 	it("single-installment plans do not say 1/1", () => {
 		expect(render("dueToday", { ...payload, seq: 1, count: 1 })?.body).toBe(
-			"Bugün ödeme günü: 4.000,00 TL.",
+			"Bugün ödeme günü: ₺4.000,00.",
 		);
 		expect(render("overdue7", { ...payload, seq: 1, count: 1 })?.body).toBe(
 			"Ödeme 7 gündür açık görünüyor.",
@@ -41,12 +41,12 @@ describe("render (copy-tr.md notif.*)", () => {
 	});
 
 	it.each([
-		["paymentReported", "Bora 1.000,00 TL ödeme yaptığını bildirdi. Aldın mı?"],
-		["paymentConfirmed", "Bora 1.000,00 TL ödemeni onayladı. Kalan: 2.000,00 TL."],
-		["paymentRecorded", "Bora 1.000,00 TL ödemeni kaydetti. Kalan: 2.000,00 TL."],
+		["paymentReported", "Bora ₺1.000,00 ödeme yaptığını bildirdi. Aldın mı?"],
+		["paymentConfirmed", "Bora ₺1.000,00 ödemeni onayladı. Kalan: ₺2.000,00."],
+		["paymentRecorded", "Bora ₺1.000,00 ödemeni kaydetti. Kalan: ₺2.000,00."],
 		[
 			"paymentRejected",
-			"Bora 1.000,00 TL ödemeyi almadığını belirtti. Bir sorun varsa birlikte bakabilirsiniz.",
+			"Bora ₺1.000,00 ödemeyi almadığını belirtti. Bir sorun varsa birlikte bakabilirsiniz.",
 		],
 	])("%s (F2-07)", (template, body) => {
 		expect(
@@ -96,7 +96,7 @@ describe("render (copy-tr.md notif.*)", () => {
 			}),
 		).toEqual({
 			title: "Paramnet",
-			body: "Ayşe borcundan 500,00 TL indirdi. Kalan: 1.500,00 TL.",
+			body: "Ayşe borcundan ₺500,00 indirdi. Kalan: ₺1.500,00.",
 		});
 		expect(
 			render("forgiven", {
@@ -107,14 +107,14 @@ describe("render (copy-tr.md notif.*)", () => {
 			}),
 		).toEqual({
 			title: "Paramnet",
-			body: "Ayşe kalan 500,00 TL borcunu sildi. Anlaşma kapandı.",
+			body: "Ayşe kalan ₺500,00 borcunu sildi. Anlaşma kapandı.",
 		});
 	});
 
 	it.each([
 		[
 			"shareReceived",
-			"Ayşe seninle 1.000,00 TL tutarında bir ödeme planı paylaştı. Göz atar mısın?",
+			"Ayşe seninle ₺1.000,00 tutarında bir ödeme planı paylaştı. Göz atar mısın?",
 		],
 		["shareAccepted", "Ayşe ödeme planını onayladı."],
 		["shareCountered", "Ayşe planda bir düzeltme önerdi."],
@@ -126,7 +126,7 @@ describe("render (copy-tr.md notif.*)", () => {
 			"Ayşe için paylaştığın bağlantının süresi doldu. İstersen yeniden paylaşabilirsin.",
 		],
 		["settled", "Ayşe ile planınız tamamlandı."],
-		["paymentPending", "Ayşe 1.000,00 TL ödeme bildirdi. Onaylıyor musun?"],
+		["paymentPending", "Ayşe ₺1.000,00 ödeme bildirdi. Onaylıyor musun?"],
 	])("%s (F2-11)", (template, body) => {
 		expect(
 			render(template, { agreement_id: "a1", name: "Ayşe", amount_minor: 100000 }),
@@ -201,7 +201,7 @@ describe("buildMessages / interpretTickets", () => {
 		expect(messages[0]).toEqual({
 			to: "ExponentPushToken[a]",
 			title: "Yıldız Mobilya",
-			body: "Bugün ödeme günü: 4.000,00 TL (2/5. taksit).",
+			body: "Bugün ödeme günü: ₺4.000,00 (2/5. taksit).",
 			data: { agreement_id: "a1", template: "dueToday" },
 			sound: "default",
 		});

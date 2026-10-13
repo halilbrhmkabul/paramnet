@@ -9,7 +9,7 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 3.4 ve 5.9.
 - Suçlayıcı, tehditkâr veya resmi-hukuki dil yok ("borcunuzu ödemediniz", "yasal işlem").
 - "Sen" hitabı, kısa cümleler, teknik terim yok ("versiyon", "hash", "durum makinesi" kullanıcıya görünmez).
 - Uygulamanın adı her zaman **Paramnet** (büyük P, bitişik). Türkçe ekler kesme işaretiyle: Paramnet'te, Paramnet'e, Paramnet'i.
-- Para her zaman `12.000,00 TL` biçiminde; tarih `10 Kasım`.
+- Para her zaman `₺12.000,00` biçiminde; tarih `10 Kasım`.
 
 ## Kaçınılacak → kullanılacak
 

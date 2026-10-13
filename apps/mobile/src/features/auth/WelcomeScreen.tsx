@@ -1,8 +1,8 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
+import { Icon } from "@/components/Icon";
 import { Brand } from "@/components/Brand";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
@@ -10,7 +10,7 @@ import { Screen } from "@/components/Screen";
 import { fill, tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
 
-const ICONS = ["albums-outline", "notifications-outline", "people-outline"] as const;
+const ICONS = ["layers", "bell", "user"] as const;
 
 // S01: promise + three skippable intro cards (spec 5.1), design 01 / 31.
 export function WelcomeScreen() {
@@ -64,11 +64,7 @@ export function WelcomeScreen() {
 				style={{ gap: spacing.md, paddingVertical: spacing.xl }}
 			>
 				<View style={[styles.icon, { backgroundColor: colors.primarySoft }]}>
-					<Ionicons
-						name={ICONS[index] ?? "albums-outline"}
-						size={26}
-						color={colors.primary}
-					/>
+					<Icon name={ICONS[index] ?? "layers"} size={26} tone="primary" />
 				</View>
 				<Text style={[typography.headline, { color: colors.text }]}>{card.title}</Text>
 				<Text style={[typography.body, { color: colors.textMuted }]}>{card.body}</Text>

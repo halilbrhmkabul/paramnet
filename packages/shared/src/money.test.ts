@@ -39,22 +39,22 @@ describe("addMinor / subtractMinor", () => {
 
 describe("formatTRY", () => {
 	it.each([
-		[0, "0,00 TL"],
-		[5, "0,05 TL"],
-		[99, "0,99 TL"],
-		[100, "1,00 TL"],
-		[123456, "1.234,56 TL"],
-		[12000_00, "12.000,00 TL"],
-		[100000_00, "100.000,00 TL"],
-		[1000000_00, "1.000.000,00 TL"],
-		[Number.MAX_SAFE_INTEGER, "90.071.992.547.409,91 TL"],
+		[0, "₺0,00"],
+		[5, "₺0,05"],
+		[99, "₺0,99"],
+		[100, "₺1,00"],
+		[123456, "₺1.234,56"],
+		[12000_00, "₺12.000,00"],
+		[100000_00, "₺100.000,00"],
+		[1000000_00, "₺1.000.000,00"],
+		[Number.MAX_SAFE_INTEGER, "₺90.071.992.547.409,91"],
 	])("formats %d as %s", (minor, expected) => {
 		expect(formatTRY(minor)).toBe(expected);
 	});
 
 	it("formats negative differences with a leading minus", () => {
-		expect(formatTRY(-5)).toBe("-0,05 TL");
-		expect(formatTRY(-123456)).toBe("-1.234,56 TL");
+		expect(formatTRY(-5)).toBe("-₺0,05");
+		expect(formatTRY(-123456)).toBe("-₺1.234,56");
 	});
 
 	it.each([0.5, Number.NaN, Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER + 1])(
@@ -75,6 +75,9 @@ describe("parseTRY", () => {
 		["  12.000,50  ", 12000_50],
 		["12.000,00 TL", 12000_00],
 		["12TL", 12_00],
+		["₺12.000,00", 12000_00],
+		["₺ 12", 12_00],
+		["₺12", 12_00],
 		["0", 0],
 		["0,00", 0],
 		["0,05", 5],
@@ -102,7 +105,9 @@ describe("parseTRY", () => {
 		["1e5", "invalid_format"],
 		["0x10", "invalid_format"],
 		["Infinity", "invalid_format"],
-		["₺12", "invalid_format"],
+		["₺", "empty"],
+		["₺12 TL", "invalid_format"],
+		["-₺5", "negative"],
 		["12,5,0", "invalid_format"],
 		["90.071.992.547.409,92", "out_of_range"],
 		["9.007.199.254.740.991", "out_of_range"],

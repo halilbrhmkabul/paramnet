@@ -375,6 +375,13 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 - Talepler, Bildirimler'e (06) taşınır; zil buradan açılır.
 - Karşılama (01), Giriş (02), Onboarding (31) birebir.
 
+### [x] F4-01c Mevcut ekranların görsel hizalaması
+- Kaynak: kullanıcı, simülatördeki ekranların tasarımla aynı olmadığını bildirdi (2026-10-13).
+- [x] Parça A: para biçimi `₺12.000,00` (ADR-047; shared, edge function kopyası, telemetri maskeleme, `AmountInput`); tasarımın SVG ikonları (`Icon`, ADR-048); Borçlarım (12); anlaşma detayı (13, 15, 25) — "⋯" menüsü, Kısmi ödeme / Tamamını öde, taksit dilimleri, sıradaki taksit kartı, ödeme planı, zaman çizelgesi, detayda alt menü; ödeme ekranı `prefill`.
+- [x] Parça B: Ana Sayfa (03) — menü, ortada logo, zil, saate göre selamlama, kayıt sayılı Borçlarım/Alacaklarım kartları, dört hızlı işlem, bekleyenler kartı, gecikenler dahil yaklaşan ödemeler; Bildirimler (06) — filtre çipleri, kart tipi bildirimler, 3 günlük hatırlatmalar; Takvim (26) — ay okları, Ay / 7 gün / 30 gün / Geciken, renk açıklamalı ızgara, renk çubuklu gün listesi.
+- Veri modeli gerektiren bölümler (Toplam Nakit, Kartlarım şeridi, Son İşlemler, ParamNet ID, banka kredisi, nakit projeksiyonu, hatırlatma tercihleri) ilgili F4 görevlerinde.
+- **Kullanıcı kontrolü:** koyu tema ve Android'de görsel kontrol yapılmadı; simülatörde yalnızca iOS açık tema karşılaştırıldı.
+
 ### [ ] F4-02 ParamNet ID, Profil (04), Profili düzenle (35), Ana menü (05), Bildirimler (06)
 
 ### [ ] F4-03 Hesaplar ve işlemler

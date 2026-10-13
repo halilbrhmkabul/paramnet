@@ -213,10 +213,10 @@ Kullanıcı “+” butonuna bastığında önce ne yaptığını seçer. Her se
 
 | **Alan**  | **Değer**                                                           |
 |-----------|---------------------------------------------------------------------|
-| Toplam    | 28.000,00 TL                                                        |
-| Peşinat   | 8.000,00 TL                                                         |
-| Kalan     | 20.000,00 TL                                                        |
-| Plan      | 5 × 4.000,00 TL, aylık, ilk ödeme 10 Kasım 2026                     |
+| Toplam    | ₺28.000,00                                                        |
+| Peşinat   | ₺8.000,00                                                         |
+| Kalan     | ₺20.000,00                                                        |
+| Plan      | 5 × ₺4.000,00, aylık, ilk ödeme 10 Kasım 2026                     |
 | Taksitler | 10 Kas 2026 · 10 Ara 2026 · 10 Oca 2027 · 10 Şub 2027 · 10 Mar 2027 |
 
 Kişi seçimi
@@ -419,7 +419,7 @@ Profil ve ayarlar Ana Sayfa’nın sağ üstündeki avatar ile açılır.
 
 - Tek ekranda tek birincil aksiyon.
 
-- Tutarlar her zaman Türk biçiminde: 12.000,00 TL. Tutar girişi özel sayısal klavye ile.
+- Tutarlar her zaman Türk biçiminde: ₺12.000,00. Tutar girişi özel sayısal klavye ile.
 
 - Renk anlamı tutarlı: alacak yeşil tonu, borç turuncu tonu, gecikme kırmızı, bekleyen gri. Renk tek başına anlam taşımaz, etiketle desteklenir.
 
@@ -1253,7 +1253,7 @@ Skill 2: paramnet-mobile (mobil uygulama kuralları)
 
 - **Klasör ve katman kuralı:** Bölüm 9.4’teki yapı; iş mantığı src/domain/’da saf TS; ekranlar yalnızca src/api/ hook’larını çağırır, Supabase istemcisini doğrudan kullanmaz.
 
-- **Para ve tarih:** Tutar girişi özel sayısal klavye ile, gösterim her zaman 12.000,00 TL; tarihler Europe/Istanbul; para birimi biçimlendirme tek yardımcı fonksiyondan.
+- **Para ve tarih:** Tutar girişi özel sayısal klavye ile, gösterim her zaman ₺12.000,00; tarihler Europe/Istanbul; para birimi biçimlendirme tek yardımcı fonksiyondan.
 
 - **Ekran kuralları:** tek birincil aksiyon; her ekranda yükleniyor, boş, hata ve çevrimdışı durumları; çevrimdışıyken yazma butonları açıklamalı devre dışı.
 

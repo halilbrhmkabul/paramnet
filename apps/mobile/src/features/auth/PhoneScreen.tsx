@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { normalizePhoneTR } from "@paramnet/shared";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -7,6 +6,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { formatPhoneDigits, phoneDigits } from "./phoneInput";
 import { useSession } from "./sessionStore";
+import { Icon } from "@/components/Icon";
 import { useAuthApi } from "@/api/ApiProvider";
 import { messageForError } from "@/api/errors";
 import { Button } from "@/components/Button";
@@ -80,7 +80,7 @@ export function PhoneScreen() {
 			/>
 			<Text style={[typography.caption, { color: colors.textMuted }]}>{tr.phone.legal}</Text>
 			<View style={[styles.trust, { backgroundColor: colors.successSoft }]}>
-				<Ionicons name="shield-checkmark-outline" size={18} color={colors.success} />
+				<Icon name="shieldCheck" size={18} tone="success" strokeWidth={2} />
 				<Text style={[typography.caption, styles.trustText, { color: colors.success }]}>
 					{tr.phone.trustNote}
 				</Text>

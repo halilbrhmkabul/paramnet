@@ -66,10 +66,10 @@ describe("Share (S13)", () => {
 		await waitFor(() => {
 			expect(screen.getByTestId("invitePreview.screen")).toBeTruthy();
 		});
-		expect(screen.queryByText("12.000,00 TL")).toBeNull();
+		expect(screen.queryByText("₺12.000,00")).toBeNull();
 		await fireEvent.press(screen.getByTestId("invitePreview.verify.button"));
 		expect(
-			within(screen.getByTestId("invitePreview.detail")).getByText("12.000,00 TL"),
+			within(screen.getByTestId("invitePreview.detail")).getByText("₺12.000,00"),
 		).toBeTruthy();
 	});
 });

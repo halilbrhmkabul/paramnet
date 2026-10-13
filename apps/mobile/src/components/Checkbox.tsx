@@ -1,6 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { Icon } from "@/components/Icon";
 import { useAppTheme } from "@/theme/useAppTheme";
 
 export type CheckboxProps = {
@@ -33,7 +33,9 @@ export function Checkbox({ label, checked, onChange, testID }: CheckboxProps) {
 					},
 				]}
 			>
-				{checked ? <Ionicons name="checkmark" size={18} color={colors.onPrimary} /> : null}
+				{checked ? (
+					<Icon name="check" size={18} tone="onPrimary" strokeWidth={2.4} />
+				) : null}
 			</View>
 			<Text style={[typography.callout, styles.label, { color: colors.text }]}>{label}</Text>
 		</Pressable>

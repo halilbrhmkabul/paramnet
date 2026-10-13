@@ -10,6 +10,8 @@ export type ScreenProps = {
 	edges?: Edge[];
 	refreshControl?: React.ReactElement<RefreshControlProps>;
 	footer?: ReactNode;
+	// Space between blocks; the design uses 16 on most screens and 18 on a few.
+	gap?: number;
 	testID?: string;
 };
 
@@ -19,13 +21,16 @@ export function Screen({
 	edges = ["top"],
 	refreshControl,
 	footer,
+	gap,
 	testID,
 }: ScreenProps) {
 	const { colors, sizes, spacing } = useAppTheme();
 	const padding = {
 		paddingHorizontal: sizes.screenPadding,
-		paddingVertical: spacing.lg,
-		gap: spacing.lg,
+		// Design ".top" sits 12 pt under the status bar.
+		paddingTop: spacing.md,
+		paddingBottom: spacing.lg,
+		gap: gap ?? spacing.lg,
 	};
 	return (
 		<SafeAreaView testID={testID} edges={edges} style={{ flex: 1, backgroundColor: colors.bg }}>

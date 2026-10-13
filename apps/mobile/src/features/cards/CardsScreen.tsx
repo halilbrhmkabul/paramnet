@@ -1,6 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
+import { Icon } from "@/components/Icon";
 import { Button } from "@/components/Button";
 import { Screen } from "@/components/Screen";
 import { ScreenTitle } from "@/components/ScreenTitle";
@@ -15,7 +15,7 @@ export function CardsScreen() {
 			<ScreenTitle>{tr.cards.title}</ScreenTitle>
 			<View testID="cards.empty" style={[styles.empty, { gap: spacing.md }]}>
 				<View style={[styles.icon, { backgroundColor: colors.primarySoft }]}>
-					<Ionicons name="card-outline" size={28} color={colors.primary} />
+					<Icon name="card" size={28} tone="primary" />
 				</View>
 				<Text style={[typography.headline, styles.center, { color: colors.text }]}>
 					{tr.cards.emptyTitle}

@@ -32,8 +32,8 @@ export function subtractMinor(a: MinorAmount, b: MinorAmount): MinorAmount {
 	return difference;
 }
 
-// Hand-rolled instead of Intl: Intl's TRY style yields "₺12.000,00" and Hermes/device ICU
-// separators vary, while every runtime must print exactly "12.000,00 TL" (ADR-010).
+// Hand-rolled instead of Intl: Hermes/device ICU separators and the ₺ spacing vary, while every
+// runtime must print exactly "₺12.000,00" (ADR-047, the design's format).
 // Negative values are allowed only for display, e.g. a plan's difference from the remaining amount.
 export function formatTRY(minor: number): string {
 	if (!Number.isSafeInteger(minor)) {
@@ -43,7 +43,7 @@ export function formatTRY(minor: number): string {
 	const digits = String(Math.abs(minor)).padStart(3, "0");
 	const lira = digits.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 	const kurus = digits.slice(-2);
-	return `${sign}${lira},${kurus} TL`;
+	return `${sign}₺${lira},${kurus}`;
 }
 
 // "." is only a thousands separator and "," only the decimal separator (tr-TR).
@@ -51,7 +51,11 @@ export function formatTRY(minor: number): string {
 const AMOUNT_PATTERN = /^(0|[1-9]\d*|[1-9]\d{0,2}(?:\.\d{3})+)(?:,(\d+))?$/;
 
 export function parseTRY(text: string): ParseTRYResult {
-	const input = text.trim().replace(/\s*TL$/, "");
+	// Accepts the current "₺12.000,00" and the legacy "12.000,00 TL" (pasted or older shares), not both.
+	const trimmed = text.trim();
+	const input = trimmed.startsWith("₺")
+		? trimmed.slice(1).trimStart()
+		: trimmed.replace(/\s*TL$/, "");
 	if (input === "") {
 		return { ok: false, error: "empty" };
 	}

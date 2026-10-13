@@ -485,3 +485,19 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Sonraki girişler telefon + PIN ile yapılır. "Şifremi unuttum" SMS koduyla yeni PIN belirletir. Yüz tanıma, PIN'in yerine cihazda kilit açma kolaylığıdır.
 	- 6 haneli PIN çevrimiçi denemeye karşı zayıftır; GoTrue'nun giriş hız sınırları ve uygulama tarafında art arda hatalı denemede bekleme uygulanır (F4-01b ayrıntıları).
 - **Not:** F4-01a'da yalnızca mock modda, geliştirme kolaylığı olarak `EXPO_PUBLIC_MOCK_SIGNED_IN=1` ile hazır oturum açılır; gerçek moda etkisi yoktur.
+
+## ADR-047 — Para gösterimi `₺12.000,00` (ADR-010'un biçim kısmının yerini alır)
+- **Tarih:** 2026-10-13
+- **Karar (kullanıcı):** Tasarımla birebir olmak için tutarlar `₺12.000,00` biçiminde gösterilir; negatif değer `-₺1.500,00`.
+	- `formatTRY` hâlâ Intl'siz ve rakam dizisi üzerinde çalışır (ADR-010'un gerekçesi geçerli); yalnızca `TL` son eki yerine boşluksuz `₺` öneki yazılır. Edge function kopyası (`supabase/functions/_shared/notifications.ts`) aynı çıktıyı verir; sözleşme testi karşılaştırır.
+	- `parseTRY` hem `₺12.000,00` hem eski `12.000,00 TL` girdisini kabul eder, ikisini birlikte kabul etmez.
+	- Telemetri maskeleme (`scrubText`) her iki biçimi de `[amount]` yapar.
+	- `AmountInput` para simgesini sola alır.
+- **Sonuç:** Bildirim metinleri de `₺` ile çıkar; uzak projedeki edge function'lar yeniden deploy edilene kadar push metinleri eski biçimde kalır (deploy kullanıcı onayıyla).
+
+## ADR-048 — Tasarımın ikonları ve detayda alt menü (F4-01c)
+- **Tarih:** 2026-10-13
+- **Karar (kullanıcı):** İkonlar tasarımla birebir olsun diye `react-native-svg` eklendi (Expo Go'da hazır gelir, SDK uyumlu sürüm `expo install` ile). Tasarım dosyalarındaki SVG yolları `Icon` bileşeninde toplanır; Ionicons ekranlardan kaldırılır.
+	- Tasarım 13, 15, 25'te alt menü detay ekranında da görünür. Rota yapısı değiştirilmeden, anlaşma detayının altına aynı görünümde `DetailTabBar` konur; bir sekmeye basınca yığın kapanır ve o sekmeye gidilir.
+	- Henüz modülü olmayan eylemler ("Para iste", "Gider ekle") tasarımdaki yerinde, devre dışı ve "Yakında" etiketiyle durur; ilgili F4 görevinde açılır.
+	- Ana Sayfa'daki menü butonu, Ana menü (05, F4-02) gelene kadar Profil ve ayarları açar.

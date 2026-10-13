@@ -43,7 +43,7 @@ Faz sonundaki "Faz kapısı" görevi tamamlanmadan sonraki faza başlanmaz.
 
 ## Kesin kurallar
 
-- **Para:** Kuruş cinsinden tam sayı (`bigint` / TS'de `number` tam sayı veya `bigint`). Ondalıklı sayı ile para hesabı yasak. Biçimlendirme tek yardımcıdan: `12.000,00 TL`.
+- **Para:** Kuruş cinsinden tam sayı (`bigint` / TS'de `number` tam sayı veya `bigint`). Ondalıklı sayı ile para hesabı yasak. Biçimlendirme tek yardımcıdan: `₺12.000,00` (ADR-047).
 - **Sunucu otoritesi:** İstemci çekirdek tablolara doğrudan yazamaz (RLS ile kapalı). Tüm yazmalar `security definer` RPC'lerle; her RPC yetki + durum geçişi kontrolü yapar, tek transaction'da çalışır, olay kaydı yazar.
 - **Idempotency:** Ödeme ve karar işlemleri istemcide üretilen UUID anahtar taşır.
 - **Versiyon:** Onaylar `version` + `terms_hash` ile verilir. Kabul edilmiş anlaşma tek taraflı değişmez.

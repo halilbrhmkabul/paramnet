@@ -42,7 +42,7 @@ describe("Button", () => {
 describe("AmountText", () => {
 	it("formats kuruş with the shared helper", async () => {
 		await render(<AmountText minor={1200000} testID="amount" />);
-		expect(screen.getByTestId("amount")).toHaveTextContent("12.000,00 TL");
+		expect(screen.getByTestId("amount")).toHaveTextContent("₺12.000,00");
 	});
 });
 

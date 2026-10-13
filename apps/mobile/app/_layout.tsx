@@ -8,7 +8,7 @@ import { Manrope_800ExtraBold } from "@expo-google-fonts/manrope/800ExtraBold";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import { ApiProvider, useAuthApi } from "@/api/ApiProvider";
 import { useTrack } from "@/api/hooks";
@@ -23,11 +23,16 @@ import { useAppTheme } from "@/theme/useAppTheme";
 
 type HeaderProps = {
 	navigation: { goBack: () => void };
-	options: { title?: string; presentation?: string };
+	options: {
+		title?: string;
+		presentation?: string;
+		headerRight?: (props: { canGoBack: boolean }) => ReactNode;
+	};
 	back?: unknown;
 };
 
-// Design ".top" for every pushed screen: back (or close on a modal) and a centred title.
+// Design ".top" for every pushed screen: back (or close on a modal), a centred title and an optional
+// action a screen sets with <Stack.Screen options={{ headerRight }} />.
 const detailHeader = {
 	headerShown: true,
 	title: "",
@@ -35,6 +40,7 @@ const detailHeader = {
 		<TopBar
 			title={typeof options.title === "string" ? options.title : ""}
 			close={options.presentation === "modal"}
+			right={options.headerRight?.({ canGoBack: back !== undefined })}
 			onBack={
 				back === undefined
 					? undefined

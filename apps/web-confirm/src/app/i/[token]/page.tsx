@@ -127,7 +127,7 @@ function Decision({
 								<input
 									name={`amount.${String(row.seq)}`}
 									inputMode="decimal"
-									defaultValue={formatTRY(row.amount_minor).replace(/ TL$/, "")}
+									defaultValue={formatTRY(row.amount_minor).replace(/^₺/, "")}
 								/>
 							</label>
 						</div>

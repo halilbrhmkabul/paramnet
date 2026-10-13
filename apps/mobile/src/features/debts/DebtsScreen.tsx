@@ -1,118 +1,238 @@
-import { formatDateTR, formatTRY } from "@paramnet/shared";
-import { Ionicons } from "@expo/vector-icons";
+import { daysBetween, formatDateTR, formatTRY, type IsoDate } from "@paramnet/shared";
 import { router } from "expo-router";
-import { useState } from "react";
+import { Children, isValidElement, useState, type ReactNode } from "react";
 import { Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
 import { useAgreements } from "@/api/hooks";
 import type { AgreementSummary } from "@/api/types";
+import { ActionButton } from "@/components/ActionButton";
 import { AmountText } from "@/components/AmountText";
 import { Avatar } from "@/components/Avatar";
-import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { ErrorState } from "@/components/ErrorState";
+import { Icon } from "@/components/Icon";
 import { LoadingState } from "@/components/LoadingState";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Screen } from "@/components/Screen";
 import { ScreenTitle } from "@/components/ScreenTitle";
 import { SegmentedControl } from "@/components/SegmentedControl";
-import { AgreementStatusBadge, InstallmentStatusBadge } from "@/components/StatusBadge";
+import {
+	AgreementStatusBadge,
+	Badge,
+	type BadgeTone,
+	InstallmentStatusBadge,
+} from "@/components/StatusBadge";
+import { IconButton } from "@/components/TopBar";
+import { dueText } from "@/features/agreements/dueText";
 import { useNewDraft } from "@/features/new/draftStore";
-import type { NewType } from "@/features/new/formModel";
 import { fill, tr } from "@/i18n/tr";
+import { useToday } from "@/lib/clock";
 import { useAppTheme } from "@/theme/useAppTheme";
 
 type Side = "payable" | "receivable";
 
 const CLOSED = new Set(["settled", "cancelled", "rejected"]);
+// An upcoming installment inside this many days is shown in amber, like the design's "3. taksit".
+const SOON_DAYS = 7;
 
-// What a new record from this tab most likely is (spec 5.1 templates).
-const ACTIONS: Record<Side, { type: NewType; label: string }[]> = {
-	payable: [
-		{ type: "borrowed", label: tr.new.borrowed },
-		{ type: "boughtInstallment", label: tr.new.boughtInstallment },
-	],
-	receivable: [{ type: "lent", label: tr.new.lent }],
-};
+function openAgreement(id: string) {
+	router.push({ pathname: "/agreement/[id]", params: { id } });
+}
 
-function AgreementRow({ agreement }: { agreement: AgreementSummary }) {
-	const { colors, typography, spacing } = useAppTheme();
-	const paid = agreement.principal_minor - agreement.outstanding_minor;
+// Design 12 ".av": people get initials; an installment purchase gets a layers icon in a rounded square.
+function RowAvatar({ agreement }: { agreement: AgreementSummary }) {
+	const { colors } = useAppTheme();
+	if (agreement.kind === "installment_purchase") {
+		return (
+			<View style={[styles.square, { backgroundColor: colors.warningSoft }]}>
+				<Icon name="layers" size={20} tone="warning" />
+			</View>
+		);
+	}
+	return <Avatar name={agreement.counterparty.display_name} />;
+}
+
+function rowTitle(agreement: AgreementSummary): string {
+	return agreement.kind === "installment_purchase"
+		? agreement.title
+		: agreement.counterparty.display_name;
+}
+
+function rowSubtitle(agreement: AgreementSummary): string {
+	if (agreement.kind === "installment_purchase") {
+		return `${agreement.counterparty.display_name} · ${tr.debts.installmentPurchase}`;
+	}
+	const due = agreement.next_installment?.due_date ?? null;
+	const when =
+		due === null
+			? tr.debts.noDueDate
+			: fill(tr.debts.due, { date: formatDateTR(due, "dayMonth") });
+	return `${tr.debts.personalLoan} · ${when}`;
+}
+
+function RowBadge({ agreement, today }: { agreement: AgreementSummary; today: IsoDate }) {
 	const next = agreement.next_installment;
+	if (agreement.reported_minor > 0) {
+		return (
+			<Badge
+				label={fill(tr.debts.awaitingConfirm, {
+					amount: formatTRY(agreement.reported_minor),
+				})}
+				tone="warning"
+			/>
+		);
+	}
+	if (next === null) {
+		return <AgreementStatusBadge status={agreement.status} />;
+	}
+	if (agreement.kind === "installment_purchase" && next.due_date !== null) {
+		const { status } = next.state;
+		const tone: BadgeTone =
+			status === "overdue"
+				? "overdue"
+				: status === "due_today" || daysBetween(today, next.due_date) <= SOON_DAYS
+					? "warning"
+					: "neutral";
+		return (
+			<Badge
+				label={fill(tr.debts.nextInstallment, {
+					seq: String(next.seq),
+					date: formatDateTR(next.due_date, "dayMonth"),
+				})}
+				tone={tone}
+			/>
+		);
+	}
+	if (next.state.partial && next.state.status === "upcoming") {
+		return <Badge label={tr.installment.partial} tone="pending" />;
+	}
+	return <InstallmentStatusBadge status={next.state.status} partial={next.state.partial} />;
+}
+
+function rowRight(agreement: AgreementSummary, today: IsoDate): string {
+	const due = agreement.next_installment?.due_date ?? null;
+	if (agreement.kind === "loan" && due !== null) {
+		return dueText(due, today);
+	}
+	return fill(tr.debts.paidCount, {
+		paid: String(agreement.paid_installment_count),
+		count: String(agreement.installment_count),
+	});
+}
+
+// Design 12 ".it": avatar, title and subtitle, amount; a progress bar on what I owe; badge and timing.
+function AgreementRow({ agreement }: { agreement: AgreementSummary }) {
+	const { colors, fonts } = useAppTheme();
+	const today = useToday();
+	const receivable = agreement.my_role === "creditor";
+	const paid = agreement.principal_minor - agreement.outstanding_minor;
 	const testID = `debts.item.${agreement.id}`;
 	return (
 		<Pressable
 			testID={testID}
 			accessibilityRole="button"
-			accessibilityLabel={`${agreement.counterparty.display_name} · ${agreement.title}`}
+			accessibilityLabel={`${rowTitle(agreement)} · ${rowSubtitle(agreement)}`}
 			onPress={() => {
-				router.push({ pathname: "/agreement/[id]", params: { id: agreement.id } });
+				openAgreement(agreement.id);
 			}}
-			style={({ pressed }) => [styles.item, { gap: spacing.sm, opacity: pressed ? 0.7 : 1 }]}
+			style={({ pressed }) => [styles.item, { opacity: pressed ? 0.7 : 1 }]}
 		>
-			<View style={[styles.row, { gap: spacing.md }]}>
-				<Avatar name={agreement.counterparty.display_name} />
+			<View style={styles.head}>
+				<RowAvatar agreement={agreement} />
 				<View style={styles.grow}>
-					<Text style={[typography.rowTitle, { color: colors.text }]} numberOfLines={1}>
-						{agreement.title}
+					<Text
+						numberOfLines={1}
+						style={{ fontFamily: fonts.bold, fontSize: 15, color: colors.text }}
+					>
+						{rowTitle(agreement)}
 					</Text>
 					<Text
-						style={[typography.caption, { color: colors.textMuted }]}
 						numberOfLines={1}
+						style={[styles.t2, { fontFamily: fonts.medium, color: colors.textMuted }]}
 					>
-						{agreement.counterparty.display_name}
-						{" · "}
-						{next?.due_date == null
-							? tr.debts.noDueDate
-							: fill(tr.debts.nextDue, {
-									date: formatDateTR(next.due_date, "short"),
-								})}
+						{rowSubtitle(agreement)}
 					</Text>
 				</View>
 				<View style={styles.end}>
 					<AmountText
 						minor={agreement.outstanding_minor}
-						variant="headline"
-						tone={agreement.my_role === "creditor" ? "receivable" : "payable"}
+						tone={receivable ? "receivable" : "text"}
+						style={{ fontFamily: fonts.extrabold, fontSize: 16, lineHeight: 21 }}
 					/>
-					<Text style={[typography.caption, { color: colors.textMuted }]}>
-						{fill(tr.debts.of, { amount: formatTRY(agreement.principal_minor) })}
-					</Text>
+					{receivable ? null : (
+						<Text
+							style={{
+								fontFamily: fonts.medium,
+								fontSize: 12,
+								color: colors.textMuted,
+							}}
+						>
+							{fill(tr.debts.of, { amount: formatTRY(agreement.principal_minor) })}
+						</Text>
+					)}
 				</View>
 			</View>
-			<ProgressBar
-				value={agreement.principal_minor === 0 ? 0 : paid / agreement.principal_minor}
-				label={fill(tr.agreement.paidOf, {
-					paid: formatTRY(paid),
-					amount: formatTRY(agreement.principal_minor),
-				})}
-				testID={`${testID}.progress`}
-			/>
-			<View style={styles.between}>
-				{next === null ? (
-					<AgreementStatusBadge status={agreement.status} />
-				) : (
-					<InstallmentStatusBadge
-						status={next.state.status}
-						partial={next.state.partial}
-					/>
-				)}
-				<Text style={[typography.caption, { color: colors.textMuted }]}>
-					{fill(tr.debts.paidCount, {
-						paid: String(agreement.paid_installment_count),
-						count: String(agreement.installment_count),
+			{receivable ? null : (
+				<ProgressBar
+					value={agreement.principal_minor === 0 ? 0 : paid / agreement.principal_minor}
+					label={fill(tr.agreement.paidOf, {
+						paid: formatTRY(paid),
+						amount: formatTRY(agreement.principal_minor),
 					})}
+					testID={`${testID}.progress`}
+				/>
+			)}
+			<View style={styles.between}>
+				<RowBadge agreement={agreement} today={today} />
+				<Text style={{ fontFamily: fonts.medium, fontSize: 12, color: colors.textMuted }}>
+					{rowRight(agreement, today)}
 				</Text>
 			</View>
 		</Pressable>
 	);
 }
 
+// Design ".lb" + ".card": a 13/700 label over a card of rows split by hairlines.
+function Section({
+	label,
+	children,
+	testID,
+}: {
+	label: string;
+	children: ReactNode[];
+	testID?: string;
+}) {
+	const { colors, fonts } = useAppTheme();
+	return (
+		<View testID={testID}>
+			<Text style={[styles.label, { fontFamily: fonts.bold, color: colors.textMuted }]}>
+				{label}
+			</Text>
+			<Card style={styles.listCard}>
+				{Children.toArray(children).map((child, index) => (
+					<View
+						// toArray drops empty slots and keys every child.
+						key={isValidElement(child) ? child.key : index}
+						style={
+							index === 0
+								? undefined
+								: { borderTopWidth: 1, borderTopColor: colors.divider }
+						}
+					>
+						{child}
+					</View>
+				))}
+			</Card>
+		</View>
+	);
+}
+
 function Content({ agreements, side }: { agreements: AgreementSummary[]; side: Side }) {
-	const { colors, typography, spacing } = useAppTheme();
+	const { colors, fonts, typography, spacing } = useAppTheme();
 	const start = useNewDraft((state) => state.start);
-	const role = side === "receivable" ? "creditor" : "debtor";
+	const receivable = side === "receivable";
+	const role = receivable ? "creditor" : "debtor";
 	const mine = agreements.filter((a) => a.my_role === role);
 	const open = mine.filter((a) => !CLOSED.has(a.status));
 	const closed = mine.filter((a) => CLOSED.has(a.status));
@@ -120,30 +240,69 @@ function Content({ agreements, side }: { agreements: AgreementSummary[]; side: S
 
 	return (
 		<>
-			<Card>
-				<Text style={[typography.label, { color: colors.textMuted }]}>
-					{side === "receivable" ? tr.debts.totalReceivable : tr.debts.totalPayable}
+			<Card style={{ gap: 0 }}>
+				<Text style={{ fontFamily: fonts.bold, fontSize: 13, color: colors.textMuted }}>
+					{receivable ? tr.debts.totalReceivable : tr.debts.totalPayable}
 				</Text>
 				<AmountText
 					minor={total}
-					variant="amountL"
-					tone={side === "receivable" ? "receivable" : "payable"}
+					tone={receivable ? "receivable" : "text"}
+					style={[styles.total, { fontFamily: fonts.extrabold }]}
 					testID="debts.total.amount"
 				/>
+				<Text
+					style={{
+						fontFamily: fonts.medium,
+						fontSize: 12,
+						marginTop: 2,
+						color: colors.textMuted,
+					}}
+				>
+					{receivable ? tr.debts.noteReceivable : tr.debts.notePayable}
+				</Text>
 				<View style={[styles.actions, { gap: spacing.sm }]}>
-					{ACTIONS[side].map(({ type, label }) => (
-						<View key={type} style={styles.grow}>
-							<Button
-								label={label}
-								variant="secondary"
+					{receivable ? (
+						<>
+							<ActionButton
+								label={tr.debts.lend}
+								icon="arrowUpRight"
+								strokeWidth={2.2}
 								onPress={() => {
-									start(type);
+									start("lent");
 									router.push("/new/form");
 								}}
-								testID={`debts.action.${type}`}
+								testID="debts.action.lent"
 							/>
-						</View>
-					))}
+							<ActionButton
+								label={tr.debts.addPerson}
+								icon="user"
+								onPress={() => {
+									router.push("/contacts");
+								}}
+								testID="debts.action.contacts"
+							/>
+						</>
+					) : (
+						<>
+							<ActionButton
+								label={tr.debts.borrow}
+								icon="arrowDownLeft"
+								strokeWidth={2.2}
+								onPress={() => {
+									start("borrowed");
+									router.push("/new/form");
+								}}
+								testID="debts.action.borrowed"
+							/>
+							<ActionButton
+								label={tr.debts.request}
+								icon="request"
+								soon
+								onPress={() => undefined}
+								testID="debts.action.request"
+							/>
+						</>
+					)}
 				</View>
 			</Card>
 
@@ -155,101 +314,69 @@ function Content({ agreements, side }: { agreements: AgreementSummary[]; side: S
 						{ color: colors.textMuted, paddingHorizontal: spacing.xs },
 					]}
 				>
-					{side === "receivable" ? tr.debts.emptyReceivable : tr.debts.emptyPayable}
+					{receivable ? tr.debts.emptyReceivable : tr.debts.emptyPayable}
 				</Text>
 			) : (
-				<View style={{ gap: spacing.sm }}>
-					<Text
-						style={[
-							typography.label,
-							{ color: colors.textMuted, paddingHorizontal: spacing.xs },
-						]}
-					>
-						{tr.debts.openList}
-					</Text>
-					<Card style={{ paddingVertical: 0 }}>
-						{open.map((agreement, index) => (
-							<View
-								key={agreement.id}
-								style={
-									index === 0
-										? undefined
-										: { borderTopWidth: 1, borderTopColor: colors.divider }
-								}
-							>
-								<AgreementRow agreement={agreement} />
-							</View>
-						))}
-					</Card>
-				</View>
+				<Section label={receivable ? tr.debts.sectionReceivable : tr.debts.sectionPayable}>
+					{open.map((agreement) => (
+						<AgreementRow key={agreement.id} agreement={agreement} />
+					))}
+				</Section>
 			)}
 
 			{closed.length === 0 ? null : (
-				<View testID="debts.closed" style={{ gap: spacing.sm }}>
-					<Text
-						style={[
-							typography.label,
-							{ color: colors.textMuted, paddingHorizontal: spacing.xs },
-						]}
-					>
-						{tr.debts.closed}
-					</Text>
-					<Card style={{ paddingVertical: 0 }}>
-						{closed.map((agreement, index) => (
-							<Pressable
-								key={agreement.id}
-								testID={`debts.closed.${agreement.id}`}
-								accessibilityRole="button"
-								accessibilityLabel={`${agreement.counterparty.display_name} · ${agreement.title}`}
-								onPress={() => {
-									router.push({
-										pathname: "/agreement/[id]",
-										params: { id: agreement.id },
-									});
-								}}
-								style={[
-									styles.row,
-									styles.item,
-									{ gap: spacing.md },
-									index === 0
-										? null
-										: { borderTopWidth: 1, borderTopColor: colors.divider },
-								]}
-							>
-								<Avatar name={agreement.counterparty.display_name} />
-								<View style={styles.grow}>
-									<Text
-										style={[typography.rowTitle, { color: colors.text }]}
-										numberOfLines={1}
-									>
-										{agreement.title}
-									</Text>
-									<Text
-										style={[typography.caption, { color: colors.textMuted }]}
-										numberOfLines={1}
-									>
-										{agreement.counterparty.display_name}
-									</Text>
-								</View>
-								<AgreementStatusBadge status={agreement.status} />
-							</Pressable>
-						))}
-					</Card>
-				</View>
+				<Section label={tr.debts.closed} testID="debts.closed">
+					{closed.map((agreement) => (
+						<Pressable
+							key={agreement.id}
+							testID={`debts.closed.${agreement.id}`}
+							accessibilityRole="button"
+							accessibilityLabel={`${rowTitle(agreement)} · ${rowSubtitle(agreement)}`}
+							onPress={() => {
+								openAgreement(agreement.id);
+							}}
+							style={[styles.item, styles.head]}
+						>
+							<RowAvatar agreement={agreement} />
+							<View style={styles.grow}>
+								<Text
+									numberOfLines={1}
+									style={{
+										fontFamily: fonts.bold,
+										fontSize: 15,
+										color: colors.text,
+									}}
+								>
+									{rowTitle(agreement)}
+								</Text>
+								<Text
+									numberOfLines={1}
+									style={[
+										styles.t2,
+										{ fontFamily: fonts.medium, color: colors.textMuted },
+									]}
+								>
+									{rowSubtitle(agreement)}
+								</Text>
+							</View>
+							<AgreementStatusBadge status={agreement.status} />
+						</Pressable>
+					))}
+				</Section>
 			)}
 		</>
 	);
 }
 
-// Design 12 "Borçlarım / Alacaklarım": one tab per side, totals of open agreements, then the list.
+// Design 12 "Borç & Alacak": one tab per side, the open total with two actions, then the list.
 export function DebtsScreen() {
-	const { colors, sizes } = useAppTheme();
 	const agreements = useAgreements();
 	const [side, setSide] = useState<Side>("payable");
 
 	return (
 		<Screen
 			testID="debts.screen"
+			gap={18}
 			refreshControl={
 				<RefreshControl
 					refreshing={agreements.isRefetching}
@@ -259,27 +386,18 @@ export function DebtsScreen() {
 				/>
 			}
 		>
-			<View style={styles.between}>
-				<ScreenTitle>{tr.debts.title}</ScreenTitle>
-				<Pressable
-					testID="debts.contacts.button"
-					accessibilityRole="button"
-					accessibilityLabel={tr.tabs.contacts}
+			<View style={styles.top}>
+				<View style={styles.grow}>
+					<ScreenTitle>{tr.debts.title}</ScreenTitle>
+				</View>
+				<IconButton
+					icon="plus"
+					label={tr.debts.newRecord}
 					onPress={() => {
-						router.push("/contacts");
+						router.push("/new");
 					}}
-					style={[
-						styles.iconButton,
-						{
-							width: sizes.iconButton,
-							height: sizes.iconButton,
-							backgroundColor: colors.surface,
-							borderColor: colors.border,
-						},
-					]}
-				>
-					<Ionicons name="people-outline" size={22} color={colors.text} />
-				</Pressable>
+					testID="debts.new.button"
+				/>
 			</View>
 			<SegmentedControl
 				label={tr.debts.title}
@@ -310,16 +428,27 @@ export function DebtsScreen() {
 }
 
 const styles = StyleSheet.create({
-	row: { flexDirection: "row", alignItems: "center" },
+	top: { flexDirection: "row", alignItems: "center", gap: 8, paddingLeft: 4 },
+	head: { flexDirection: "row", alignItems: "center", gap: 12 },
 	between: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
 	grow: { flex: 1, minWidth: 0 },
 	end: { alignItems: "flex-end" },
-	actions: { flexDirection: "row", marginTop: 8 },
-	item: { paddingVertical: 14 },
-	iconButton: {
+	actions: { flexDirection: "row", marginTop: 14 },
+	item: { paddingVertical: 14, paddingHorizontal: 16, gap: 10 },
+	t2: { fontSize: 13, lineHeight: 18, marginTop: 2 },
+	label: { fontSize: 13, lineHeight: 18, paddingHorizontal: 4, paddingBottom: 8 },
+	listCard: { padding: 0, gap: 0 },
+	total: {
+		fontSize: 30,
+		lineHeight: 38,
+		letterSpacing: -0.6,
+		marginTop: 2,
+	},
+	square: {
+		width: 42,
+		height: 42,
+		borderRadius: 12,
 		alignItems: "center",
 		justifyContent: "center",
-		borderRadius: 14,
-		borderWidth: 1,
 	},
 });

@@ -31,8 +31,8 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 7.
 - **Eşit olmayan plan:** kullanıcı her satırın tarih ve tutarını düzenler; toplam kalan tutara eşit değilse kaydedilemez; her tutar > 0; tarihler artan (eşit olabilir).
 - **Peşinat:** `payments` tablosunda `kind = down_payment`, `status = confirmed` olarak oluşturulur.
 
-Örnek: 28.000,00 TL, peşinat 8.000,00, 5 taksit aylık, ilk 10 Kasım 2026 → 5 × 4.000,00; 10 Kas, 10 Ara, 10 Oca, 10 Şub, 10 Mar.
-Örnek: 10.000,00 TL, 3 taksit → 3.333,33 / 3.333,33 / 3.333,34.
+Örnek: ₺28.000,00, peşinat 8.000,00, 5 taksit aylık, ilk 10 Kasım 2026 → 5 × 4.000,00; 10 Kas, 10 Ara, 10 Oca, 10 Şub, 10 Mar.
+Örnek: ₺10.000,00, 3 taksit → 3.333,33 / 3.333,33 / 3.333,34.
 
 ## Ödeme dağıtımı
 
