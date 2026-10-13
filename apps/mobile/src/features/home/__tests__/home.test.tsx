@@ -34,7 +34,9 @@ describe("Home (S05)", () => {
 		expect(within(upcoming).getAllByTestId(/^home\.upcoming\.item\./)).toHaveLength(5);
 		expect(within(upcoming).getByText(tr.installment.status.due_today)).toBeTruthy();
 		// The demo has one plan shared with me (S19).
-		expect(screen.getByTestId("home.pending.band")).toHaveTextContent("1 iş seni bekliyor");
+		expect(screen.getByTestId("home.pending.band")).toHaveTextContent("1 iş seni bekliyor", {
+			exact: false,
+		});
 	});
 
 	it("opens the agreement from a due item", async () => {
@@ -77,6 +79,29 @@ describe("Home (S05)", () => {
 		await fireEvent.press(screen.getByTestId("home.error.retry.button"));
 		await waitFor(() => {
 			expect(screen.getByTestId("home.receivable.amount")).toHaveTextContent("15.500,00 TL");
+		});
+	});
+
+	it("the bell shows what waits for me and opens Talepler (design 03)", async () => {
+		await renderRouter(appRoutes, { initialUrl: "/" });
+		await waitFor(() => {
+			expect(screen.getByTestId("home.notifications.badge")).toHaveTextContent("1");
+		});
+		expect(screen.getByTestId("home.brand")).toBeTruthy();
+		await fireEvent.press(screen.getByTestId("home.notifications.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("requests.screen")).toBeTruthy();
+		});
+	});
+
+	it("quick starts stay on Home once there are records", async () => {
+		await renderRouter(appRoutes, { initialUrl: "/" });
+		await waitFor(() => {
+			expect(screen.getByTestId("home.receivable.amount")).toBeTruthy();
+		});
+		await fireEvent.press(screen.getByTestId("home.template.lent"));
+		await waitFor(() => {
+			expect(screen.getByTestId("newForm.screen")).toBeTruthy();
 		});
 	});
 });

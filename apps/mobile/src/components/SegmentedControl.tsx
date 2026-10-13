@@ -9,6 +9,8 @@ export type SegmentedControlProps<T extends string> = {
 	options: readonly SegmentOption<T>[];
 	value: T;
 	onChange: (value: T) => void;
+	// The label still names the group for screen readers; hidden when the screen title says it.
+	hideLabel?: boolean;
 	testID: string;
 };
 
@@ -17,12 +19,15 @@ export function SegmentedControl<T extends string>({
 	options,
 	value,
 	onChange,
+	hideLabel = false,
 	testID,
 }: SegmentedControlProps<T>) {
 	const { colors, typography, radius, spacing, sizes } = useAppTheme();
 	return (
 		<View style={{ gap: spacing.xs }}>
-			<Text style={[typography.label, { color: colors.textMuted }]}>{label}</Text>
+			{hideLabel ? null : (
+				<Text style={[typography.label, { color: colors.textMuted }]}>{label}</Text>
+			)}
 			<View
 				accessibilityRole="radiogroup"
 				accessibilityLabel={label}

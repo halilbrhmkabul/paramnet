@@ -18,6 +18,7 @@ export function createSupabaseAgreementsApi(client: SupabaseClient): AgreementsA
 		getDashboard: () => call("get_dashboard"),
 		listContacts: () => call("list_contacts_with_balance"),
 		getContact: (id) => call("get_contact_detail", { p_id: id }),
+		listAgreements: () => call("list_agreements"),
 		getAgreement: (id) => call("get_agreement_detail", { p_id: id }),
 		getCalendar: (month) => call("get_calendar", { p_month: month }),
 		createAgreement: (input, idempotencyKey) =>

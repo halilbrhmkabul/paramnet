@@ -2,6 +2,7 @@ import type { CreateAgreementInput, IsoDate, PaymentInput } from "@paramnet/shar
 
 import type {
 	AgreementDetail,
+	AgreementSummary,
 	CalendarMonth,
 	ContactDetail,
 	AnalyticsEvent,
@@ -21,6 +22,8 @@ export interface AgreementsApi {
 	listContacts(): Promise<ContactSummary[]>;
 	getContact(id: string): Promise<ContactDetail>;
 	getAgreement(id: string): Promise<AgreementDetail>;
+	// Every agreement I am party to (Borçlarım / Alacaklarım, F3-11).
+	listAgreements(): Promise<AgreementSummary[]>;
 	getCalendar(month: IsoDate): Promise<CalendarMonth>;
 	// The key is generated once per draft and reused on retry (BR-09).
 	createAgreement(
