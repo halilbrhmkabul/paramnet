@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { Share, Text, View } from "react-native";
 
 import { useApi, useAuthApi } from "@/api/ApiProvider";
+import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { ListItem } from "@/components/ListItem";
@@ -63,7 +64,8 @@ export function SettingsScreen() {
 				/>
 			}
 		>
-			<Card>
+			<Card style={{ alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xl }}>
+				<Avatar name={user?.display_name ?? "?"} size={72} />
 				<ScreenTitle testID="settings.name.text">{user?.display_name ?? ""}</ScreenTitle>
 				<ListItem
 					title={tr.settings.phone}
