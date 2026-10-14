@@ -28,11 +28,15 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 3.4 ve 5.9.
 | Anahtar | Metin |
 |---|---|
 | `app.name` | Paramnet |
-| `welcome.title` | Verdiğin, aldığın ve taksitle ödediğin her şey tek yerde. |
-| `welcome.subtitle` | Planı kaydet, istersen karşı tarafla paylaş, ödemeleri birlikte takip edin. |
-| `welcome.cta` | Başla |
-| `phone.title` | Telefon numaran |
-| `phone.helper` | Sana bir doğrulama kodu göndereceğiz. |
+| `welcome.title` | Paranı, borçlarını ve gelecekteki ödemelerini tek yerden yönet. |
+| `welcome.create` / `welcome.signIn` | Hesap oluştur / Giriş yap |
+| `login.signInTitle` | Tekrar hoş geldin |
+| `login.signInHelper` | Telefon numaran ve 6 haneli şifrenle giriş yap. |
+| `login.forgot` | Şifremi unuttum |
+| `pin.createTitle` / `pin.confirmTitle` | Şifreni belirle / Şifreni tekrar gir |
+| `pin.weak` | Bu şifre kolay tahmin edilir. Art arda ya da aynı rakamlar kullanma. |
+| `error.attemptsLeft` | Numara ya da şifre hatalı. {count} deneme hakkın kaldı. |
+| `error.accountLocked` | Çok fazla hatalı deneme yapıldı. {minutes} dakika sonra tekrar dene ya da şifreni SMS ile yenile. |
 | `otp.title` | Kodu gir |
 | `otp.resend` | Kodu tekrar gönder |
 | `otp.error.invalid` | Kod hatalı. Tekrar dener misin? |

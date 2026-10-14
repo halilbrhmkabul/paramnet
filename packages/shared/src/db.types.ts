@@ -645,6 +645,34 @@ export type Database = {
 					},
 				];
 			};
+			pin_login_attempts: {
+				Row: {
+					created_at: string;
+					failed_count: number;
+					last_failed_at: string | null;
+					locked_until: string | null;
+					phone_hash: string;
+					updated_at: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					created_at?: string;
+					failed_count?: number;
+					last_failed_at?: string | null;
+					locked_until?: string | null;
+					phone_hash: string;
+					updated_at?: string;
+				};
+				Update: {
+					created_at?: string;
+					failed_count?: number;
+					last_failed_at?: string | null;
+					locked_until?: string | null;
+					phone_hash?: string;
+					updated_at?: string;
+				};
+				Relationships: [];
+			};
 			profiles: {
 				Row: {
 					created_at: string;
@@ -819,6 +847,25 @@ export type Database = {
 				};
 				Relationships: [];
 			};
+			user_pins: {
+				Row: {
+					created_at: string;
+					pin_set_at: string;
+					user_id: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					created_at?: string;
+					pin_set_at?: string;
+					user_id: string;
+				};
+				Update: {
+					created_at?: string;
+					pin_set_at?: string;
+					user_id?: string;
+				};
+				Relationships: [];
+			};
 		};
 		Views: {
 			[_ in never]: never;
@@ -875,6 +922,7 @@ export type Database = {
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
 			get_metrics: { Args: { p_days: number }; Returns: Json };
 			get_pending_decision: { Args: { p_id: string }; Returns: Json };
+			has_pin: { Args: Record<PropertyKey, never>; Returns: boolean };
 			invite_decide: {
 				Args: {
 					p_counter_terms: Json;
@@ -911,6 +959,9 @@ export type Database = {
 				};
 				Returns: Json;
 			};
+			pin_login_check: { Args: { p_phone: string }; Returns: Json };
+			pin_login_record: { Args: { p_ok: boolean; p_phone: string }; Returns: Json };
+			pin_mark_set: { Args: { p_phone: string; p_uid: string }; Returns: undefined };
 			propose_amendment: {
 				Args: { p_id: string; p_reason: string; p_row_version: number; p_terms: Json };
 				Returns: Json;

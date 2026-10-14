@@ -1,18 +1,28 @@
-# Signs in from a clean install; continues through the profile steps only for a new account.
+# Signs in from a clean install through sign-up (SMS code), which works for new and returning numbers
+# alike; sets the PIN and the profile only when the account still needs them (ADR-046).
 appId: com.paramnet.app
 ---
 - launchApp:
     clearState: true
 - tapOn:
-    id: welcome.skip.button
+    id: welcome.create.button
 - tapOn:
-    id: phone.number.input
+    id: onboarding.skip.button
+- tapOn:
+    id: login.phone.input
 - inputText: "5550000001"
 - tapOn:
-    id: phone.continue.button
+    id: login.submit.button
 - tapOn:
     id: otp.code.input
 - inputText: "123456"
+- runFlow:
+    when:
+      visible:
+        id: pin.screen
+    commands:
+      - inputText: "482915"
+      - inputText: "482915"
 - runFlow:
     when:
       visible:

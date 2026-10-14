@@ -27,3 +27,6 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Tasarım kanvasındaki kapsam dışı modüller (ADR-043): Kartlarım/ekstre/kart ödemesi, banka kredileri, hesaplar ve cüzdan, gelir-gider girişi, tekrarlayan işlem, bütçe kategorileri, aylık rapor, hesap bölme (kare kod/davet). Faiz simülasyonu kesin kural gereği yapılmaz.
 - Tasarımdaki yeni kavramlar için ürün kararı: ParamNet ID (PN-xxxxxx) ile kişi bulma, "para teslimi bekleniyor" durumu (kabulden sonra paranın verildiğinin iki tarafça işaretlenmesi), "Para iste" akışı, nazik hatırlatma gönderme butonu.
 - Marka ikonu, Android adaptive ikon katmanları ve açılış görseli (tasarımdaki logodan 1024 px PNG).
+- Yüz tanıma / parmak izi ile giriş (tasarım 02 "Yüz tanıma ile giriş"): PIN'in yerine cihazda kilit açma kolaylığı (ADR-046); buton F4-01b'de gizli — F4-01b sırasında.
+- `pin-login`'e IP başına deneme sınırı (`private.take_rate_limit`) ve üretimde GoTrue `sign_in_sign_ups` sınırının yükseltilmesi; ayarlardan PIN değiştirme — F4-01b sırasında (ADR-049).
+- Router test ortamı: aynı test dosyasında sekmeler bir kez açıldıktan sonra (auth)'dan sekmelere geçiş "Unmatched Route"a düşüyor; şimdilik bu tür testler ayrı dosyada (`restoreLegacy.test.tsx`) — F4-01b sırasında.

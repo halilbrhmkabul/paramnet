@@ -103,7 +103,7 @@ describe("KVKK notice at sign-up", () => {
 	it("can be read before accepting it", async () => {
 		resetSession();
 		useSession.setState({
-			user: { id: "u1", phone_e164: "+905550000001", display_name: null },
+			user: { id: "u1", phone_e164: "+905550000001", display_name: null, has_pin: true },
 			onboarded: false,
 		});
 		await renderRouter(appRoutes, { initialUrl: "/profile" });

@@ -6,14 +6,25 @@ import { appRoutes } from "@/testing/appRoutes";
 import { provideTestAuthApi } from "@/testing/providers";
 
 beforeEach(() => {
-	useSession.setState({ user: null, pendingPhone: null, onboarded: false, restored: false });
+	useSession.setState({
+		user: null,
+		pendingPhone: null,
+		pinRequired: false,
+		onboarded: false,
+		restored: false,
+	});
 });
 
 describe("session restore (F1-16)", () => {
 	it("opens the tabs directly when a stored session with a profile exists", async () => {
 		const auth = createMockAuthApi({ latencyMs: 0 });
 		auth.restore = () =>
-			Promise.resolve({ id: "u1", phone_e164: "+905550000001", display_name: "Ayşe" });
+			Promise.resolve({
+				id: "u1",
+				phone_e164: "+905550000001",
+				display_name: "Ayşe",
+				has_pin: true,
+			});
 		provideTestAuthApi(auth);
 		await renderRouter(appRoutes, { initialUrl: "/" });
 		await waitFor(() => {
@@ -31,7 +42,12 @@ describe("session restore (F1-16)", () => {
 	it("a stored session without a profile continues at the profile step", async () => {
 		const auth = createMockAuthApi({ latencyMs: 0 });
 		auth.restore = () =>
-			Promise.resolve({ id: "u1", phone_e164: "+905550000001", display_name: null });
+			Promise.resolve({
+				id: "u1",
+				phone_e164: "+905550000001",
+				display_name: null,
+				has_pin: true,
+			});
 		provideTestAuthApi(auth);
 		await renderRouter(appRoutes, { initialUrl: "/" });
 		await waitFor(() => {

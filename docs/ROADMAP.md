@@ -369,8 +369,21 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 
 Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekranlar tasarımdaki gibi birebir; kapsam ADR-043'teki sınırlamadan çıkıp genişler (ADR-044). Her görevde ekran, `scratchpad/design` altında yerelde çizdirilen referans görüntüyle simülatörde yan yana karşılaştırılır.
 
-### [ ] F4-01 Birebir görsel temel
-- **İlerleme (2026-10-13):** [x] F4-01a: tasarımdaki alt menü (`AppTabBar`), üst çubuk (`TopBar`, tüm itilen ekranlarda), Kartlarım sekmesi (boş durum), Bildirimler ekranı (eski Talepler), mock modda hazır oturum ayarı. [ ] F4-01b: karşılama, onboarding, giriş + PIN.
+### [x] F4-01 Birebir görsel temel
+- **İlerleme (2026-10-13):** [x] F4-01a: tasarımdaki alt menü (`AppTabBar`), üst çubuk (`TopBar`, tüm itilen ekranlarda), Kartlarım sekmesi (boş durum), Bildirimler ekranı (eski Talepler), mock modda hazır oturum ayarı. [x] F4-01b (2026-10-14): karşılama, onboarding, giriş + PIN.
+	- Karşılama (01): koyu orman zemin, dekoratif kart yığını, "Hesap oluştur" / "Giriş yap".
+	- Tanıtım (31): 3 slayt, sayaç, Atla, Devam / Başlayalım.
+	- Giriş (02): Giriş yap / Kayıt ol sekmeleri, PIN göster/gizle, Şifremi unuttum. Yüz tanıma gizli (BACKLOG).
+	- PIN ekranı: iki kez giriş, zayıf PIN ve eşleşmeme hatası. Eski hesaplar SMS ile girişten ya da açılışta PIN ekranına yönlenir.
+	- Sunucu (ADR-049):
+		- `pin-login` ve `pin-set` edge function'ları;
+		- türetilmiş parola (`PIN_PEPPER`);
+		- `pin_login_attempts` ve `user_pins` tabloları;
+		- 5 hata / 15 dakika kilidi.
+	- Testler: pgTAP 24, Vitest (kural ve edge sözleşmesi) 14, Jest (API ve ekran akışları). Uçtan uca davranış `supabase functions serve` ile yerelde denendi.
+	- **Kullanıcı kontrolü:**
+		- Expo Go'da açık ve koyu temada 01, 31, 02 ve PIN ekranına bakılmalı.
+		- Üretimden önce `supabase secrets set PIN_PEPPER=...` ayarlanmalı ve GoTrue `sign_in_sign_ups` sınırı yükseltilmeli.
 - Tasarımdaki üst çubuk (44 px beyaz kenarlıklı ikon butonları, ortada 17/800 başlık) ve alt menü: Ana Sayfa · Kartlarım · İşlem (+) · Borçlarım · Takvim.
 - Talepler, Bildirimler'e (06) taşınır; zil buradan açılır.
 - Karşılama (01), Giriş (02), Onboarding (31) birebir.

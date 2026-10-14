@@ -438,6 +438,13 @@ verify_jwt = false
 [functions.delete-account]
 verify_jwt = true
 
+# F4-01b: PIN sign-in is public (it has its own lock); setting a PIN needs the user's session.
+[functions.pin-login]
+verify_jwt = false
+
+[functions.pin-set]
+verify_jwt = true
+
 # Invite functions check their own credentials (OTP, signed approval session); public by design.
 [functions.invite-open]
 verify_jwt = false

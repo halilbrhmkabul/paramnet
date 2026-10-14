@@ -51,6 +51,14 @@ describe.each(["light", "dark"] as const)("%s palette contrast", (scheme) => {
 		["pending", "pendingSoft"],
 		["neutral", "neutralSoft"],
 		["primary", "primarySoft"],
+		["heroText", "heroBg"],
+		["heroSoft", "heroBg"],
+		["heroMuted", "heroBg"],
+		["heroAccent", "heroBg"],
+		["onHeroAccent", "heroAccent"],
+		["heroText", "heroStage"],
+		["heroCardText", "heroCardSurface"],
+		["heroCardMuted", "heroCardSurface"],
 	] as const)("%s on %s ≥ 4.5", (fg, bg) => {
 		expect(contrast(c[fg], c[bg])).toBeGreaterThanOrEqual(4.5);
 	});
