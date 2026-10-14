@@ -158,11 +158,11 @@ Bu bölüm kullanıcının uygulamada yaptığı her işi uçtan uca anlatır.
 
 ## 5.1 İlk açılış ve kayıt
 
-1.  Karşılama ekranı: tek cümlelik vaat ve 3 kısa tanıtım kartı (atlanabilir).
+1.  Karşılama ekranı (01): tek cümlelik vaat, "Hesap oluştur" ve "Giriş yap". "Hesap oluştur" 3 kısa tanıtım ekranını (31, atlanabilir) açar.
 
-2.  Telefon numarası girişi (+90). SMS ile 6 haneli kod gönderilir.
+2.  Telefon numarası girişi (+90, 02 "Kayıt ol"). SMS ile 6 haneli kod gönderilir.
 
-3.  Kod doğrulanır, hesap oluşturulur. Ad soyad (görünen ad) alınır.
+3.  Kod doğrulanır, hesap oluşturulur. Kullanıcı 6 haneli PIN'i iki kez girerek belirler (ADR-046). Ad soyad (görünen ad) alınır.
 
 4.  KVKK aydınlatma metni ve kullanım koşulları onayı.
 
@@ -171,6 +171,8 @@ Bu bölüm kullanıcının uygulamada yaptığı her işi uçtan uca anlatır.
 6.  Telefon numarasına bekleyen davet varsa (başkası bu kullanıcıyla anlaşma paylaşmışsa) doğrudan Talepler ekranı açılır.
 
 7.  Yoksa boş durum ekranı: “İlk kaydını ekle” butonu ve 3 hızlı şablon (Borç verdim, Borç aldım, Taksitle aldım).
+
+Sonraki girişler (02 "Giriş yap"): telefon + 6 haneli PIN. "Şifremi unuttum" SMS koduyla yeni PIN belirletir (Bölüm 11.1).
 
 <table>
 <colgroup>
@@ -808,7 +810,10 @@ Diğer tablolar
 
 ## 11.1 Kimlik doğrulama
 
-- Telefon numarası + SMS OTP. Şifre yok.
+- Telefon + 6 haneli PIN (ADR-046). Kayıtta numara SMS koduyla doğrulanır, ardından PIN iki kez girilerek belirlenir. "Şifremi unuttum": SMS kodu → yeni PIN. PIN'i olmayan eski hesaplar SMS ile girdikten sonra PIN belirler.
+- PIN, Supabase Auth'ta hesabın parolası olarak tutulur; ama PIN'in kendisi değil, sunucudaki `PIN_PEPPER` sırrıyla türetilmiş HMAC değeri (ADR-049). Bu yüzden Auth'a doğrudan parola girişi işe yaramaz; tek yol `pin-login` edge function'ıdır.
+- Hesap kilidi sunucuda: `pin-login` her başarısız denemeyi `pin_login_attempts`'e yazar (numara yalnızca hash'iyle); 15 dakika içinde 5 hata numarayı 15 dakika kilitler. Kayıtlı olmayan numara da aynı yanıtı alır. Başarılı giriş ve yeni PIN sayacı sıfırlar.
+- Zayıf PIN reddedilir: tüm haneleri aynı olan ve art arda gelen (123456, 654321) PIN'ler; kural uygulamada ve `pin-set`'te aynı.
 
 - Oturum: Supabase JWT (kısa ömürlü erişim + yenileme token’ı). Token’lar Expo SecureStore’da (Keychain/Keystore) saklanır.
 

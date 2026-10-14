@@ -483,5 +483,28 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 - **Karar (kullanıcı):** Tasarım 02'deki "6 haneli şifre" gerçek bir PIN'dir.
 	- Kayıtta numara SMS koduyla doğrulanır, ardından kullanıcı 6 haneli PIN belirler (Supabase Auth telefon + parola; parola GoTrue'da hash'li tutulur).
 	- Sonraki girişler telefon + PIN ile yapılır. "Şifremi unuttum" SMS koduyla yeni PIN belirletir. Yüz tanıma, PIN'in yerine cihazda kilit açma kolaylığıdır.
-	- 6 haneli PIN çevrimiçi denemeye karşı zayıftır; GoTrue'nun giriş hız sınırları ve uygulama tarafında art arda hatalı denemede bekleme uygulanır (F4-01b ayrıntıları).
+	- 6 haneli PIN çevrimiçi denemeye karşı zayıftır; GoTrue'nun giriş hız sınırları ve uygulama tarafında art arda hatalı denemede bekleme uygulanır (F4-01b ayrıntıları: sunucu tarafı kilit, ADR-049).
 - **Not:** F4-01a'da yalnızca mock modda, geliştirme kolaylığı olarak `EXPO_PUBLIC_MOCK_SIGNED_IN=1` ile hazır oturum açılır; gerçek moda etkisi yoktur.
+
+## ADR-049 — PIN girişinde sunucu tarafı hesap kilidi
+- **Tarih:** 2026-10-14
+- **Bağlam:** ADR-046'daki 6 haneli PIN yalnızca 10⁶ olasılıktır. GoTrue'nun IP başına hız sınırı numara başına denemeyi durdurmaz; istemcideki bekleme de atlanabilir.
+- **Karar (kullanıcı onaylı, F4-01b):**
+	- **Türetilmiş parola:** Auth'ta PIN'in kendisi değil, `HMAC-SHA256(PIN_PEPPER, "paramnet-pin:v1:" + PIN)` (base64url) parola olarak tutulur. `PIN_PEPPER` yalnızca edge function sırrıdır (en az 32 karakter). Anon anahtarla Auth'a doğrudan PIN denemek işe yaramaz; tek giriş yolu `pin-login`'dir. Sır değişirse tüm PIN'ler geçersizleşir.
+	- **`pin-login` (JWT yok):**
+		- numarayı normalleştirir ve `pin_login_check` ile kilide bakar;
+		- türetilmiş parolayla `signInWithPassword` dener;
+		- `pin_login_record` ile sonucu yazar;
+		- oturumu (`access_token`, `refresh_token`) uygulamaya döndürür; uygulama `setSession` yapar.
+	- **`pin-set` (JWT gerekli):** zayıf PIN'i reddeder, admin API ile türetilmiş parolayı yazar, `pin_mark_set` ile `user_pins` kaydını ve numaranın hatalarını siler. Kayıt, "Şifremi unuttum" ve eski hesaplar aynı yolu kullanır.
+	- **Kilit kuralı:**
+		- 15 dakika içinde 5 hatalı deneme numarayı 15 dakika kilitler;
+		- kilit süresince doğru PIN de denenmez (423 `account_locked`, `retry_after_s`);
+		- 15 dakikadan eski hatalar sayılmaz; başarılı giriş ve yeni PIN sayacı sıfırlar;
+		- kayıtlı olmayan numara da sayılır ve aynı yanıtı alır, böylece numaranın kayıtlı olup olmadığı anlaşılmaz.
+	- **Veri:** `pin_login_attempts` numarayı yalnızca `sha256` hash'iyle tutar; son hatadan 1 gün sonra pg_cron siler. Her iki tablo istemciye kapalıdır; `has_pin()` yalnızca oturumdaki hesap için cevap verir.
+	- **Zayıf PIN:** tüm haneleri aynı olan ve art arda gelen PIN'ler (`012345`…`456789`, `987654`…`543210`) reddedilir. Kural `packages/shared` `pinProblem` ve `_shared/pin.ts`'de aynıdır (sözleşme testi).
+	- **Edge mantığı:** `supabase/functions/_shared/pin.ts`'de I/O dışarıdan verilerek yazıldı ve Vitest sözleşme testiyle sınanır (Deno bu makinede kurulu değil; repo düzeni). Uçtan uca davranış `supabase functions serve` ile yerelde denendi.
+- **Bilinen bedeller:**
+	- Numarayı bilen biri 5 hatalı denemeyle hesabı 15 dakika kilitleyebilir; SMS ile "Şifremi unuttum" kilitten etkilenmez.
+	- Tüm parola girişleri edge function'ın IP'sinden geldiği için GoTrue'nun `sign_in_sign_ups` sınırı (yerelde 5 dakikada 30) üretimde herkese ortaktır. Canlıya çıkmadan önce panelden yükseltilmeli; IP başına sınır `pin-login`'e eklenebilir (BACKLOG).

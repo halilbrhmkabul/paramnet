@@ -3,6 +3,7 @@ import { renderRouter, screen, waitFor, fireEvent } from "expo-router/testing-li
 import { redirectSystemPath } from "../../../../app/+native-intent";
 import { resetSession, useSession } from "@/features/auth/sessionStore";
 import { appRoutes } from "@/testing/appRoutes";
+import { reachSignUpOtp, verifyAndSetPin } from "@/testing/signUp";
 import { signInForTest } from "@/testing/session";
 
 describe("invite links (F2-05)", () => {
@@ -42,16 +43,8 @@ describe("invite links (F2-05)", () => {
 		});
 		expect(useSession.getState().pendingInviteToken).toBe("tok123");
 
-		await fireEvent.press(screen.getByTestId("welcome.skip.button"));
-		await fireEvent.changeText(screen.getByTestId("phone.number.input"), "5551234567");
-		await fireEvent.press(screen.getByTestId("phone.continue.button"));
-		await waitFor(() => {
-			expect(screen.getByTestId("otp.screen")).toBeTruthy();
-		});
-		await fireEvent.changeText(screen.getByTestId("otp.code.input"), "123456");
-		await waitFor(() => {
-			expect(screen.getByTestId("profile.screen")).toBeTruthy();
-		});
+		await reachSignUpOtp();
+		await verifyAndSetPin();
 		await fireEvent.changeText(screen.getByTestId("profile.name.input"), "Bora");
 		await fireEvent.press(screen.getByTestId("profile.consent.checkbox"));
 		await fireEvent.press(screen.getByTestId("profile.save.button"));

@@ -1,4 +1,4 @@
-import { normalizePhoneTR } from "@paramnet/shared";
+import { normalizePhoneTR, pinProblem } from "@paramnet/shared";
 
 import { ApiError } from "../errors";
 import type { AuthApi, AuthUser } from "./AuthApi";
@@ -7,6 +7,11 @@ import type { AuthApi, AuthUser } from "./AuthApi";
 export const MOCK_OTP_CODE = "123456";
 const OTP_TTL_MS = 3 * 60 * 1000;
 const RESEND_AFTER_S = 60;
+// The design's sample PIN; the demo account signs in with it (F4-01b).
+export const MOCK_PIN = "482915";
+// Same lock as pin_login_record (ADR-049).
+const MAX_PIN_FAILURES = 5;
+const PIN_LOCK_MS = 15 * 60 * 1000;
 
 // signedIn: the prototype starts with a demo account (design QA in the simulator, F4-01).
 export type MockAuthOptions = { now?: () => Date; latencyMs?: number; signedIn?: boolean };
@@ -15,6 +20,7 @@ export const DEMO_USER: AuthUser = {
 	id: "u-demo",
 	phone_e164: "+905550000001",
 	display_name: "Deniz Yılmaz",
+	has_pin: true,
 };
 
 export function createMockAuthApi({
@@ -23,7 +29,9 @@ export function createMockAuthApi({
 	signedIn = false,
 }: MockAuthOptions = {}): AuthApi {
 	const sentAt = new Map<string, number>();
-	const users = new Map<string, AuthUser>();
+	const users = new Map<string, AuthUser>([[DEMO_USER.phone_e164, DEMO_USER]]);
+	const pins = new Map<string, string>([[DEMO_USER.phone_e164, MOCK_PIN]]);
+	const failures = new Map<string, { count: number; last: number; lockedUntil: number | null }>();
 	let current: AuthUser | null = null;
 
 	async function delay(): Promise<void> {
@@ -68,10 +76,59 @@ export function createMockAuthApi({
 				id: `u-${phone.slice(-4)}`,
 				phone_e164: phone,
 				display_name: null,
+				has_pin: false,
 			};
 			users.set(phone, user);
 			current = user;
 			return { ...user };
+		},
+
+		async signInWithPin(input, pin) {
+			await delay();
+			const phone = phoneOrThrow(input);
+			const time = now().getTime();
+			const entry = failures.get(phone);
+			if (entry?.lockedUntil != null && entry.lockedUntil > time) {
+				throw new ApiError("account_locked", {
+					retry_after_s: Math.ceil((entry.lockedUntil - time) / 1000),
+				});
+			}
+			const user = users.get(phone);
+			if (user !== undefined && pins.get(phone) === pin) {
+				failures.delete(phone);
+				current = user;
+				return { ...user };
+			}
+			const fresh =
+				entry === undefined ||
+				entry.lockedUntil !== null ||
+				time - entry.last > PIN_LOCK_MS;
+			const count = fresh ? 1 : entry.count + 1;
+			const locked = count >= MAX_PIN_FAILURES;
+			failures.set(phone, {
+				count,
+				last: time,
+				lockedUntil: locked ? time + PIN_LOCK_MS : null,
+			});
+			if (locked) {
+				throw new ApiError("account_locked", { retry_after_s: PIN_LOCK_MS / 1000 });
+			}
+			throw new ApiError("invalid_credentials", { attempts_left: MAX_PIN_FAILURES - count });
+		},
+
+		async setPin(pin) {
+			await delay();
+			if (current === null) {
+				throw new ApiError("forbidden");
+			}
+			const problem = pinProblem(pin);
+			if (problem !== null) {
+				throw new ApiError(problem === "pin_weak" ? "pin_weak" : "validation_error");
+			}
+			pins.set(current.phone_e164, pin);
+			failures.delete(current.phone_e164);
+			current = { ...current, has_pin: true };
+			users.set(current.phone_e164, current);
 		},
 
 		async updateProfile(displayName) {
@@ -96,14 +153,14 @@ export function createMockAuthApi({
 				throw new ApiError("forbidden");
 			}
 			users.delete(current.phone_e164);
+			pins.delete(current.phone_e164);
 			current = null;
 		},
 
 		// The prototype keeps nothing between launches (ADR-016).
 		restore() {
 			if (signedIn) {
-				current = DEMO_USER;
-				users.set(DEMO_USER.phone_e164, DEMO_USER);
+				current = users.get(DEMO_USER.phone_e164) ?? DEMO_USER;
 			}
 			return Promise.resolve(current === null ? null : { ...current });
 		},

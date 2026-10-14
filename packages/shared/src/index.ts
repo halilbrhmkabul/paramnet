@@ -8,6 +8,7 @@ export * from "./allocation";
 export * from "./dates";
 export * from "./enums";
 export * from "./money";
+export * from "./pin";
 export * from "./plan";
 export * from "./schemas";
 export * from "./terms-hash";

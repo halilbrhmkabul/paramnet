@@ -18,11 +18,14 @@ export type TextFieldProps = Pick<
 	| "multiline"
 	| "returnKeyType"
 	| "onSubmitEditing"
+	| "secureTextEntry"
 > & {
 	label: string;
 	error?: string;
 	helper?: string;
 	prefix?: ReactNode;
+	// Trailing control inside the field, e.g. the PIN's show/hide button.
+	suffix?: ReactNode;
 	testID: string;
 };
 
@@ -31,6 +34,7 @@ export function TextField({
 	error,
 	helper,
 	prefix,
+	suffix,
 	testID,
 	multiline,
 	...inputProps
@@ -63,6 +67,7 @@ export function TextField({
 					style={[styles.input, typography.body, { color: colors.text }]}
 					{...inputProps}
 				/>
+				{suffix}
 			</View>
 			{error !== undefined ? (
 				<Text

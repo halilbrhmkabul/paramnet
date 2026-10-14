@@ -138,6 +138,8 @@ create type event_channel    as enum ('app','web','system');
 - `consents`: user_id, document (kvkk, terms), version, accepted_at.
 - `disputes`: id, agreement_id, opened_by, payment_id null, reason (zorunlu, ≤500), status (open, resolved, amended, closed), resolved_at; anlaşma başına tek açık itiraz (ADR-034).
 - `agreements.cancel_requested_by` / `cancel_requested_at`: açık karşılıklı iptal talebi (ADR-034).
+- `pin_login_attempts` (istemciye kapalı, ADR-049): phone_hash text pk (sha256), failed_count, last_failed_at, locked_until. 1 günden eski satırları pg_cron siler.
+- `user_pins` (istemciye kapalı): user_id pk → auth.users, pin_set_at. Satırı yoksa hesap PIN'den önceki bir hesaptır.
 - `rate_limits`: key text, window_start timestamptz, count int (RPC/edge rate limit sayaçları).
 
 ## RLS ilkeleri
@@ -174,6 +176,8 @@ create type event_channel    as enum ('app','web','system');
 | `get_calendar(month date)` | |
 | `get_agreement_detail(id)` | Anlaşma + versiyon + taksitler (türetilmiş durumla) + ödemeler + olaylar |
 | `list_contacts_with_balance()` | |
+| `has_pin()` | Oturumdaki hesap PIN belirlemiş mi (ADR-046) |
+| `pin_login_check(phone)` / `pin_login_record(phone, ok)` / `pin_mark_set(uid, phone)` | Yalnızca service_role; `pin-login` / `pin-set` kilit sayacı (ADR-049) |
 
 ## Edge functions
 
@@ -187,4 +191,6 @@ create type event_channel    as enum ('app','web','system');
 | `dispatch-notifications` | Outbox → Expo Push; geçersiz token temizliği |
 | `schedule-reminders` | pg_cron, her gün 08:00 |
 | `expire-invites` | pg_cron |
+| `pin-login` | Telefon + PIN girişi; kilit kontrolü, türetilmiş parola ile Auth girişi, oturumu döndürür (ADR-049) |
+| `pin-set` | Oturumdaki hesabın PIN'ini belirler; zayıf PIN'i reddeder |
 | `send-sms-hook` | Supabase Auth OTP → yerli SMS sağlayıcı (Faz 3) |

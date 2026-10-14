@@ -1,4 +1,5 @@
-# Karşılama → telefon → OTP (test kodu) → profil → Ana Sayfa
+# Karşılama (01) → tanıtım (31) → Kayıt ol (02) → OTP (test kodu) → PIN → profil → Ana Sayfa;
+# ardından çıkış yapmadan PIN ile giriş ayrı akışta denenebilir (subflows/login.yaml).
 appId: com.paramnet.app
 ---
 - launchApp:
@@ -6,22 +7,35 @@ appId: com.paramnet.app
 - assertVisible:
     id: welcome.screen
 - tapOn:
-    id: welcome.next.button
+    id: welcome.create.button
+- assertVisible: "1 / 3"
 - tapOn:
-    id: welcome.next.button
+    id: onboarding.next.button
 - tapOn:
-    id: welcome.next.button
+    id: onboarding.next.button
 - tapOn:
-    id: phone.number.input
-- inputText: "5550000001"
+    id: onboarding.next.button
+- assertVisible: "Hesap oluştur"
 - tapOn:
-    id: phone.continue.button
+    id: login.phone.input
+- inputText: "5550000002"
+- tapOn:
+    id: login.submit.button
 - tapOn:
     id: otp.code.input
 - inputText: "000000"
 - assertVisible: "Kod hatalı. Tekrar dener misin?"
 - eraseText: 6
 - inputText: "123456"
+- runFlow:
+    when:
+      visible:
+        id: pin.screen
+    commands:
+      - inputText: "123456"
+      - assertVisible: "Bu şifre kolay tahmin edilir. Art arda ya da aynı rakamlar kullanma."
+      - inputText: "482915"
+      - inputText: "482915"
 - runFlow:
     when:
       visible:

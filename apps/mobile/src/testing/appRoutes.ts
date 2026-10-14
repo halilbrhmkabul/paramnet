@@ -2,7 +2,9 @@ import RootLayout from "../../app/_layout";
 import AuthLayout from "../../app/(auth)/_layout";
 import Notifications from "../../app/(auth)/notifications";
 import Otp from "../../app/(auth)/otp";
-import Phone from "../../app/(auth)/phone";
+import Login from "../../app/(auth)/login";
+import OnboardingRoute from "../../app/(auth)/onboarding";
+import Pin from "../../app/(auth)/pin";
 import Profile from "../../app/(auth)/profile";
 import Welcome from "../../app/(auth)/welcome";
 import TabsLayout from "../../app/(tabs)/_layout";
@@ -38,7 +40,9 @@ export const appRoutes = {
 	index: Index,
 	"(auth)/_layout": AuthLayout,
 	"(auth)/welcome": Welcome,
-	"(auth)/phone": Phone,
+	"(auth)/onboarding": OnboardingRoute,
+	"(auth)/login": Login,
+	"(auth)/pin": Pin,
 	"(auth)/otp": Otp,
 	"(auth)/profile": Profile,
 	"(auth)/notifications": Notifications,

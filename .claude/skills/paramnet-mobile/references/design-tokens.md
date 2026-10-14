@@ -26,6 +26,13 @@ Kaynak: kullanıcının tasarım kanvası (ParamNet, "30 · Tasarım Sistemi"), 
 | `warning` / `warningSoft` | `#7A4E00` / `#FBEFD5` | `#E3B65E` / `#352A12` | Yaklaşan, onay bekliyor |
 | `overdue` / `overdueSoft` / `dangerBorder` | `#A1291F` / `#FBE4E1` / `#EDC1BB` | `#F08C82` / `#3A1D1A` / `#5C2C27` | Gecikmiş, itiraz, yıkıcı eylem |
 | `neutral` / `neutralSoft` | `#46534C` / `#ECEFEC` | `#B3C0B8` / `#26302B` | Planlı, manuel kayıt, iptal |
+| `heroBg` / `heroStage` / `heroCard` | `#0C2F25` / `#0F3A2E` / `#146A4E` | aynı | Karşılama (01) zemini, tanıtım (31) sahnesi, dekoratif kart |
+| `heroText` / `heroSoft` / `heroMuted` | `#FFFFFF` / `#B7CEC4` / `#9FBAAE` | aynı | Koyu zemin üstünde metin |
+| `heroAccent` / `onHeroAccent` | `#7FD3AE` / `#0C2F25` | aynı | Koyu zeminde birincil buton ve vurgu |
+| `heroLine` / `heroGlow` / `heroChip` | beyaz %28 / nane %40 / beyaz %12 | aynı | Koyu zeminde çerçeve, kart kenarı, hap |
+| `heroCardSurface` / `heroCardText` / `heroCardMuted` | `#FFFFFF` / `#13221B` / `#56645D` | aynı | Tanıtım görsellerindeki beyaz mini kartlar |
+
+`hero*` token'ları her iki temada aynıdır: karşılama ve tanıtım görselleri tasarımda koyu orman zemindedir (F4-01b).
 
 Rozet tonları (`Badge`): `success`, `pending`, `warning`, `overdue`, `neutral`, `primary`; her biri yumuşak zemin + koyu metin, hap biçiminde.
 

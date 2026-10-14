@@ -1,7 +1,7 @@
 import { normalizePhoneTR } from "@paramnet/shared";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 
-import { ApiError } from "../errors";
+import { ApiError, type ApiErrorCode } from "../errors";
 import { toApiError } from "../supabase/toApiError";
 import type { AuthApi, AuthUser, ProfileResult } from "./AuthApi";
 import { KVKK_VERSION, TERMS_VERSION } from "@/lib/legal";
@@ -16,6 +16,75 @@ function phoneOrThrow(input: string): string {
 	return phone;
 }
 
+// Codes pin-login and pin-set answer with (supabase/functions/_shared/pin.ts).
+const FUNCTION_CODES: readonly ApiErrorCode[] = [
+	"invalid_credentials",
+	"account_locked",
+	"pin_weak",
+	"invalid_phone",
+	"validation_error",
+	"rate_limited",
+];
+
+function numberField(body: Record<string, unknown>, key: string): number | undefined {
+	const value = body[key];
+	return typeof value === "number" ? value : undefined;
+}
+
+// supabase-js reports a non-2xx function answer as an error whose context is the Response.
+async function functionError(error: unknown): Promise<ApiError | Error> {
+	const context: unknown =
+		typeof error === "object" && error !== null && "context" in error
+			? error.context
+			: undefined;
+	if (
+		typeof context === "object" &&
+		context !== null &&
+		"json" in context &&
+		typeof context.json === "function"
+	) {
+		try {
+			const body: unknown = await (context.json as () => Promise<unknown>)();
+			if (typeof body === "object" && body !== null && "error" in body) {
+				const fields = body as Record<string, unknown>;
+				const code = FUNCTION_CODES.find((c) => c === fields.error);
+				if (code !== undefined) {
+					const attempts_left = numberField(fields, "attempts_left");
+					const retry_after_s = numberField(fields, "retry_after_s");
+					const details = {
+						...(attempts_left === undefined ? {} : { attempts_left }),
+						...(retry_after_s === undefined ? {} : { retry_after_s }),
+					};
+					return new ApiError(
+						code,
+						Object.keys(details).length > 0 ? details : undefined,
+					);
+				}
+			}
+		} catch {
+			// Not a JSON answer: fall through to the generic mapping.
+		}
+	}
+	return toApiError(error);
+}
+
+function isPinSession(
+	value: unknown,
+): value is { session: { access_token: string; refresh_token: string } } {
+	if (typeof value !== "object" || value === null || !("session" in value)) {
+		return false;
+	}
+	const session: unknown = value.session;
+	return (
+		typeof session === "object" &&
+		session !== null &&
+		"access_token" in session &&
+		typeof session.access_token === "string" &&
+		"refresh_token" in session &&
+		typeof session.refresh_token === "string"
+	);
+}
+
 export function createSupabaseAuthApi(client: SupabaseClient): AuthApi {
 	async function toAuthUser(user: User): Promise<AuthUser> {
 		// RLS lets a user read only their own profile; no row yet means the profile step is still open.
@@ -26,10 +95,15 @@ export function createSupabaseAuthApi(client: SupabaseClient): AuthApi {
 		if (error !== null) {
 			throw toApiError(error);
 		}
+		const pin: { data: unknown; error: unknown } = await client.rpc("has_pin");
+		if (pin.error !== null) {
+			throw toApiError(pin.error);
+		}
 		return {
 			id: user.id,
 			phone_e164: `+${user.phone ?? ""}`,
 			display_name: data?.display_name ?? null,
+			has_pin: pin.data === true,
 		};
 	}
 
@@ -52,6 +126,35 @@ export function createSupabaseAuthApi(client: SupabaseClient): AuthApi {
 				throw toApiError(error);
 			}
 			return toAuthUser(data.user);
+		},
+
+		async signInWithPin(input, pin) {
+			const response: { data: unknown; error: unknown } = await client.functions.invoke(
+				"pin-login",
+				{ body: { phone: phoneOrThrow(input), pin } },
+			);
+			if (response.error !== null) {
+				throw await functionError(response.error);
+			}
+			if (!isPinSession(response.data)) {
+				throw new Error("pin-login returned no session");
+			}
+			const { access_token, refresh_token } = response.data.session;
+			const { data, error } = await client.auth.setSession({ access_token, refresh_token });
+			if (error !== null || data.user === null) {
+				throw toApiError(error);
+			}
+			return toAuthUser(data.user);
+		},
+
+		async setPin(pin) {
+			// The function reads the user from the session's JWT; supabase-js attaches it.
+			const response: { error: unknown } = await client.functions.invoke("pin-set", {
+				body: { pin },
+			});
+			if (response.error !== null) {
+				throw await functionError(response.error);
+			}
 		},
 
 		async updateProfile(displayName) {

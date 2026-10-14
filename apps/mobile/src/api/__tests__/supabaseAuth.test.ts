@@ -12,6 +12,7 @@ function fakeClient(overrides: {
 	profile?: Result;
 	rpc?: Result;
 	invoke?: Result;
+	setSession?: Result;
 }) {
 	const calls: { method: string; args: unknown[] }[] = [];
 	const record =
@@ -25,6 +26,7 @@ function fakeClient(overrides: {
 			signInWithOtp: record("signInWithOtp", overrides.signInWithOtp),
 			verifyOtp: record("verifyOtp", overrides.verifyOtp),
 			getSession: record("getSession", overrides.getSession),
+			setSession: record("setSession", overrides.setSession),
 			signOut: record("signOut", undefined),
 			onAuthStateChange: () => ({ data: { subscription: { unsubscribe: jest.fn() } } }),
 		},
@@ -75,6 +77,7 @@ describe("Supabase AuthApi", () => {
 			id: "u1",
 			phone_e164: "+905550000001",
 			display_name: null,
+			has_pin: false,
 		});
 		expect(fresh.calls[0]).toEqual({
 			method: "verifyOtp",
@@ -123,6 +126,7 @@ describe("Supabase AuthApi", () => {
 			id: "u1",
 			phone_e164: "+905550000001",
 			display_name: "Ayşe",
+			has_pin: false,
 		});
 	});
 
@@ -139,5 +143,77 @@ describe("Supabase AuthApi", () => {
 		const { client, calls } = fakeClient({ invoke: { data: null, error: new Error("boom") } });
 		await expect(createSupabaseAuthApi(client).deleteAccount()).rejects.toBeInstanceOf(Error);
 		expect(calls.map((c) => c.method)).toEqual(["invoke"]);
+	});
+
+	// supabase-js hands a non-2xx function answer over as an error whose context is the Response.
+	function httpError(body: unknown) {
+		return { name: "FunctionsHttpError", context: { json: () => Promise.resolve(body) } };
+	}
+
+	it("signs in through pin-login and keeps the returned session (ADR-046)", async () => {
+		const tokens = { access_token: "at", refresh_token: "rt", expires_in: 3600 };
+		const { client, calls } = fakeClient({
+			invoke: { data: { session: tokens }, error: null },
+			setSession: { data: { user, session: {} }, error: null },
+			profile: { data: { display_name: "Ayşe" }, error: null },
+			rpc: { data: true, error: null },
+		});
+		await expect(
+			createSupabaseAuthApi(client).signInWithPin("0555 000 00 01", "482915"),
+		).resolves.toEqual({
+			id: "u1",
+			phone_e164: "+905550000001",
+			display_name: "Ayşe",
+			has_pin: true,
+		});
+		expect(calls.slice(0, 2)).toEqual([
+			{
+				method: "invoke",
+				args: ["pin-login", { body: { phone: "+905550000001", pin: "482915" } }],
+			},
+			{ method: "setSession", args: [{ access_token: "at", refresh_token: "rt" }] },
+		]);
+		expect(calls).toContainEqual({ method: "rpc", args: ["has_pin"] });
+	});
+
+	it("maps a wrong PIN and a locked number with their details (ADR-049)", async () => {
+		const wrong = fakeClient({
+			invoke: {
+				data: null,
+				error: httpError({ error: "invalid_credentials", attempts_left: 2 }),
+			},
+		});
+		const error: unknown = await createSupabaseAuthApi(wrong.client)
+			.signInWithPin("5550000001", "482915")
+			.catch((e: unknown) => e);
+		expect(error).toEqual(new ApiError("invalid_credentials"));
+		expect((error as ApiError).details).toEqual({ attempts_left: 2 });
+		expect(wrong.calls.map((c) => c.method)).toEqual(["invoke"]);
+
+		const locked = fakeClient({
+			invoke: {
+				data: null,
+				error: httpError({ error: "account_locked", retry_after_s: 840 }),
+			},
+		});
+		const lockError: unknown = await createSupabaseAuthApi(locked.client)
+			.signInWithPin("5550000001", "482915")
+			.catch((e: unknown) => e);
+		expect(lockError).toEqual(new ApiError("account_locked"));
+		expect((lockError as ApiError).details).toEqual({ retry_after_s: 840 });
+	});
+
+	it("sets the PIN through pin-set", async () => {
+		const ok = fakeClient({ invoke: { data: { pin_set: true }, error: null } });
+		await createSupabaseAuthApi(ok.client).setPin("482915");
+		expect(ok.calls).toEqual([
+			{ method: "invoke", args: ["pin-set", { body: { pin: "482915" } }] },
+		]);
+		const weak = fakeClient({
+			invoke: { data: null, error: httpError({ error: "pin_weak" }) },
+		});
+		await expect(createSupabaseAuthApi(weak.client).setPin("123456")).rejects.toEqual(
+			new ApiError("pin_weak"),
+		);
 	});
 });

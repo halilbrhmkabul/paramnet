@@ -13,9 +13,11 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 
 | ID | Ekran | Rota | Ana bileşenler | Not |
 |---|---|---|---|---|
-| S01 | Karşılama | `(auth)/welcome` | Vaat cümlesi, 3 atlanabilir tanıtım kartı, Başla | |
-| S02 | Telefon | `(auth)/phone` | +90 sabit, numara girişi, KVKK ve koşullar linki | |
-| S03 | OTP | `(auth)/otp` | 6 haneli kod, 60 sn sonra yeniden gönder, hata durumları | iOS otomatik SMS kod doldurma |
+| S01 | Karşılama (01) | `(auth)/welcome` | Koyu orman zemin, dekoratif kart yığını, vaat, Hesap oluştur / Giriş yap | Her iki temada koyu |
+| S01b | Tanıtım (31) | `(auth)/onboarding` | 3 slayt, sayaç, Atla, Devam / Başlayalım → Kayıt ol | |
+| S02 | Giriş (02) | `(auth)/login?mode=signin\|signup` | Giriş yap / Kayıt ol sekmeleri; +90 numara; giriş: 6 haneli PIN (göster/gizle), Şifremi unuttum; kayıt: Kod gönder | Yüz tanıma gizli (BACKLOG) |
+| S03 | OTP | `(auth)/otp` | 6 haneli kod, 60 sn sonra yeniden gönder, hata durumları; kayıt ve PIN yenileme | iOS otomatik SMS kod doldurma |
+| S03b | PIN belirle | `(auth)/pin` | 6 hane iki kez; zayıf PIN ve eşleşmeme hatası; eski hesaba açıklama | ADR-046 |
 | S04 | Profil kurulumu | `(auth)/profile` | Görünen ad, KVKK onayı, bildirim izni (gerekçeli) | Bekleyen davet varsa sonrasında Talepler |
 | S05 | Ana Sayfa | `(tabs)/index` | Toplam alacak, toplam borç, bu ay ödenecek/tahsil edilecek, gecikenler, yaklaşan 5 vade, bekleyen işler bandı | Boş durum: 3 hızlı şablon |
 | S06 | Kişiler | `(tabs)/contacts` | Arama, kişi listesi, net bakiye (bana borçlu / borçluyum) | |
