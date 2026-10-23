@@ -33,9 +33,9 @@ select is_empty(
 );
 select results_eq(
 	$$ select p.proname::text collate "default" from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-		where n.nspname = 'private' and has_function_privilege('authenticated', p.oid, 'execute') $$,
-	$$ values ('can_view_agreement') $$,
-	'private şemasından yalnızca RLS yardımcısı çağrılabilir'
+		where n.nspname = 'private' and has_function_privilege('authenticated', p.oid, 'execute') order by 1 $$,
+	$$ values ('avatar_visible'), ('can_view_agreement') $$,
+	'private şemasından yalnızca RLS yardımcıları çağrılabilir (avatars politikası dahil)'
 );
 -- Web onayı ve outbox işleme servis rolüne ait; oturum açmış kullanıcı da çağıramaz.
 select is_empty(

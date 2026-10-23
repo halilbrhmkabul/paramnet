@@ -508,3 +508,43 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 - **Bilinen bedeller:**
 	- Numarayı bilen biri 5 hatalı denemeyle hesabı 15 dakika kilitleyebilir; SMS ile "Şifremi unuttum" kilitten etkilenmez.
 	- Tüm parola girişleri edge function'ın IP'sinden geldiği için GoTrue'nun `sign_in_sign_ups` sınırı (yerelde 5 dakikada 30) üretimde herkese ortaktır. Canlıya çıkmadan önce panelden yükseltilmeli; IP başına sınır `pin-login`'e eklenebilir (BACKLOG).
+
+## ADR-050 — ParamNet ID
+- **Tarih:** 2026-10-24
+- **Bağlam:** Tasarımdaki ParamNet ID (PN-xxxxxx) veri modelinde yoktu (ADR-043). ADR-044 ile kapsama alındı; kurallar F4-02 başında kullanıcıyla belirlendi.
+- **Karar (kullanıcı):**
+	- **Biçim:** `PN-` + 6 karakter; alfabe `23456789ABCDEFGHJKLMNPQRSTUVWXYZ` (karışan `0`, `1`, `I`, `O` yok; 32⁶ ≈ 1 milyar). Sunucuda `gen_random_bytes` ile rastgele üretilir; çakışmada yeniden denenir. Sıralı değildir, kullanıcı sayısını ele vermez.
+		- Saklama: `profiles.paramnet_id` (`PN-XXXXXX`, UNIQUE, biçim CHECK'li). Kayıtta otomatik atanır; mevcut hesaplara migration ile verilir.
+		- Girdi normalleştirme: büyük harf; boşluk, tire ve baştaki `PN` atılır. Kural `packages/shared` ve SQL'de aynıdır (sözleşme testi).
+	- **Değişim:** Kullanıcı kendi ID'sini seçemez; Profil'den yeni rastgele ID üretebilir, 30 günde en fazla bir kez. Eski ID hemen geçersiz olur ve hiçbir hesaba yeniden verilmez (`retired_paramnet_ids`). Eski ID ile gönderilmiş ve bekleyen paylaşımlar etkilenmez (hedef profile bağlıdır).
+	- **Arama (`find_by_paramnet_id`):**
+		- Yalnızca tam eşleşme. Arayan yalnızca görünen adı ve baş harfleri görür; telefon, profil kimliği ya da başka bilgi dönmez.
+		- Kullanıcı başına saatte 20 arama (bulunan ve bulunamayan aramalar birlikte sayılır); aşımda `rate_limited`.
+		- Profilde "ID ile bulunabilirim" anahtarı (`id_discoverable`, varsayılan açık). Kapalı, silinmiş ya da olmayan ID aynı "bulunamadı" yanıtını alır.
+		- Kendi ID'sini arayan `self` hatası alır. Aranan kişiye bildirim gitmez.
+	- **Paylaşmayla ilişkisi:** ID, telefon numarasına alternatif bir paylaşım hedefidir; telefonla davet akışı (5.4) aynen kalır.
+		- `share_agreement_by_id`: anlaşmayı `pending`'e geçirir ve hedef profile bağlı bir davet oluşturur (`invites.target_profile_id`; token ve OTP yok). Davet 7 gün geçerli; geri çekme ve süre dolumu telefonla paylaşımdaki gibidir.
+		- Karşı tarafa push ve Bildirimler'de talep gider; kararını uygulama içinden `decide_agreement` ile verir. Yetki: oturumdaki kullanıcı = davetin hedef profili.
+		- Kendine paylaşma reddedilir (BR-12). Kişi kaydında numara yoksa telefon istenmez; kabulde `contacts.linked_profile_id` dolar, karşı tarafın numarası paylaşana gösterilmez.
+		- Spam sınırı: kullanıcı başına günde 10 ID ile paylaşım.
+	- **Kişisel veri:** ID kişisel tanımlayıcı sayılır; loglara ve analitik olaylarına yazılmaz.
+- **Tasarımla ilişkisi:** Tasarımdaki `PN-481927` yalnızca örnektir; ID harf de içerir. 35'teki "Değiştirilemez" etiketi kullanılmaz (kullanıcı kararı): yenileme Profil > "ID ile bulunabilirlik" ekranındaki "Yeni ID al" butonundadır. Aynı ekranda seçenekler "Herkes" ve "Kimse"dir (`id_discoverable`).
+- **Uygulama notları (F4-02a):**
+	- Arama ve ID ile paylaşım "bulunamadı"yı hata değil değer olarak döner (`status`). Hata, `rate_limits` sayaç artışını da geri alırdı; bulunamayan aramalar sayılmaz ve ID taranabilirdi. ID ile paylaşımda bulunamayan ID de arama sayacından düşer.
+	- Sayaçlar mevcut `rate_limits` tablosunda; ayrı arama tablosu yok.
+	- Hesap silmede ID emekliye ayrılır; o hesaba ID ile verilmiş bekleyen davetlerin süresi hemen dolar ve anlaşmalar sahibine döner.
+- **Kapsam dışı (BACKLOG):** kullanıcı engelleme, ID'yi QR kodla paylaşma, ID ile kişi ekleme (paylaşmadan rehbere kaydetme).
+
+## ADR-051 — Profil alanları, bildirim kutusu ve hatırlatma tercihleri
+- **Tarih:** 2026-10-24
+- **Bağlam:** F4-02 tasarımı (04, 05, 06, 35) veri modelinde olmayan alanlar ve davranışlar içeriyor.
+- **Karar (kullanıcı):**
+	- **Ad ve soyad:** `profiles.first_name` ve `last_name` ayrı tutulur; `display_name` bunlardan türetilir (karşı tarafa ve aramaya giden ad budur). Mevcut hesaplarda ve yalnızca görünen ad gelen yollarda (`complete_profile`) ad son boşluktan bölünür: "Ayşe Nur Yılmaz" → "Ayşe Nur" + "Yılmaz" (ikili ön adlar yaygın).
+	- **Profil fotoğrafı:** özel `avatars` bucket'ı; yükleme RPC'yle verilen yola, kare kırpılmış ve küçültülmüş JPEG (en fazla 512 px, 1 MB). Kendisi ve anlaşmalardaki karşı tarafı kısa süreli imzalı URL ile görür; ID aramasında fotoğraf dönmez (BR-17). Kamera ve galeri için `expo-image-picker` eklenir. Hesap silmede silinir.
+	- **Kullanıcı adı (@):** benzersiz, 3–20 karakter, küçük harf, rakam, `_` ve `.`; isteğe bağlı. Yalnızca gösterim içindir: kişi bulmada kullanılmaz (tahmin edilebilir adlarla tarama riski). Uygunluk kontrolü yalnızca oturumdaki kullanıcı için ve sayaçla sınırlıdır.
+	- **E-posta:** eklenmez; tasarımdaki alan gösterilmez.
+	- **Bildirim kutusu:** kullanıcı başına `notifications` tablosu. Push gönderen her olay (outbox) aynı kaydı kutuya da yazar. Okundu bilgisi (`read_at`), "Tümünü okundu işaretle", filtreler (Tümü, Onay gereken, Hatırlatmalar, Tamamlanan) ve gün gruplaması bu tablodan gelir. "Onay gereken" sayısı canlı veriden (bekleyen kararlar) hesaplanır, kutudaki kopya bayatlamaz. Kayıtlar 90 gün saklanır (pg_cron).
+	- **Hatırlatma tercihleri:** vade öncesi hatırlatma kullanıcı tercihidir: 7 gün, 3 gün, 1 gün önce ve vade günü (çoklu seçim; varsayılan 3 gün önce ve vade günü). Vade sonrası hatırlatmalar (1 ve 7 gün sonra) ve bildirilen ödeme hatırlatması değişmez. Tercih yalnızca kendi hatırlatmalarını etkiler; anlaşma bazında kapatma (spec 5.9) BACKLOG'da kalır.
+	- **Henüz yapılmamış modüller gizlenir:** Ana menüde Hesaplar, Banka Kredileri, Raporlar, Bütçe, Faiz Hesaplayıcı; Profilde Hesaplarım, QR kod, yüz tanıma kilidi, "Açılışta tutarları gizle". Her biri kendi görevinde görünür olur.
+	- **Fotoğraf erişimi:** `avatars` politikası sahibine ve paylaşılmış (kişisel olmayan) bir anlaşmanın karşı tarafına okuma verir; yükleme ve silme yalnızca kendi klasörüne. Storage SQL ile silmeye izin vermez: eski dosyayı uygulama Storage API'siyle siler, hesap silmede `delete-account` klasörü boşaltır.
+	- **Yasal metinler ve hesap silme:** Profil'de "Gizlilik ve güvenlik" kartına "Yasal metinler" ve "Hesabı sil" satırları eklenir; "Kayıtları dışa aktar" mevcut dışa aktarmaya bağlanır. Ayrı Ayarlar ekranı kalkar; Ana menüdeki "Gizlilik ve ayarlar" Profil'i açar.

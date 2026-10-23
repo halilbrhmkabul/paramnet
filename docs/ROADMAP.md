@@ -389,6 +389,16 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 - Karşılama (01), Giriş (02), Onboarding (31) birebir.
 
 ### [ ] F4-02 ParamNet ID, Profil (04), Profili düzenle (35), Ana menü (05), Bildirimler (06)
+- Kararlar: ADR-050 (ParamNet ID), ADR-051 (profil alanları, bildirim kutusu, hatırlatma tercihi). İki parça, iki commit.
+- **İlerleme (2026-10-24):** [x] F4-02a sunucu ve paylaşılan kod:
+	- `packages/shared` `profile-ids`: ID ve kullanıcı adı normalleştirme; aynı kural plpgsql'de, `test-vectors/profile-ids.json` ikisini de sınar (Vitest 33, pgTAP vektörleri `db:vectors` ile).
+	- ParamNet ID: kayıtta atanır (mevcut hesaplara migration ile), `find_by_paramnet_id` (saatte 20), `regenerate_paramnet_id` (30 günde bir, eski ID emekli), `set_id_discoverable`, `share_agreement_by_id` (günde 10, hedef profile bağlı davet). Karar, talepler ve bildirim tetikleyicisi iki davet türünü de tanır.
+	- Profil: ad/soyad, @kullanıcı adı (`update_profile`, `check_username`), `avatars` deposu ve `set_avatar`, `get_my_profile`; karşı tarafın fotoğraf yolu anlaşma özetinde.
+	- Bildirim kutusu: `notifications` (outbox tetikleyicisi), `list_notifications`, `mark_notifications_read`, 90 gün saklama. Vade öncesi hatırlatma tercihi `set_reminder_prefs` (7, 3, 1 gün önce, vade günü).
+	- Hesap silme ve dışa aktarma yeni alanları kapsar; `delete-account` fotoğraf klasörünü boşaltır.
+	- Testler: pgTAP 240 (57), 250 (43), 260 (34); tüm paket 827 test geçti. Mevcut 050, 170, 200 beklenen çıktıları yeni alanlarla güncellendi.
+	- **Kullanıcı kontrolü:** `delete-account` değişikliği Deno bu makinede olmadığı için çalıştırılmadı; `supabase functions serve` ile hesap silme denenmeli. Migration'lar yalnızca yerelde uygulandı.
+- [ ] F4-02b ekranlar: Profil (04), Profili düzenle (35), Ana menü (05), Bildirimler (06), Paylaş ekranında ID seçimi.
 
 ### [ ] F4-03 Hesaplar ve işlemler
 - Hesaplar/cüzdan (29), Hesap ekle (33), İşlem merkezi (21), Gider/Gelir/Transfer (22), İşlem geçmişi (36), İşlem detayı (37).

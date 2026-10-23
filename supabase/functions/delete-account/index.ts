@@ -19,6 +19,21 @@ Deno.serve(
 		if (erased.error !== null) {
 			return rpcError(erased.error);
 		}
+		// Storage refuses SQL deletes, so the photo goes through the API: every file in the user's folder,
+		// old uploads the app failed to clean up included (ADR-051).
+		const avatars = client.storage.from("avatars");
+		const listed = await avatars.list(data.user.id);
+		if (listed.error !== null) {
+			throw listed.error;
+		}
+		if (listed.data.length > 0) {
+			const removedFiles = await avatars.remove(
+				listed.data.map((file) => `${data.user.id}/${file.name}`),
+			);
+			if (removedFiles.error !== null) {
+				throw removedFiles.error;
+			}
+		}
 		const removed = await client.auth.admin.deleteUser(data.user.id, true);
 		if (removed.error !== null) {
 			throw removed.error;

@@ -28,6 +28,13 @@ create type event_channel    as enum ('app','web','system');
 | locale | text default 'tr-TR' | |
 | timezone | text default 'Europe/Istanbul' | |
 | deleted_at | timestamptz null | |
+| first_name / last_name | text null | Görünen ad bunlardan; yalnızca görünen ad gelirse son boşluktan bölünür (ADR-051) |
+| username | text unique null | `normalize_username` biçiminde; yalnızca gösterim, aramada kullanılmaz |
+| avatar_path | text null | `avatars/{uid}/{uuid}.jpg` |
+| paramnet_id | text unique null | `PN-` + 6 karakter (`23456789A–Z`, I ve O yok); kayıtta tetikleyiciyle atanır (ADR-050) |
+| paramnet_id_changed_at | timestamptz null | Yenileme 30 günde bir |
+| id_discoverable | boolean default true | Kapalıysa ID ile bulunmaz |
+| reminder_before_days | int[] default {3,0} | 7, 3, 1, 0 alt kümesi |
 
 ### contacts
 | Sütun | Tip | Not |
@@ -111,7 +118,8 @@ create type event_channel    as enum ('app','web','system');
 | id | uuid PK | |
 | agreement_id, version | FK | |
 | token_hash | bytea unique | SHA-256(token) |
-| target_phone_e164 | text | |
+| target_phone_e164 | text null | Numarayla davet |
+| target_profile_id | uuid null | ID ile davet: token ve OTP yok (`token_hash` null). İkisinden tam biri dolu |
 | status | invite_status | |
 | expires_at | timestamptz | +7 gün |
 | otp_attempts | int default 0 | Üst sınır 5 |
@@ -140,7 +148,10 @@ create type event_channel    as enum ('app','web','system');
 - `agreements.cancel_requested_by` / `cancel_requested_at`: açık karşılıklı iptal talebi (ADR-034).
 - `pin_login_attempts` (istemciye kapalı, ADR-049): phone_hash text pk (sha256), failed_count, last_failed_at, locked_until. 1 günden eski satırları pg_cron siler.
 - `user_pins` (istemciye kapalı): user_id pk → auth.users, pin_set_at. Satırı yoksa hesap PIN'den önceki bir hesaptır.
-- `rate_limits`: key text, window_start timestamptz, count int (RPC/edge rate limit sayaçları).
+- `rate_limits`: key text, window_start timestamptz, count int (RPC/edge rate limit sayaçları). Hata fırlatan RPC sayacı da geri alır; sayılması gereken sonuçlar (ör. "bulunamadı") hata değil değer döner.
+- `retired_paramnet_ids` (istemciye kapalı): paramnet_id pk, retired_at. Kullanılmış ID yeniden verilmez.
+- `notifications` (istemciye kapalı, ADR-051): id bigint identity, user_id, template, payload, agreement_id null, category (approval, reminder, completed, info), read_at null. `notification_outbox`'a her ekleme tetikleyiciyle buraya da yazılır; 90 gün sonra pg_cron siler.
+- Storage `avatars` (özel, 1 MB, JPEG): okuma sahibine ve paylaşılmış anlaşmanın karşı tarafına (`private.avatar_visible`); yazma/silme yalnızca `{uid}/` klasörüne.
 
 ## RLS ilkeleri
 
@@ -176,6 +187,11 @@ create type event_channel    as enum ('app','web','system');
 | `get_calendar(month date)` | |
 | `get_agreement_detail(id)` | Anlaşma + versiyon + taksitler (türetilmiş durumla) + ödemeler + olaylar |
 | `list_contacts_with_balance()` | |
+| `find_by_paramnet_id(id)` | `{status: found/not_found/self/invalid, display_name?, paramnet_id?}`; saatte 20 |
+| `share_agreement_by_id(id, paramnet_id, row_version)` | `pending`; hedef profile bağlı davet; `{status: shared/not_found/self/invalid}`; günde 10 |
+| `regenerate_paramnet_id()` / `set_id_discoverable(on)` | 30 günde bir yeni ID / bulunabilirlik |
+| `get_my_profile()` / `update_profile(first, last, username)` / `check_username(u)` / `set_avatar(path)` | Kendi profili (ADR-051) |
+| `list_notifications(category, before_id, limit)` / `mark_notifications_read(ids)` / `set_reminder_prefs(days)` | Bildirim kutusu ve vade öncesi hatırlatma tercihi |
 | `has_pin()` | Oturumdaki hesap PIN belirlemiş mi (ADR-046) |
 | `pin_login_check(phone)` / `pin_login_record(phone, ok)` / `pin_mark_set(uid, phone)` | Yalnızca service_role; `pin-login` / `pin-set` kilit sayacı (ADR-049) |
 

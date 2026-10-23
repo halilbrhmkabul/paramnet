@@ -27,6 +27,7 @@ Aktör kısaltmaları: **C** = oluşturan (creator), **K** = karşı taraf (coun
 | `personal` | `record_payment` | C | `personal` / `settled` | Doğrudan `confirmed`; kalan 0 ise `settled` |
 | `personal` | `cancel_agreement` | C | `cancelled` | |
 | `personal` | `share_agreement` | C | `pending` | Telefon zorunlu; davet oluşur; `pending_version` = mevcut versiyon |
+| `personal` | `share_agreement_by_id` | C | `pending` | ParamNet ID ile; davet hedef profile bağlı, token/OTP yok; karar yalnızca o hesaptan (ADR-050) |
 | `pending` | `decide_agreement(accept)` | K | `active` | version + terms_hash eşleşmeli; `counterparty_profile_id` set; `active_version` = onaylanan |
 | `pending` | `decide_agreement(counter)` | K | `countered` | Yeni versiyon taslağı (`proposed_by` = K) |
 | `pending` | `decide_agreement(reject)` | K | `rejected` | Gerekçe opsiyonel |
