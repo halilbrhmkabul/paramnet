@@ -62,3 +62,6 @@ auditConfig:
     # decode-uri-component via expo-router's query-string, in the app; the fix is ESM-only and breaks
     # query-string. Mitigated: links over 512 characters never reach the router (app/+native-intent.tsx).
     - GHSA-vcc3-ghjq-m6fr
+    # zod 3 via @expo/cli and eslint-plugin-react-hooks (CLI and lint tooling); the fix exists only in zod 4,
+    # which they do not support. The app and shared code use zod >= 4.6.7.
+    - GHSA-mrhx-c7xc-m3w5
