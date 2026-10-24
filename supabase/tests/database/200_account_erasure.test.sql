@@ -86,7 +86,7 @@ reset role;
 select ok(not has_function_privilege('authenticated', 'public.delete_account_data(uuid)', 'execute'), 'silme yalnızca servis rolüyle (edge function)');
 select is(
 	public.delete_account_data('22222222-2222-4222-8222-222222222222'),
-	'{"deleted_agreements": 1, "kept_agreements": 1}'::jsonb,
+	'{"deleted_agreements": 1, "kept_agreements": 1, "avatar_path": null}'::jsonb,
 	'kendi kaydı silinir, ortak anlaşma korunur'
 );
 select results_eq(
@@ -138,7 +138,7 @@ select throws_ok(
 );
 select is(
 	public.delete_account_data('22222222-2222-4222-8222-222222222222'),
-	'{"deleted_agreements": 0, "kept_agreements": 1}'::jsonb,
+	'{"deleted_agreements": 0, "kept_agreements": 1, "avatar_path": null}'::jsonb,
 	'tekrar çağrı güvenli'
 );
 select throws_ok($$ select public.delete_account_data(gen_random_uuid()) $$, 'P0001', 'not_found', 'olmayan hesap');

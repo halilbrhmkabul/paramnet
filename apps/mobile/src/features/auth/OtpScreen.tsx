@@ -16,11 +16,12 @@ import { useAppTheme } from "@/theme/useAppTheme";
 const CODE_LENGTH = 6;
 const RESEND_AFTER_S = 60;
 
-// S03: auto-submits at six digits; iOS fills the SMS code via textContentType="oneTimeCode".
+// S03: sign-up and PIN reset; auto-submits at six digits; iOS fills the SMS code via textContentType="oneTimeCode".
 export function OtpScreen() {
 	const { colors, typography } = useAppTheme();
 	const auth = useAuthApi();
 	const phone = useSession((state) => state.pendingPhone);
+	const purpose = useSession((state) => state.otpPurpose);
 	const signIn = useSession((state) => state.signIn);
 	const [code, setCode] = useState("");
 	const [secondsLeft, setSecondsLeft] = useState(RESEND_AFTER_S);
@@ -41,8 +42,12 @@ export function OtpScreen() {
 	const verify = useMutation({
 		mutationFn: (value: string) => auth.verifyOtp(phone ?? "", value),
 		onSuccess: (user) => {
-			signIn(user);
-			if (user.display_name === null) {
+			// "Şifremi unuttum" and accounts without a PIN choose one next (ADR-046), then the profile.
+			const resetPin = purpose === "reset";
+			signIn(user, { resetPin });
+			if (resetPin || !user.has_pin) {
+				router.replace("/pin");
+			} else if (user.display_name === null) {
 				router.replace("/profile");
 			}
 		},
@@ -59,7 +64,7 @@ export function OtpScreen() {
 	});
 
 	if (phone === null) {
-		return <Redirect href="/phone" />;
+		return <Redirect href="/login" />;
 	}
 
 	const error = verify.isError ? verify.error : resend.isError ? resend.error : null;

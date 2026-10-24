@@ -1,0 +1,45 @@
+{
+	"paramnet_id": [
+		{ "name": "canonical form", "input": "PN-7K4QX9", "expected": "PN-7K4QX9" },
+		{ "name": "lower case", "input": "pn-7k4qx9", "expected": "PN-7K4QX9" },
+		{ "name": "without prefix", "input": "7K4QX9", "expected": "PN-7K4QX9" },
+		{ "name": "spaces and dashes", "input": "  pn 7k4-qx9 ", "expected": "PN-7K4QX9" },
+		{ "name": "prefix without dash", "input": "PN7K4QX9", "expected": "PN-7K4QX9" },
+		{ "name": "code that itself starts with PN", "input": "PN2345", "expected": "PN-PN2345" },
+		{ "name": "digits only", "input": "PN-482937", "expected": "PN-482937" },
+		{ "name": "design sample PN-481927 has a 1", "input": "PN-481927", "expected": null },
+		{ "name": "confusable 0 is not in the alphabet", "input": "PN-48192O", "expected": null },
+		{ "name": "confusable 1 is not in the alphabet", "input": "PN-481921", "expected": null },
+		{ "name": "letter I is not in the alphabet", "input": "PN-ABCDEI", "expected": null },
+		{ "name": "too short", "input": "PN-48192", "expected": null },
+		{ "name": "too long", "input": "PN-4819277", "expected": null },
+		{ "name": "Turkish dotless i", "input": "PN-ABCDEı", "expected": null },
+		{ "name": "empty", "input": "", "expected": null },
+		{ "name": "other punctuation", "input": "PN_7K4QX9", "expected": null }
+	],
+	"username": [
+		{ "name": "plain", "input": "denizyilmaz", "expected": "denizyilmaz" },
+		{
+			"name": "leading at sign and upper case",
+			"input": " @DenizYilmaz ",
+			"expected": "denizyilmaz"
+		},
+		{ "name": "digits, underscore and dot", "input": "deniz_y.84", "expected": "deniz_y.84" },
+		{ "name": "three characters", "input": "abc", "expected": "abc" },
+		{
+			"name": "twenty characters",
+			"input": "abcdefghijklmnopqrst",
+			"expected": "abcdefghijklmnopqrst"
+		},
+		{ "name": "two characters", "input": "ab", "expected": null },
+		{ "name": "twenty-one characters", "input": "abcdefghijklmnopqrstu", "expected": null },
+		{ "name": "Turkish letters", "input": "denizyılmaz", "expected": null },
+		{ "name": "space inside", "input": "deniz yilmaz", "expected": null },
+		{ "name": "starts with a dot", "input": ".deniz", "expected": null },
+		{ "name": "ends with a dot", "input": "deniz.", "expected": null },
+		{ "name": "two dots in a row", "input": "deniz..y", "expected": null },
+		{ "name": "reserved: paramnet", "input": "ParamNet", "expected": null },
+		{ "name": "reserved: destek", "input": "destek", "expected": null },
+		{ "name": "empty", "input": "", "expected": null }
+	]
+}

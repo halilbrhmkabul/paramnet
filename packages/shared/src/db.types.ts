@@ -447,8 +447,9 @@ export type Database = {
 					otp_hash: string | null;
 					otp_last_sent_at: string | null;
 					status: Database["public"]["Enums"]["invite_status"];
-					target_phone_e164: string;
-					token_hash: string;
+					target_phone_e164: string | null;
+					target_profile_id: string | null;
+					token_hash: string | null;
 					version: number;
 				};
 				ComputedFields: never;
@@ -463,8 +464,9 @@ export type Database = {
 					otp_hash?: string | null;
 					otp_last_sent_at?: string | null;
 					status?: Database["public"]["Enums"]["invite_status"];
-					target_phone_e164: string;
-					token_hash: string;
+					target_phone_e164?: string | null;
+					target_profile_id?: string | null;
+					token_hash?: string | null;
 					version: number;
 				};
 				Update: {
@@ -478,8 +480,9 @@ export type Database = {
 					otp_hash?: string | null;
 					otp_last_sent_at?: string | null;
 					status?: Database["public"]["Enums"]["invite_status"];
-					target_phone_e164?: string;
-					token_hash?: string;
+					target_phone_e164?: string | null;
+					target_profile_id?: string | null;
+					token_hash?: string | null;
 					version?: number;
 				};
 				Relationships: [
@@ -489,6 +492,13 @@ export type Database = {
 						isOneToOne: false;
 						referencedRelation: "agreement_versions";
 						referencedColumns: ["agreement_id", "version"];
+					},
+					{
+						foreignKeyName: "invites_target_profile_id_fkey";
+						columns: ["target_profile_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
 					},
 				];
 			};
@@ -527,6 +537,48 @@ export type Database = {
 				Relationships: [
 					{
 						foreignKeyName: "notification_outbox_user_id_fkey";
+						columns: ["user_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+				];
+			};
+			notifications: {
+				Row: {
+					agreement_id: string | null;
+					category: string;
+					created_at: string;
+					id: number;
+					payload: NonNullable<Json>;
+					read_at: string | null;
+					template: string;
+					user_id: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					agreement_id?: string | null;
+					category: string;
+					created_at?: string;
+					id?: never;
+					payload?: NonNullable<Json>;
+					read_at?: string | null;
+					template: string;
+					user_id: string;
+				};
+				Update: {
+					agreement_id?: string | null;
+					category?: string;
+					created_at?: string;
+					id?: never;
+					payload?: NonNullable<Json>;
+					read_at?: string | null;
+					template?: string;
+					user_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "notifications_user_id_fkey";
 						columns: ["user_id"];
 						isOneToOne: false;
 						referencedRelation: "profiles";
@@ -645,34 +697,86 @@ export type Database = {
 					},
 				];
 			};
-			profiles: {
+			pin_login_attempts: {
 				Row: {
 					created_at: string;
-					deleted_at: string | null;
-					display_name: string;
-					id: string;
-					locale: string;
-					phone_e164: string | null;
-					timezone: string;
+					failed_count: number;
+					last_failed_at: string | null;
+					locked_until: string | null;
+					phone_hash: string;
+					updated_at: string;
 				};
 				ComputedFields: never;
 				Insert: {
 					created_at?: string;
-					deleted_at?: string | null;
-					display_name: string;
-					id: string;
-					locale?: string;
-					phone_e164?: string | null;
-					timezone?: string;
+					failed_count?: number;
+					last_failed_at?: string | null;
+					locked_until?: string | null;
+					phone_hash: string;
+					updated_at?: string;
 				};
 				Update: {
 					created_at?: string;
+					failed_count?: number;
+					last_failed_at?: string | null;
+					locked_until?: string | null;
+					phone_hash?: string;
+					updated_at?: string;
+				};
+				Relationships: [];
+			};
+			profiles: {
+				Row: {
+					avatar_path: string | null;
+					created_at: string;
+					deleted_at: string | null;
+					display_name: string;
+					first_name: string | null;
+					id: string;
+					id_discoverable: boolean;
+					last_name: string | null;
+					locale: string;
+					paramnet_id: string | null;
+					paramnet_id_changed_at: string | null;
+					phone_e164: string | null;
+					reminder_before_days: number[];
+					timezone: string;
+					username: string | null;
+				};
+				ComputedFields: never;
+				Insert: {
+					avatar_path?: string | null;
+					created_at?: string;
+					deleted_at?: string | null;
+					display_name: string;
+					first_name?: string | null;
+					id: string;
+					id_discoverable?: boolean;
+					last_name?: string | null;
+					locale?: string;
+					paramnet_id?: string | null;
+					paramnet_id_changed_at?: string | null;
+					phone_e164?: string | null;
+					reminder_before_days?: number[];
+					timezone?: string;
+					username?: string | null;
+				};
+				Update: {
+					avatar_path?: string | null;
+					created_at?: string;
 					deleted_at?: string | null;
 					display_name?: string;
+					first_name?: string | null;
 					id?: string;
+					id_discoverable?: boolean;
+					last_name?: string | null;
 					locale?: string;
+					paramnet_id?: string | null;
+					paramnet_id_changed_at?: string | null;
 					phone_e164?: string | null;
+					reminder_before_days?: number[];
 					timezone?: string;
+					username?: string | null;
 				};
 				Relationships: [];
 			};
@@ -800,6 +904,25 @@ export type Database = {
 					},
 				];
 			};
+			retired_paramnet_ids: {
+				Row: {
+					created_at: string;
+					paramnet_id: string;
+					retired_at: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					created_at?: string;
+					paramnet_id: string;
+					retired_at?: string;
+				};
+				Update: {
+					created_at?: string;
+					paramnet_id?: string;
+					retired_at?: string;
+				};
+				Relationships: [];
+			};
 			sms_usage: {
 				Row: {
 					count: number;
@@ -819,12 +942,32 @@ export type Database = {
 				};
 				Relationships: [];
 			};
+			user_pins: {
+				Row: {
+					created_at: string;
+					pin_set_at: string;
+					user_id: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					created_at?: string;
+					pin_set_at?: string;
+					user_id: string;
+				};
+				Update: {
+					created_at?: string;
+					pin_set_at?: string;
+					user_id?: string;
+				};
+				Relationships: [];
+			};
 		};
 		Views: {
 			[_ in never]: never;
 		};
 		Functions: {
 			cancel_agreement: { Args: { p_id: string; p_row_version: number }; Returns: Json };
+			check_username: { Args: { p_username: string }; Returns: Json };
 			claim_notifications: { Args: { p_limit: number }; Returns: Json };
 			complete_profile: {
 				Args: { p_display_name: string; p_kvkk_version: string; p_terms_version: string };
@@ -859,6 +1002,7 @@ export type Database = {
 			decide_payment: { Args: { p_decision: string; p_payment_id: string }; Returns: Json };
 			delete_account_data: { Args: { p_uid: string }; Returns: Json };
 			export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
+			find_by_paramnet_id: { Args: { p_paramnet_id: string }; Returns: Json };
 			finish_notifications: { Args: { p_results: Json }; Returns: Json };
 			forgive_remaining: {
 				Args: {
@@ -874,7 +1018,9 @@ export type Database = {
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
 			get_metrics: { Args: { p_days: number }; Returns: Json };
+			get_my_profile: { Args: Record<PropertyKey, never>; Returns: Json };
 			get_pending_decision: { Args: { p_id: string }; Returns: Json };
+			has_pin: { Args: Record<PropertyKey, never>; Returns: boolean };
 			invite_decide: {
 				Args: {
 					p_counter_terms: Json;
@@ -900,8 +1046,13 @@ export type Database = {
 			};
 			list_agreements: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
+			list_notifications: {
+				Args: { p_before_id: number; p_category: string; p_limit: number };
+				Returns: Json;
+			};
 			list_requests: { Args: Record<PropertyKey, never>; Returns: Json };
 			make_personal: { Args: { p_id: string }; Returns: Json };
+			mark_notifications_read: { Args: { p_ids: number[] }; Returns: Json };
 			open_dispute: {
 				Args: {
 					p_id: string;
@@ -911,6 +1062,9 @@ export type Database = {
 				};
 				Returns: Json;
 			};
+			pin_login_check: { Args: { p_phone: string }; Returns: Json };
+			pin_login_record: { Args: { p_ok: boolean; p_phone: string }; Returns: Json };
+			pin_mark_set: { Args: { p_phone: string; p_uid: string }; Returns: undefined };
 			propose_amendment: {
 				Args: { p_id: string; p_reason: string; p_row_version: number; p_terms: Json };
 				Returns: Json;
@@ -924,12 +1078,20 @@ export type Database = {
 				};
 				Returns: Json;
 			};
+			regenerate_paramnet_id: { Args: Record<PropertyKey, never>; Returns: Json };
 			register_push_token: { Args: { p_platform: string; p_token: string }; Returns: Json };
 			request_cancel: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			resolve_dispute: { Args: { p_id: string }; Returns: Json };
 			resolve_invite: { Args: { p_token: string }; Returns: Json };
+			set_avatar: { Args: { p_path: string }; Returns: Json };
+			set_id_discoverable: { Args: { p_on: boolean }; Returns: Json };
+			set_reminder_prefs: { Args: { p_days: number[] }; Returns: Json };
 			share_agreement: {
 				Args: { p_id: string; p_phone: string; p_row_version: number };
+				Returns: Json;
+			};
+			share_agreement_by_id: {
+				Args: { p_id: string; p_paramnet_id: string; p_row_version: number };
 				Returns: Json;
 			};
 			take_sms_budget: {
@@ -940,6 +1102,10 @@ export type Database = {
 			unregister_push_token: { Args: { p_token: string }; Returns: Json };
 			update_personal_agreement: {
 				Args: { p_id: string; p_row_version: number; p_terms: Json };
+				Returns: Json;
+			};
+			update_profile: {
+				Args: { p_first_name: string; p_last_name: string; p_username: string };
 				Returns: Json;
 			};
 			withdraw_amendment: { Args: { p_id: string }; Returns: Json };

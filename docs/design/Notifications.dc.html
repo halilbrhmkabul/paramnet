@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>ParamNet · Bildirimler</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E9ECE8}
+*{box-sizing:border-box}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer}
+.scr{width:390px;font-family:Manrope,'Segoe UI',system-ui,sans-serif;color:#13221B;background:#F5F7F4;display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.top{display:flex;align-items:center;gap:8px;padding:12px 16px 8px}
+.ib{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#13221B;flex:none}
+.ib.s{background:#FFFFFF;border:1px solid #E2E7E2}
+.ttl{flex:1;text-align:center;font-weight:800;font-size:17px;margin:0}
+.sec{padding:0 16px}
+.lbl{font-size:13px;font-weight:700;color:#56645D;padding:0 4px 8px;display:block}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 16px;scrollbar-width:none}
+.chip{height:40px;padding:0 14px;border-radius:999px;border:1px solid #D5DCD6;background:#FFFFFF;font-size:14px;font-weight:700;color:#3E4C45;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.chip.on{background:#0F3A2E;border-color:#0F3A2E;color:#FFFFFF}
+.chip i{font-style:normal;min-width:20px;height:20px;border-radius:10px;background:#DDEFE4;color:#0F3A2E;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.nt{background:#FFFFFF;border:1px solid #E2E7E2;border-radius:18px;padding:14px;display:flex;gap:12px;position:relative}
+.nt.un::before{content:"";position:absolute;left:6px;top:22px;width:6px;height:6px;border-radius:50%;background:#146A4E}
+.nt .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.nt b{font-size:15px;font-weight:800;display:block}
+.nt p{margin:3px 0 0;font-size:13px;color:#3E4C45;line-height:1.45}
+.nt time{font-size:12px;color:#56645D;display:block;margin-top:6px}
+.acts{display:flex;gap:8px;margin-top:10px}
+.acts a{height:40px;padding:0 14px;border-radius:12px;font-size:14px;font-weight:700;display:flex;align-items:center}
+.list{display:flex;flex-direction:column;gap:10px}
+.rc{height:40px;padding:0 12px;border-radius:12px;border:1px solid #D5DCD6;background:#FFFFFF;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;color:#3E4C45}
+.rc.on{background:#DDEFE4;border-color:#9FCDB6;color:#0F3A2E}
+</style>
+</helmet>
+<div class="scr" style="height: 1100px; gap: 18px; padding-bottom: 32px">
+	<div class="top">
+		<a class="ib s" href="Main.dc.html" aria-label="Geri">
+			<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg>
+		</a>
+		<h1 class="ttl">Bildirimler</h1>
+		<button class="ib s" aria-label="Tümünü okundu işaretle">
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 12.5 4 4L14 8M10 15.5l1 1L19.5 8"></path></svg>
+		</button>
+	</div>
+
+	<div class="chips" role="tablist">
+		<button class="chip on" role="tab" aria-selected="true">Tümü <i>3</i></button>
+		<button class="chip" role="tab" aria-selected="false">Onay gereken <i>2</i></button>
+		<button class="chip" role="tab" aria-selected="false">Hatırlatmalar</button>
+		<button class="chip" role="tab" aria-selected="false">Tamamlanan</button>
+	</div>
+
+	<section class="sec">
+		<span class="lbl">Bugün</span>
+		<div class="list">
+			<div class="nt un">
+				<span class="ic" style="background: #E3ECF6; color: #24507D; border-radius: 50%; font-weight: 800; font-size: 14px">EK</span>
+				<div style="flex: 1">
+					<b>Emre Kılıç senden borç istiyor</b>
+					<p>₺2.000,00 · Geri ödeme 15 Kasım 2026 · “Araba tamiri için, maaşta öderim.”</p>
+					<div class="acts">
+						<a href="IncomingRequest.dc.html" style="background: #0F3A2E; color: #FFFFFF">İncele</a>
+						<a href="Notifications.dc.html" style="border: 1px solid #D5DCD6; color: #3E4C45">Sonra</a>
+					</div>
+					<time>09:05 · Yanıt bekliyor</time>
+				</div>
+			</div>
+			<div class="nt un">
+				<span class="ic" style="background: #F3E6EC; color: #7D2E52; border-radius: 50%; font-weight: 800; font-size: 14px">AD</span>
+				<div style="flex: 1">
+					<b>Ayşe Demir ödeme yaptığını bildirdi</b>
+					<p>₺1.500,00 · Paranın ulaştığını onaylarsan alacağın ₺3.000,00’a düşer.</p>
+					<div class="acts">
+						<a href="ReceivableDetail.dc.html" style="background: #0F3A2E; color: #FFFFFF">Kontrol et</a>
+					</div>
+					<time>Dün 21:40 · Onay bekliyor</time>
+				</div>
+			</div>
+			<a class="nt un" href="Cards.dc.html">
+				<span class="ic" style="background: #FBEFD5; color: #7A4E00">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect><path d="M2.5 10h19M6.5 15h4"></path></svg>
+				</span>
+				<div style="flex: 1">
+					<b>Garanti Bonus son ödeme 2 gün sonra</b>
+					<p>Ekstre ₺4.250,00 · Asgari ₺850,00 · 14 Ekim</p>
+					<time>08:00 · Hatırlatma</time>
+				</div>
+			</a>
+		</div>
+	</section>
+
+	<section class="sec">
+		<span class="lbl">Bu hafta</span>
+		<div class="list">
+			<a class="nt" href="InstallmentDetail.dc.html">
+				<span class="ic" style="background: #F1F4F0; color: #2F3D36">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5z"></path><path d="m3 13 9 5 9-5"></path></svg>
+				</span>
+				<div style="flex: 1">
+					<b>Mobilya taksiti yaklaşıyor</b>
+					<p>3. taksit ₺3.333,33 · Kaya Mobilya · 15 Ekim</p>
+					<time>11 Eki · Okundu</time>
+				</div>
+			</a>
+			<a class="nt" href="DebtDetail.dc.html">
+				<span class="ic" style="background: #E1F1E7; color: #11613F">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12.5 2.8 2.8L16 10"></path></svg>
+				</span>
+				<div style="flex: 1">
+					<b>Mehmet Yılmaz ödemeni onayladı</b>
+					<p>₺1.500,00 · Kalan borcun ₺3.500,00</p>
+					<time>6 Eki · Tamamlandı</time>
+				</div>
+			</a>
+		</div>
+	</section>
+
+	<section class="sec">
+		<span class="lbl">Ödeme hatırlatmaları</span>
+		<div style="background: #FFFFFF; border: 1px solid #E2E7E2; border-radius: 18px; padding: 14px">
+			<div style="font-size: 14px; color: #3E4C45; margin-bottom: 10px">Vadesi yaklaşan her ödeme için bildirim gönder:</div>
+			<div style="display: flex; flex-wrap: wrap; gap: 8px">
+				<button class="rc" aria-pressed="false">7 gün önce</button>
+				<button class="rc on" aria-pressed="true">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>3 gün önce</button>
+				<button class="rc on" aria-pressed="true">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>1 gün önce</button>
+				<button class="rc on" aria-pressed="true">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>Vade günü</button>
+			</div>
+		</div>
+	</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+	renderVals() {
+		return {};
+	}
+}
+</script>
+</body>
+</html>

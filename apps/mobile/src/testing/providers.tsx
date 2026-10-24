@@ -5,6 +5,8 @@ import { ApiProvider } from "@/api/ApiProvider";
 import type { AuthApi } from "@/api/auth/AuthApi";
 import { createMockAuthApi } from "@/api/auth/mockAuth";
 import { createMockApi, type MockApiOptions } from "@/api/mock/mockApi";
+import { createMockProfileApi, type MockProfileOptions } from "@/api/profile/mockProfile";
+import type { ProfileApi } from "@/api/profile/ProfileApi";
 
 export const TEST_NOW = () => new Date("2026-10-11T09:00:00Z");
 
@@ -32,6 +34,35 @@ export function provideTestApi(api: ReturnType<typeof createMockApi>): void {
 export function takeTestApi(): ReturnType<typeof createMockApi> {
 	const api = nextApi ?? createTestApi();
 	nextApi = null;
+	return api;
+}
+
+// Matches signInForTest(): the same name and number as the session user.
+export function createTestProfileApi(options: MockProfileOptions = {}): ProfileApi {
+	return createMockProfileApi({
+		now: TEST_NOW,
+		latencyMs: 0,
+		...options,
+		profile: {
+			id: "u-test",
+			first_name: "Test",
+			last_name: null,
+			display_name: "Test",
+			username: "test",
+			...options.profile,
+		},
+	});
+}
+
+let nextProfileApi: ProfileApi | null = null;
+
+export function provideTestProfileApi(api: ProfileApi): void {
+	nextProfileApi = api;
+}
+
+export function takeTestProfileApi(): ProfileApi {
+	const api = nextProfileApi ?? createTestProfileApi();
+	nextProfileApi = null;
 	return api;
 }
 
@@ -67,14 +98,21 @@ export function createTestAuthApi(): AuthApi {
 export function TestProviders({
 	api = createTestApi(),
 	authApi = createTestAuthApi(),
+	profileApi = createTestProfileApi(),
 	children,
 }: {
 	api?: ReturnType<typeof createMockApi>;
 	authApi?: AuthApi;
+	profileApi?: ProfileApi;
 	children: ReactNode;
 }) {
 	return (
-		<ApiProvider api={api} authApi={authApi} queryClient={createTestQueryClient()}>
+		<ApiProvider
+			api={api}
+			authApi={authApi}
+			profileApi={profileApi}
+			queryClient={createTestQueryClient()}
+		>
 			{children}
 		</ApiProvider>
 	);

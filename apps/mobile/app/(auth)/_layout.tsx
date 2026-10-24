@@ -7,8 +7,10 @@ export default function AuthLayout() {
 	return (
 		<Stack screenOptions={{ headerShown: false }}>
 			<Stack.Screen name="welcome" />
-			<Stack.Screen name="phone" />
+			<Stack.Screen name="onboarding" />
+			<Stack.Screen name="login" />
 			<Stack.Screen name="otp" />
+			<Stack.Screen name="pin" />
 			<Stack.Screen name="profile" />
 			<Stack.Screen name="notifications" />
 		</Stack>

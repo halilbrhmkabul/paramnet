@@ -150,6 +150,7 @@ Tüm ekip ve kod aynı terimleri kullanır. Kod tarafında İngilizce karşılı
 | Değişiklik talebi (amendment)         | Aktif anlaşmanın şartlarında önerilen değişiklik (erteleme, tutar, vade). Karşı taraf onaylarsa yeni versiyon olur.               |
 | İtiraz (dispute)                      | Taraflardan birinin kayıt veya ödemeye itiraz ettiği durum.                                                                       |
 | Davet (invite)                        | Anlaşmayı karşı tarafa ileten, süreli ve tek amaçlı link.                                                                         |
+| ParamNet ID (paramnet_id)             | Kullanıcının rastgele, yeniden üretilebilir kimliği (PN-XXXXXX). Kayıtlı kullanıcıyı telefonsuz bulmak ve paylaşmak içindir (ADR-050). |
 | Olay kaydı (agreement_event)          | Anlaşmada olan her şeyin değiştirilemez günlüğü. Denetim ve itiraz kanıtıdır.                                                     |
 
 # 5. Uygulamanın Çalışma Şekli
@@ -158,11 +159,11 @@ Bu bölüm kullanıcının uygulamada yaptığı her işi uçtan uca anlatır.
 
 ## 5.1 İlk açılış ve kayıt
 
-1.  Karşılama ekranı: tek cümlelik vaat ve 3 kısa tanıtım kartı (atlanabilir).
+1.  Karşılama ekranı (01): tek cümlelik vaat, "Hesap oluştur" ve "Giriş yap". "Hesap oluştur" 3 kısa tanıtım ekranını (31, atlanabilir) açar.
 
-2.  Telefon numarası girişi (+90). SMS ile 6 haneli kod gönderilir.
+2.  Telefon numarası girişi (+90, 02 "Kayıt ol"). SMS ile 6 haneli kod gönderilir.
 
-3.  Kod doğrulanır, hesap oluşturulur. Ad soyad (görünen ad) alınır.
+3.  Kod doğrulanır, hesap oluşturulur. Kullanıcı 6 haneli PIN'i iki kez girerek belirler (ADR-046). Ad soyad (görünen ad) alınır.
 
 4.  KVKK aydınlatma metni ve kullanım koşulları onayı.
 
@@ -171,6 +172,8 @@ Bu bölüm kullanıcının uygulamada yaptığı her işi uçtan uca anlatır.
 6.  Telefon numarasına bekleyen davet varsa (başkası bu kullanıcıyla anlaşma paylaşmışsa) doğrudan Talepler ekranı açılır.
 
 7.  Yoksa boş durum ekranı: “İlk kaydını ekle” butonu ve 3 hızlı şablon (Borç verdim, Borç aldım, Taksitle aldım).
+
+Sonraki girişler (02 "Giriş yap"): telefon + 6 haneli PIN. "Şifremi unuttum" SMS koduyla yeni PIN belirletir (Bölüm 11.1).
 
 <table>
 <colgroup>
@@ -265,6 +268,18 @@ Web onay sayfası
 
 - Web sayfası yalnızca bu işlemi yapar: onay, düzeltme önerisi, red. Hesap yönetimi veya başka işlem yoktur.
 
+ParamNet ID ile paylaşım (ADR-050)
+
+- Paylaş ekranında telefon numarası yerine karşı tarafın ParamNet ID'si girilebilir. Uygulama ID'yi arar ve yalnızca görünen adı ve baş harfleri gösterir; kullanıcı doğru kişi olduğunu teyit eder.
+
+- Sunucu hedef profile bağlı bir davet oluşturur; link, token ve OTP yoktur. Davet 7 gün geçerlidir; geri çekme ve süre dolumu telefonla paylaşımdaki gibidir.
+
+- Karşı tarafa push ve Bildirimler'de talep gider; kararı uygulama içinde verir (adım 6–8 aynı).
+
+- Arama tam eşleşmedir ve kullanıcı başına saatte 20 ile sınırlıdır; ID ile paylaşım günde 10 ile sınırlıdır. "ID ile bulunabilirim" kapalı olan kullanıcı bulunamaz.
+
+- Kullanıcı ID'sini Profil'den 30 günde bir yeniden üretebilir; eski ID hemen geçersiz olur ve tekrar kullanılmaz.
+
 Düzeltme önerisi
 
 Karşı taraf tutar, peşinat veya plan üzerinde değişiklik önerebilir. Öneri yeni bir versiyon taslağı oluşturur ve oluşturan kullanıcıya gider. Oluşturan kabul ederse anlaşma bu versiyonla aktif olur; karşı öneri yaparsa döngü devam eder. Her tur olay kaydına yazılır.
@@ -338,15 +353,15 @@ Paylaşılan ve aktif bir anlaşmanın şartları tek taraflı değiştirilemez.
 
 | **Zaman**                         | **Kime**           | **Mesaj örneği**                                               |
 |-----------------------------------|--------------------|----------------------------------------------------------------|
-| Vadeden 3 gün önce                | Borçlu             | 10 Kasım’da Yıldız Mobilya’ya 4.000 TL ödemen var.             |
-| Vade günü 10:00                   | Borçlu ve alacaklı | Bugün ödeme günü: 4.000 TL (2/5. taksit).                      |
+| Vadeden 7, 3 ya da 1 gün önce (kullanıcı tercihi, ADR-051) | Borçlu | 10 Kasım’da Yıldız Mobilya’ya 4.000 TL ödemen var. |
+| Vade günü 10:00 (kullanıcı tercihi) | Borçlu ve alacaklı | Bugün ödeme günü: 4.000 TL (2/5. taksit).                    |
 | Vadeden 1 gün sonra (ödenmemişse) | Borçlu             | Dünkü 4.000 TL’lik ödeme henüz kaydedilmedi. Ödediysen kaydet. |
 | Vadeden 7 gün sonra               | Borçlu ve alacaklı | 2\. taksit 7 gündür açık görünüyor.                            |
 | Bildirilen ödeme bekliyorsa       | Alacaklı           | Ahmet 6.000 TL ödeme bildirdi. Onaylıyor musun?                |
 
 - Sessiz saatler: 22:00–09:00 arası bildirim gönderilmez (Europe/Istanbul).
 
-- Kullanıcı hatırlatma zamanlarını anlaşma bazında kapatabilir veya değiştirebilir.
+- Kullanıcı vade öncesi hatırlatma zamanlarını Bildirimler ekranından seçer (7, 3, 1 gün önce, vade günü; varsayılan 3 gün önce ve vade günü). Anlaşma bazında kapatma sonraki sürümde.
 
 - Hatırlatma alacaklı adına değil, uygulama adına yazılır; amaç para isteme mahcubiyetini kaldırmaktır.
 
@@ -395,7 +410,7 @@ Profil ve ayarlar Ana Sayfa’nın sağ üstündeki avatar ile açılır.
 | S17    | Anlaşma geçmişi               | Zaman çizelgesi (olay kaydı)                                                          |
 | S18    | Takvim                        | Ay görünümü, gün listesi                                                              |
 | S19    | Talepler                      | Sekmeli liste: Paylaşımlar, Ödemeler, Değişiklikler                                   |
-| S20    | Profil / Ayarlar              | Ad, numara, bildirim tercihleri, uygulama kilidi, veri dışa aktarma, hesabı sil, KVKK |
+| S20    | Profil / Ayarlar              | Fotoğraf, ad, @kullanıcı adı, ParamNet ID (kopyala, paylaş), ID ile bulunabilirlik ve yeni ID, bildirim tercihleri, veri dışa aktarma, yasal metinler, hesabı sil (ADR-050, 051) |
 | W01    | Web onay – giriş              | Kısa bilgi, numara doğrulama                                                          |
 | W02    | Web onay – OTP                | Kod girişi                                                                            |
 | W03    | Web onay – detay ve karar     | Anlaşma detayı, 3 aksiyon                                                             |
@@ -443,12 +458,14 @@ Aşağıdaki kurallar sunucu tarafında zorunlu kılınır; istemci yalnızca ku
 | BR-08   | Borçlunun bildirdiği ödeme, alacaklı onaylamadan bakiyeden düşmez. Alacaklının kaydettiği ödeme doğrudan onaylıdır.                                |
 | BR-09   | Her ödeme işlemi idempotency anahtarı taşır; aynı anahtarla gelen ikinci istek yeni kayıt oluşturmaz, ilk sonucu döner.                            |
 | BR-10   | Onaylanmış ödeme silinmez; yalnızca karşı taraf onayıyla “iptal edildi” durumuna geçer.                                                            |
-| BR-11   | Davet linki yalnızca davette belirtilen telefon numarasını doğrulayan kişi tarafından kullanılabilir.                                              |
-| BR-12   | Kullanıcı kendisiyle anlaşma paylaşamaz (oluşturanın numarası = hedef numara ise reddedilir).                                                      |
+| BR-11   | Davet linki yalnızca davette belirtilen telefon numarasını doğrulayan kişi tarafından kullanılabilir. ID ile verilen davette karar yalnızca hedef profil tarafından uygulama içinden verilir. |
+| BR-12   | Kullanıcı kendisiyle anlaşma paylaşamaz (oluşturanın numarası = hedef numara ya da hedef ID kendi ID'si ise reddedilir).                           |
 | BR-13   | Olay kaydı yalnızca eklenir; güncellenemez ve silinemez (hesap silme hariç, bkz. KVKK).                                                            |
 | BR-14   | Kapanmış, iptal edilmiş veya itirazlı anlaşmaya yeni ödeme ve değişiklik eklenemez (itiraz çözülene kadar).                                        |
 | BR-15   | Uygulama faiz hesaplamaz ve faiz alanı sunmaz (ilk sürüm).                                                                                         |
 | BR-16   | Tarihler Europe/Istanbul saat dilimine göre “gün” olarak (date) saklanır; olay zamanları timestamptz.                                              |
+| BR-17   | ParamNet ID araması yalnızca görünen adı ve baş harfleri döner; telefon ve profil kimliği dönmez. Kapalı, silinmiş ve olmayan ID aynı yanıtı alır. |
+| BR-18   | ParamNet ID 30 günde en fazla bir kez yeniden üretilir; kullanılmış bir ID hiçbir hesaba yeniden verilmez.                                         |
 
 # 8. Durum Makineleri
 
@@ -473,7 +490,7 @@ Uygulamanın doğruluğu durum makinelerine dayanır. Durum geçişleri yalnızc
 | **Mevcut**        | **Olay**                        | **Kim**              | **Yeni**                       | **Koşul / Etki**                                           |
 |-------------------|---------------------------------|----------------------|--------------------------------|------------------------------------------------------------|
 | —                 | create                          | Oluşturan            | personal                       | Versiyon 1 oluşur.                                         |
-| personal          | share                           | Oluşturan            | pending                        | Telefon numarası zorunlu. Davet oluşur.                    |
+| personal          | share                           | Oluşturan            | pending                        | Telefon numarası ya da ParamNet ID zorunlu. Davet oluşur.  |
 | personal          | record_payment / edit / cancel  | Oluşturan            | personal / settled / cancelled | Doğrulama gerekmez.                                        |
 | pending           | accept                          | Karşı taraf          | active                         | Versiyon hash eşleşmeli. Karşı taraf profile bağlanır.     |
 | pending           | counter                         | Karşı taraf          | countered                      | Yeni versiyon taslağı.                                     |
@@ -648,8 +665,15 @@ profiles
 | **Sütun**         | **Tip**          | **Açıklama**             |
 |-------------------|------------------|--------------------------|
 | id                | uuid PK          | auth.users.id ile aynı   |
-| display_name      | text             | Görünen ad               |
+| display_name      | text             | Görünen ad; first_name + last_name'den türer |
+| first_name / last_name | text        | Ad / soyad (ADR-051)     |
+| username          | text UNIQUE null | @kullanıcı adı; yalnızca gösterim, aramada kullanılmaz |
+| avatar_path       | text null        | Özel `avatars` bucket'ında yol |
+| reminder_before_days | int[]         | Vade öncesi hatırlatma: 7, 3, 1, 0 alt kümesi; varsayılan {3,0} |
 | phone_e164        | text UNIQUE      | Doğrulanmış numara, +90… |
+| paramnet_id       | text UNIQUE      | PN-XXXXXX, rastgele (ADR-050) |
+| paramnet_id_changed_at | timestamptz | Son yeniden üretim; 30 gün sınırı |
+| id_discoverable   | boolean          | ID ile bulunabilir; varsayılan true |
 | locale / timezone | text             | tr-TR / Europe/Istanbul  |
 | deleted_at        | timestamptz null | Hesap silme işareti      |
 
@@ -729,7 +753,8 @@ invites
 | id                    | uuid PK          |                                     |
 | agreement_id, version | FK               | Paylaşılan versiyon                 |
 | token_hash            | bytea UNIQUE     | SHA-256(token); düz token saklanmaz |
-| target_phone_e164     | text             | Yalnızca bu numara onaylayabilir    |
+| target_phone_e164     | text null        | Yalnızca bu numara onaylayabilir    |
+| target_profile_id     | uuid null        | ID ile paylaşımda hedef profil; token ve OTP yok. İkisinden tam biri dolu (CHECK). |
 | status                | enum (bkz. 8.5)  |                                     |
 | expires_at            | timestamptz      | Oluşturma + 7 gün                   |
 | otp_attempts          | int              | Üst sınır 5                         |
@@ -757,7 +782,13 @@ Diğer tablolar
 
 - push_tokens: user_id, expo_token, platform, last_seen_at.
 
+- notifications (bildirim kutusu, ADR-051): user_id, template, payload, agreement_id null, category (approval, reminder, completed, info), created_at, read_at null. Outbox'a yazılan her bildirim buraya da yazılır; 90 gün saklanır.
+
 - consents: user_id, document (kvkk, terms), version, accepted_at.
+
+- retired_paramnet_ids: paramnet_id (PK), retired_at. Kullanılmış ID'ler yeniden verilmez.
+
+- Arama, paylaşım ve kullanıcı adı kontrolü sayaçları mevcut `rate_limits` tablosundadır (`pnid:find:`, `pnid:share:`, `username:check:` + kullanıcı).
 
 ## 10.2 Satır düzeyi güvenlik (RLS)
 
@@ -778,7 +809,14 @@ Diğer tablolar
 | create_agreement(input, idem_key)                                   | Anlaşma + v1 + taksitler + peşinat ödemesi                                  |
 | update_personal_agreement(id, terms, row_version)                   | Kişisel modda düzenleme (yeni versiyon)                                     |
 | share_agreement(id, phone, row_version)                             | pending’e geçirir, davet token’ı üretir, düz token’ı yalnızca bir kez döner |
+| share_agreement_by_id(id, paramnet_id, row_version)                 | ID ile pending'e geçirir; hedef profile bağlı davet, token yok (günde 10)   |
 | withdraw_share(id)                                                  | Daveti iptal eder                                                           |
+| find_by_paramnet_id(paramnet_id)                                    | status (found, not_found, self, invalid) + görünen ad; saatte 20 (ADR-050)  |
+| get_my_profile() / update_profile(first, last, username) / check_username(u) | Kendi profili; ad, soyad, @kullanıcı adı (ADR-051)                |
+| set_avatar(path)                                                    | `avatars/{uid}/{uuid}.jpg`; eski yolu silinmek üzere döner                  |
+| list_notifications(category, before_id, limit) / mark_notifications_read(ids) | Bildirim kutusu; okunmamış ve canlı onay bekleyen sayısı           |
+| set_reminder_prefs(days)                                            | Vade öncesi hatırlatma: 7, 3, 1, 0 alt kümesi                               |
+| regenerate_paramnet_id() / set_id_discoverable(on)                  | Yeni rastgele ID (30 günde bir) / bulunabilirlik anahtarı                   |
 | decide_agreement(id, version, terms_hash, decision, counter_terms?) | accept / counter / reject                                                   |
 | record_payment(id, input, idem_key)                                 | Alacaklı/kişisel: confirmed; borçlu: reported                               |
 | decide_payment(payment_id, decision)                                | confirm / reject                                                            |
@@ -808,7 +846,10 @@ Diğer tablolar
 
 ## 11.1 Kimlik doğrulama
 
-- Telefon numarası + SMS OTP. Şifre yok.
+- Telefon + 6 haneli PIN (ADR-046). Kayıtta numara SMS koduyla doğrulanır, ardından PIN iki kez girilerek belirlenir. "Şifremi unuttum": SMS kodu → yeni PIN. PIN'i olmayan eski hesaplar SMS ile girdikten sonra PIN belirler.
+- PIN, Supabase Auth'ta hesabın parolası olarak tutulur; ama PIN'in kendisi değil, sunucudaki `PIN_PEPPER` sırrıyla türetilmiş HMAC değeri (ADR-049). Bu yüzden Auth'a doğrudan parola girişi işe yaramaz; tek yol `pin-login` edge function'ıdır.
+- Hesap kilidi sunucuda: `pin-login` her başarısız denemeyi `pin_login_attempts`'e yazar (numara yalnızca hash'iyle); 15 dakika içinde 5 hata numarayı 15 dakika kilitler. Kayıtlı olmayan numara da aynı yanıtı alır. Başarılı giriş ve yeni PIN sayacı sıfırlar.
+- Zayıf PIN reddedilir: tüm haneleri aynı olan ve art arda gelen (123456, 654321) PIN'ler; kural uygulamada ve `pin-set`'te aynı.
 
 - Oturum: Supabase JWT (kısa ömürlü erişim + yenileme token’ı). Token’lar Expo SecureStore’da (Keychain/Keystore) saklanır.
 
@@ -847,7 +888,7 @@ Diğer tablolar
 
 - Yedekleme: Supabase günlük yedek + PITR (ücretli plan).
 
-- Loglarda telefon numarası ve tutar maskelenir.
+- Loglarda telefon numarası ve tutar maskelenir. ParamNet ID loglara ve analitik olaylarına yazılmaz.
 
 # 12. KVKK ve Hukuki Çerçeve
 

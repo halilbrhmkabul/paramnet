@@ -15,11 +15,11 @@ import {
 } from "@/testing/providers";
 import { signInForTest } from "@/testing/session";
 
-async function openSettings() {
+async function openProfile() {
 	await renderRouter(appRoutes, { initialUrl: "/" });
 	await fireEvent.press(screen.getByTestId("home.profile.button"));
 	await waitFor(() => {
-		expect(screen.getByTestId("settings.screen")).toBeTruthy();
+		expect(screen.getByTestId("me.export.item")).toBeTruthy();
 	});
 }
 
@@ -29,8 +29,12 @@ describe("KVKK texts, export and account deletion (F3-03)", () => {
 	});
 
 	it("shows the KVKK notice and the terms, marked as drafts with their version", async () => {
-		await openSettings();
-		await fireEvent.press(screen.getByTestId("settings.kvkk.item"));
+		await openProfile();
+		await fireEvent.press(screen.getByTestId("me.legal.item"));
+		await waitFor(() => {
+			expect(screen.getByTestId("meLegal.screen")).toBeTruthy();
+		});
+		await fireEvent.press(screen.getByTestId("meLegal.kvkk.item"));
 		await waitFor(() => {
 			expect(screen.getByTestId("legal.screen")).toBeTruthy();
 		});
@@ -44,13 +48,13 @@ describe("KVKK texts, export and account deletion (F3-03)", () => {
 		api.exportMyData = jest.fn().mockResolvedValue({ profile: { display_name: "Test" } });
 		provideTestApi(api);
 		const share = jest.spyOn(Share, "share").mockResolvedValue({ action: "sharedAction" });
-		await openSettings();
-		await fireEvent.press(screen.getByTestId("settings.export.item"));
+		await openProfile();
+		await fireEvent.press(screen.getByTestId("me.export.item"));
 		await waitFor(() => {
 			expect(share).toHaveBeenCalled();
 		});
 		const content = share.mock.calls[0]?.[0];
-		expect(content).toMatchObject({ title: tr.settings.exportTitle });
+		expect(content).toMatchObject({ title: tr.me.exportTitle });
 		expect(content && "message" in content ? content.message : "").toContain(
 			'"display_name": "Test"',
 		);
@@ -62,8 +66,8 @@ describe("KVKK texts, export and account deletion (F3-03)", () => {
 		provideTestAuthApi(auth);
 		const queryClient = createTestQueryClient();
 		provideTestQueryClient(queryClient);
-		await openSettings();
-		await fireEvent.press(screen.getByTestId("settings.deleteAccount.item"));
+		await openProfile();
+		await fireEvent.press(screen.getByTestId("me.deleteAccount.item"));
 		await waitFor(() => {
 			expect(screen.getByTestId("deleteAccount.screen")).toBeTruthy();
 		});
@@ -85,8 +89,8 @@ describe("KVKK texts, export and account deletion (F3-03)", () => {
 		const auth = createMockAuthApi({ latencyMs: 0 });
 		jest.spyOn(auth, "deleteAccount").mockRejectedValue(new ApiError("network"));
 		provideTestAuthApi(auth);
-		await openSettings();
-		await fireEvent.press(screen.getByTestId("settings.deleteAccount.item"));
+		await openProfile();
+		await fireEvent.press(screen.getByTestId("me.deleteAccount.item"));
 		await waitFor(() => {
 			expect(screen.getByTestId("deleteAccount.ack.checkbox")).toBeTruthy();
 		});
@@ -103,7 +107,7 @@ describe("KVKK notice at sign-up", () => {
 	it("can be read before accepting it", async () => {
 		resetSession();
 		useSession.setState({
-			user: { id: "u1", phone_e164: "+905550000001", display_name: null },
+			user: { id: "u1", phone_e164: "+905550000001", display_name: null, has_pin: true },
 			onboarded: false,
 		});
 		await renderRouter(appRoutes, { initialUrl: "/profile" });

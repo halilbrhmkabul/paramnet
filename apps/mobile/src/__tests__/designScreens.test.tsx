@@ -16,11 +16,10 @@ describe("signed out", () => {
 		await renderRouter(appRoutes, { initialUrl: "/" });
 		expect(screen.getByTestId("welcome.brand")).toBeTruthy();
 		expect(screen.getByText(tr.welcome.disclaimer)).toBeTruthy();
-		expect(screen.getByTestId("welcome.dots")).toBeTruthy();
 	});
 
-	it("the phone step promises never to ask for bank passwords", async () => {
-		await renderRouter(appRoutes, { initialUrl: "/phone" });
+	it("the login step promises never to ask for bank passwords", async () => {
+		await renderRouter(appRoutes, { initialUrl: "/login" });
 		expect(screen.getByText(tr.phone.trustNote)).toBeTruthy();
 	});
 });

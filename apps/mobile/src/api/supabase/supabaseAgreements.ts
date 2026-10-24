@@ -32,6 +32,12 @@ export function createSupabaseAgreementsApi(client: SupabaseClient): AgreementsA
 			}),
 		shareAgreement: (id, phone, rowVersion) =>
 			call("share_agreement", { p_id: id, p_phone: phone, p_row_version: rowVersion }),
+		shareAgreementById: (id, paramnetId, rowVersion) =>
+			call("share_agreement_by_id", {
+				p_id: id,
+				p_paramnet_id: paramnetId,
+				p_row_version: rowVersion,
+			}),
 		withdrawShare: async (id) => {
 			await call("withdraw_share", { p_id: id });
 		},

@@ -17,3 +17,12 @@ export function readConfig(env: Record<string, string | undefined> = process.env
 	}
 	return { mode: "supabase", supabaseUrl, supabaseKey };
 }
+
+// Menü > "Yardım ve destek" writes to this address; without it the row is hidden (no address decided yet).
+export function supportEmail(env?: Record<string, string | undefined>): string | null {
+	// The full member expression: only that form is inlined into release bundles.
+	const raw: unknown =
+		env === undefined ? process.env.EXPO_PUBLIC_SUPPORT_EMAIL : env.EXPO_PUBLIC_SUPPORT_EMAIL;
+	const value = typeof raw === "string" ? raw.trim() : "";
+	return value === "" ? null : value;
+}

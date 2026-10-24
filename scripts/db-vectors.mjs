@@ -57,6 +57,20 @@ for (const vector of read("terms-hash.json").vectors) {
 	);
 }
 
+// SQL null and a text literal: is() compares them with IS NOT DISTINCT FROM.
+const textOrNull = (value) => (value === null ? "null::text" : text(value));
+const ids = read("profile-ids.json");
+for (const vector of ids.paramnet_id) {
+	lines.push(
+		`select is(private.normalize_paramnet_id(${text(vector.input)}), ${textOrNull(vector.expected)}, ${name(`paramnet_id: ${vector.name}`)});`,
+	);
+}
+for (const vector of ids.username) {
+	lines.push(
+		`select is(private.normalize_username(${text(vector.input)}), ${textOrNull(vector.expected)}, ${name(`username: ${vector.name}`)});`,
+	);
+}
+
 writeFileSync(
 	out,
 	[

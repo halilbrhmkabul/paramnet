@@ -124,7 +124,7 @@ select is((select (a ->> 'row_version')::int from detail), 3, 'row_version');
 select is(
 	(select a -> 'counterparty' from detail),
 	jsonb_build_object('contact_id', (select counterparty_contact_id from public.agreements where id = (select id from ids where name = 'ahmet')),
-		'display_name', 'Ahmet Yılmaz', 'kind', 'person', 'phone_e164', '+905551112233'),
+		'display_name', 'Ahmet Yılmaz', 'kind', 'person', 'phone_e164', '+905551112233', 'avatar_path', null),
 	'karşı taraf'
 );
 select is(

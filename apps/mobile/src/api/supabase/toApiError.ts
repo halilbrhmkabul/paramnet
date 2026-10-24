@@ -8,6 +8,8 @@ const RPC_CODES: readonly ApiErrorCode[] = [
 	"amount_exceeds_outstanding",
 	"not_found",
 	"validation_error",
+	"rate_limited",
+	"username_taken",
 ];
 
 const AUTH_CODES: Partial<Record<string, ApiErrorCode>> = {
@@ -32,7 +34,11 @@ export function toApiError(error: unknown): ApiError | Error {
 	if (code === "P0001" && message !== undefined) {
 		const known = RPC_CODES.find((c) => c === message);
 		if (known !== undefined) {
-			return new ApiError(known);
+			const detail = field(error, "details");
+			return new ApiError(
+				known,
+				detail === undefined || detail === "" ? undefined : { field: detail },
+			);
 		}
 	}
 	if (code === "28000") {

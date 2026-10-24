@@ -1,3 +1,5 @@
 {
-	"contacts": "Planı paylaşacağın kişiyi rehberinden seçebilmen için. Rehberin sunucuya yüklenmez, yalnızca seçtiğin kişi kaydedilir."
+	"contacts": "Planı paylaşacağın kişiyi rehberinden seçebilmen için. Rehberin sunucuya yüklenmez, yalnızca seçtiğin kişi kaydedilir.",
+	"camera": "Profil fotoğrafını çekebilmen için. Fotoğraf yalnızca senin ve anlaşma yaptığın kişilerin göreceği profilinde kullanılır.",
+	"photos": "Profil fotoğrafını galerinden seçebilmen için. Yalnızca seçtiğin fotoğraf yüklenir."
 }

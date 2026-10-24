@@ -369,13 +369,44 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 
 Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekranlar tasarımdaki gibi birebir; kapsam ADR-043'teki sınırlamadan çıkıp genişler (ADR-044). Her görevde ekran, `scratchpad/design` altında yerelde çizdirilen referans görüntüyle simülatörde yan yana karşılaştırılır.
 
-### [ ] F4-01 Birebir görsel temel
-- **İlerleme (2026-10-13):** [x] F4-01a: tasarımdaki alt menü (`AppTabBar`), üst çubuk (`TopBar`, tüm itilen ekranlarda), Kartlarım sekmesi (boş durum), Bildirimler ekranı (eski Talepler), mock modda hazır oturum ayarı. [ ] F4-01b: karşılama, onboarding, giriş + PIN.
+### [x] F4-01 Birebir görsel temel
+- **İlerleme (2026-10-13):** [x] F4-01a: tasarımdaki alt menü (`AppTabBar`), üst çubuk (`TopBar`, tüm itilen ekranlarda), Kartlarım sekmesi (boş durum), Bildirimler ekranı (eski Talepler), mock modda hazır oturum ayarı. [x] F4-01b (2026-10-14): karşılama, onboarding, giriş + PIN.
+	- Karşılama (01): koyu orman zemin, dekoratif kart yığını, "Hesap oluştur" / "Giriş yap".
+	- Tanıtım (31): 3 slayt, sayaç, Atla, Devam / Başlayalım.
+	- Giriş (02): Giriş yap / Kayıt ol sekmeleri, PIN göster/gizle, Şifremi unuttum. Yüz tanıma gizli (BACKLOG).
+	- PIN ekranı: iki kez giriş, zayıf PIN ve eşleşmeme hatası. Eski hesaplar SMS ile girişten ya da açılışta PIN ekranına yönlenir.
+	- Sunucu (ADR-049):
+		- `pin-login` ve `pin-set` edge function'ları;
+		- türetilmiş parola (`PIN_PEPPER`);
+		- `pin_login_attempts` ve `user_pins` tabloları;
+		- 5 hata / 15 dakika kilidi.
+	- Testler: pgTAP 24, Vitest (kural ve edge sözleşmesi) 14, Jest (API ve ekran akışları). Uçtan uca davranış `supabase functions serve` ile yerelde denendi.
+	- **Kullanıcı kontrolü:**
+		- Expo Go'da açık ve koyu temada 01, 31, 02 ve PIN ekranına bakılmalı.
+		- Üretimden önce `supabase secrets set PIN_PEPPER=...` ayarlanmalı ve GoTrue `sign_in_sign_ups` sınırı yükseltilmeli.
 - Tasarımdaki üst çubuk (44 px beyaz kenarlıklı ikon butonları, ortada 17/800 başlık) ve alt menü: Ana Sayfa · Kartlarım · İşlem (+) · Borçlarım · Takvim.
 - Talepler, Bildirimler'e (06) taşınır; zil buradan açılır.
 - Karşılama (01), Giriş (02), Onboarding (31) birebir.
 
-### [ ] F4-02 ParamNet ID, Profil (04), Profili düzenle (35), Ana menü (05), Bildirimler (06)
+### [x] F4-02 ParamNet ID, Profil (04), Profili düzenle (35), Ana menü (05), Bildirimler (06)
+- Kararlar: ADR-050 (ParamNet ID), ADR-051 (profil alanları, bildirim kutusu, hatırlatma tercihi). İki parça, iki commit.
+- **İlerleme (2026-10-24):** [x] F4-02a sunucu ve paylaşılan kod:
+	- `packages/shared` `profile-ids`: ID ve kullanıcı adı normalleştirme; aynı kural plpgsql'de, `test-vectors/profile-ids.json` ikisini de sınar (Vitest 33, pgTAP vektörleri `db:vectors` ile).
+	- ParamNet ID: kayıtta atanır (mevcut hesaplara migration ile), `find_by_paramnet_id` (saatte 20), `regenerate_paramnet_id` (30 günde bir, eski ID emekli), `set_id_discoverable`, `share_agreement_by_id` (günde 10, hedef profile bağlı davet). Karar, talepler ve bildirim tetikleyicisi iki davet türünü de tanır.
+	- Profil: ad/soyad, @kullanıcı adı (`update_profile`, `check_username`), `avatars` deposu ve `set_avatar`, `get_my_profile`; karşı tarafın fotoğraf yolu anlaşma özetinde.
+	- Bildirim kutusu: `notifications` (outbox tetikleyicisi), `list_notifications`, `mark_notifications_read`, 90 gün saklama. Vade öncesi hatırlatma tercihi `set_reminder_prefs` (7, 3, 1 gün önce, vade günü).
+	- Hesap silme ve dışa aktarma yeni alanları kapsar; `delete-account` fotoğraf klasörünü boşaltır.
+	- Testler: pgTAP 240 (57), 250 (43), 260 (34); tüm paket 827 test geçti. Mevcut 050, 170, 200 beklenen çıktıları yeni alanlarla güncellendi.
+	- **Kullanıcı kontrolü:** `delete-account` değişikliği Deno bu makinede olmadığı için çalıştırılmadı; `supabase functions serve` ile hesap silme denenmeli. Migration'lar yalnızca yerelde uygulandı.
+- [x] F4-02b ekranlar (2026-10-24, ADR-052):
+	- Profil (04) `/me`: fotoğraf, ad, @kullanıcı adı, ParamNet ID kartı (Kopyala, Paylaş), Bildirim tercihleri, ID ile bulunabilirlik (Herkes/Kimse, 30 günde bir "Yeni ID al"), Kayıtları dışa aktar, Yasal metinler, Hesabı sil, Çıkış yap. Eski Ayarlar ekranı kalktı.
+	- Profili düzenle (35): kamera/galeri (`expo-image-picker`, `expo-image-manipulator`; kare 512 px JPEG), fotoğraf kaldırma, ad/soyad, canlı kullanıcı adı denetimi, salt okunur telefon ve ID.
+	- Ana menü (05): ad + ID, yalnızca Elden Taksit modülü, Bildirimler, Gizlilik ve ayarlar, Yardım ve destek (adres tanımlıysa), para transferi notu ve sürüm. Ana Sayfa'ya menü düğmesi; zil artık Bildirimler'i açar.
+	- Bildirimler (06): filtre çipleri ve sayıları, Bugün/Bu hafta/Daha eski, okunmamış noktası, İncele/Sonra/Kontrol et, Tümünü okundu işaretle, sayfalama, hatırlatma tercih düğmeleri.
+	- Paylaş: "Telefon / ParamNet ID" seçimi; ID ile ad gösterimi ve uygulama içi paylaşım.
+	- `ProfileApi` (mock + Supabase), yeni hata kodları, `expo-clipboard`; Türkçe kamera/galeri izin metinleri.
+	- Testler: RNTL 337 (yeni: profil, düzenleme, bulunabilirlik, menü, bildirimler, ID ile paylaşım, adaptör); shared Vitest 413. Typecheck, lint, biçim temiz.
+	- **Kullanıcı kontrolü (Expo Go):** fotoğraf çekme/seçme ve yükleme (gerçek cihazda, `supabase` modunda Storage'a gidip eski dosyanın silindiği), Kopyala/Paylaş, ID ile paylaşımın karşı hesapta Talepler'e düşmesi, koyu tema, Bildirimler'de "Bildirim tercihleri"nden gelince tercih kartına kaydırma.
 
 ### [ ] F4-03 Hesaplar ve işlemler
 - Hesaplar/cüzdan (29), Hesap ekle (33), İşlem merkezi (21), Gider/Gelir/Transfer (22), İşlem geçmişi (36), İşlem detayı (37).

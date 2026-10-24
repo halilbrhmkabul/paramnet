@@ -1,10 +1,27 @@
 import type { CreateAgreementInput, IsoDate, PaymentInput } from "@paramnet/shared";
 
-import type { AnalyticsEvent, Decision, PendingDecision, TermsView } from "./types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type {
+	AnalyticsEvent,
+	Decision,
+	InboxPage,
+	MyProfile,
+	NotificationCategory,
+	PendingDecision,
+	ProfileInput,
+	ReminderDay,
+	TermsView,
+} from "./types";
+import {
+	infiniteQueryOptions,
+	useInfiniteQuery,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { useApi } from "./ApiProvider";
+import { useApi, useProfileApi } from "./ApiProvider";
+import type { ProfileApi } from "./profile/ProfileApi";
 
 export const queryKeys = {
 	dashboard: ["dashboard"] as const,
@@ -16,6 +33,11 @@ export const queryKeys = {
 	invite: (token: string) => ["invite", token] as const,
 	decision: (id: string) => ["decision", id] as const,
 	requests: ["requests"] as const,
+	profile: ["profile"] as const,
+	avatar: (path: string) => ["avatar", path] as const,
+	username: (name: string) => ["username", name] as const,
+	paramnetId: (id: string) => ["paramnetId", id] as const,
+	inbox: (category: NotificationCategory | null) => ["inbox", category ?? "all"] as const,
 };
 
 export function useDashboard() {
@@ -104,6 +126,14 @@ export function useRequests() {
 function useSharingMutation<TArgs, TResult>(run: (args: TArgs) => Promise<TResult>) {
 	const queryClient = useQueryClient();
 	return useMutation({ mutationFn: run, onSettled: () => queryClient.invalidateQueries() });
+}
+
+export function useShareAgreementById() {
+	const api = useApi();
+	return useSharingMutation(
+		({ id, paramnetId, rowVersion }: { id: string; paramnetId: string; rowVersion: number }) =>
+			api.shareAgreementById(id, paramnetId, rowVersion),
+	);
 }
 
 export function useShareAgreement() {
@@ -244,4 +274,149 @@ export function useTrack(): (event: AnalyticsEvent) => void {
 		},
 		[api],
 	);
+}
+
+// Profile, ParamNet ID and inbox (F4-02) -----------------------------------------------------------
+
+// Signed URLs live an hour (supabaseProfile); refetch well before they expire.
+const AVATAR_URL_STALE_MS = 45 * 60 * 1000;
+const INBOX_PAGE = 50;
+
+export function useMyProfile() {
+	const api = useProfileApi();
+	return useQuery({ queryKey: queryKeys.profile, queryFn: () => api.getMyProfile() });
+}
+
+export function useAvatarUrl(path: string | null) {
+	const api = useProfileApi();
+	return useQuery({
+		queryKey: queryKeys.avatar(path ?? ""),
+		queryFn: () => (path === null ? Promise.resolve(null) : api.avatarUrl(path)),
+		enabled: path !== null,
+		staleTime: AVATAR_URL_STALE_MS,
+	});
+}
+
+// Every write returns or implies the new profile; keep one copy for Profil, Menü and the form.
+function useProfileMutation<TArgs, TResult>(
+	run: (args: TArgs) => Promise<TResult>,
+	patch: (result: TResult, args: TArgs) => Partial<MyProfile> | null,
+) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: run,
+		onSuccess: (result, args) => {
+			const change = patch(result, args);
+			if (change === null) {
+				return queryClient.invalidateQueries({ queryKey: queryKeys.profile });
+			}
+			queryClient.setQueryData<MyProfile>(queryKeys.profile, (old) =>
+				old === undefined ? old : { ...old, ...change },
+			);
+			return undefined;
+		},
+	});
+}
+
+export function useUpdateProfile() {
+	const api = useProfileApi();
+	return useProfileMutation(
+		(input: ProfileInput) => api.updateProfile(input),
+		(profile) => profile,
+	);
+}
+
+export function useUploadAvatar() {
+	const api = useProfileApi();
+	return useProfileMutation(
+		(localUri: string) => api.uploadAvatar(localUri),
+		({ avatar_path }) => ({ avatar_path }),
+	);
+}
+
+export function useRemoveAvatar() {
+	const api = useProfileApi();
+	return useProfileMutation(
+		() => api.removeAvatar(),
+		() => ({ avatar_path: null }),
+	);
+}
+
+export function useRegenerateParamnetId() {
+	const api = useProfileApi();
+	return useProfileMutation(
+		() => api.regenerateParamnetId(),
+		(result) => result,
+	);
+}
+
+export function useSetIdDiscoverable() {
+	const api = useProfileApi();
+	return useProfileMutation(
+		(on: boolean) => api.setIdDiscoverable(on),
+		(_result, on) => ({ id_discoverable: on }),
+	);
+}
+
+export function useSetReminderPrefs() {
+	const api = useProfileApi();
+	return useProfileMutation(
+		(days: ReminderDay[]) => api.setReminderPrefs(days),
+		(reminder_before_days) => ({ reminder_before_days }),
+	);
+}
+
+// name: an already valid, normalized username; null skips the check (empty, invalid or unchanged).
+export function useUsernameCheck(name: string | null) {
+	const api = useProfileApi();
+	return useQuery({
+		queryKey: queryKeys.username(name ?? ""),
+		queryFn: () => (name === null ? Promise.resolve(null) : api.checkUsername(name)),
+		enabled: name !== null,
+	});
+}
+
+// id: a complete, normalized ParamNet ID. Every lookup counts against the hourly limit (ADR-050), so the
+// answer is kept for the session and a lookup is never retried on its own.
+export function useParamnetIdLookup(id: string | null) {
+	const api = useProfileApi();
+	return useQuery({
+		queryKey: queryKeys.paramnetId(id ?? ""),
+		queryFn: () => (id === null ? Promise.resolve(null) : api.findByParamnetId(id)),
+		enabled: id !== null,
+		staleTime: Infinity,
+		retry: false,
+	});
+}
+
+function inboxOptions(api: ProfileApi, category: NotificationCategory | null) {
+	return infiniteQueryOptions({
+		queryKey: queryKeys.inbox(category),
+		queryFn: ({ pageParam }: { pageParam: number | null }) =>
+			api.listNotifications(category, pageParam),
+		initialPageParam: null as number | null,
+		getNextPageParam: (last: InboxPage) =>
+			last.items.length < INBOX_PAGE ? undefined : (last.items.at(-1)?.id ?? undefined),
+	});
+}
+
+export function useInbox(category: NotificationCategory | null) {
+	const api = useProfileApi();
+	return useInfiniteQuery(inboxOptions(api, category));
+}
+
+// Home's bell: unread notices (design 03, "Bildirimler, 3 okunmamış").
+export function useUnreadCount(): number {
+	const api = useProfileApi();
+	const inbox = useInfiniteQuery(inboxOptions(api, null));
+	return inbox.data?.pages[0]?.unread_count ?? 0;
+}
+
+export function useMarkNotificationsRead() {
+	const api = useProfileApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (ids: number[] | null) => api.markNotificationsRead(ids),
+		onSettled: () => queryClient.invalidateQueries({ queryKey: ["inbox"] }),
+	});
 }

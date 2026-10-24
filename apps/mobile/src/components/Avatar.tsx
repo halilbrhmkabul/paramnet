@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 import type { ColorToken } from "@/theme/tokens";
 import { useAppTheme } from "@/theme/useAppTheme";
@@ -32,18 +32,39 @@ function toneFor(name: string): readonly [ColorToken, ColorToken] {
 	return TONES[hash % TONES.length] ?? FALLBACK;
 }
 
-// Design "av": initials in a circle; decorative, the name is always written next to it.
-export function Avatar({ name, size = 42 }: { name: string; size?: number }) {
+// Design "av": initials in a circle, or the photo when there is one (ADR-051); decorative, the name is
+// always written next to it.
+export function Avatar({
+	name,
+	size = 42,
+	uri = null,
+	testID,
+}: {
+	name: string;
+	size?: number;
+	uri?: string | null;
+	testID?: string;
+}) {
 	const { colors, fonts } = useAppTheme();
 	const [fg, bg] = toneFor(name);
+	const circle = { width: size, height: size, borderRadius: size / 2 };
+	if (uri !== null) {
+		return (
+			<Image
+				testID={testID === undefined ? undefined : `${testID}.image`}
+				source={{ uri }}
+				accessibilityElementsHidden
+				importantForAccessibility="no-hide-descendants"
+				style={[circle, { backgroundColor: colors[bg] }]}
+			/>
+		);
+	}
 	return (
 		<View
+			testID={testID}
 			importantForAccessibility="no-hide-descendants"
 			accessibilityElementsHidden
-			style={[
-				styles.circle,
-				{ width: size, height: size, borderRadius: size / 2, backgroundColor: colors[bg] },
-			]}
+			style={[styles.circle, circle, { backgroundColor: colors[bg] }]}
 		>
 			<Text style={{ fontFamily: fonts.extrabold, fontSize: size / 3, color: colors[fg] }}>
 				{initials(name)}

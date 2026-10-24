@@ -5,6 +5,7 @@ import { SEED_IDS } from "@/api/mock/seed";
 import { resetSession } from "@/features/auth/sessionStore";
 import * as notifications from "@/lib/notifications";
 import { appRoutes } from "@/testing/appRoutes";
+import { reachSignUpOtp, verifyAndSetPin } from "@/testing/signUp";
 import { provideTestAuthApi } from "@/testing/providers";
 import { signInForTest } from "@/testing/session";
 
@@ -29,16 +30,8 @@ describe("push (F1-18)", () => {
 		resetSession();
 		const { register } = spyAuth();
 		await renderRouter(appRoutes, { initialUrl: "/welcome" });
-		await fireEvent.press(screen.getByTestId("welcome.skip.button"));
-		await fireEvent.changeText(screen.getByTestId("phone.number.input"), "5551234567");
-		await fireEvent.press(screen.getByTestId("phone.continue.button"));
-		await waitFor(() => {
-			expect(screen.getByTestId("otp.screen")).toBeTruthy();
-		});
-		await fireEvent.changeText(screen.getByTestId("otp.code.input"), "123456");
-		await waitFor(() => {
-			expect(screen.getByTestId("profile.screen")).toBeTruthy();
-		});
+		await reachSignUpOtp();
+		await verifyAndSetPin();
 		await fireEvent.changeText(screen.getByTestId("profile.name.input"), "Halil");
 		await fireEvent.press(screen.getByTestId("profile.consent.checkbox"));
 		await fireEvent.press(screen.getByTestId("profile.save.button"));
@@ -71,7 +64,10 @@ describe("push (F1-18)", () => {
 			expect(register).toHaveBeenCalled();
 		});
 		await fireEvent.press(screen.getByTestId("home.profile.button"));
-		await fireEvent.press(screen.getByTestId("settings.signOut.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("me.signOut.button")).toBeTruthy();
+		});
+		await fireEvent.press(screen.getByTestId("me.signOut.button"));
 		await waitFor(() => {
 			expect(unregister).toHaveBeenCalledWith("ExponentPushToken[device]");
 		});

@@ -15,6 +15,15 @@ export function serviceClient(): SupabaseClient {
 	});
 }
 
+// ADR-049: key for the password Auth stores in place of the PIN. Changing it invalidates every PIN.
+export function pinPepper(): string {
+	const pepper = env("PIN_PEPPER");
+	if (pepper === undefined || pepper.length < 32) {
+		throw new Error("PIN_PEPPER is not configured");
+	}
+	return pepper;
+}
+
 export function sessionSecret(): string {
 	const secret = env("INVITE_SESSION_SECRET");
 	if (secret === undefined || secret.length < 32) {
@@ -66,6 +75,7 @@ const STATUS_BY_CODE: Record<string, number> = {
 	invalid_transition: 409,
 	invite_unavailable: 410,
 	locked: 423,
+	account_locked: 423,
 	rate_limited: 429,
 };
 

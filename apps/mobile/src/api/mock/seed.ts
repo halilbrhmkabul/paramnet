@@ -18,6 +18,13 @@ export const SEED_IDS = {
 	zeynepShare: "00000000-0000-4000-8000-0000000000c1",
 } as const;
 
+// ParamNet IDs (ADR-050) the prototype knows: the signed-in user's own and other discoverable users.
+export const MOCK_OWN_PARAMNET_ID = "PN-48K7QZ";
+export const MOCK_DIRECTORY: Readonly<Record<string, string>> = {
+	"PN-7KQ2M9": "Ahmet Yılmaz",
+	"PN-EK4X8R": "Emre Kılıç",
+};
+
 function at(date: IsoDate): string {
 	return `${date}T09:00:00.000Z`;
 }

@@ -221,3 +221,61 @@ export type AnalyticsEvent =
 	| { name: "app_opened" }
 	| { name: "reminder_opened"; template: string }
 	| { name: "invite_opened" };
+
+// Profile, ParamNet ID and the notification inbox (ADR-050, ADR-051) ---------------------------------
+
+// Days before the due date a reminder goes out; 0 is the due day itself.
+export type ReminderDay = 7 | 3 | 1 | 0;
+
+export type MyProfile = {
+	id: string;
+	first_name: string | null;
+	last_name: string | null;
+	display_name: string | null;
+	username: string | null;
+	phone_e164: string;
+	paramnet_id: string;
+	id_discoverable: boolean;
+	// Earliest time a new ID can be taken (once every 30 days).
+	can_regenerate_at: string;
+	avatar_path: string | null;
+	reminder_before_days: ReminderDay[];
+};
+
+export type ProfileInput = { first_name: string; last_name: string; username: string };
+
+export type UsernameStatus = "available" | "taken" | "invalid";
+
+// "Not found" is a value, not an error (ADR-050): only the display name comes back.
+export type IdLookup =
+	| { status: "found"; display_name: string; paramnet_id: string }
+	| { status: "not_found" | "self" | "invalid" };
+
+export type IdShareResult =
+	| { status: "shared"; display_name: string; expires_at: string }
+	| { status: "not_found" | "self" | "invalid" };
+
+export type NotificationCategory = "approval" | "reminder" | "completed" | "info";
+
+// Same fields the push texts are built from (supabase/functions/_shared/notifications.ts).
+export type NotificationPayload = {
+	agreement_id?: string;
+	name?: string;
+	amount_minor?: number;
+	due_date?: IsoDate;
+	seq?: number;
+	count?: number;
+	remaining_minor?: number;
+};
+
+export type InboxItem = {
+	id: number;
+	template: string;
+	category: NotificationCategory;
+	payload: NotificationPayload;
+	agreement_id: string | null;
+	created_at: string;
+	read_at: string | null;
+};
+
+export type InboxPage = { items: InboxItem[]; unread_count: number; approval_count: number };

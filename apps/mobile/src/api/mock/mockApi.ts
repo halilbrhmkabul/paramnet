@@ -1,5 +1,6 @@
 import {
 	createAgreementInputSchema,
+	normalizeParamnetId,
 	normalizePhoneTR,
 	outstanding,
 	paymentInputSchema,
@@ -14,12 +15,13 @@ import type {
 	ContactSummary,
 	DueItem,
 	EventType,
+	IdShareResult,
 	PendingDecision,
 	RequestItem,
 	TermsView,
 } from "../types";
 import { dueItems, inMonth, isOpen, toDetail, toSummary } from "./derive";
-import { seedState, type MockSeed } from "./seed";
+import { MOCK_DIRECTORY, MOCK_OWN_PARAMNET_ID, seedState, type MockSeed } from "./seed";
 import {
 	applyPayment,
 	insertAgreement,
@@ -37,6 +39,7 @@ export type MockApiOptions = {
 };
 
 const UPCOMING_LIMIT = 5;
+const SHARE_TTL_MS = 7 * 24 * 3600 * 1000;
 
 export function createMockApi({
 	now = () => clock.now(),
@@ -66,6 +69,32 @@ export function createMockApi({
 		agreement.events.push({
 			id: `${agreement.id}-${type}-${String(agreement.row_version)}`,
 			type,
+			at: now().toISOString(),
+			actor: "me",
+			amount_minor: null,
+		});
+	}
+
+	function shareableAgreement(id: string, rowVersion: number): MockAgreement {
+		const agreement = state.agreements.find((a) => a.id === id && a.is_creator);
+		if (agreement === undefined) {
+			throw new ApiError("not_found");
+		}
+		if (agreement.status !== "personal") {
+			throw new ApiError("invalid_transition");
+		}
+		if (agreement.row_version !== rowVersion) {
+			throw new ApiError("conflict");
+		}
+		return agreement;
+	}
+
+	function markShared(agreement: MockAgreement): void {
+		agreement.status = "pending";
+		agreement.row_version += 1;
+		agreement.events.push({
+			id: `${agreement.id}-shared-${String(agreement.row_version)}`,
+			type: "shared",
 			at: now().toISOString(),
 			actor: "me",
 			amount_minor: null,
@@ -285,33 +314,38 @@ export function createMockApi({
 		// Sharing (F2-06) — the prototype has no other party, so sharing only changes my record.
 		shareAgreement: (id, phone, rowVersion) =>
 			respond(() => {
-				const agreement = state.agreements.find((a) => a.id === id && a.is_creator);
-				if (agreement === undefined) {
-					throw new ApiError("not_found");
-				}
-				if (agreement.status !== "personal") {
-					throw new ApiError("invalid_transition");
-				}
-				if (agreement.row_version !== rowVersion) {
-					throw new ApiError("conflict");
-				}
+				const agreement = shareableAgreement(id, rowVersion);
 				if (normalizePhoneTR(phone) === null) {
 					throw new ApiError("validation_error");
 				}
 				const token = `mock-${id}`;
 				state.shares.set(token, id);
-				agreement.status = "pending";
-				agreement.row_version += 1;
-				agreement.events.push({
-					id: `${id}-shared-${String(agreement.row_version)}`,
-					type: "shared",
-					at: now().toISOString(),
-					actor: "me",
-					amount_minor: null,
-				});
+				markShared(agreement);
 				return {
 					token,
-					expires_at: new Date(now().getTime() + 7 * 24 * 3600 * 1000).toISOString(),
+					expires_at: new Date(now().getTime() + SHARE_TTL_MS).toISOString(),
+				};
+			}),
+
+		shareAgreementById: (id, paramnetId, rowVersion) =>
+			respond((): IdShareResult => {
+				const agreement = shareableAgreement(id, rowVersion);
+				const target = normalizeParamnetId(paramnetId);
+				if (target === null) {
+					return { status: "invalid" };
+				}
+				if (target === MOCK_OWN_PARAMNET_ID) {
+					return { status: "self" };
+				}
+				const name = MOCK_DIRECTORY[target];
+				if (name === undefined) {
+					return { status: "not_found" };
+				}
+				markShared(agreement);
+				return {
+					status: "shared",
+					display_name: name,
+					expires_at: new Date(now().getTime() + SHARE_TTL_MS).toISOString(),
 				};
 			}),
 

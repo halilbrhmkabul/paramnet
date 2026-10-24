@@ -30,6 +30,15 @@ jest.mock("@/lib/contactPicker", () => ({
 	pickContact: jest.fn(() => Promise.resolve(null)),
 }));
 
+// Camera, gallery and image resizing need native modules; screens reach them only through this wrapper.
+jest.mock("@/lib/avatarImage", () => ({
+	pickAvatar: jest.fn(() => Promise.resolve(null)),
+}));
+
+jest.mock("expo-clipboard", () => ({
+	setStringAsync: jest.fn(() => Promise.resolve(true)),
+}));
+
 // The root layout renders ApiProvider without props; in tests it receives the in-memory adapters,
 // including one prepared with provideTestApi() (same module instance the tests import).
 jest.mock("@/api/ApiProvider", () => {
@@ -38,11 +47,18 @@ jest.mock("@/api/ApiProvider", () => {
 	function MockApiProvider(props: Parameters<typeof actual.ApiProvider>[0]) {
 		const [api] = useState(() => props.api ?? mockTesting.takeTestApi());
 		const [authApi] = useState(() => props.authApi ?? mockTesting.takeTestAuthApi());
+		const [profileApi] = useState(() => props.profileApi ?? mockTesting.takeTestProfileApi());
 		const [queryClient] = useState(
 			() => props.queryClient ?? mockTesting.takeTestQueryClient(),
 		);
 		return (
-			<actual.ApiProvider {...props} api={api} authApi={authApi} queryClient={queryClient} />
+			<actual.ApiProvider
+				{...props}
+				api={api}
+				authApi={authApi}
+				profileApi={profileApi}
+				queryClient={queryClient}
+			/>
 		);
 	}
 	return { ...actual, ApiProvider: MockApiProvider };

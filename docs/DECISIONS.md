@@ -483,5 +483,85 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 - **Karar (kullanıcı):** Tasarım 02'deki "6 haneli şifre" gerçek bir PIN'dir.
 	- Kayıtta numara SMS koduyla doğrulanır, ardından kullanıcı 6 haneli PIN belirler (Supabase Auth telefon + parola; parola GoTrue'da hash'li tutulur).
 	- Sonraki girişler telefon + PIN ile yapılır. "Şifremi unuttum" SMS koduyla yeni PIN belirletir. Yüz tanıma, PIN'in yerine cihazda kilit açma kolaylığıdır.
-	- 6 haneli PIN çevrimiçi denemeye karşı zayıftır; GoTrue'nun giriş hız sınırları ve uygulama tarafında art arda hatalı denemede bekleme uygulanır (F4-01b ayrıntıları).
+	- 6 haneli PIN çevrimiçi denemeye karşı zayıftır; GoTrue'nun giriş hız sınırları ve uygulama tarafında art arda hatalı denemede bekleme uygulanır (F4-01b ayrıntıları: sunucu tarafı kilit, ADR-049).
 - **Not:** F4-01a'da yalnızca mock modda, geliştirme kolaylığı olarak `EXPO_PUBLIC_MOCK_SIGNED_IN=1` ile hazır oturum açılır; gerçek moda etkisi yoktur.
+
+## ADR-049 — PIN girişinde sunucu tarafı hesap kilidi
+- **Tarih:** 2026-10-14
+- **Bağlam:** ADR-046'daki 6 haneli PIN yalnızca 10⁶ olasılıktır. GoTrue'nun IP başına hız sınırı numara başına denemeyi durdurmaz; istemcideki bekleme de atlanabilir.
+- **Karar (kullanıcı onaylı, F4-01b):**
+	- **Türetilmiş parola:** Auth'ta PIN'in kendisi değil, `HMAC-SHA256(PIN_PEPPER, "paramnet-pin:v1:" + PIN)` (base64url) parola olarak tutulur. `PIN_PEPPER` yalnızca edge function sırrıdır (en az 32 karakter). Anon anahtarla Auth'a doğrudan PIN denemek işe yaramaz; tek giriş yolu `pin-login`'dir. Sır değişirse tüm PIN'ler geçersizleşir.
+	- **`pin-login` (JWT yok):**
+		- numarayı normalleştirir ve `pin_login_check` ile kilide bakar;
+		- türetilmiş parolayla `signInWithPassword` dener;
+		- `pin_login_record` ile sonucu yazar;
+		- oturumu (`access_token`, `refresh_token`) uygulamaya döndürür; uygulama `setSession` yapar.
+	- **`pin-set` (JWT gerekli):** zayıf PIN'i reddeder, admin API ile türetilmiş parolayı yazar, `pin_mark_set` ile `user_pins` kaydını ve numaranın hatalarını siler. Kayıt, "Şifremi unuttum" ve eski hesaplar aynı yolu kullanır.
+	- **Kilit kuralı:**
+		- 15 dakika içinde 5 hatalı deneme numarayı 15 dakika kilitler;
+		- kilit süresince doğru PIN de denenmez (423 `account_locked`, `retry_after_s`);
+		- 15 dakikadan eski hatalar sayılmaz; başarılı giriş ve yeni PIN sayacı sıfırlar;
+		- kayıtlı olmayan numara da sayılır ve aynı yanıtı alır, böylece numaranın kayıtlı olup olmadığı anlaşılmaz.
+	- **Veri:** `pin_login_attempts` numarayı yalnızca `sha256` hash'iyle tutar; son hatadan 1 gün sonra pg_cron siler. Her iki tablo istemciye kapalıdır; `has_pin()` yalnızca oturumdaki hesap için cevap verir.
+	- **Zayıf PIN:** tüm haneleri aynı olan ve art arda gelen PIN'ler (`012345`…`456789`, `987654`…`543210`) reddedilir. Kural `packages/shared` `pinProblem` ve `_shared/pin.ts`'de aynıdır (sözleşme testi).
+	- **Edge mantığı:** `supabase/functions/_shared/pin.ts`'de I/O dışarıdan verilerek yazıldı ve Vitest sözleşme testiyle sınanır (Deno bu makinede kurulu değil; repo düzeni). Uçtan uca davranış `supabase functions serve` ile yerelde denendi.
+- **Bilinen bedeller:**
+	- Numarayı bilen biri 5 hatalı denemeyle hesabı 15 dakika kilitleyebilir; SMS ile "Şifremi unuttum" kilitten etkilenmez.
+	- Tüm parola girişleri edge function'ın IP'sinden geldiği için GoTrue'nun `sign_in_sign_ups` sınırı (yerelde 5 dakikada 30) üretimde herkese ortaktır. Canlıya çıkmadan önce panelden yükseltilmeli; IP başına sınır `pin-login`'e eklenebilir (BACKLOG).
+
+## ADR-050 — ParamNet ID
+- **Tarih:** 2026-10-24
+- **Bağlam:** Tasarımdaki ParamNet ID (PN-xxxxxx) veri modelinde yoktu (ADR-043). ADR-044 ile kapsama alındı; kurallar F4-02 başında kullanıcıyla belirlendi.
+- **Karar (kullanıcı):**
+	- **Biçim:** `PN-` + 6 karakter; alfabe `23456789ABCDEFGHJKLMNPQRSTUVWXYZ` (karışan `0`, `1`, `I`, `O` yok; 32⁶ ≈ 1 milyar). Sunucuda `gen_random_bytes` ile rastgele üretilir; çakışmada yeniden denenir. Sıralı değildir, kullanıcı sayısını ele vermez.
+		- Saklama: `profiles.paramnet_id` (`PN-XXXXXX`, UNIQUE, biçim CHECK'li). Kayıtta otomatik atanır; mevcut hesaplara migration ile verilir.
+		- Girdi normalleştirme: büyük harf; boşluk, tire ve baştaki `PN` atılır. Kural `packages/shared` ve SQL'de aynıdır (sözleşme testi).
+	- **Değişim:** Kullanıcı kendi ID'sini seçemez; Profil'den yeni rastgele ID üretebilir, 30 günde en fazla bir kez. Eski ID hemen geçersiz olur ve hiçbir hesaba yeniden verilmez (`retired_paramnet_ids`). Eski ID ile gönderilmiş ve bekleyen paylaşımlar etkilenmez (hedef profile bağlıdır).
+	- **Arama (`find_by_paramnet_id`):**
+		- Yalnızca tam eşleşme. Arayan yalnızca görünen adı ve baş harfleri görür; telefon, profil kimliği ya da başka bilgi dönmez.
+		- Kullanıcı başına saatte 20 arama (bulunan ve bulunamayan aramalar birlikte sayılır); aşımda `rate_limited`.
+		- Profilde "ID ile bulunabilirim" anahtarı (`id_discoverable`, varsayılan açık). Kapalı, silinmiş ya da olmayan ID aynı "bulunamadı" yanıtını alır.
+		- Kendi ID'sini arayan `self` hatası alır. Aranan kişiye bildirim gitmez.
+	- **Paylaşmayla ilişkisi:** ID, telefon numarasına alternatif bir paylaşım hedefidir; telefonla davet akışı (5.4) aynen kalır.
+		- `share_agreement_by_id`: anlaşmayı `pending`'e geçirir ve hedef profile bağlı bir davet oluşturur (`invites.target_profile_id`; token ve OTP yok). Davet 7 gün geçerli; geri çekme ve süre dolumu telefonla paylaşımdaki gibidir.
+		- Karşı tarafa push ve Bildirimler'de talep gider; kararını uygulama içinden `decide_agreement` ile verir. Yetki: oturumdaki kullanıcı = davetin hedef profili.
+		- Kendine paylaşma reddedilir (BR-12). Kişi kaydında numara yoksa telefon istenmez; kabulde `contacts.linked_profile_id` dolar, karşı tarafın numarası paylaşana gösterilmez.
+		- Spam sınırı: kullanıcı başına günde 10 ID ile paylaşım.
+	- **Kişisel veri:** ID kişisel tanımlayıcı sayılır; loglara ve analitik olaylarına yazılmaz.
+- **Tasarımla ilişkisi:** Tasarımdaki `PN-481927` yalnızca örnektir; ID harf de içerir. 35'teki "Değiştirilemez" etiketi kullanılmaz (kullanıcı kararı): yenileme Profil > "ID ile bulunabilirlik" ekranındaki "Yeni ID al" butonundadır. Aynı ekranda seçenekler "Herkes" ve "Kimse"dir (`id_discoverable`).
+- **Uygulama notları (F4-02a):**
+	- Arama ve ID ile paylaşım "bulunamadı"yı hata değil değer olarak döner (`status`). Hata, `rate_limits` sayaç artışını da geri alırdı; bulunamayan aramalar sayılmaz ve ID taranabilirdi. ID ile paylaşımda bulunamayan ID de arama sayacından düşer.
+	- Sayaçlar mevcut `rate_limits` tablosunda; ayrı arama tablosu yok.
+	- Hesap silmede ID emekliye ayrılır; o hesaba ID ile verilmiş bekleyen davetlerin süresi hemen dolar ve anlaşmalar sahibine döner.
+- **Kapsam dışı (BACKLOG):** kullanıcı engelleme, ID'yi QR kodla paylaşma, ID ile kişi ekleme (paylaşmadan rehbere kaydetme).
+
+## ADR-051 — Profil alanları, bildirim kutusu ve hatırlatma tercihleri
+- **Tarih:** 2026-10-24
+- **Bağlam:** F4-02 tasarımı (04, 05, 06, 35) veri modelinde olmayan alanlar ve davranışlar içeriyor.
+- **Karar (kullanıcı):**
+	- **Ad ve soyad:** `profiles.first_name` ve `last_name` ayrı tutulur; `display_name` bunlardan türetilir (karşı tarafa ve aramaya giden ad budur). Mevcut hesaplarda ve yalnızca görünen ad gelen yollarda (`complete_profile`) ad son boşluktan bölünür: "Ayşe Nur Yılmaz" → "Ayşe Nur" + "Yılmaz" (ikili ön adlar yaygın).
+	- **Profil fotoğrafı:** özel `avatars` bucket'ı; yükleme RPC'yle verilen yola, kare kırpılmış ve küçültülmüş JPEG (en fazla 512 px, 1 MB). Kendisi ve anlaşmalardaki karşı tarafı kısa süreli imzalı URL ile görür; ID aramasında fotoğraf dönmez (BR-17). Kamera ve galeri için `expo-image-picker` eklenir. Hesap silmede silinir.
+	- **Kullanıcı adı (@):** benzersiz, 3–20 karakter, küçük harf, rakam, `_` ve `.`; isteğe bağlı. Yalnızca gösterim içindir: kişi bulmada kullanılmaz (tahmin edilebilir adlarla tarama riski). Uygunluk kontrolü yalnızca oturumdaki kullanıcı için ve sayaçla sınırlıdır.
+	- **E-posta:** eklenmez; tasarımdaki alan gösterilmez.
+	- **Bildirim kutusu:** kullanıcı başına `notifications` tablosu. Push gönderen her olay (outbox) aynı kaydı kutuya da yazar. Okundu bilgisi (`read_at`), "Tümünü okundu işaretle", filtreler (Tümü, Onay gereken, Hatırlatmalar, Tamamlanan) ve gün gruplaması bu tablodan gelir. "Onay gereken" sayısı canlı veriden (bekleyen kararlar) hesaplanır, kutudaki kopya bayatlamaz. Kayıtlar 90 gün saklanır (pg_cron).
+	- **Hatırlatma tercihleri:** vade öncesi hatırlatma kullanıcı tercihidir: 7 gün, 3 gün, 1 gün önce ve vade günü (çoklu seçim; varsayılan 3 gün önce ve vade günü). Vade sonrası hatırlatmalar (1 ve 7 gün sonra) ve bildirilen ödeme hatırlatması değişmez. Tercih yalnızca kendi hatırlatmalarını etkiler; anlaşma bazında kapatma (spec 5.9) BACKLOG'da kalır.
+	- **Henüz yapılmamış modüller gizlenir:** Ana menüde Hesaplar, Banka Kredileri, Raporlar, Bütçe, Faiz Hesaplayıcı; Profilde Hesaplarım, QR kod, yüz tanıma kilidi, "Açılışta tutarları gizle". Her biri kendi görevinde görünür olur.
+	- **Fotoğraf erişimi:** `avatars` politikası sahibine ve paylaşılmış (kişisel olmayan) bir anlaşmanın karşı tarafına okuma verir; yükleme ve silme yalnızca kendi klasörüne. Storage SQL ile silmeye izin vermez: eski dosyayı uygulama Storage API'siyle siler, hesap silmede `delete-account` klasörü boşaltır.
+	- **Yasal metinler ve hesap silme:** Profil'de "Gizlilik ve güvenlik" kartına "Yasal metinler" ve "Hesabı sil" satırları eklenir; "Kayıtları dışa aktar" mevcut dışa aktarmaya bağlanır. Ayrı Ayarlar ekranı kalkar; Ana menüdeki "Gizlilik ve ayarlar" Profil'i açar.
+
+## ADR-052 — Profil, Ana menü ve Bildirimler ekranlarının uygulama kararları (F4-02b)
+- **Tarih:** 2026-10-24
+- **Bağlam:** F4-02b planında açık kalan sorular kullanıcıyla önerilen varsayılanlarla kapatıldı; uygulamada birkaç teknik seçim daha yapıldı.
+- **Karar (kullanıcı, önerilen varsayılanlar):**
+	- **Zil:** Ana Sayfa'daki zil okunmamış bildirim sayısını gösterir ve Bildirimler'i (06) açar. Talepler ekranı kalır; bekleyen işler bandından ve onay gereken bildirimlerden ulaşılır. Ana Sayfa'nın soluna Ana menü düğmesi eklendi.
+	- **Bildirim satır metinleri:** tasarımdaki kalın başlık ve ayrıntı satırı istemcide kurulur. Başlıklar `tr.inbox.titles` (şablon başına kısa cümle), ayrıntı satırı yükten (taksit, tutar, vade, kalan). Push metinleri sunucuda değişmeden kalır.
+	- **Yardım ve destek:** `mailto:` bağlantısı; adres `EXPO_PUBLIC_SUPPORT_EMAIL`. Adres henüz belirlenmediği için boşken satır gizlenir.
+	- **Elden Taksit kutucuğu:** taksit ekranları gelene kadar (F4-09) Borçlarım sekmesini açar; alt satırda açık taksitli alışveriş sayısı yazar.
+- **Uygulama kararları:**
+	- **Rotalar:** Profil `/me` (`/me/edit`, `/me/discoverability`, `/me/legal`, `/me/delete`), Ana menü `/menu` (modal), Bildirimler `/inbox`. `/profile` ve `/notifications` kayıt akışındaki `(auth)` ekranlarında kullanılıyor.
+	- **`ProfileApi`:** profil, ID ve bildirim kutusu `AgreementsApi`'den ayrı bir arayüzde; mock ve Supabase adaptörleri ortak. ID ile paylaşım (`shareAgreementById`) anlaşmayı değiştirdiği için `AgreementsApi`'de.
+	- **Fotoğraf:** seçim ve küçültme `src/lib/avatarImage.ts`'de (kamera izni, kare kırpma, 512 px JPEG). Yükleme, `set_avatar` ve eski dosyanın silinmesi Supabase adaptöründe; eski dosya silinemezse sessiz kalınır (hesapla birlikte silinir).
+	- **ID araması:** yalnızca tam ve geçerli bir ID yazılınca bir kez sorulur, oturum boyunca önbellekte kalır, kendiliğinden yeniden denenmez (saatte 20 sınırı). Kullanıcı adı denetimi yazma durduktan 500 ms sonra yapılır.
+	- **Hata eşleme:** sunucunun `detail` alanı `ApiError.details.field` olarak taşınır. `rate_limited` + `paramnet_id` "30 günde bir" mesajını, ID arama ve paylaşımında `rate_limited` "çok fazla ID denemesi" mesajını verir.
+	- **Profili düzenle formu:** üç alan ve canlı kullanıcı adı denetimi için react-hook-form yerine yerel durum kullanıldı (kayıt akışındaki ad ekranı gibi). Kurallar `@paramnet/shared` `usernameProblem` / `normalizeUsername`'den gelir.
+	- **Tasarımdan sapmalar:** Profil'de alt sekme çubuğu ve sağ üstteki Ayarlar ikonu yok (Profil yığına açılır; ikon Menü ile döngü kurardı). Profil'de dışa aktarma satırının "CSV · PDF" etiketi yok (çıktı JSON). Bildirimlerde okunmuş onay bildiriminde "Sonra" düğmesi gizlenir.

@@ -2,7 +2,9 @@ import RootLayout from "../../app/_layout";
 import AuthLayout from "../../app/(auth)/_layout";
 import Notifications from "../../app/(auth)/notifications";
 import Otp from "../../app/(auth)/otp";
-import Phone from "../../app/(auth)/phone";
+import Login from "../../app/(auth)/login";
+import OnboardingRoute from "../../app/(auth)/onboarding";
+import Pin from "../../app/(auth)/pin";
 import Profile from "../../app/(auth)/profile";
 import Welcome from "../../app/(auth)/welcome";
 import TabsLayout from "../../app/(tabs)/_layout";
@@ -28,8 +30,13 @@ import NewLayout from "../../app/new/_layout";
 import NewForm from "../../app/new/form";
 import NewIndex from "../../app/new/index";
 import NewPlan from "../../app/new/plan";
-import Settings from "../../app/settings/index";
-import SettingsDelete from "../../app/settings/delete";
+import Me from "../../app/me/index";
+import MeDelete from "../../app/me/delete";
+import MeDiscoverability from "../../app/me/discoverability";
+import MeEdit from "../../app/me/edit";
+import MeLegal from "../../app/me/legal";
+import Menu from "../../app/menu";
+import Inbox from "../../app/inbox";
 import Legal from "../../app/legal/[doc]";
 
 // Every route of the app for expo-router's renderRouter; extend when a route file is added.
@@ -38,7 +45,9 @@ export const appRoutes = {
 	index: Index,
 	"(auth)/_layout": AuthLayout,
 	"(auth)/welcome": Welcome,
-	"(auth)/phone": Phone,
+	"(auth)/onboarding": OnboardingRoute,
+	"(auth)/login": Login,
+	"(auth)/pin": Pin,
 	"(auth)/otp": Otp,
 	"(auth)/profile": Profile,
 	"(auth)/notifications": Notifications,
@@ -63,8 +72,13 @@ export const appRoutes = {
 	"agreement/[id]/share": AgreementShare,
 	"agreement/[id]/invite-preview": AgreementInvitePreview,
 	"contact/[id]": ContactDetail,
-	"settings/index": Settings,
-	"settings/delete": SettingsDelete,
+	"me/index": Me,
+	"me/edit": MeEdit,
+	"me/discoverability": MeDiscoverability,
+	"me/legal": MeLegal,
+	"me/delete": MeDelete,
+	menu: Menu,
+	inbox: Inbox,
 	"legal/[doc]": Legal,
 	"invite/[token]": Invite,
 };
