@@ -5,6 +5,9 @@ import type {
 	Account,
 	AccountList,
 	BudgetMonth,
+	Card,
+	CardDetail,
+	CardList,
 	CashSummary,
 	MonthlyReport,
 	RecurringRule,
@@ -14,7 +17,7 @@ import type {
 } from "../types";
 import type { AccountsApi } from "./AccountsApi";
 
-// Shapes are guarded by the pgTAP tests (270_accounts, 280_transactions, 290_recurring, 300_budgets_reports).
+// Shapes are guarded by the pgTAP tests (270_accounts, 280_transactions, 290_recurring, 300_budgets_reports, 310_cards).
 export function createSupabaseAccountsApi(client: SupabaseClient): AccountsApi {
 	async function call<T>(fn: string, args?: Record<string, unknown>): Promise<T> {
 		const response: { data: unknown; error: unknown } = await client.rpc(fn, args);
@@ -107,5 +110,26 @@ export function createSupabaseAccountsApi(client: SupabaseClient): AccountsApi {
 			await call("set_budget", { p_category: category, p_limit_minor: limitMinor });
 		},
 		getMonthlyReport: (month) => call<MonthlyReport>("get_monthly_report", { p_month: month }),
+
+		listCards: () => call<CardList>("list_cards"),
+		createCard: async (input, idempotencyKey) =>
+			(
+				await call<{ card: Card }>("create_card", {
+					p_input: input,
+					p_idempotency_key: idempotencyKey,
+				})
+			).card,
+		updateCard: async (id, input, rowVersion) =>
+			(
+				await call<{ card: Card }>("update_card", {
+					p_id: id,
+					p_input: input,
+					p_row_version: rowVersion,
+				})
+			).card,
+		archiveCard: async (id, rowVersion) =>
+			(await call<{ card: Card }>("archive_card", { p_id: id, p_row_version: rowVersion }))
+				.card,
+		getCard: (id) => call<CardDetail>("get_card", { p_id: id }),
 	};
 }

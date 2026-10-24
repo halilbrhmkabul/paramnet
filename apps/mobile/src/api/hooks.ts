@@ -1,5 +1,6 @@
 import type {
 	AccountInput,
+	CardInput,
 	CreateAgreementInput,
 	IsoDate,
 	PaymentInput,
@@ -56,6 +57,8 @@ export const queryKeys = {
 	recurring: ["cash", "recurring"] as const,
 	budgets: (month: IsoDate) => ["cash", "budgets", month] as const,
 	report: (month: IsoDate) => ["cash", "report", month] as const,
+	cards: ["cash", "cards"] as const,
+	card: (id: string) => ["cash", "card", id] as const,
 };
 
 export function useDashboard() {
@@ -621,4 +624,39 @@ export function useMonthlyReport(month: IsoDate) {
 		queryKey: queryKeys.report(month),
 		queryFn: () => api.getMonthlyReport(month),
 	});
+}
+
+// Credit cards (F4-05) -----------------------------------------------------------------------------------
+
+export function useCards() {
+	const api = useAccountsApi();
+	return useQuery({ queryKey: queryKeys.cards, queryFn: () => api.listCards() });
+}
+
+export function useCard(id: string) {
+	const api = useAccountsApi();
+	return useQuery({ queryKey: queryKeys.card(id), queryFn: () => api.getCard(id) });
+}
+
+export function useCreateCard() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ input, idempotencyKey }: { input: CardInput; idempotencyKey: string }) =>
+			api.createCard(input, idempotencyKey),
+	);
+}
+
+export function useUpdateCard() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ id, input, rowVersion }: { id: string; input: CardInput; rowVersion: number }) =>
+			api.updateCard(id, input, rowVersion),
+	);
+}
+
+export function useArchiveCard() {
+	const api = useAccountsApi();
+	return useCashMutation(({ id, rowVersion }: { id: string; rowVersion: number }) =>
+		api.archiveCard(id, rowVersion),
+	);
 }

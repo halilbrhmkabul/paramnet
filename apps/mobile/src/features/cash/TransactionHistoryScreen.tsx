@@ -22,6 +22,7 @@ import {
 	filterTransactions,
 	groupByDay,
 	monthTitle,
+	sourceName,
 	type CashFilter,
 } from "./cashModel";
 import { TransactionRow } from "./parts";
@@ -33,7 +34,7 @@ function subOf(tx: Transaction): string {
 		return tr.txHistory.transferSub;
 	}
 	const category = categoryLabel(tx);
-	return category === null ? tx.account_name : `${category} · ${tx.account_name}`;
+	return category === null ? sourceName(tx) : `${category} · ${sourceName(tx)}`;
 }
 
 // Design 36: one month, searched and filtered on the device; planned items come with F4-10 (ADR-053).

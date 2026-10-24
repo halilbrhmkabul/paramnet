@@ -43,8 +43,9 @@ grant select on t_income to authenticated;
 select is((select r ->> 'replayed' from t_income), 'false', 'gelir yazıldı');
 select is(
 	(select array_agg(k order by k) from jsonb_object_keys((select r -> 'transaction' from t_income)) k),
-	array['account_id', 'account_name', 'amount_minor', 'category', 'created_at', 'deleted_at', 'id', 'kind', 'note',
-		'occurred_on', 'row_version', 'title', 'to_account_id', 'to_account_name', 'updated_at'],
+	array['account_id', 'account_name', 'amount_minor', 'card_id', 'card_name', 'category', 'created_at', 'deleted_at',
+		'id', 'installments', 'kind', 'note', 'occurred_on', 'row_version', 'title', 'to_account_id', 'to_account_name',
+		'to_card_id', 'to_card_name', 'updated_at'],
 	'işlem alanları'
 );
 select is((select r -> 'transaction' ->> 'account_name' from t_income), 'Maaş Hesabı', 'hesap adı döner');
@@ -77,7 +78,7 @@ select throws_ok($$ select pg_temp.tx('expense', 'a1a1a1a1-0000-4000-8000-000000
 select throws_ok($$ select pg_temp.tx('expense', 'b2b2b2b2-0000-4000-8000-000000000001', null, 100, 'food', '2026-10-01', gen_random_uuid()) $$, 'P0001', 'not_found', 'başkasının hesabına yazılamaz');
 select throws_ok($$ select pg_temp.tx('transfer', 'a1a1a1a1-0000-4000-8000-000000000001', 'b2b2b2b2-0000-4000-8000-000000000001', 100, null, '2026-10-01', gen_random_uuid()) $$, 'P0001', 'not_found', 'başkasının hesabına transfer edilemez');
 select throws_ok(
-	$$ select public.create_transaction('{"kind": "expense", "account_id": "a1a1a1a1-0000-4000-8000-000000000001", "to_account_id": null, "amount_minor": 100, "category": "food", "title": null, "note": null, "occurred_on": "2026-10-01", "card_id": null}', gen_random_uuid()) $$,
+	$$ select public.create_transaction('{"kind": "expense", "account_id": "a1a1a1a1-0000-4000-8000-000000000001", "to_account_id": null, "amount_minor": 100, "category": "food", "title": null, "note": null, "occurred_on": "2026-10-01", "iban": null}', gen_random_uuid()) $$,
 	'P0001', 'validation_error', 'bilinmeyen alan alınmaz'
 );
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
 	addDays,
 	addMonthsClamped,
+	daysBetween,
 	daysOfMonth,
 	formatDateTR,
 	formatDateTimeTR,
@@ -176,5 +177,14 @@ describe("shiftMonth", () => {
 		expect(shiftMonth("2026-10-11", 1)).toBe("2026-11-01");
 		expect(shiftMonth("2026-01-31", -1)).toBe("2025-12-01");
 		expect(shiftMonth("2026-03-15", -14)).toBe("2025-01-01");
+	});
+});
+
+describe("daysBetween", () => {
+	it("counts calendar days across months and years", () => {
+		expect(daysBetween("2026-10-12", "2026-10-19")).toBe(7);
+		expect(daysBetween("2026-12-30", "2027-01-02")).toBe(3);
+		expect(daysBetween("2026-10-19", "2026-10-12")).toBe(-7);
+		expect(daysBetween("2026-10-12", "2026-10-12")).toBe(0);
 	});
 });

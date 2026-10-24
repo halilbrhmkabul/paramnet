@@ -33,6 +33,13 @@ export const palette = {
 		neutralSoft: "#ECEFEC",
 		// Behind a bottom sheet (design 37).
 		scrim: "rgba(13,28,22,0.45)",
+		// Card faces (design 07, 32): the card's own colour, the same in both themes.
+		cardNavy: "#33305E",
+		cardGraphite: "#2F3B33",
+		cardMidnight: "#18466A",
+		cardBordeaux: "#5A2232",
+		cardChip: "#D4BE7F",
+		onCard: "#FFFFFF",
 		// Welcome (01) and the intro illustrations (31) stay dark forest in both themes.
 		heroBg: "#0C2F25",
 		heroStage: "#0F3A2E",
@@ -79,6 +86,13 @@ export const palette = {
 		neutral: "#B3C0B8",
 		neutralSoft: "#26302B",
 		scrim: "rgba(0,0,0,0.6)",
+		// Card faces (design 07, 32): the card's own colour, the same in both themes.
+		cardNavy: "#33305E",
+		cardGraphite: "#2F3B33",
+		cardMidnight: "#18466A",
+		cardBordeaux: "#5A2232",
+		cardChip: "#D4BE7F",
+		onCard: "#FFFFFF",
 		// Welcome (01) and the intro illustrations (31) stay dark forest in both themes.
 		heroBg: "#0C2F25",
 		heroStage: "#0F3A2E",

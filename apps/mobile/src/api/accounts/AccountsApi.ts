@@ -1,5 +1,6 @@
 import type {
 	AccountInput,
+	CardInput,
 	IsoDate,
 	RecurringInput,
 	TransactionCategory,
@@ -10,6 +11,9 @@ import type {
 	Account,
 	AccountList,
 	BudgetMonth,
+	Card,
+	CardDetail,
+	CardList,
 	CashSummary,
 	MonthlyReport,
 	RecurringRule,
@@ -51,4 +55,10 @@ export interface AccountsApi {
 	// null removes the category's budget.
 	setBudget(category: TransactionCategory, limitMinor: number | null): Promise<void>;
 	getMonthlyReport(month: IsoDate): Promise<MonthlyReport>;
+	// F4-05 (ADR-055). Card purchases and payments are transactions (card_id / to_card_id).
+	listCards(): Promise<CardList>;
+	createCard(input: CardInput, idempotencyKey: string): Promise<Card>;
+	updateCard(id: string, input: CardInput, rowVersion: number): Promise<Card>;
+	archiveCard(id: string, rowVersion: number): Promise<Card>;
+	getCard(id: string): Promise<CardDetail>;
 }

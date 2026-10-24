@@ -67,11 +67,21 @@ export const accountInputSchema = z.strictObject({
 export type AccountInput = z.output<typeof accountInputSchema>;
 
 // Adjustments come only from "Bakiye düzelt" (adjust_account_balance), never from this form.
+// Income and expense sit on an account or a card (ADR-055); a transfer leaves an account for one of the
+// user's accounts or cards (a card payment). Card purchases may be split into instalments.
 export const transactionInputSchema = z
 	.strictObject({
 		kind: z.enum(["expense", "income", "transfer"], { error: "invalid_option" }),
-		account_id: uuidSchema,
+		account_id: uuidSchema.nullable(),
 		to_account_id: uuidSchema.nullable(),
+		card_id: uuidSchema.nullable().default(null),
+		to_card_id: uuidSchema.nullable().default(null),
+		installments: z
+			.number({ error: "invalid_installments" })
+			.refine((v) => Number.isSafeInteger(v) && v >= 1 && v <= 36, {
+				error: "invalid_installments",
+			})
+			.default(1),
 		amount_minor: z
 			.number({ error: "invalid_amount" })
 			.refine((value) => isCashAmount(value) && value > 0, { error: "invalid_amount" }),
@@ -81,24 +91,36 @@ export const transactionInputSchema = z
 		occurred_on: isoDateSchema,
 	})
 	.superRefine((input, ctx) => {
+		const issue = (message: string, path: string) => {
+			ctx.addIssue({ code: "custom", message, path: [path] });
+		};
+		if (input.installments > 1 && (input.kind !== "expense" || input.card_id === null)) {
+			issue("invalid_installments", "installments");
+			return;
+		}
 		if (input.kind === "transfer") {
-			if (input.to_account_id === null || input.category !== null) {
-				ctx.addIssue({
-					code: "custom",
-					message: "invalid_transfer",
-					path: ["to_account_id"],
-				});
+			if (
+				input.account_id === null ||
+				input.card_id !== null ||
+				input.category !== null ||
+				(input.to_account_id === null) === (input.to_card_id === null)
+			) {
+				issue("invalid_transfer", "to_account_id");
 			} else if (input.to_account_id === input.account_id) {
-				ctx.addIssue({ code: "custom", message: "same_account", path: ["to_account_id"] });
+				issue("same_account", "to_account_id");
 			}
 			return;
 		}
 		if (input.category === null || !isCategoryFor(input.kind, input.category)) {
-			ctx.addIssue({ code: "custom", message: "invalid_category", path: ["category"] });
+			issue("invalid_category", "category");
 			return;
 		}
-		if (input.to_account_id !== null) {
-			ctx.addIssue({ code: "custom", message: "invalid_transfer", path: ["to_account_id"] });
+		if ((input.account_id === null) === (input.card_id === null)) {
+			issue("invalid_source", "account_id");
+			return;
+		}
+		if (input.to_account_id !== null || input.to_card_id !== null) {
+			issue("invalid_transfer", "to_account_id");
 		}
 	});
 
@@ -113,7 +135,8 @@ export type CashAccount = {
 
 export type CashTransaction = {
 	kind: TransactionKind;
-	account_id: string;
+	// Null for a card purchase or refund: it does not touch an account (ADR-055).
+	account_id: string | null;
 	to_account_id: string | null;
 	// Signed only for adjustments; every other kind is positive.
 	amount_minor: number;

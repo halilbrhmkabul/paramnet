@@ -14,11 +14,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { messageForError } from "@/api/errors";
 import {
 	useAccounts,
+	useCards,
 	useCreateTransaction,
 	useTransaction,
 	useUpdateTransaction,
 } from "@/api/hooks";
-import type { Account, Transaction } from "@/api/types";
+import type { Account, Card, Transaction } from "@/api/types";
 import { Button } from "@/components/Button";
 import { Chip } from "@/components/Chip";
 import { DateField } from "@/components/DateField";
@@ -118,13 +119,17 @@ function Keypad({ onKey }: { onKey: (key: string) => void }) {
 
 type Picking = "account" | "to" | null;
 
+const INSTALLMENT_CHOICES = [1, 2, 3, 6, 9, 12] as const;
+
 function Form({
 	accounts,
+	cards,
 	initialKind,
 	initialAccountId,
 	editing,
 }: {
 	accounts: readonly Account[];
+	cards: readonly Card[];
 	initialKind: FormKind;
 	initialAccountId: string | null;
 	editing: Transaction | null;
@@ -141,6 +146,9 @@ function Form({
 	const [toId, setToId] = useState<string | null>(
 		editing?.to_account_id ?? accounts.find((a) => a.id !== (first?.id ?? null))?.id ?? null,
 	);
+	const [cardId, setCardId] = useState<string | null>(editing?.card_id ?? null);
+	const [toCardId, setToCardId] = useState<string | null>(editing?.to_card_id ?? null);
+	const [installments, setInstallments] = useState(editing?.installments ?? 1);
 	const [date, setDate] = useState<IsoDate>(editing?.occurred_on ?? today);
 	const [title, setTitle] = useState(editing?.title ?? "");
 	const [note, setNote] = useState(editing?.note ?? "");
@@ -158,10 +166,18 @@ function Form({
 	const shown = formatSignedTRY(amount ?? 0, sign);
 	const nameOf = (id: string | null) =>
 		accounts.find((a) => a.id === id)?.name ?? tr.txForm.pickAccount;
-	const needTwo = kind === "transfer" && accounts.length < 2;
+	const cardOf = (id: string | null) => cards.find((c) => c.id === id)?.label;
+	// A card payment counts as a second place to move money to.
+	const needTwo = kind === "transfer" && accounts.length < 2 && cards.length === 0;
+	const onCard = kind !== "transfer" && cardId !== null;
 
 	function changeKind(next: FormKind) {
 		setKind(next);
+		// A transfer always leaves an account.
+		if (next === "transfer" && cardId !== null) {
+			setCardId(null);
+			setAccountId((current) => current ?? accounts[0]?.id ?? null);
+		}
 		const options = categoriesOf(next);
 		setCategory((current) =>
 			current !== null && options.includes(current) ? current : (options[0] ?? null),
@@ -172,8 +188,11 @@ function Form({
 	function submit() {
 		const parsed = transactionInputSchema.safeParse({
 			kind,
-			account_id: accountId,
-			to_account_id: kind === "transfer" ? toId : null,
+			account_id: onCard ? null : accountId,
+			to_account_id: kind === "transfer" && toCardId === null ? toId : null,
+			card_id: onCard ? cardId : null,
+			to_card_id: kind === "transfer" ? toCardId : null,
+			installments: onCard && kind === "expense" ? installments : 1,
 			amount_minor: amount ?? 0,
 			category: kind === "transfer" ? null : category,
 			title,
@@ -286,8 +305,12 @@ function Form({
 				<View style={{ paddingHorizontal: sizes.screenPadding, gap: spacing.md }}>
 					<View style={[styles.metaRow, { gap: spacing.sm }]}>
 						<MetaButton
-							label={kind === "transfer" ? tr.txForm.from : tr.txForm.account}
-							value={nameOf(accountId)}
+							label={kind === "transfer" ? tr.txForm.from : tr.txForm.source}
+							value={
+								onCard
+									? (cardOf(cardId) ?? tr.txForm.pickAccount)
+									: nameOf(accountId)
+							}
 							onPress={() => {
 								setPicking("account");
 							}}
@@ -296,7 +319,7 @@ function Form({
 						{kind === "transfer" ? (
 							<MetaButton
 								label={tr.txForm.to}
-								value={nameOf(toId)}
+								value={cardOf(toCardId) ?? nameOf(toId)}
 								onPress={() => {
 									setPicking("to");
 								}}
@@ -304,6 +327,36 @@ function Form({
 							/>
 						) : null}
 					</View>
+					{onCard && kind === "expense" ? (
+						<View style={{ gap: spacing.xs }}>
+							<Text style={[typography.label, { color: colors.textMuted }]}>
+								{tr.txForm.installments}
+							</Text>
+							<View
+								accessibilityRole="radiogroup"
+								style={[styles.metaRow, { gap: spacing.sm, flexWrap: "wrap" }]}
+							>
+								{INSTALLMENT_CHOICES.map((n) => (
+									<Chip
+										key={n}
+										label={
+											n === 1
+												? tr.txForm.single
+												: fill(tr.txForm.installmentsN, {
+														count: String(n),
+													})
+										}
+										selected={n === installments}
+										role="radio"
+										onPress={() => {
+											setInstallments(n);
+										}}
+										testID={`txForm.installments.${String(n)}`}
+									/>
+								))}
+							</View>
+						</View>
+					) : null}
 					{needTwo ? (
 						<Text style={[typography.caption, { color: colors.warning }]}>
 							{tr.txForm.needTwo}
@@ -372,12 +425,23 @@ function Form({
 							: tr.txForm.account
 				}
 				accounts={accounts}
-				selectedId={picking === "to" ? toId : accountId}
+				cards={picking === "to" || kind !== "transfer" ? cards : []}
+				selectedId={picking === "to" ? (toCardId ?? toId) : onCard ? cardId : accountId}
 				onSelect={(account) => {
 					if (picking === "to") {
 						setToId(account.id);
+						setToCardId(null);
 					} else {
 						setAccountId(account.id);
+						setCardId(null);
+					}
+					setPicking(null);
+				}}
+				onSelectCard={(card) => {
+					if (picking === "to") {
+						setToCardId(card.id);
+					} else {
+						setCardId(card.id);
 					}
 					setPicking(null);
 				}}
@@ -426,6 +490,7 @@ export function TransactionFormScreen({
 	editId: string | null;
 }) {
 	const accounts = useAccounts();
+	const cards = useCards();
 	const editing = useTransaction(editId);
 	if (accounts.isPending || (editId !== null && editing.isPending)) {
 		return (
@@ -471,7 +536,13 @@ export function TransactionFormScreen({
 	const tx = editId === null ? null : (editing.data?.transaction ?? null);
 	const formKind: FormKind = tx !== null && tx.kind !== "adjustment" ? tx.kind : kind;
 	return (
-		<Form accounts={open} initialKind={formKind} initialAccountId={accountId} editing={tx} />
+		<Form
+			accounts={open}
+			cards={cards.data?.cards ?? []}
+			initialKind={formKind}
+			initialAccountId={accountId}
+			editing={tx}
+		/>
 	);
 }
 

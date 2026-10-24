@@ -395,6 +395,14 @@ Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle 
 - **Bütçe:** gider kategorisi başına aylık sınır. Harcanan, o ayın silinmemiş gider kayıtlarıdır. Sınırın %80'inde "sınıra yakın", aşınca "aşıldı" uyarısı; özet kartında kalan gün ve kalan günlük pay.
 - **Aylık rapor:** seçilen ayın geliri, gideri ve neti; son 6 ayın gelir-gider sütunları; gider kategorisi dağılımı; borç ve alacak dengesi (anlaşmalardan). Transfer, düzeltme ve borç kayıtları gelir-gidere dahil değildir. Varsayılan ay son tamamlanan aydır.
 
+## 5.13 Kredi kartları (ADR-055)
+
+- **Kart:** banka, isteğe bağlı kart adı, son 4 hane, renk, limit, güncel borç (son ekstreye dahil sayılır), hesap kesim günü (1–28), son ödeme (kesimden kaç gün sonra) ve asgari ödeme oranı. Tam kart numarası, CVV ya da şifre istenmez. Limit 50.000 TL'ye kadar %20, üstünde %40 önerilir. Kullanıcı başına en fazla 20 açık kart.
+- **Kart harcaması** bir gider kaydıdır ama bir hesaba değil karta yazılır: Toplam Nakit'i değiştirmez, kart borcunu artırır, gider olarak bir kez sayılır. Taksitli harcama (2–36) eşit parçalara bölünür; kalan kuruş ilk taksittedir ve her taksit kendi ayının ekstresine girer. **İade** kartta gelir kaydıdır ve borcu azaltır.
+- **Kart ödemesi** bir hesaptan karta transferdir: hesabın bakiyesi düşer, kart borcu azalır, gider sayılmaz.
+- **Ekstre türetilir:** son kesimde kartta biriken (açılış borcu + o güne kadar faturalanan taksitler ve harcamalar − o güne kadar yapılan ödeme ve iadeler, sıfırın altına inmez). Kalan ekstre borcu = ekstre − kesimden sonraki ödemeler. Asgari = ekstre × oran (yukarı yuvarlanır). Son ödeme = kesim + gün. Dönem içi harcama = son kesimden sonraki kesime kadar faturalanacak taksitler. Kullanılabilir limit = limit − (açılış borcu + tüm harcamalar − ödeme ve iadeler).
+- **Faiz hesaplanmaz** (simülasyon F4-07). Uygulama banka ile konuşmaz; ödeme bir kayıttır.
+
 # 6. Ekranlar ve Bilgi Mimarisi
 
 ## 6.1 Navigasyon
@@ -824,6 +832,8 @@ Diğer tablolar
 
 - budgets: owner_id + category (PK, gider kategorisi), limit_minor.
 
+- cards (ADR-055): owner_id, bank_name, card_name null, last4, color, limit_minor, opening_debt_minor, statement_day (1–28), due_offset_days, min_payment_rate, archived_at null, idempotency_key, row_version. transactions'a card_id, to_card_id ve installments eklendi; kart harcamasında account_id boştur.
+
 - Arama, paylaşım ve kullanıcı adı kontrolü sayaçları mevcut `rate_limits` tablosundadır (`pnid:find:`, `pnid:share:`, `username:check:` + kullanıcı).
 
 ## 10.2 Satır düzeyi güvenlik (RLS)
@@ -873,6 +883,7 @@ Diğer tablolar
 | confirm_recurring(rule, date, idem_key) / skip_recurring(rule, date) | Günü gelen tarihi kaydet ya da atla |
 | set_budget(category, limit) / list_budgets(month) | Kategori bütçesi; harcananla birlikte |
 | get_monthly_report(month) | Gelir, gider, kategori dağılımı, 6 aylık seri |
+| create_card / update_card / archive_card / list_cards / get_card | Kartlar; türetilmiş ekstre, asgari, son ödeme, kullanılabilir limit (ADR-055) |
 
 ## 10.4 Edge Functions
 

@@ -1,6 +1,9 @@
 import {
 	EXPENSE_CATEGORIES,
 	MAX_ACCOUNTS,
+	cardInputSchema,
+	deriveCardState,
+	type CardInput,
 	accountInputSchema,
 	addDays,
 	adjustmentDelta,
@@ -22,6 +25,7 @@ import {
 import { ApiError } from "../errors";
 import type {
 	Account,
+	Card,
 	RecurringRule,
 	Transaction,
 	TransactionChange,
@@ -38,7 +42,12 @@ export type MockAccountsOptions = {
 };
 
 type StoredAccount = Omit<Account, "balance_minor"> & { key: string | null };
-type StoredTransaction = Omit<Transaction, "account_name" | "to_account_name"> & { key: string };
+type StoredTransaction = Omit<
+	Transaction,
+	"account_name" | "to_account_name" | "card_name" | "to_card_name"
+> & { key: string };
+type StoredCard = Omit<Card, "label" | "state"> & { key: string | null };
+type CardFields = "card_id" | "to_card_id" | "installments";
 type StoredRule = Omit<RecurringRule, "account_name" | "next_dates" | "pending_dates"> & {
 	key: string;
 	tracking_from: IsoDate;
@@ -55,6 +64,9 @@ const EDITABLE = [
 	"title",
 	"note",
 	"occurred_on",
+	"card_id",
+	"to_card_id",
+	"installments",
 ] as const;
 
 // Same rules as the RPCs (270_accounts, 280_transactions): the screens see the same refusals in both modes.
@@ -67,6 +79,7 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 	const events = new Map<string, TransactionEvent[]>();
 
 	const rules: StoredRule[] = [];
+	const cards: StoredCard[] = [];
 	const budgets = new Map<TransactionCategory, number>();
 	const stamp = () => now().toISOString();
 	const today = () => todayInIstanbul(now());
@@ -93,12 +106,16 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 	function addTransaction(
 		fields: Omit<
 			StoredTransaction,
-			"id" | "deleted_at" | "row_version" | "created_at" | "updated_at" | "key"
-		>,
+			"id" | "deleted_at" | "row_version" | "created_at" | "updated_at" | "key" | CardFields
+		> &
+			Partial<Pick<StoredTransaction, CardFields>>,
 		key: string,
 	): StoredTransaction {
 		const tx: StoredTransaction = {
 			id: newId(),
+			card_id: null,
+			to_card_id: null,
+			installments: 1,
 			...fields,
 			deleted_at: null,
 			row_version: 1,
@@ -197,12 +214,32 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 			handled: new Map([[day(0), transactions[0]?.id ?? null]]),
 		};
 		rules.push(wage, rent);
+		cards.push({
+			id: newId(),
+			bank_name: "Yapı Kredi",
+			card_name: "World",
+			last4: "4281",
+			color: "navy",
+			limit_minor: 6000000,
+			opening_debt_minor: 1245000,
+			statement_day: 9,
+			due_offset_days: 10,
+			min_payment_rate: 40,
+			archived_at: null,
+			row_version: 1,
+			created_at: stamp(),
+			key: null,
+		});
 		budgets.set("groceries", 800000);
 		budgets.set("food", 450000);
 		budgets.set("bills", 300000);
 	}
 
 	function wait<T>(value: () => T): Promise<T> {
+		// Without latency the answer comes on the microtask queue: tests may hold fake timers.
+		if (latencyMs === 0) {
+			return Promise.resolve().then(value);
+		}
 		return new Promise((resolve, reject) => {
 			setTimeout(() => {
 				try {
@@ -232,11 +269,25 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 		return { ...rest, balance_minor: cash().balances[account.id] ?? 0 };
 	}
 
+	function cardLabel(card: StoredCard): string {
+		return `${card.bank_name}${card.card_name === null ? "" : ` ${card.card_name}`} ••${card.last4}`;
+	}
+
+	function cardName(id: string | null): string | null {
+		const card = id === null ? undefined : cards.find((c) => c.id === id);
+		return card === undefined ? null : cardLabel(card);
+	}
+
 	function txView(tx: StoredTransaction): Transaction {
 		const { key: _key, ...rest } = tx;
 		return {
 			...rest,
-			account_name: accounts.find((a) => a.id === tx.account_id)?.name ?? "",
+			card_name: cardName(tx.card_id),
+			to_card_name: cardName(tx.to_card_id),
+			account_name:
+				tx.account_id === null
+					? null
+					: (accounts.find((a) => a.id === tx.account_id)?.name ?? null),
 			to_account_name:
 				tx.to_account_id === null
 					? null
@@ -291,6 +342,15 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 			const unchanged = old !== null && (id === old.account_id || id === old.to_account_id);
 			if (ownAccount(id).archived_at !== null && !unchanged) {
 				throw invalid("account_archived");
+			}
+		}
+		for (const id of [value.card_id, value.to_card_id]) {
+			if (id === null) {
+				continue;
+			}
+			const unchanged = old !== null && (id === old.card_id || id === old.to_card_id);
+			if (ownCard(id).archived_at !== null && !unchanged) {
+				throw invalid("card_archived");
 			}
 		}
 		return value;
@@ -426,6 +486,60 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 		}
 	}
 
+	function ownCard(id: string): StoredCard {
+		const card = cards.find((c) => c.id === id);
+		if (card === undefined) {
+			throw new ApiError("not_found");
+		}
+		return card;
+	}
+
+	function cardView(card: StoredCard): Card {
+		const { key: _key, ...rest } = card;
+		const own = transactions
+			.filter(
+				(t) => t.deleted_at === null && (t.card_id === card.id || t.to_card_id === card.id),
+			)
+			.sort((a, b) => a.occurred_on.localeCompare(b.occurred_on));
+		return {
+			...rest,
+			label: cardLabel(card),
+			state: deriveCardState(
+				{ ...card, since: todayInIstanbul(new Date(card.created_at)) },
+				own.map((t) => ({
+					id: t.id,
+					kind:
+						t.kind === "income"
+							? "income"
+							: t.kind === "transfer"
+								? "transfer"
+								: "expense",
+					amount_minor: t.amount_minor,
+					occurred_on: t.occurred_on,
+					installments: t.installments,
+				})),
+				today(),
+			),
+		};
+	}
+
+	function parseCard(input: CardInput): CardInput {
+		const parsed = cardInputSchema.safeParse(input);
+		if (!parsed.success) {
+			throw invalid(String(parsed.error.issues[0]?.path[0] ?? "input"));
+		}
+		return parsed.data;
+	}
+
+	function writableCard(card: StoredCard, rowVersion: number): void {
+		if (card.archived_at !== null) {
+			throw new ApiError("invalid_transition");
+		}
+		if (card.row_version !== rowVersion) {
+			throw new ApiError("conflict");
+		}
+	}
+
 	const expenseIn = (month: IsoDate) =>
 		transactions.filter(
 			(t) =>
@@ -478,7 +592,7 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 			wait(() => {
 				const replay = transactions.find((t) => t.key === key);
 				if (replay !== undefined) {
-					return view(ownAccount(replay.account_id));
+					return view(ownAccount(replay.account_id ?? id));
 				}
 				const account = ownAccount(id);
 				if (account.archived_at !== null) {
@@ -731,6 +845,78 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 							expense_minor: sumKind(m, "expense"),
 						};
 					}),
+				};
+			}),
+
+		listCards: () =>
+			wait(() => {
+				const open = cards.filter((c) => c.archived_at === null).map(cardView);
+				return {
+					cards: open,
+					total_debt_minor: open.reduce((sum, c) => sum + c.state.total_debt_minor, 0),
+					available_minor: open.reduce((sum, c) => sum + c.state.available_minor, 0),
+					limit_minor: open.reduce((sum, c) => sum + c.limit_minor, 0),
+				};
+			}),
+
+		createCard: (input, key) =>
+			wait(() => {
+				const replay = cards.find((c) => c.key === key);
+				if (replay !== undefined) {
+					return cardView(replay);
+				}
+				const card: StoredCard = {
+					id: newId(),
+					...parseCard(input),
+					archived_at: null,
+					row_version: 1,
+					created_at: stamp(),
+					key,
+				};
+				cards.push(card);
+				return cardView(card);
+			}),
+
+		updateCard: (id, input, rowVersion) =>
+			wait(() => {
+				const value = parseCard(input);
+				const card = ownCard(id);
+				writableCard(card, rowVersion);
+				Object.assign(card, value, { row_version: card.row_version + 1 });
+				return cardView(card);
+			}),
+
+		archiveCard: (id, rowVersion) =>
+			wait(() => {
+				const card = ownCard(id);
+				writableCard(card, rowVersion);
+				card.archived_at = stamp();
+				card.row_version += 1;
+				return cardView(card);
+			}),
+
+		getCard: (id) =>
+			wait(() => {
+				const card = ownCard(id);
+				const view = cardView(card);
+				const live = transactions.filter((t) => t.deleted_at === null);
+				const newestFirst = (a: StoredTransaction, b: StoredTransaction) =>
+					b.occurred_on.localeCompare(a.occurred_on) ||
+					b.created_at.localeCompare(a.created_at);
+				return {
+					card: view,
+					period_items: live
+						.filter((t) => t.card_id === id && t.occurred_on > view.state.last_cut)
+						.sort(newestFirst)
+						.map(txView),
+					installment_items: live
+						.filter((t) => t.card_id === id && t.installments > 1)
+						.sort((a, b) => a.occurred_on.localeCompare(b.occurred_on))
+						.map(txView),
+					payments: live
+						.filter((t) => t.to_card_id === id)
+						.sort(newestFirst)
+						.map(txView),
 				};
 			}),
 	};

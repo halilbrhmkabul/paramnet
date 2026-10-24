@@ -41,7 +41,7 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 | S21 | Ana menü (05) | `menu` (modal) | Ad + ID, Modüller (yalnızca yapılanlar), Uygulama kartı, para transferi notu, sürüm | ADR-051, ADR-052 |
 | S22 | Bildirimler (06) | `inbox` | Filtre çipleri, gün grupları, okunmamış noktası, satır eylemleri, Tümünü okundu işaretle, hatırlatma tercihleri | ADR-051, ADR-052 |
 | S23 | İşlem merkezi (21) | `(tabs)/add` (orta "+" sekmesi) | Gelir / Gider / Transfer kutucukları; Borç al, Borç ver, Elden taksit ekle | Yapılmamış modüller gizli (ADR-053) |
-| S24 | Gider / Gelir / Transfer (22) | `transaction/new?kind=&account=` (modal), `transaction/[id]/edit` | Tür seçici, tutar tuş takımı, kategori çipleri, hesap (transferde Nereden/Nereye), tarih, açıklama, not | Hesap yoksa "Önce bir hesap ekle" |
+| S24 | Gider / Gelir / Transfer (22) | `transaction/new?kind=&account=` (modal), `transaction/[id]/edit` | Tür seçici, tutar tuş takımı, kategori çipleri, hesap / kart (kartta taksit; transferde Nereden/Nereye, hedef kart olabilir), tarih, açıklama, not | Hesap yoksa "Önce bir hesap ekle" |
 | S25 | Hesaplar (29) | `accounts/index` | Toplam Nakit, Hesap ekle / Transfer / Bakiye düzelt, hesap listesi, seçili hesabın bu ayki hareketleri | "Manuel kayıt · banka verisi değildir" |
 | S26 | Hesap ekle (33) | `accounts/new`, `accounts/[id]/edit` (modal) | Tür (banka, nakit, birikim, diğer), ad, banka, açılış bakiyesi (eksi olabilir), Toplam Nakit'e dahil et; düzenlemede Hesabı arşivle | IBAN yok |
 | S26a | Bakiye düzelt | `accounts/[id]/adjust` (modal) | Şu anki bakiye, gerçek bakiye, fark | Fark gelir/gider sayılmaz |
@@ -50,6 +50,11 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 | S29 | Tekrarlayan işlemler (38) | `recurring/index`, `recurring/new` ve `recurring/[id]` (modal) | Onay bekleyenler (Onayla / Atla), aktif kurallar; form: tür, ad, tutar, kategori, hesap, sıklık, ilk tarih, sonraki 3 tarih, her seferinde onay; düzenlemede Durdur / Sürdür / Sil | ADR-054 |
 | S30 | Bütçe (39) | `budget` | Özet (harcanan / bütçe, kalan gün, günlük pay), Tüm / Dikkat gerekenler, kategori satırları ve uyarı rozetleri; sınır ekleme/düzenleme/kaldırma paneli | |
 | S31 | Aylık rapor (27) | `reports` | Ay seçici (son tamamlanan ay), Gelir / Gider / Net, 6 aylık sütunlar, kategori dağılımı, borç ve alacak dengesi | Dışa aktarma yok (BACKLOG) |
+| S32 | Kartlarım (07) | `(tabs)/cards` | Toplam borç / kullanılabilir / limit, "limitler Toplam Nakit'e eklenmez" notu, kart yüzü + ekstre, asgari, son ödeme rozeti, kullanılabilir limit | ADR-055 |
+| S33 | Kart ekle (32) | `cards/new`, `cards/[id]/edit` (modal) | Önizleme kartı, renk, banka, ad, son 4 hane, limit, güncel borç, kesim günü, son ödeme günü, asgari oran (önerili); düzenlemede arşivle | CVV / tam numara yok |
+| S34 | Kart detayı (08) | `cards/[id]` | Toplam borç; Ekstre (durum, asgari çizgisi, kalan, son ödeme, Ödeme kaydet, dönem içi, kart bilgileri) / Taksitler / Geçmiş (ekstreler, ödemeler) | Faiz simülasyonu F4-07 |
+| S35 | Kart ödemesi (09) | `cards/[id]/pay` (modal) | Tamamı / asgari / başka tutar, kaynak hesap, tarih, kalan ve yeni bakiye, kısmi ödeme uyarısı | Ödeme = hesaptan karta transfer |
+| S36 | Ödeme kaydedildi (11) | `cards/[id]/paid` (modal) | Tutar, kalan ekstre, hesap önce → sonra, tarih, kayıt no, "gider sayılmadı" notu, Ana sayfaya dön / Geri al | |
 
 Web onay ekranları (W01–W04) `apps/web-confirm`'dedir, bu skill kapsamında değil.
 

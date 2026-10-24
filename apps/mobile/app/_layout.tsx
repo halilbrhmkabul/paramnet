@@ -229,6 +229,29 @@ function AppNavigator() {
 						presentation: "modal",
 					}}
 				/>
+				{/* F4-05 (ADR-055). */}
+				<Stack.Screen
+					name="cards/new"
+					options={{
+						...detailHeader,
+						title: tr.cardForm.titleNew,
+						presentation: "modal",
+					}}
+				/>
+				<Stack.Screen name="cards/[id]/index" options={detailHeader} />
+				<Stack.Screen
+					name="cards/[id]/edit"
+					options={{
+						...detailHeader,
+						title: tr.cardForm.titleEdit,
+						presentation: "modal",
+					}}
+				/>
+				<Stack.Screen
+					name="cards/[id]/pay"
+					options={{ ...detailHeader, title: tr.cardPay.title, presentation: "modal" }}
+				/>
+				<Stack.Screen name="cards/[id]/paid" options={{ presentation: "modal" }} />
 				<Stack.Screen name="budget" options={detailHeader} />
 				<Stack.Screen
 					name="reports"

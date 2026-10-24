@@ -1,0 +1,223 @@
+{
+	"cuts": [
+		{
+			"name": "kesim günü geçti",
+			"today": "2026-10-12",
+			"statement_day": 9,
+			"last": "2026-10-09",
+			"next": "2026-11-09"
+		},
+		{
+			"name": "kesim günü bugün",
+			"today": "2026-10-09",
+			"statement_day": 9,
+			"last": "2026-10-09",
+			"next": "2026-11-09"
+		},
+		{
+			"name": "kesim günü gelmedi",
+			"today": "2026-10-04",
+			"statement_day": 22,
+			"last": "2026-09-22",
+			"next": "2026-10-22"
+		},
+		{
+			"name": "yıl dönümü",
+			"today": "2026-01-03",
+			"statement_day": 15,
+			"last": "2025-12-15",
+			"next": "2026-01-15"
+		}
+	],
+	"parts": [
+		{
+			"name": "tek çekim",
+			"amount": 128460,
+			"count": 1,
+			"expected": [128460]
+		},
+		{
+			"name": "eşit taksit",
+			"amount": 1665000,
+			"count": 9,
+			"expected": [185000, 185000, 185000, 185000, 185000, 185000, 185000, 185000, 185000]
+		},
+		{
+			"name": "kalan kuruş ilk taksitte",
+			"amount": 1000000,
+			"count": 3,
+			"expected": [333334, 333333, 333333]
+		}
+	],
+	"states": [
+		{
+			"name": "ekstre, dönem içi harcama, taksit ve kısmi ödeme",
+			"card": {
+				"limit_minor": 6000000,
+				"opening_debt_minor": 0,
+				"statement_day": 9,
+				"due_offset_days": 10,
+				"min_payment_rate": 40,
+				"since": "2026-01-01"
+			},
+			"today": "2026-10-12",
+			"transactions": [
+				{
+					"id": "t1",
+					"kind": "expense",
+					"amount_minor": 1092000,
+					"occurred_on": "2026-09-05",
+					"installments": 1
+				},
+				{
+					"id": "t2",
+					"kind": "expense",
+					"amount_minor": 1665000,
+					"occurred_on": "2026-08-20",
+					"installments": 9
+				},
+				{
+					"id": "t3",
+					"kind": "transfer",
+					"amount_minor": 500000,
+					"occurred_on": "2026-09-15",
+					"installments": 1
+				},
+				{
+					"id": "t4",
+					"kind": "expense",
+					"amount_minor": 340000,
+					"occurred_on": "2026-09-30",
+					"installments": 1
+				},
+				{
+					"id": "t5",
+					"kind": "expense",
+					"amount_minor": 128460,
+					"occurred_on": "2026-10-11",
+					"installments": 1
+				},
+				{
+					"id": "t6",
+					"kind": "income",
+					"amount_minor": 20000,
+					"occurred_on": "2026-10-11",
+					"installments": 1
+				},
+				{
+					"id": "t7",
+					"kind": "transfer",
+					"amount_minor": 100000,
+					"occurred_on": "2026-10-10",
+					"installments": 1
+				}
+			],
+			"expected": {
+				"last_cut": "2026-10-09",
+				"next_cut": "2026-11-09",
+				"due_date": "2026-10-19",
+				"statement_minor": 1302000,
+				"paid_since_minor": 100000,
+				"statement_remaining_minor": 1202000,
+				"minimum_minor": 520800,
+				"minimum_remaining_minor": 420800,
+				"period_spent_minor": 313460,
+				"total_debt_minor": 1495460,
+				"used_minor": 2605460,
+				"available_minor": 3394540,
+				"overdue": false,
+				"history": [
+					{
+						"cut": "2026-09-09",
+						"amount_minor": 1277000,
+						"paid_minor": 500000,
+						"status": "partial"
+					}
+				],
+				"installments": [
+					{
+						"id": "t2",
+						"part_minor": 185000,
+						"count": 9,
+						"billed": 2
+					}
+				]
+			}
+		},
+		{
+			"name": "son ödeme geçti, borç kaldı; açılış borcu ekstrede",
+			"card": {
+				"limit_minor": 4000000,
+				"opening_debt_minor": 250000,
+				"statement_day": 22,
+				"due_offset_days": 10,
+				"min_payment_rate": 20,
+				"since": "2026-10-01"
+			},
+			"today": "2026-10-04",
+			"transactions": [],
+			"expected": {
+				"last_cut": "2026-09-22",
+				"next_cut": "2026-10-22",
+				"due_date": "2026-10-02",
+				"statement_minor": 250000,
+				"paid_since_minor": 0,
+				"statement_remaining_minor": 250000,
+				"minimum_minor": 50000,
+				"minimum_remaining_minor": 50000,
+				"period_spent_minor": 0,
+				"total_debt_minor": 250000,
+				"used_minor": 250000,
+				"available_minor": 3750000,
+				"overdue": true,
+				"history": [],
+				"installments": []
+			}
+		},
+		{
+			"name": "fazla ödeme borcu sıfırın altına indirmez",
+			"card": {
+				"limit_minor": 1000000,
+				"opening_debt_minor": 0,
+				"statement_day": 1,
+				"due_offset_days": 10,
+				"min_payment_rate": 20,
+				"since": "2026-09-01"
+			},
+			"today": "2026-10-05",
+			"transactions": [
+				{
+					"id": "t1",
+					"kind": "expense",
+					"amount_minor": 50000,
+					"occurred_on": "2026-09-10",
+					"installments": 1
+				},
+				{
+					"id": "t2",
+					"kind": "transfer",
+					"amount_minor": 80000,
+					"occurred_on": "2026-10-03",
+					"installments": 1
+				}
+			],
+			"expected": {
+				"last_cut": "2026-10-01",
+				"next_cut": "2026-11-01",
+				"due_date": "2026-10-11",
+				"statement_minor": 50000,
+				"paid_since_minor": 80000,
+				"statement_remaining_minor": 0,
+				"minimum_minor": 10000,
+				"minimum_remaining_minor": 0,
+				"period_spent_minor": 0,
+				"total_debt_minor": 0,
+				"used_minor": 0,
+				"available_minor": 1000000,
+				"overdue": false,
+				"history": [],
+				"installments": []
+			}
+		}
+	]
+}

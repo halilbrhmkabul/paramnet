@@ -345,6 +345,72 @@ export type Database = {
 					},
 				];
 			};
+			cards: {
+				Row: {
+					archived_at: string | null;
+					bank_name: string;
+					card_name: string | null;
+					color: Database["public"]["Enums"]["card_color"];
+					created_at: string;
+					due_offset_days: number;
+					id: string;
+					idempotency_key: string | null;
+					last4: string;
+					limit_minor: number;
+					min_payment_rate: number;
+					opening_debt_minor: number;
+					owner_id: string;
+					row_version: number;
+					statement_day: number;
+					updated_at: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					archived_at?: string | null;
+					bank_name: string;
+					card_name?: string | null;
+					color?: Database["public"]["Enums"]["card_color"];
+					created_at?: string;
+					due_offset_days?: number;
+					id?: string;
+					idempotency_key?: string | null;
+					last4: string;
+					limit_minor: number;
+					min_payment_rate?: number;
+					opening_debt_minor?: number;
+					owner_id: string;
+					row_version?: number;
+					statement_day: number;
+					updated_at?: string;
+				};
+				Update: {
+					archived_at?: string | null;
+					bank_name?: string;
+					card_name?: string | null;
+					color?: Database["public"]["Enums"]["card_color"];
+					created_at?: string;
+					due_offset_days?: number;
+					id?: string;
+					idempotency_key?: string | null;
+					last4?: string;
+					limit_minor?: number;
+					min_payment_rate?: number;
+					opening_debt_minor?: number;
+					owner_id?: string;
+					row_version?: number;
+					statement_day?: number;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "cards_owner_id_fkey";
+						columns: ["owner_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+				];
+			};
 			consents: {
 				Row: {
 					accepted_at: string;
@@ -1190,13 +1256,15 @@ export type Database = {
 			};
 			transactions: {
 				Row: {
-					account_id: string;
+					account_id: string | null;
 					amount_minor: number;
+					card_id: string | null;
 					category: string | null;
 					created_at: string;
 					deleted_at: string | null;
 					id: string;
 					idempotency_key: string;
+					installments: number;
 					kind: Database["public"]["Enums"]["transaction_kind"];
 					note: string | null;
 					occurred_on: string;
@@ -1204,17 +1272,20 @@ export type Database = {
 					row_version: number;
 					title: string | null;
 					to_account_id: string | null;
+					to_card_id: string | null;
 					updated_at: string;
 				};
 				ComputedFields: never;
 				Insert: {
-					account_id: string;
+					account_id?: string | null;
 					amount_minor: number;
+					card_id?: string | null;
 					category?: string | null;
 					created_at?: string;
 					deleted_at?: string | null;
 					id?: string;
 					idempotency_key: string;
+					installments?: number;
 					kind: Database["public"]["Enums"]["transaction_kind"];
 					note?: string | null;
 					occurred_on: string;
@@ -1222,16 +1293,19 @@ export type Database = {
 					row_version?: number;
 					title?: string | null;
 					to_account_id?: string | null;
+					to_card_id?: string | null;
 					updated_at?: string;
 				};
 				Update: {
-					account_id?: string;
+					account_id?: string | null;
 					amount_minor?: number;
+					card_id?: string | null;
 					category?: string | null;
 					created_at?: string;
 					deleted_at?: string | null;
 					id?: string;
 					idempotency_key?: string;
+					installments?: number;
 					kind?: Database["public"]["Enums"]["transaction_kind"];
 					note?: string | null;
 					occurred_on?: string;
@@ -1239,6 +1313,7 @@ export type Database = {
 					row_version?: number;
 					title?: string | null;
 					to_account_id?: string | null;
+					to_card_id?: string | null;
 					updated_at?: string;
 				};
 				Relationships: [
@@ -1247,6 +1322,13 @@ export type Database = {
 						columns: ["account_id"];
 						isOneToOne: false;
 						referencedRelation: "accounts";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "transactions_card_id_fkey";
+						columns: ["card_id"];
+						isOneToOne: false;
+						referencedRelation: "cards";
 						referencedColumns: ["id"];
 					},
 					{
@@ -1261,6 +1343,13 @@ export type Database = {
 						columns: ["to_account_id"];
 						isOneToOne: false;
 						referencedRelation: "accounts";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "transactions_to_card_id_fkey";
+						columns: ["to_card_id"];
+						isOneToOne: false;
+						referencedRelation: "cards";
 						referencedColumns: ["id"];
 					},
 				];
@@ -1294,6 +1383,7 @@ export type Database = {
 				Returns: Json;
 			};
 			archive_account: { Args: { p_id: string; p_row_version: number }; Returns: Json };
+			archive_card: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			cancel_agreement: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			check_username: { Args: { p_username: string }; Returns: Json };
 			claim_notifications: { Args: { p_limit: number }; Returns: Json };
@@ -1307,6 +1397,7 @@ export type Database = {
 			};
 			create_account: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_agreement: { Args: { idem_key: string; input: Json }; Returns: Json };
+			create_card: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_recurring: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_transaction: {
 				Args: { p_idempotency_key: string; p_input: Json };
@@ -1355,6 +1446,7 @@ export type Database = {
 			};
 			get_agreement_detail: { Args: { p_id: string }; Returns: Json };
 			get_calendar: { Args: { p_month: string }; Returns: Json };
+			get_card: { Args: { p_id: string }; Returns: Json };
 			get_cash_summary: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -1390,6 +1482,7 @@ export type Database = {
 			list_accounts: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_agreements: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_budgets: { Args: { p_month: string }; Returns: Json };
+			list_cards: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_notifications: {
 				Args: { p_before_id: number; p_category: string; p_limit: number };
@@ -1458,6 +1551,10 @@ export type Database = {
 				Args: { p_id: string; p_input: Json; p_row_version: number };
 				Returns: Json;
 			};
+			update_card: {
+				Args: { p_id: string; p_input: Json; p_row_version: number };
+				Returns: Json;
+			};
 			update_personal_agreement: {
 				Args: { p_id: string; p_row_version: number; p_terms: Json };
 				Returns: Json;
@@ -1491,6 +1588,7 @@ export type Database = {
 				| "rejected"
 				| "settled"
 				| "cancelled";
+			card_color: "navy" | "graphite" | "midnight" | "bordeaux";
 			contact_kind: "person" | "merchant";
 			event_channel: "app" | "web" | "system";
 			invite_status: "active" | "consumed" | "revoked" | "expired" | "locked";
@@ -1627,6 +1725,7 @@ export const Constants = {
 				"settled",
 				"cancelled",
 			],
+			card_color: ["navy", "graphite", "midnight", "bordeaux"],
 			contact_kind: ["person", "merchant"],
 			event_channel: ["app", "web", "system"],
 			invite_status: ["active", "consumed", "revoked", "expired", "locked"],

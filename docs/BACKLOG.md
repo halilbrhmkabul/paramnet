@@ -38,3 +38,4 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Hesaplar ve işlemler: borç ödemelerinin ve kart harcamalarının bir hesabın bakiyesine yazılması, fiş/belge ekleme, kategoriye bölme, özel kategoriler, işlem geçmişinde "Planlı & bekleyen" (anlaşma taksitleri, ekstreler; F4-10) — F4-03 sırasında (ADR-053).
 - Ana Sayfa'da "Son işlemler" listesi (tasarım 03) ve açılışta tutarları gizleme tercihi; işlem akışları için Maestro senaryosu — F4-03b sırasında.
 - Rapor dışa aktarma (PDF/CSV), sabit gider işareti ve "sabitler dışında harcama" özeti, özel bütçe dönemleri; tekrarlayan transfer — F4-04 sırasında (ADR-054).
+- Kartlar: banka ekstresi PDF okuma, kart bazlı harcama kategorisi raporu, son ödeme hatırlatması (push), kart taksitlerini erken kapatma — F4-05 sırasında (ADR-055).
