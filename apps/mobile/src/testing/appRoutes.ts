@@ -61,6 +61,7 @@ import LoanNew from "../../app/loans/new";
 import LoanDetail from "../../app/loans/[id]/index";
 import LoanEdit from "../../app/loans/[id]/edit";
 import LoanPay from "../../app/loans/[id]/pay";
+import Interest from "../../app/interest";
 
 // Every route of the app for expo-router's renderRouter; extend when a route file is added.
 export const appRoutes = {
@@ -124,6 +125,7 @@ export const appRoutes = {
 	"loans/[id]/index": LoanDetail,
 	"loans/[id]/edit": LoanEdit,
 	"loans/[id]/pay": LoanPay,
+	interest: Interest,
 	inbox: Inbox,
 	"legal/[doc]": Legal,
 	"invite/[token]": Invite,

@@ -176,6 +176,15 @@ export function LoanDetailScreen({ id }: { id: string }) {
 			</View>
 			<LoanPanel loan={loan} testID="loanDetail.panel" />
 			<Button
+				label={tr.loans.early}
+				variant="secondary"
+				disabled={loan.next === null}
+				onPress={() => {
+					router.push({ pathname: "/interest", params: { loan: loan.id } });
+				}}
+				testID="loanDetail.early.button"
+			/>
+			<Button
 				label={tr.loans.payNext}
 				disabled={loan.next === null}
 				onPress={() => {

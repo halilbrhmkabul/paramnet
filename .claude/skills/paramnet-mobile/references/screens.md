@@ -59,6 +59,7 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 | S38 | Kredi detayı (28) | `loans/[id]` | Kalan anapara paneli (taksit hücreleri), Taksit ödedim kaydet, kredi bilgileri, ödeme planı tablosu (tümünü göster), ödenen taksitler | ADR-056 |
 | S39 | Kredi ekle (34) | `loans/new`, `loans/[id]/edit` (modal) | Banka, tür, tutar, aylık faiz, ilk taksit, vade çipleri, hesaplanan taksit / toplam / faiz / son taksit, bankanın taksiti, ödeme hesabı; düzenlemede arşivle | |
 | S40 | Taksit ödemesi | `loans/[id]/pay` (modal) | Sıradaki taksit, ödeme hesabı, tarih, yeni bakiye | Transfer, gider değil |
+| S41 | Faiz simülasyonu (10) | `interest?card=` / `interest?loan=` / `interest` (seçim) | "Bu bir tahmindir" notu; kart: asgari/kısmi/tamamı, tahmini faiz + KKDF + BSMV, hesaplama satırı, parametreler, Ödeme kaydet; kredi: erken kapama tutarı, ücret, kazanç | Kayıt yazılmaz (ADR-057) |
 
 Web onay ekranları (W01–W04) `apps/web-confirm`'dedir, bu skill kapsamında değil.
 

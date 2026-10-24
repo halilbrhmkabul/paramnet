@@ -208,6 +208,15 @@ function Statement({ data }: { data: CardDetail }) {
 					/>
 				</View>
 				<Button
+					label={tr.cardDetail.simulate}
+					variant="secondary"
+					disabled={s.statement_minor === 0}
+					onPress={() => {
+						router.push({ pathname: "/interest", params: { card: card.id } });
+					}}
+					testID="cardDetail.simulate.button"
+				/>
+				<Button
 					label={tr.cardDetail.pay}
 					disabled={s.statement_remaining_minor === 0 && s.period_spent_minor === 0}
 					onPress={() => {
