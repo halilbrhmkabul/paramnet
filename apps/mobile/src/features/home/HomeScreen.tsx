@@ -1,9 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
+import { formatTRY, monthOf } from "@paramnet/shared";
 import { router } from "expo-router";
+import { useState } from "react";
 import { Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
-import { useDashboard, useMyProfile, useUnreadCount } from "@/api/hooks";
+import {
+	useAccounts,
+	useCashSummary,
+	useDashboard,
+	useMyProfile,
+	useUnreadCount,
+} from "@/api/hooks";
 import type { Dashboard, DueItem } from "@/api/types";
 import { AmountText } from "@/components/AmountText";
 import { Avatar } from "@/components/Avatar";
@@ -18,9 +26,11 @@ import { IconButton } from "@/components/TopBar";
 import { useSession } from "@/features/auth/sessionStore";
 import { useMyAvatar } from "@/features/me/useMyAvatar";
 import { DueItemRow } from "@/features/agreements/DueItemRow";
+import { monthTitle } from "@/features/cash/cashModel";
 import { useNewDraft } from "@/features/new/draftStore";
 import type { NewType } from "@/features/new/formModel";
 import { fill, tr } from "@/i18n/tr";
+import { useToday } from "@/lib/clock";
 import type { ColorToken } from "@/theme/tokens";
 import { useAppTheme } from "@/theme/useAppTheme";
 
@@ -346,6 +356,153 @@ function DashboardContent({ data }: { data: Dashboard }) {
 	);
 }
 
+// Design 03 "Toplam Nakit" (ADR-053): manual balances, the month's income and expense, a way to the accounts.
+function CashCard() {
+	const { colors, typography, fonts, spacing, radius } = useAppTheme();
+	const month = monthOf(useToday());
+	const accounts = useAccounts();
+	const summary = useCashSummary(month);
+	const [hidden, setHidden] = useState(false);
+	if (accounts.data === undefined || summary.data === undefined) {
+		// The debt figures below stay the screen's main content; the card simply waits.
+		return null;
+	}
+	if (accounts.data.accounts.length === 0) {
+		return (
+			<Pressable
+				testID="home.cash.empty"
+				accessibilityRole="button"
+				accessibilityLabel={`${tr.accounts.homeEmpty}. ${tr.accounts.homeEmptyBody}`}
+				onPress={() => {
+					router.push("/accounts/new");
+				}}
+				style={[
+					styles.cashEmpty,
+					{
+						backgroundColor: colors.surface,
+						borderColor: colors.border,
+						borderRadius: radius.lg,
+						gap: spacing.md,
+					},
+				]}
+			>
+				<View style={[styles.cashIcon, { backgroundColor: colors.primarySoft }]}>
+					<Ionicons name="wallet-outline" size={20} color={colors.primary} />
+				</View>
+				<View style={styles.grow}>
+					<Text style={[typography.rowTitle, { color: colors.text }]}>
+						{tr.accounts.homeEmpty}
+					</Text>
+					<Text style={[typography.caption, { fontSize: 12, color: colors.textMuted }]}>
+						{tr.accounts.homeEmptyBody}
+					</Text>
+				</View>
+				<Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+			</Pressable>
+		);
+	}
+	const { total_cash_minor, account_count, income_minor, expense_minor } = summary.data;
+	const name = monthTitle(month);
+	const amount = (minor: number) => (hidden ? tr.accounts.hidden : formatTRY(minor));
+	return (
+		<View
+			testID="home.cash.card"
+			style={{
+				backgroundColor: colors.surface,
+				borderColor: colors.border,
+				borderWidth: 1,
+				borderRadius: radius.xl,
+				paddingHorizontal: 18,
+				paddingTop: 18,
+				paddingBottom: 6,
+			}}
+		>
+			<View style={[styles.line, { gap: spacing.sm }]}>
+				<Text style={[typography.label, { color: colors.textMuted }]}>
+					{tr.accounts.totalCash}
+				</Text>
+				<View
+					style={[
+						styles.cashBadge,
+						{ backgroundColor: colors.neutralSoft, borderRadius: radius.pill },
+					]}
+				>
+					<Text style={[typography.badge, { fontSize: 11, color: colors.neutral }]}>
+						{tr.accounts.manual}
+					</Text>
+				</View>
+				<View style={styles.grow} />
+				<Pressable
+					testID="home.cash.toggle"
+					accessibilityRole="button"
+					accessibilityLabel={hidden ? tr.accounts.show : tr.accounts.hide}
+					onPress={() => {
+						setHidden((value) => !value);
+					}}
+					style={styles.eye}
+				>
+					<Ionicons
+						name={hidden ? "eye-off-outline" : "eye-outline"}
+						size={20}
+						color={colors.textMuted}
+					/>
+				</Pressable>
+			</View>
+			<Text
+				testID="home.cash.amount"
+				style={[
+					typography.amountXL,
+					{ fontSize: 36, color: colors.primary, fontVariant: ["tabular-nums"] },
+				]}
+			>
+				{amount(total_cash_minor)}
+			</Text>
+			<Text style={[typography.caption, { fontSize: 12, color: colors.textMuted }]}>
+				{`${fill(tr.accounts.count, { count: String(account_count) })} · ${tr.accounts.noBank}`}
+			</Text>
+			<View style={[styles.row, { gap: 10, marginTop: spacing.lg }]}>
+				<View style={[styles.cashCell, { backgroundColor: colors.successSoft }]}>
+					<Text style={[typography.caption, { fontSize: 12, color: colors.success }]}>
+						{fill(tr.accounts.monthIncome, { month: name })}
+					</Text>
+					<Text
+						testID="home.cash.income"
+						style={{ fontFamily: fonts.extrabold, fontSize: 16, color: colors.text }}
+					>
+						{amount(income_minor)}
+					</Text>
+				</View>
+				<View style={[styles.cashCell, { backgroundColor: colors.surfaceSunken }]}>
+					<Text style={[typography.caption, { fontSize: 12, color: colors.overdue }]}>
+						{fill(tr.accounts.monthExpense, { month: name })}
+					</Text>
+					<Text
+						testID="home.cash.expense"
+						style={{ fontFamily: fonts.extrabold, fontSize: 16, color: colors.text }}
+					>
+						{amount(expense_minor)}
+					</Text>
+				</View>
+			</View>
+			<Pressable
+				testID="home.cash.link"
+				accessibilityRole="link"
+				onPress={() => {
+					router.push("/accounts");
+				}}
+				style={[styles.cashLink, { borderTopColor: colors.divider, gap: 10 }]}
+			>
+				<Text
+					style={[typography.rowTitle, styles.grow, { fontSize: 14, color: colors.text }]}
+				>
+					{tr.accounts.homeLink}
+				</Text>
+				<Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+			</Pressable>
+		</View>
+	);
+}
+
 // S05, design 03
 export function HomeScreen() {
 	const dashboard = useDashboard();
@@ -375,6 +532,7 @@ export function HomeScreen() {
 				<NotificationsButton />
 			</View>
 			<Greeting />
+			<CashCard />
 			{dashboard.isPending ? (
 				<LoadingState rows={4} testID="home.loading" />
 			) : dashboard.isError ? (
@@ -445,4 +603,28 @@ const styles = StyleSheet.create({
 		minHeight: 56,
 	},
 	link: { minHeight: 44, justifyContent: "center" },
+	cashBadge: { paddingHorizontal: 7, height: 20, justifyContent: "center" },
+	eye: { width: 44, height: 44, alignItems: "center", justifyContent: "center", marginRight: -8 },
+	cashCell: { flex: 1, borderRadius: 14, padding: 12, gap: 4 },
+	cashLink: {
+		flexDirection: "row",
+		alignItems: "center",
+		minHeight: 52,
+		marginTop: 8,
+		borderTopWidth: 1,
+	},
+	cashEmpty: {
+		flexDirection: "row",
+		alignItems: "center",
+		borderWidth: 1,
+		padding: 16,
+		minHeight: 72,
+	},
+	cashIcon: {
+		width: 40,
+		height: 40,
+		borderRadius: 12,
+		alignItems: "center",
+		justifyContent: "center",
+	},
 });

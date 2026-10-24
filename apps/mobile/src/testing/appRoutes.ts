@@ -38,6 +38,14 @@ import MeLegal from "../../app/me/legal";
 import Menu from "../../app/menu";
 import Inbox from "../../app/inbox";
 import Legal from "../../app/legal/[doc]";
+import Accounts from "../../app/accounts/index";
+import AccountNew from "../../app/accounts/new";
+import AccountEdit from "../../app/accounts/[id]/edit";
+import AccountAdjust from "../../app/accounts/[id]/adjust";
+import TransactionNew from "../../app/transaction/new";
+import TransactionEdit from "../../app/transaction/[id]/edit";
+import TransactionDetail from "../../app/transaction/[id]/index";
+import Transactions from "../../app/transactions";
 
 // Every route of the app for expo-router's renderRouter; extend when a route file is added.
 export const appRoutes = {
@@ -78,6 +86,14 @@ export const appRoutes = {
 	"me/legal": MeLegal,
 	"me/delete": MeDelete,
 	menu: Menu,
+	"accounts/index": Accounts,
+	"accounts/new": AccountNew,
+	"accounts/[id]/edit": AccountEdit,
+	"accounts/[id]/adjust": AccountAdjust,
+	"transaction/new": TransactionNew,
+	"transaction/[id]/edit": TransactionEdit,
+	"transaction/[id]/index": TransactionDetail,
+	transactions: Transactions,
 	inbox: Inbox,
 	"legal/[doc]": Legal,
 	"invite/[token]": Invite,

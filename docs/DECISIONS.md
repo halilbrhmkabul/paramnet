@@ -584,3 +584,12 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- "Kayıt no" (37) kimliğin ilk 8 karakteridir (`TRX-3F9A1C2B`); ayrı sıra numarası tutulmaz.
 	- Hesap ve kayıtların `created_at`'i `clock_timestamp()`: aynı işlemde eklenenler de eklenme sırasını korur.
 	- Hata kodları: `validation_error` (detail: alan, `account_archived`, `no_change`, `too_many_accounts`, `same_account`), `not_found`, `conflict`, `invalid_transition`.
+- **Uygulama kararları (F4-03b):**
+	- **`AccountsApi`:** hesaplar ve işlemler `AgreementsApi` ve `ProfileApi`'den ayrı bir arayüzde (`src/api/accounts/`); mock adaptör sunucunun kurallarını `@paramnet/shared` şemaları ve `deriveCash` ile uygular. Tüm okumalar `["cash", …]` sorgu anahtarındadır; her yazma bunları birlikte yeniler.
+	- **Rotalar:** Hesaplar `/accounts`, Hesap ekle `/accounts/new` ve düzenleme `/accounts/[id]/edit` (modal), Bakiye düzelt `/accounts/[id]/adjust` (modal), işlem formu `/transaction/new?kind=&account=` ve `/transaction/[id]/edit` (modal, kendi üst çubuğu), detay `/transaction/[id]`, geçmiş `/transactions`. İşlem merkezi `(tabs)/add`; "+" artık `/new` modalını açmaz.
+	- **Tutar girişi:** tasarımdaki tuş takımı (`pressKey`), metni `AmountInput` ile aynı kuralla kuruşa çevirir (`nextAmountState`); en fazla 11 hane lira. Açılış ve gerçek bakiyede eksi değer "Bakiye eksi" kutusuyla girilir.
+	- **Gösterim:** tutarlar tek yardımcıdan, `12.000,00 TL` biçiminde (tasarımdaki `₺` öneki kullanılmaz); işaretli satırlar `formatSignedTRY` (gerçek eksi işareti). Ana Sayfa'daki göz düğmesi tutarları yalnızca o ekran açıkken gizler; "Açılışta tutarları gizle" tercihi BACKLOG'da kalır.
+	- **Hesaplar (29):** listedeki satıra dokunmak o hesabı seçer; hareketler, Transfer ve Bakiye düzelt seçili hesaba göredir. Hesap düzenleme, hareketler başlığındaki kalem düğmesindedir (tasarımda yok). "Tüm işlemler" bağlantısı geçmişi açar.
+	- **İşlem formu (22):** tasarıma "Açıklama" ve "Not" alanları eklendi (37'deki başlık ve not için). Transferde kategori çipleri yerine Nereden / Nereye seçicileri var. Boş açıklamada başlık kategori adıdır.
+	- **Silme (37):** onay alt panelinden sonra ekranda "İşlem silindi · Geri al" bandı 10 saniye durur; süre dolunca geri dönülür. Fiş ekleme ve "Kategoriye böl" gizli.
+	- **Ortak bileşenler:** Bildirimler'deki filtre çipi `components/Chip`'e taşındı ve kategori seçiminde de kullanılıyor. Alt panel arka planı için `scrim` renk token'ı eklendi.

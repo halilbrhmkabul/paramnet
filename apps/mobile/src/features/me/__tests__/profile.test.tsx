@@ -34,12 +34,13 @@ describe("Profil (04)", () => {
 		expect(screen.getByTestId("me.paramnetId.text")).toHaveTextContent("PN-48K7QZ");
 		expect(screen.getByText(tr.me.idBody)).toBeTruthy();
 		// ADR-051: hidden until their own tasks.
-		for (const hidden of [
-			"QR kod",
-			"Hesaplarım",
-			"Yüz tanıma ile kilit",
-			"Açılışta tutarları gizle",
-		]) {
+		await waitFor(() => {
+			expect(screen.getByTestId("me.accounts.item")).toHaveTextContent(
+				fill(tr.accounts.count, { count: "3" }),
+				{ exact: false },
+			);
+		});
+		for (const hidden of ["QR kod", "Yüz tanıma ile kilit", "Açılışta tutarları gizle"]) {
 			expect(screen.queryByText(hidden)).toBeNull();
 		}
 		expect(screen.getByTestId("me.discoverability.item")).toHaveTextContent(

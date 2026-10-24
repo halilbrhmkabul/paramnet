@@ -18,15 +18,17 @@ async function openMenu() {
 }
 
 describe("Ana menü (05)", () => {
-	it("shows name, ID, only the built module and the money-transfer note", async () => {
+	it("shows name, ID, only the built modules and the money-transfer note", async () => {
 		await openMenu();
 		expect(screen.getByTestId("menu.profile.button")).toHaveTextContent("Test", {
 			exact: false,
 		});
 		expect(screen.getByTestId("menu.paramnetId.text")).toHaveTextContent("PN-48K7QZ");
 		// ADR-051: modules that are not built stay hidden.
+		expect(screen.getByTestId("menu.module.accounts")).toHaveTextContent(tr.accounts.menuLine, {
+			exact: false,
+		});
 		for (const hidden of [
-			"Hesaplar",
 			"Banka Kredileri",
 			"Raporlar",
 			"Bütçe Kategorileri",
@@ -61,6 +63,14 @@ describe("Ana menü (05)", () => {
 		await fireEvent.press(screen.getByTestId("menu.notifications.item"));
 		await waitFor(() => {
 			expect(screen.getByTestId("inbox.screen")).toBeTruthy();
+		});
+	});
+
+	it("opens Hesaplar (F4-03)", async () => {
+		await openMenu();
+		await fireEvent.press(screen.getByTestId("menu.module.accounts"));
+		await waitFor(() => {
+			expect(screen.getByTestId("accounts.screen")).toBeTruthy();
 		});
 	});
 

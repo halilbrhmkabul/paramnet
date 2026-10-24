@@ -50,6 +50,12 @@ export function formatTRY(minor: number): string {
 // Leading zeros and partial input such as "12," are rejected; AmountInput handles in-progress typing.
 const AMOUNT_PATTERN = /^(0|[1-9]\d*|[1-9]\d{0,2}(?:\.\d{3})+)(?:,(\d+))?$/;
 
+// Income, expense and transfer rows (F4-03): "+8.000,00 TL", "−842,30 TL" with a real minus sign.
+export function formatSignedTRY(minor: number, sign: "plus" | "minus" | "none"): string {
+	const text = formatTRY(Math.abs(minor));
+	return sign === "plus" ? `+${text}` : sign === "minus" ? `\u2212${text}` : text;
+}
+
 export function parseTRY(text: string): ParseTRYResult {
 	const input = text.trim().replace(/\s*TL$/, "");
 	if (input === "") {

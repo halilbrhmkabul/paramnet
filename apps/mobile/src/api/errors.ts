@@ -52,6 +52,13 @@ const MESSAGES: Record<ApiErrorCode, string> = {
 	username_taken: tr.error.usernameTaken,
 };
 
+// validation_error refusals that need their own words (ADR-053).
+const FIELD_MESSAGES: Partial<Record<string, string>> = {
+	account_archived: tr.error.accountArchived,
+	no_change: tr.error.noChange,
+	too_many_accounts: tr.error.tooManyAccounts,
+};
+
 // Where the error came from when the code alone is not enough: an ID search or share hitting its limit
 // reads differently from a generic "too many tries".
 export type ErrorContext = "paramnetId";
@@ -66,6 +73,10 @@ export function messageForError(error: unknown, context?: ErrorContext): string 
 	}
 	if (error.code === "rate_limited" && context === "paramnetId") {
 		return tr.error.idLimited;
+	}
+	const fieldMessage = field === undefined ? undefined : FIELD_MESSAGES[field];
+	if (error.code === "validation_error" && fieldMessage !== undefined) {
+		return fieldMessage;
 	}
 	if (error.code === "invalid_credentials" && attempts_left !== undefined && attempts_left > 0) {
 		return fill(tr.error.attemptsLeft, { count: String(attempts_left) });

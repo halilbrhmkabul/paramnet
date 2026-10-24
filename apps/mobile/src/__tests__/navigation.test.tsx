@@ -23,10 +23,10 @@ describe("navigation (signed in)", () => {
 		expect(screen.getByTestId("cards.screen")).toBeTruthy();
 	});
 
-	it("the centre + button opens the new-record modal", async () => {
+	it("the centre + button opens İşlem merkezi (21)", async () => {
 		await renderRouter(appRoutes, { initialUrl: "/" });
 		await fireEvent.press(screen.getByTestId("tabs.new.button"));
-		expect(screen.getByTestId("new.screen")).toBeTruthy();
+		expect(screen.getByTestId("action.screen")).toBeTruthy();
 	});
 });
 

@@ -7,7 +7,7 @@ import { Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 import { useApi, useAuthApi } from "@/api/ApiProvider";
 import { messageForError } from "@/api/errors";
-import { useMyProfile } from "@/api/hooks";
+import { useAccounts, useMyProfile } from "@/api/hooks";
 import type { MyProfile } from "@/api/types";
 import { Avatar } from "@/components/Avatar";
 import { ErrorState } from "@/components/ErrorState";
@@ -215,11 +215,28 @@ function ProfileBody({ profile }: { profile: MyProfile }) {
 		},
 	});
 
+	const accounts = useAccounts();
+
 	return (
 		<>
 			<Header profile={profile} />
 			<IdCard paramnetId={profile.paramnet_id} />
 			<RowGroup label={tr.me.accountSection}>
+				<Row
+					icon="wallet-outline"
+					title={tr.accounts.mine}
+					value={
+						accounts.data === undefined
+							? undefined
+							: fill(tr.accounts.count, {
+									count: String(accounts.data.accounts.length),
+								})
+					}
+					onPress={() => {
+						router.push("/accounts");
+					}}
+					testID="me.accounts.item"
+				/>
 				<Row
 					icon="notifications-outline"
 					title={tr.me.reminderPrefs}

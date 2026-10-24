@@ -31,6 +31,8 @@ export const palette = {
 		successSoft: "#E1F1E7",
 		neutral: "#46534C",
 		neutralSoft: "#ECEFEC",
+		// Behind a bottom sheet (design 37).
+		scrim: "rgba(13,28,22,0.45)",
 		// Welcome (01) and the intro illustrations (31) stay dark forest in both themes.
 		heroBg: "#0C2F25",
 		heroStage: "#0F3A2E",
@@ -76,6 +78,7 @@ export const palette = {
 		successSoft: "#163526",
 		neutral: "#B3C0B8",
 		neutralSoft: "#26302B",
+		scrim: "rgba(0,0,0,0.6)",
 		// Welcome (01) and the intro illustrations (31) stay dark forest in both themes.
 		heroBg: "#0C2F25",
 		heroStage: "#0F3A2E",
