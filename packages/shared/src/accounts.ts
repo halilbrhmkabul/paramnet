@@ -35,7 +35,7 @@ export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
 export type IncomeCategory = (typeof INCOME_CATEGORIES)[number];
 export type TransactionCategory = ExpenseCategory | IncomeCategory;
 
-const ALL_CATEGORIES = [
+export const TRANSACTION_CATEGORIES = [
 	...new Set<TransactionCategory>([...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES]),
 ];
 
@@ -75,7 +75,7 @@ export const transactionInputSchema = z
 		amount_minor: z
 			.number({ error: "invalid_amount" })
 			.refine((value) => isCashAmount(value) && value > 0, { error: "invalid_amount" }),
-		category: z.enum(ALL_CATEGORIES, { error: "invalid_category" }).nullable(),
+		category: z.enum(TRANSACTION_CATEGORIES, { error: "invalid_category" }).nullable(),
 		title: optionalText(TRANSACTION_TITLE_MAX),
 		note: optionalText(NOTE_MAX),
 		occurred_on: isoDateSchema,

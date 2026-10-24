@@ -1,9 +1,18 @@
-import type { AccountInput, IsoDate, TransactionInput } from "@paramnet/shared";
+import type {
+	AccountInput,
+	IsoDate,
+	RecurringInput,
+	TransactionCategory,
+	TransactionInput,
+} from "@paramnet/shared";
 
 import type {
 	Account,
 	AccountList,
+	BudgetMonth,
 	CashSummary,
+	MonthlyReport,
+	RecurringRule,
 	Transaction,
 	TransactionDetail,
 	TransactionMonth,
@@ -30,4 +39,16 @@ export interface AccountsApi {
 	// month: the first day; accountId narrows to one account.
 	listTransactions(month: IsoDate, accountId: string | null): Promise<TransactionMonth>;
 	getCashSummary(month: IsoDate): Promise<CashSummary>;
+	// F4-04 (ADR-054).
+	listRecurring(): Promise<RecurringRule[]>;
+	createRecurring(input: RecurringInput, idempotencyKey: string): Promise<RecurringRule>;
+	updateRecurring(id: string, input: RecurringInput, rowVersion: number): Promise<RecurringRule>;
+	setRecurringPaused(id: string, paused: boolean, rowVersion: number): Promise<RecurringRule>;
+	deleteRecurring(id: string, rowVersion: number): Promise<void>;
+	confirmRecurring(id: string, date: IsoDate, idempotencyKey: string): Promise<Transaction>;
+	skipRecurring(id: string, date: IsoDate): Promise<void>;
+	listBudgets(month: IsoDate): Promise<BudgetMonth>;
+	// null removes the category's budget.
+	setBudget(category: TransactionCategory, limitMinor: number | null): Promise<void>;
+	getMonthlyReport(month: IsoDate): Promise<MonthlyReport>;
 }

@@ -386,6 +386,15 @@ Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle 
 - **Arşiv:** arşivlenen hesap listeden ve Toplam Nakit'ten çıkar, yeni kayıt almaz; geçmiş kayıtları kalır.
 - **Tarih:** işlem tarihi `date` (Europe/Istanbul), en fazla bir yıl ileri. Kayıt zamanı ayrıca tutulur.
 
+## 5.12 Tekrarlayan işlem, bütçe ve aylık rapor (ADR-054)
+
+- **Tekrarlayan işlem:** gelir ya da gider; ad, tutar, kategori, hesap, sıklık (haftalık, aylık, yıllık), ilk tarih ve "Her seferinde onay iste". Tarihler ilk tarihten sayılır; ay sonu kısalırsa ayın son günü kullanılır (31 Ocak → 28 Şubat → 31 Mart).
+	- Onay isteyen kuralın günü gelen tarihi "Onay bekleyenler"de görünür: Onayla gerçekleşen kaydı yazar, Atla yazmaz. Onay istemeyen kural günü gelince kendiliğinden kaydedilir (saatlik iş).
+	- Kural oluşturulmadan en fazla 31 gün önceki tarihler sayılır; durdurulup sürdürülen kuralda durdurma süresindeki tarihler sayılmaz. Arşivlenmiş hesaba kayıt yazılmaz.
+	- Kural silinince yazılmış kayıtlar kalır. Kullanıcı başına en fazla 100 kural.
+- **Bütçe:** gider kategorisi başına aylık sınır. Harcanan, o ayın silinmemiş gider kayıtlarıdır. Sınırın %80'inde "sınıra yakın", aşınca "aşıldı" uyarısı; özet kartında kalan gün ve kalan günlük pay.
+- **Aylık rapor:** seçilen ayın geliri, gideri ve neti; son 6 ayın gelir-gider sütunları; gider kategorisi dağılımı; borç ve alacak dengesi (anlaşmalardan). Transfer, düzeltme ve borç kayıtları gelir-gidere dahil değildir. Varsayılan ay son tamamlanan aydır.
+
 # 6. Ekranlar ve Bilgi Mimarisi
 
 ## 6.1 Navigasyon
@@ -809,6 +818,12 @@ Diğer tablolar
 
 - transaction_events (yalnızca ekleme): transaction_id, owner_id, type (created, updated, deleted, restored), changes jsonb ({alan: [eski, yeni]}).
 
+- recurring_rules (ADR-054): owner_id, kind (expense, income), name, amount_minor, category, account_id, frequency (weekly, monthly, yearly), start_on, confirm_each, tracking_from, paused_at null, idempotency_key, row_version.
+
+- recurring_occurrences: rule_id + occurrence_on (PK), status (posted, skipped), transaction_id null.
+
+- budgets: owner_id + category (PK, gider kategorisi), limit_minor.
+
 - Arama, paylaşım ve kullanıcı adı kontrolü sayaçları mevcut `rate_limits` tablosundadır (`pnid:find:`, `pnid:share:`, `username:check:` + kullanıcı).
 
 ## 10.2 Satır düzeyi güvenlik (RLS)
@@ -854,6 +869,10 @@ Diğer tablolar
 | create_transaction(input, idem_key) / update_transaction(id, input, row_version) | Gider, gelir, transfer; değişiklikler geçmişe              |
 | delete_transaction(id, row_version) / restore_transaction(id, row_version) | Geçici silme ve geri alma                                            |
 | get_transaction(id) / list_transactions(month, account_id?) / get_cash_summary(month) | Detay + geçmiş / ay listesi + gelir-gider / Ana Sayfa özeti |
+| create_recurring / update_recurring / set_recurring_paused / delete_recurring / list_recurring | Tekrarlayan işlem kuralları; sonraki 3 tarih ve onay bekleyenler (ADR-054) |
+| confirm_recurring(rule, date, idem_key) / skip_recurring(rule, date) | Günü gelen tarihi kaydet ya da atla |
+| set_budget(category, limit) / list_budgets(month) | Kategori bütçesi; harcananla birlikte |
+| get_monthly_report(month) | Gelir, gider, kategori dağılımı, 6 aylık seri |
 
 ## 10.4 Edge Functions
 

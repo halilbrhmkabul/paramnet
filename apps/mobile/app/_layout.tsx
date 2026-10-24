@@ -208,6 +208,32 @@ function AppNavigator() {
 					name="transactions"
 					options={{ ...detailHeader, title: tr.txHistory.title }}
 				/>
+				{/* F4-04 (ADR-054). */}
+				<Stack.Screen
+					name="recurring/index"
+					options={{ ...detailHeader, title: tr.recurring.title }}
+				/>
+				<Stack.Screen
+					name="recurring/new"
+					options={{
+						...detailHeader,
+						title: tr.recurring.formNew,
+						presentation: "modal",
+					}}
+				/>
+				<Stack.Screen
+					name="recurring/[id]"
+					options={{
+						...detailHeader,
+						title: tr.recurring.formEdit,
+						presentation: "modal",
+					}}
+				/>
+				<Stack.Screen name="budget" options={detailHeader} />
+				<Stack.Screen
+					name="reports"
+					options={{ ...detailHeader, title: tr.report.title }}
+				/>
 				{/* Ana menü draws its own header (name, ID and a close button, design 05). */}
 				<Stack.Screen name="menu" options={{ presentation: "modal" }} />
 				{/* Bildirimler draws its own bar: the "mark all read" action lives in it (design 06). */}

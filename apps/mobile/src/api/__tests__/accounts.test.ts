@@ -254,3 +254,67 @@ describe("Supabase AccountsApi", () => {
 		expect(message("name")).toBe(tr.error.validation);
 	});
 });
+
+describe("mock AccountsApi · F4-04", () => {
+	const gym = (accountId: string, confirm: boolean) => ({
+		kind: "expense" as const,
+		name: "Spor salonu",
+		amount_minor: 120000,
+		category: "health" as const,
+		account_id: accountId,
+		frequency: "monthly" as const,
+		start_on: "2026-10-05",
+		confirm_each: confirm,
+	});
+
+	it("lists planned dates, confirms and skips them", async () => {
+		const api = createTestAccountsApi({ seed: "empty" });
+		const a = await api.createAccount(bank, "k1");
+		const rule = await api.createRecurring(gym(a.id, true), "r1");
+		expect(rule.pending_dates).toEqual(["2026-10-05"]);
+		expect(rule.next_dates).toEqual(["2026-11-05", "2026-12-05", "2027-01-05"]);
+		const tx = await api.confirmRecurring(rule.id, "2026-10-05", "c1");
+		expect(tx).toMatchObject({
+			kind: "expense",
+			title: "Spor salonu",
+			occurred_on: "2026-10-05",
+		});
+		expect(await code(api.confirmRecurring(rule.id, "2026-10-05", "c2"))).toBe(
+			"invalid_transition:",
+		);
+		expect((await api.listRecurring())[0]?.pending_dates).toEqual([]);
+	});
+
+	it("records rules that do not ask, once", async () => {
+		const api = createTestAccountsApi({ seed: "empty" });
+		const a = await api.createAccount(bank, "k1");
+		await api.createRecurring(gym(a.id, false), "r1");
+		await api.listRecurring();
+		await api.listRecurring();
+		expect((await api.listTransactions(MONTH, null)).items).toHaveLength(1);
+	});
+
+	it("sums budgets and builds the report", async () => {
+		const api = createTestAccountsApi({ seed: "empty" });
+		const a = await api.createAccount(bank, "k1");
+		await api.createTransaction({ ...expense(a.id, 90000), category: "groceries" }, "t1");
+		await api.setBudget("groceries", 100000);
+		const budgets = await api.listBudgets(MONTH);
+		expect(budgets.items).toEqual([
+			{ category: "groceries", limit_minor: 100000, spent_minor: 90000, count: 1 },
+		]);
+		await api.setBudget("groceries", null);
+		expect((await api.listBudgets(MONTH)).items).toEqual([]);
+		const report = await api.getMonthlyReport(MONTH);
+		expect(report.expense_minor).toBe(90000);
+		expect(report.by_category).toEqual([{ category: "groceries", amount_minor: 90000 }]);
+		expect(report.series.map((m) => m.month)).toEqual([
+			"2026-05-01",
+			"2026-06-01",
+			"2026-07-01",
+			"2026-08-01",
+			"2026-09-01",
+			"2026-10-01",
+		]);
+	});
+});

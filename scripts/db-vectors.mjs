@@ -75,6 +75,19 @@ for (const vector of read("accounts.json").categories) {
 		`select is(private.is_category_for(${text(vector.kind)}, ${text(vector.category)}), ${String(vector.expected)}, ${name(`category: ${vector.name}`)});`,
 	);
 }
+// SQL arrays of dates read back as a JSON array of strings.
+const dates = (call) => `to_jsonb(${call})`;
+const recurrence = read("recurrence.json");
+for (const vector of recurrence.next) {
+	lines.push(
+		`select is(${dates(`private.next_occurrences(${text(vector.start)}, ${text(vector.frequency)}, ${text(vector.from)}, ${String(vector.count)})`)}, ${json(vector.expected)}, ${name(`next: ${vector.name}`)});`,
+	);
+}
+for (const vector of recurrence.between) {
+	lines.push(
+		`select is(${dates(`private.recurrence_dates(${text(vector.start)}, ${text(vector.frequency)}, ${text(vector.from)}, ${text(vector.to)})`)}, ${json(vector.expected)}, ${name(`between: ${vector.name}`)});`,
+	);
+}
 
 writeFileSync(
 	out,

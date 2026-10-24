@@ -47,6 +47,9 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 | S26a | Bakiye düzelt | `accounts/[id]/adjust` (modal) | Şu anki bakiye, gerçek bakiye, fark | Fark gelir/gider sayılmaz |
 | S27 | İşlem geçmişi (36) | `transactions` | Ay seçici, arama, Tümü/Gelir/Gider/Transfer, ay geliri/gideri, gün grupları | "Planlı & bekleyen" F4-10 |
 | S28 | İşlem detayı (37) | `transaction/[id]` | Tutar, rozetler, bilgi satırları, etki notu, Düzenle / Sil (alt panel, 10 sn Geri al), oluşturma ve son düzenleme | Düzeltme düzenlenmez |
+| S29 | Tekrarlayan işlemler (38) | `recurring/index`, `recurring/new` ve `recurring/[id]` (modal) | Onay bekleyenler (Onayla / Atla), aktif kurallar; form: tür, ad, tutar, kategori, hesap, sıklık, ilk tarih, sonraki 3 tarih, her seferinde onay; düzenlemede Durdur / Sürdür / Sil | ADR-054 |
+| S30 | Bütçe (39) | `budget` | Özet (harcanan / bütçe, kalan gün, günlük pay), Tüm / Dikkat gerekenler, kategori satırları ve uyarı rozetleri; sınır ekleme/düzenleme/kaldırma paneli | |
+| S31 | Aylık rapor (27) | `reports` | Ay seçici (son tamamlanan ay), Gelir / Gider / Net, 6 aylık sütunlar, kategori dağılımı, borç ve alacak dengesi | Dışa aktarma yok (BACKLOG) |
 
 Web onay ekranları (W01–W04) `apps/web-confirm`'dedir, bu skill kapsamında değil.
 

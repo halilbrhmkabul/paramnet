@@ -427,7 +427,14 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 	- Testler: RNTL 391 (yeni: hesaplar 8, işlemler 13, model 11, adaptör 21; menü, profil ve gezinme güncellendi); shared Vitest 434. Typecheck, lint, biçim temiz.
 	- **Kullanıcı kontrolü (Expo Go):** açık ve koyu temada 21, 22, 29, 33, 36, 37 ve Ana Sayfa kartı; tuş takımının küçük ekranda sığması; `supabase` modunda hesap ekleme, işlem kaydı, silip geri alma.
 
-### [ ] F4-04 Tekrarlayan işlem (38), Bütçe (39), Aylık rapor (27)
+### [x] F4-04 Tekrarlayan işlem (38), Bütçe (39), Aylık rapor (27)
+- Karar: ADR-054 (kararlar kullanıcının yetkisiyle varsayılanlardan verildi).
+- **İlerleme (2026-10-24):**
+	- Sunucu: `recurring_rules`, `recurring_occurrences`, `budgets`; kural, onay/atla, saatlik otomatik kayıt, bütçe ve aylık rapor RPC'leri. Hesap silme ve dışa aktarma kapsar.
+	- Paylaşılan: `recurrence` (`nextOccurrences`, `occurrencesBetween`, `recurringInputSchema`, `budgetLevel`), `test-vectors/recurrence.json`.
+	- Ekranlar: Tekrarlayan işlemler (liste, onay bekleyenler, form, durdur/sil), Bütçe (özet, uyarılar, sınır paneli), Aylık rapor (KPI, 6 ay, dağılım, borç dengesi). İşlem merkezinde Tekrarlayan işlem, Ana menüde Raporlar ve Bütçe.
+	- Testler: pgTAP 290 (38), 300 (24) ve tarih vektörleri; RNTL (ekranlar 8, model 12, adaptör 3 yeni). Typecheck, lint, biçim temiz.
+	- **Kullanıcı kontrolü:** koyu temada 38, 39, 27; `supabase` modunda saatlik işin onay istemeyen kuralı kaydetmesi (yerelde pg_cron).
 
 ### [ ] F4-05 Kartlar
 - Kartlarım (07), Kart detayı ve ekstre (08), Kart ödemesi (09), Kart ekle (32), Ödeme kaydedildi (11).
