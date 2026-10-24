@@ -637,3 +637,12 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- **Kredi:** bugün kapatma tutarı = kalan anapara + erken ödeme ücreti (kalan vade 36 aydan uzunsa %2, değilse %1); kazanç = kalan taksitlerin toplamı − bu tutar.
 	- **Hiçbiri kayda geçmez:** tasarımdaki "Tahmini tutarı ayrı kayıt olarak ekle" düğmesi yok; faiz bir bakiyeye, karta ya da anlaşmaya yazılmaz. Ekran sunucu çağrısı yapmaz, hesap `packages/shared` `interest`'te (kuruşta tam, BigInt).
 	- **Girişler:** Kart detayında "Faiz simüle et", kart ödemesinde kısmi ödeme uyarısındaki "Tahmini faizi gör", kredi detayında "Erken ödeme hesapla", Ana menüde "Faiz Hesaplayıcı" (kart ya da kredi seçimi). Oranlar saklanmaz.
+
+## ADR-058 — Para iste ve para teslimi (F4-08)
+- **Tarih:** 2026-10-25
+- **Karar (kullanıcı):** "Para iste" mevcut kayıt + ParamNet ID ile paylaşım akışıdır; para teslimi "active" içinde ayrı bir teslim onayıdır. Anlaşma durum makinesine yeni durum eklenmez.
+- **Uygulama:**
+	- `request_money`: borç alanın tek ödemeli borç kaydını oluşturur, ID ile paylaşır ve `delivery_required` işaretler; hepsi tek işlemde. Paylaşım "shared" dönmezse (bulunamadı, kendisi) kayıt tutulmaz (`not_found`, detail = durum).
+	- `agreements.delivery_required`, `delivery_reported_at`, `delivery_confirmed_at`. `report_delivery` yalnızca borç veren, `confirm_delivery` yalnızca borç alan; olaylar `delivery_reported`, `delivery_confirmed` (push yok, BACKLOG).
+	- **Tasarımdan sapmalar:** Gönderilmiş talep Borçlarım ve Ana Sayfa toplamlarında, teslim onayından önce de "active" anlaşma olarak sayılır (tasarım "ancak teslimden sonra eklenir" diyor; toplamları değiştirmek `get_dashboard`'u değiştirmeyi gerektirir, BACKLOG). "Kimden?" alanı yalnızca ParamNet ID alır (rehberde ID tutulmuyor); son kişiler satırı yok. Tasarımdaki "Çıkacak hesap" ve "Alacaklarım önce → sonra" satırları yok (teslim bir hesaba yazılmaz, ADR-043 notu).
+	- Gelen talep (16), Borçlarım (12), detaylar (13, 15) ve kısmi ödeme (14) F3-11 ve F4-01c'de tasarıma hizalanmıştı; bu görevde yalnızca teslim bandı eklendi.

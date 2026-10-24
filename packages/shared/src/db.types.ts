@@ -176,6 +176,9 @@ export type Database = {
 					creator_id: string;
 					creator_role: Database["public"]["Enums"]["party_role"];
 					currency: string;
+					delivery_confirmed_at: string | null;
+					delivery_reported_at: string | null;
+					delivery_required: boolean;
 					description: string | null;
 					id: string;
 					idempotency_key: string | null;
@@ -201,6 +204,9 @@ export type Database = {
 					creator_id: string;
 					creator_role: Database["public"]["Enums"]["party_role"];
 					currency?: string;
+					delivery_confirmed_at?: string | null;
+					delivery_reported_at?: string | null;
+					delivery_required?: boolean;
 					description?: string | null;
 					id?: string;
 					idempotency_key?: string | null;
@@ -225,6 +231,9 @@ export type Database = {
 					creator_id?: string;
 					creator_role?: Database["public"]["Enums"]["party_role"];
 					currency?: string;
+					delivery_confirmed_at?: string | null;
+					delivery_reported_at?: string | null;
+					delivery_required?: boolean;
 					description?: string | null;
 					id?: string;
 					idempotency_key?: string | null;
@@ -1472,6 +1481,7 @@ export type Database = {
 				Args: { p_display_name: string; p_kvkk_version: string; p_terms_version: string };
 				Returns: Json;
 			};
+			confirm_delivery: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			confirm_recurring: {
 				Args: { p_idempotency_key: string; p_occurrence_on: string; p_rule_id: string };
 				Returns: Json;
@@ -1532,6 +1542,7 @@ export type Database = {
 			get_cash_summary: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
+			get_delivery: { Args: { p_id: string }; Returns: Json };
 			get_loan: { Args: { p_id: string }; Returns: Json };
 			get_metrics: { Args: { p_days: number }; Returns: Json };
 			get_monthly_report: { Args: { p_month: string }; Returns: Json };
@@ -1613,7 +1624,12 @@ export type Database = {
 			};
 			regenerate_paramnet_id: { Args: Record<PropertyKey, never>; Returns: Json };
 			register_push_token: { Args: { p_platform: string; p_token: string }; Returns: Json };
+			report_delivery: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			request_cancel: { Args: { p_id: string; p_row_version: number }; Returns: Json };
+			request_money: {
+				Args: { p_idempotency_key: string; p_input: Json; p_paramnet_id: string };
+				Returns: Json;
+			};
 			resolve_dispute: { Args: { p_id: string }; Returns: Json };
 			resolve_invite: { Args: { p_token: string }; Returns: Json };
 			restore_transaction: { Args: { p_id: string; p_row_version: number }; Returns: Json };

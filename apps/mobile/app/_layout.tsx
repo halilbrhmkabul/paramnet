@@ -282,6 +282,16 @@ function AppNavigator() {
 					name="interest"
 					options={{ ...detailHeader, title: tr.interest.title }}
 				/>
+				{/* F4-08 (ADR-058). */}
+				<Stack.Screen
+					name="request/index"
+					options={{ ...detailHeader, title: tr.request.title, presentation: "modal" }}
+				/>
+				<Stack.Screen name="request/sent" options={{ presentation: "modal" }} />
+				<Stack.Screen
+					name="agreement/[id]/delivery"
+					options={{ ...detailHeader, title: tr.delivery.title }}
+				/>
 				<Stack.Screen name="budget" options={detailHeader} />
 				<Stack.Screen
 					name="reports"

@@ -1,10 +1,10 @@
 import { formatDateTimeTR, formatDateTR, formatTRY } from "@paramnet/shared";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
-import { useAgreement, useDecidePayment, useWithdrawPayment } from "@/api/hooks";
+import { useAgreement, useDecidePayment, useDelivery, useWithdrawPayment } from "@/api/hooks";
 import type { AgreementDetail, InstallmentView, PaymentView } from "@/api/types";
 import { AmountText } from "@/components/AmountText";
 import { Avatar } from "@/components/Avatar";
@@ -232,6 +232,43 @@ function Timeline({ agreement }: { agreement: AgreementDetail }) {
 	);
 }
 
+// ADR-058: while the money of an accepted request has not changed hands, both sides see it here.
+function DeliveryBanner({ agreement }: { agreement: AgreementDetail }) {
+	const { colors, typography, spacing, radius } = useAppTheme();
+	const delivery = useDelivery(agreement.id);
+	const d = delivery.data;
+	if (d === undefined || !d.required || d.confirmed_at !== null || d.status !== "active") {
+		return null;
+	}
+	const label = d.reported_at === null ? tr.delivery.banner : tr.delivery.bannerReported;
+	return (
+		<Pressable
+			testID="agreement.delivery.banner"
+			accessibilityRole="button"
+			accessibilityLabel={label}
+			onPress={() => {
+				router.push({ pathname: "/agreement/[id]/delivery", params: { id: agreement.id } });
+			}}
+			style={[
+				styles.row,
+				{
+					gap: spacing.sm,
+					backgroundColor: colors.warningSoft,
+					borderRadius: radius.md,
+					paddingHorizontal: 16,
+					minHeight: 56,
+				},
+			]}
+		>
+			<Ionicons name="hand-left-outline" size={20} color={colors.warning} />
+			<Text style={[typography.rowTitle, styles.grow, { color: colors.warning }]}>
+				{label}
+			</Text>
+			<Ionicons name="chevron-forward" size={18} color={colors.warning} />
+		</Pressable>
+	);
+}
+
 function Detail({ agreement }: { agreement: AgreementDetail }) {
 	const { colors, typography, spacing } = useAppTheme();
 	const online = useIsOnline();
@@ -240,6 +277,7 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 
 	return (
 		<>
+			<DeliveryBanner agreement={agreement} />
 			{/* Design 13 / 15: who, how much is left of what, and the next step, in one card. */}
 			<Card testID="agreement.summary" style={{ gap: spacing.md }}>
 				<View style={[styles.row, { gap: spacing.md }]}>

@@ -12,6 +12,7 @@ import type { AgreementsApi } from "../AgreementsApi";
 import { ApiError } from "../errors";
 import type {
 	CalendarMonth,
+	DeliveryState,
 	ContactSummary,
 	DueItem,
 	EventType,
@@ -34,6 +35,8 @@ import { clock } from "@/lib/clock";
 export type MockApiOptions = {
 	now?: () => Date;
 	seed?: MockSeed;
+	// Agreements whose hand-over is still open (ADR-058), as the server would hold them.
+	deliveries?: Record<string, { reported_at?: string | null }>;
 	// Simulated network delay so loading states are visible in the prototype.
 	latencyMs?: number;
 };
@@ -45,10 +48,17 @@ export function createMockApi({
 	now = () => clock.now(),
 	seed = "demo",
 	latencyMs = 300,
+	deliveries = {},
 }: MockApiOptions = {}) {
 	const today = (): IsoDate => todayInIstanbul(now());
 	const state: MockState = seedState(seed, today());
 	const createdByKey = new Map<string, string>();
+	const delivery = new Map<string, { reported_at: string | null; confirmed_at: string | null }>(
+		Object.entries(deliveries).map(([id, d]) => [
+			id,
+			{ reported_at: d.reported_at ?? null, confirmed_at: null },
+		]),
+	);
 	const paymentByKey = new Map<string, string>();
 	let sequence = 0;
 	const nextId = () => {
@@ -768,7 +778,80 @@ export function createMockApi({
 					settled: agreement.status === "settled",
 				};
 			}),
+		requestMoney: async (input, paramnetId, idempotencyKey) => {
+			const created = await api.createAgreement(input, idempotencyKey);
+			if (created.replayed) {
+				return { agreement_id: created.agreement_id, display_name: null };
+			}
+			const agreement = state.agreements.find((a) => a.id === created.agreement_id);
+			const shared = await api.shareAgreementById(
+				created.agreement_id,
+				paramnetId,
+				agreement?.row_version ?? 1,
+			);
+			if (shared.status !== "shared") {
+				// The server keeps nothing for a request that could not be sent.
+				state.agreements = state.agreements.filter((a) => a.id !== created.agreement_id);
+				createdByKey.delete(idempotencyKey);
+				throw new ApiError("not_found", { field: shared.status });
+			}
+			delivery.set(created.agreement_id, { reported_at: null, confirmed_at: null });
+			return { agreement_id: created.agreement_id, display_name: shared.display_name };
+		},
+
+		getDelivery: (id) => respond(() => deliveryView(id)),
+		reportDelivery: (id, rowVersion) => respond(() => deliveryStep(id, rowVersion, "report")),
+		confirmDelivery: (id, rowVersion) => respond(() => deliveryStep(id, rowVersion, "confirm")),
 	};
+
+	function deliveryView(id: string): DeliveryState {
+		const agreement = state.agreements.find((a) => a.id === id);
+		if (agreement === undefined) {
+			throw new ApiError("not_found");
+		}
+		const d = delivery.get(id);
+		return {
+			required: d !== undefined,
+			reported_at: d?.reported_at ?? null,
+			confirmed_at: d?.confirmed_at ?? null,
+			my_role: agreement.my_role,
+			status: agreement.status,
+			row_version: agreement.row_version,
+		};
+	}
+
+	function deliveryStep(
+		id: string,
+		rowVersion: number,
+		step: "report" | "confirm",
+	): DeliveryState {
+		const current = deliveryView(id);
+		const d = delivery.get(id);
+		if ((step === "report") !== (current.my_role === "creditor")) {
+			throw new ApiError("forbidden");
+		}
+		if (
+			d === undefined ||
+			current.status !== "active" ||
+			(step === "report" && d.reported_at !== null) ||
+			(step === "confirm" && (d.reported_at === null || d.confirmed_at !== null))
+		) {
+			throw new ApiError("invalid_transition");
+		}
+		if (current.row_version !== rowVersion) {
+			throw new ApiError("conflict");
+		}
+		const agreement = state.agreements.find((a) => a.id === id);
+		if (agreement !== undefined) {
+			agreement.row_version += 1;
+		}
+		if (step === "report") {
+			d.reported_at = now().toISOString();
+		} else {
+			d.confirmed_at = now().toISOString();
+		}
+		return deliveryView(id);
+	}
 
 	return Object.assign(api, {
 		// Test/prototype helper: lets screens show "today" consistently with the mock clock.

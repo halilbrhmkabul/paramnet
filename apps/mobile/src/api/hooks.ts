@@ -56,6 +56,7 @@ export const queryKeys = {
 		["cash", "transactions", month, accountId ?? "all"] as const,
 	transaction: (id: string) => ["cash", "transaction", id] as const,
 	recurring: ["cash", "recurring"] as const,
+	delivery: (id: string) => ["delivery", id] as const,
 	budgets: (month: IsoDate) => ["cash", "budgets", month] as const,
 	report: (month: IsoDate) => ["cash", "report", month] as const,
 	cards: ["cash", "cards"] as const,
@@ -714,4 +715,49 @@ export function useRecordLoanPayment() {
 			idempotencyKey: string;
 		}) => api.recordLoanPayment(id, accountId, paidOn, idempotencyKey),
 	);
+}
+
+// "Para iste" and the hand-over (F4-08) ------------------------------------------------------------------
+
+export function useRequestMoney() {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			input,
+			paramnetId,
+			idempotencyKey,
+		}: {
+			input: CreateAgreementInput;
+			paramnetId: string;
+			idempotencyKey: string;
+		}) => api.requestMoney(input, paramnetId, idempotencyKey),
+		onSuccess: () => queryClient.invalidateQueries(),
+	});
+}
+
+export function useDelivery(id: string) {
+	const api = useApi();
+	return useQuery({ queryKey: queryKeys.delivery(id), queryFn: () => api.getDelivery(id) });
+}
+
+export function useDeliveryStep() {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			id,
+			rowVersion,
+			step,
+		}: {
+			id: string;
+			rowVersion: number;
+			step: "report" | "confirm";
+		}) =>
+			step === "report"
+				? api.reportDelivery(id, rowVersion)
+				: api.confirmDelivery(id, rowVersion),
+		// The agreement's row_version moved too.
+		onSettled: () => queryClient.invalidateQueries(),
+	});
 }

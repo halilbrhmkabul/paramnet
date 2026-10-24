@@ -60,6 +60,9 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 | S39 | Kredi ekle (34) | `loans/new`, `loans/[id]/edit` (modal) | Banka, tür, tutar, aylık faiz, ilk taksit, vade çipleri, hesaplanan taksit / toplam / faiz / son taksit, bankanın taksiti, ödeme hesabı; düzenlemede arşivle | |
 | S40 | Taksit ödemesi | `loans/[id]/pay` (modal) | Sıradaki taksit, ödeme hesabı, tarih, yeni bakiye | Transfer, gider değil |
 | S41 | Faiz simülasyonu (10) | `interest?card=` / `interest?loan=` / `interest` (seçim) | "Bu bir tahmindir" notu; kart: asgari/kısmi/tamamı, tahmini faiz + KKDF + BSMV, hesaplama satırı, parametreler, Ödeme kaydet; kredi: erken kapama tutarı, ücret, kazanç | Kayıt yazılmaz (ADR-057) |
+| S42 | Para iste (18, 19) | `request` (modal, iki adım) | Kimden (ParamNet ID + bulunan kişi), tutar, geri ödeme (2 hafta / 1 ay / tarih), not; önizleme taslağı, adım çizgisi, onay kutusu, Talebi gönder | ADR-058 |
+| S43 | Talep gönderildi (20) | `request/sent` (modal) | Yanıt bekleniyor, tutar, kime, geri ödeme, geçerlilik; Ana sayfa, Borç & Alacak, Talebi geri çek | |
+| S44 | Para teslimi (17) | `agreement/[id]/delivery` | Durum kartı, 5 adım, tutar ve vade; borç veren "Parayı verdim", borç alan "Aldım, onaylıyorum" | Anlaşma detayında bant |
 
 Web onay ekranları (W01–W04) `apps/web-confirm`'dedir, bu skill kapsamında değil.
 

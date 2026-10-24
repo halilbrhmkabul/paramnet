@@ -410,6 +410,11 @@ Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle 
 - **Faiz yalnızca planı göstermek için** hesaplanır (ADR-045); kişiler arası anlaşmalara, Toplam Nakit'e ya da karşı tarafa yansımaz.
 - **Taksit kaydı** bir hesaptan krediye transferdir: hesap bakiyesi düşer, gider sayılmaz; sıradaki taksitin tutarıyla yazılır, düzenlenmez, yalnızca silinir. Ödenen taksit sayısı bu kayıtlardan gelir.
 
+## 5.15 Para iste ve para teslimi (ADR-058)
+
+- **Para iste:** borç alan, ParamNet ID'si bilinen kişiden para ister. Bu, borç alanın kendisini borçlu olarak kaydettiği tek ödemeli bir borç kaydıdır ve aynı işlemde ID ile paylaşılır (5.4'teki ID ile paylaşım). Anlaşma durum makinesine yeni durum eklenmez: talep "pending", kabul "active" olur. Bulunamayan ID'ye talep kaydı tutulmaz. Talep, karşı taraf yanıtlamadan geri çekilebilir.
+- **Para teslimi:** "Para iste" ile kurulan anlaşmada kabulden sonra para elden ele geçer. Anlaşma "active" kalır; ayrı bir teslim onayı tutulur: önce borç veren "Parayı verdim" der, sonra borç alan "Aldım" diye onaylar. İki adım da olay kaydına yazılır. Onay tamamlanana kadar iki tarafın anlaşma ekranında "Para teslimi bekleniyor" bandı görünür.
+
 # 6. Ekranlar ve Bilgi Mimarisi
 
 ## 6.1 Navigasyon
@@ -894,6 +899,8 @@ Diğer tablolar
 | get_monthly_report(month) | Gelir, gider, kategori dağılımı, 6 aylık seri |
 | create_card / update_card / archive_card / list_cards / get_card | Kartlar; türetilmiş ekstre, asgari, son ödeme, kullanılabilir limit (ADR-055) |
 | create_loan / update_loan / archive_loan / list_loans / get_loan / record_loan_payment | Banka kredileri, türetilmiş ödeme planı, taksit kaydı (ADR-056) |
+| request_money(input, paramnet_id, idem_key) | Borç alanın kaydı + ID ile paylaşım, tek işlemde (ADR-058) |
+| get_delivery(id) / report_delivery(id, row_version) / confirm_delivery(id, row_version) | Para teslimi: borç veren bildirir, borç alan onaylar |
 
 ## 10.4 Edge Functions
 
