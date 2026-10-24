@@ -2,7 +2,7 @@ import { fireEvent, renderRouter, screen, waitFor, within } from "expo-router/te
 
 import { ApiError } from "@/api/errors";
 import { SEED_IDS } from "@/api/mock/seed";
-import { tr } from "@/i18n/tr";
+import { fill, tr } from "@/i18n/tr";
 import { appRoutes } from "@/testing/appRoutes";
 import { createTestApi, provideTestApi } from "@/testing/providers";
 import { signInForTest } from "@/testing/session";
@@ -82,15 +82,27 @@ describe("Home (S05)", () => {
 		});
 	});
 
-	it("the bell shows what waits for me and opens Talepler (design 03)", async () => {
+	it("the bell shows unread notices and opens Bildirimler (design 03)", async () => {
 		await renderRouter(appRoutes, { initialUrl: "/" });
 		await waitFor(() => {
-			expect(screen.getByTestId("home.notifications.badge")).toHaveTextContent("1");
+			expect(screen.getByTestId("home.notifications.badge")).toHaveTextContent("2");
 		});
+		expect(screen.getByTestId("home.notifications.button")).toHaveProp(
+			"accessibilityLabel",
+			fill(tr.inbox.bell, { count: "2" }),
+		);
 		expect(screen.getByTestId("home.brand")).toBeTruthy();
 		await fireEvent.press(screen.getByTestId("home.notifications.button"));
 		await waitFor(() => {
-			expect(screen.getByTestId("requests.screen")).toBeTruthy();
+			expect(screen.getByTestId("inbox.screen")).toBeTruthy();
+		});
+	});
+
+	it("the menu button opens Ana menü", async () => {
+		await renderRouter(appRoutes, { initialUrl: "/" });
+		await fireEvent.press(screen.getByTestId("home.menu.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("menu.screen")).toBeTruthy();
 		});
 	});
 

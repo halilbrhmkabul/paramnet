@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
-import { useDashboard } from "@/api/hooks";
+import { useDashboard, useMyProfile, useUnreadCount } from "@/api/hooks";
 import type { Dashboard, DueItem } from "@/api/types";
 import { AmountText } from "@/components/AmountText";
 import { Avatar } from "@/components/Avatar";
@@ -14,7 +14,9 @@ import { ErrorState } from "@/components/ErrorState";
 import { LoadingState } from "@/components/LoadingState";
 import { Screen } from "@/components/Screen";
 import { SectionHeader } from "@/components/SectionHeader";
+import { IconButton } from "@/components/TopBar";
 import { useSession } from "@/features/auth/sessionStore";
+import { useMyAvatar } from "@/features/me/useMyAvatar";
 import { DueItemRow } from "@/features/agreements/DueItemRow";
 import { useNewDraft } from "@/features/new/draftStore";
 import type { NewType } from "@/features/new/formModel";
@@ -51,20 +53,19 @@ const TEMPLATES: {
 	},
 ];
 
-// Design 03: the bell carries what waits for me; Talepler is where it is answered.
-function NotificationsButton({ count }: { count: number }) {
+// Design 03: the bell carries the unread notices and opens Bildirimler (06).
+function NotificationsButton() {
+	const count = useUnreadCount();
 	const { colors, fonts, sizes } = useAppTheme();
 	return (
 		<Pressable
 			testID="home.notifications.button"
 			accessibilityRole="button"
 			accessibilityLabel={
-				count > 0
-					? fill(tr.home.notifications, { count: String(count) })
-					: tr.home.notificationsNone
+				count > 0 ? fill(tr.inbox.bell, { count: String(count) }) : tr.inbox.bellNone
 			}
 			onPress={() => {
-				router.push("/requests");
+				router.push("/inbox");
 			}}
 			style={[
 				styles.iconButton,
@@ -104,17 +105,19 @@ function NotificationsButton({ count }: { count: number }) {
 function Greeting() {
 	const { colors, typography, fonts, spacing } = useAppTheme();
 	const name = useSession((state) => state.user?.display_name ?? null);
+	const profile = useMyProfile();
+	const avatar = useMyAvatar(profile.data);
 	return (
 		<Pressable
 			testID="home.profile.button"
 			accessibilityRole="button"
-			accessibilityLabel={tr.settings.open}
+			accessibilityLabel={tr.me.open}
 			onPress={() => {
-				router.push("/settings");
+				router.push("/me");
 			}}
 			style={[styles.greeting, { gap: spacing.md }]}
 		>
-			<Avatar name={name ?? "?"} size={52} />
+			<Avatar name={name ?? "?"} size={52} uri={avatar} />
 			<View style={styles.grow}>
 				<Text style={[typography.caption, { color: colors.textMuted }]}>
 					{tr.home.hello}
@@ -360,8 +363,16 @@ export function HomeScreen() {
 			}
 		>
 			<View style={styles.between}>
+				<IconButton
+					icon="menu-outline"
+					label={tr.menu.open}
+					onPress={() => {
+						router.push("/menu");
+					}}
+					testID="home.menu.button"
+				/>
 				<Brand testID="home.brand" />
-				<NotificationsButton count={dashboard.data?.pending_count ?? 0} />
+				<NotificationsButton />
 			</View>
 			<Greeting />
 			{dashboard.isPending ? (

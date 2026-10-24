@@ -7,6 +7,7 @@ import type {
 	ContactDetail,
 	AnalyticsEvent,
 	ContactSummary,
+	IdShareResult,
 	Dashboard,
 	Decision,
 	InviteResolution,
@@ -39,6 +40,8 @@ export interface AgreementsApi {
 	): Promise<{ payment_id: string; replayed: boolean }>;
 	// Sharing (F2-06).
 	shareAgreement(id: string, phone: string, rowVersion: number): Promise<ShareResult>;
+	// ADR-050: the target is an account found by its ParamNet ID; no link, it answers in the app.
+	shareAgreementById(id: string, paramnetId: string, rowVersion: number): Promise<IdShareResult>;
 	withdrawShare(id: string): Promise<void>;
 	makePersonal(id: string): Promise<void>;
 	resolveInvite(token: string): Promise<InviteResolution>;

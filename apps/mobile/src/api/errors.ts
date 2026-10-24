@@ -16,10 +16,13 @@ export type ApiErrorCode =
 	// ADR-046 / ADR-049: PIN sign-in.
 	| "invalid_credentials"
 	| "account_locked"
-	| "pin_weak";
+	| "pin_weak"
+	// ADR-051: update_profile on a name someone else already has.
+	| "username_taken";
 
 // What pin-login adds to a refusal: tries left before the lock, or seconds until it lifts.
-export type ApiErrorDetails = { attempts_left?: number; retry_after_s?: number };
+// RPCs also name the field a refusal is about (SQL `detail`, e.g. "paramnet_id" for the 30-day ID limit).
+export type ApiErrorDetails = { attempts_left?: number; retry_after_s?: number; field?: string };
 
 export class ApiError extends Error {
 	constructor(
@@ -46,13 +49,24 @@ const MESSAGES: Record<ApiErrorCode, string> = {
 	invalid_credentials: tr.error.invalidCredentials,
 	account_locked: fill(tr.error.accountLocked, { minutes: "15" }),
 	pin_weak: tr.pin.weak,
+	username_taken: tr.error.usernameTaken,
 };
 
-export function messageForError(error: unknown): string {
+// Where the error came from when the code alone is not enough: an ID search or share hitting its limit
+// reads differently from a generic "too many tries".
+export type ErrorContext = "paramnetId";
+
+export function messageForError(error: unknown, context?: ErrorContext): string {
 	if (!(error instanceof ApiError)) {
 		return tr.error.generic;
 	}
-	const { attempts_left, retry_after_s } = error.details ?? {};
+	const { attempts_left, retry_after_s, field } = error.details ?? {};
+	if (error.code === "rate_limited" && field === "paramnet_id") {
+		return tr.error.idRegenerateWait;
+	}
+	if (error.code === "rate_limited" && context === "paramnetId") {
+		return tr.error.idLimited;
+	}
 	if (error.code === "invalid_credentials" && attempts_left !== undefined && attempts_left > 0) {
 		return fill(tr.error.attemptsLeft, { count: String(attempts_left) });
 	}

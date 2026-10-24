@@ -32,3 +32,6 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Router test ortamı: aynı test dosyasında sekmeler bir kez açıldıktan sonra (auth)'dan sekmelere geçiş "Unmatched Route"a düşüyor; şimdilik bu tür testler ayrı dosyada (`restoreLegacy.test.tsx`) — F4-01b sırasında.
 - ParamNet ID: kullanıcı engelleme, ID'yi QR kodla paylaşma, ID ile kişi ekleme (paylaşmadan rehbere kaydetme) — F4-02 sırasında (ADR-050).
 - Profil: e-posta alanı (tasarım 35), anlaşma bazında hatırlatma kapatma (spec 5.9) — F4-02 sırasında (ADR-051).
+- Karşı tarafın fotoğrafını anlaşma, Borçlarım ve Talepler satırlarında gösterme (`counterparty.avatar_path` hazır) — F4-02b sırasında.
+- Bildirim kutusunun açıkken canlı güncellenmesi (Realtime ya da push gelince yenileme) ve uygulama simgesinde okunmamış sayısı — F4-02b sırasında.
+- Destek e-posta adresinin belirlenmesi (`EXPO_PUBLIC_SUPPORT_EMAIL`) ya da uygulama içi Yardım ekranı — F4-02b sırasında (ADR-052).

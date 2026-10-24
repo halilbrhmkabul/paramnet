@@ -157,11 +157,25 @@ function AppNavigator() {
 					options={{ ...detailHeader, title: tr.tabs.contacts }}
 				/>
 				<Stack.Screen name="contact/[id]" options={detailHeader} />
+				<Stack.Screen name="me/index" options={{ ...detailHeader, title: tr.me.title }} />
 				<Stack.Screen
-					name="settings/index"
-					options={{ ...detailHeader, title: tr.settings.title }}
+					name="me/edit"
+					options={{
+						...detailHeader,
+						title: tr.editProfile.title,
+						presentation: "modal",
+					}}
 				/>
-				<Stack.Screen name="settings/delete" options={detailHeader} />
+				<Stack.Screen
+					name="me/discoverability"
+					options={{ ...detailHeader, title: tr.discoverability.title }}
+				/>
+				<Stack.Screen name="me/legal" options={{ ...detailHeader, title: tr.me.legal }} />
+				<Stack.Screen name="me/delete" options={detailHeader} />
+				{/* Ana menü draws its own header (name, ID and a close button, design 05). */}
+				<Stack.Screen name="menu" options={{ presentation: "modal" }} />
+				{/* Bildirimler draws its own bar: the "mark all read" action lives in it (design 06). */}
+				<Stack.Screen name="inbox" />
 			</Stack.Protected>
 			{/* Open whether signed in or not; the route sends signed-out users through sign-in first. */}
 			<Stack.Screen name="invite/[token]" options={detailHeader} />

@@ -15,6 +15,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 		plugins: [
 			...(config.plugins ?? []),
 			["expo-contacts", { contactsPermission: permissions.contacts }],
+			[
+				"expo-image-picker",
+				{
+					cameraPermission: permissions.camera,
+					photosPermission: permissions.photos,
+					microphonePermission: false,
+				},
+			],
 		] satisfies ExpoConfig["plugins"],
 	};
 	if (domain === null) {

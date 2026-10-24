@@ -64,7 +64,10 @@ describe("push (F1-18)", () => {
 			expect(register).toHaveBeenCalled();
 		});
 		await fireEvent.press(screen.getByTestId("home.profile.button"));
-		await fireEvent.press(screen.getByTestId("settings.signOut.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("me.signOut.button")).toBeTruthy();
+		});
+		await fireEvent.press(screen.getByTestId("me.signOut.button"));
 		await waitFor(() => {
 			expect(unregister).toHaveBeenCalledWith("ExponentPushToken[device]");
 		});

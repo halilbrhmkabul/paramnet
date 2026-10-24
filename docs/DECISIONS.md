@@ -548,3 +548,20 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- **Henüz yapılmamış modüller gizlenir:** Ana menüde Hesaplar, Banka Kredileri, Raporlar, Bütçe, Faiz Hesaplayıcı; Profilde Hesaplarım, QR kod, yüz tanıma kilidi, "Açılışta tutarları gizle". Her biri kendi görevinde görünür olur.
 	- **Fotoğraf erişimi:** `avatars` politikası sahibine ve paylaşılmış (kişisel olmayan) bir anlaşmanın karşı tarafına okuma verir; yükleme ve silme yalnızca kendi klasörüne. Storage SQL ile silmeye izin vermez: eski dosyayı uygulama Storage API'siyle siler, hesap silmede `delete-account` klasörü boşaltır.
 	- **Yasal metinler ve hesap silme:** Profil'de "Gizlilik ve güvenlik" kartına "Yasal metinler" ve "Hesabı sil" satırları eklenir; "Kayıtları dışa aktar" mevcut dışa aktarmaya bağlanır. Ayrı Ayarlar ekranı kalkar; Ana menüdeki "Gizlilik ve ayarlar" Profil'i açar.
+
+## ADR-052 — Profil, Ana menü ve Bildirimler ekranlarının uygulama kararları (F4-02b)
+- **Tarih:** 2026-10-24
+- **Bağlam:** F4-02b planında açık kalan sorular kullanıcıyla önerilen varsayılanlarla kapatıldı; uygulamada birkaç teknik seçim daha yapıldı.
+- **Karar (kullanıcı, önerilen varsayılanlar):**
+	- **Zil:** Ana Sayfa'daki zil okunmamış bildirim sayısını gösterir ve Bildirimler'i (06) açar. Talepler ekranı kalır; bekleyen işler bandından ve onay gereken bildirimlerden ulaşılır. Ana Sayfa'nın soluna Ana menü düğmesi eklendi.
+	- **Bildirim satır metinleri:** tasarımdaki kalın başlık ve ayrıntı satırı istemcide kurulur. Başlıklar `tr.inbox.titles` (şablon başına kısa cümle), ayrıntı satırı yükten (taksit, tutar, vade, kalan). Push metinleri sunucuda değişmeden kalır.
+	- **Yardım ve destek:** `mailto:` bağlantısı; adres `EXPO_PUBLIC_SUPPORT_EMAIL`. Adres henüz belirlenmediği için boşken satır gizlenir.
+	- **Elden Taksit kutucuğu:** taksit ekranları gelene kadar (F4-09) Borçlarım sekmesini açar; alt satırda açık taksitli alışveriş sayısı yazar.
+- **Uygulama kararları:**
+	- **Rotalar:** Profil `/me` (`/me/edit`, `/me/discoverability`, `/me/legal`, `/me/delete`), Ana menü `/menu` (modal), Bildirimler `/inbox`. `/profile` ve `/notifications` kayıt akışındaki `(auth)` ekranlarında kullanılıyor.
+	- **`ProfileApi`:** profil, ID ve bildirim kutusu `AgreementsApi`'den ayrı bir arayüzde; mock ve Supabase adaptörleri ortak. ID ile paylaşım (`shareAgreementById`) anlaşmayı değiştirdiği için `AgreementsApi`'de.
+	- **Fotoğraf:** seçim ve küçültme `src/lib/avatarImage.ts`'de (kamera izni, kare kırpma, 512 px JPEG). Yükleme, `set_avatar` ve eski dosyanın silinmesi Supabase adaptöründe; eski dosya silinemezse sessiz kalınır (hesapla birlikte silinir).
+	- **ID araması:** yalnızca tam ve geçerli bir ID yazılınca bir kez sorulur, oturum boyunca önbellekte kalır, kendiliğinden yeniden denenmez (saatte 20 sınırı). Kullanıcı adı denetimi yazma durduktan 500 ms sonra yapılır.
+	- **Hata eşleme:** sunucunun `detail` alanı `ApiError.details.field` olarak taşınır. `rate_limited` + `paramnet_id` "30 günde bir" mesajını, ID arama ve paylaşımında `rate_limited` "çok fazla ID denemesi" mesajını verir.
+	- **Profili düzenle formu:** üç alan ve canlı kullanıcı adı denetimi için react-hook-form yerine yerel durum kullanıldı (kayıt akışındaki ad ekranı gibi). Kurallar `@paramnet/shared` `usernameProblem` / `normalizeUsername`'den gelir.
+	- **Tasarımdan sapmalar:** Profil'de alt sekme çubuğu ve sağ üstteki Ayarlar ikonu yok (Profil yığına açılır; ikon Menü ile döngü kurardı). Profil'de dışa aktarma satırının "CSV · PDF" etiketi yok (çıktı JSON). Bildirimlerde okunmuş onay bildiriminde "Sonra" düğmesi gizlenir.

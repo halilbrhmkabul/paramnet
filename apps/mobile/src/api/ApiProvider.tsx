@@ -6,11 +6,14 @@ import type { AuthApi } from "./auth/AuthApi";
 import { createMockAuthApi } from "./auth/mockAuth";
 import { createSupabaseAuthApi } from "./auth/supabaseAuth";
 import { createMockApi } from "./mock/mockApi";
+import { createMockProfileApi } from "./profile/mockProfile";
+import type { ProfileApi } from "./profile/ProfileApi";
+import { createSupabaseProfileApi } from "./profile/supabaseProfile";
 import { createSupabaseAgreementsApi } from "./supabase/supabaseAgreements";
 import { readConfig } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
 
-type Apis = { agreements: AgreementsApi; auth: AuthApi };
+type Apis = { agreements: AgreementsApi; auth: AuthApi; profile: ProfileApi };
 
 const ApiContext = createContext<Apis | null>(null);
 
@@ -29,6 +32,13 @@ export function createAuthApi(): AuthApi {
 		: createMockAuthApi({ signedIn: process.env.EXPO_PUBLIC_MOCK_SIGNED_IN === "1" });
 }
 
+export function createProfileApi(): ProfileApi {
+	const config = readConfig();
+	return config.mode === "supabase"
+		? createSupabaseProfileApi(getSupabase(config.supabaseUrl, config.supabaseKey))
+		: createMockProfileApi();
+}
+
 export function createQueryClient(): QueryClient {
 	return new QueryClient({
 		defaultOptions: {
@@ -41,17 +51,20 @@ export function createQueryClient(): QueryClient {
 export function ApiProvider({
 	api,
 	authApi,
+	profileApi,
 	queryClient,
 	children,
 }: {
 	api?: AgreementsApi;
 	authApi?: AuthApi;
+	profileApi?: ProfileApi;
 	queryClient?: QueryClient;
 	children: ReactNode;
 }) {
 	const [value] = useState<Apis>(() => ({
 		agreements: api ?? createApi(),
 		auth: authApi ?? createAuthApi(),
+		profile: profileApi ?? createProfileApi(),
 	}));
 	const [client] = useState(() => queryClient ?? createQueryClient());
 	return (
@@ -75,4 +88,8 @@ export function useApi(): AgreementsApi {
 
 export function useAuthApi(): AuthApi {
 	return useApis().auth;
+}
+
+export function useProfileApi(): ProfileApi {
+	return useApis().profile;
 }
