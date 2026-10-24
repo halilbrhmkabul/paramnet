@@ -56,6 +56,11 @@ import CardDetail from "../../app/cards/[id]/index";
 import CardEdit from "../../app/cards/[id]/edit";
 import CardPay from "../../app/cards/[id]/pay";
 import CardPaid from "../../app/cards/[id]/paid";
+import Loans from "../../app/loans/index";
+import LoanNew from "../../app/loans/new";
+import LoanDetail from "../../app/loans/[id]/index";
+import LoanEdit from "../../app/loans/[id]/edit";
+import LoanPay from "../../app/loans/[id]/pay";
 
 // Every route of the app for expo-router's renderRouter; extend when a route file is added.
 export const appRoutes = {
@@ -114,6 +119,11 @@ export const appRoutes = {
 	"cards/[id]/edit": CardEdit,
 	"cards/[id]/pay": CardPay,
 	"cards/[id]/paid": CardPaid,
+	"loans/index": Loans,
+	"loans/new": LoanNew,
+	"loans/[id]/index": LoanDetail,
+	"loans/[id]/edit": LoanEdit,
+	"loans/[id]/pay": LoanPay,
 	inbox: Inbox,
 	"legal/[doc]": Legal,
 	"invite/[token]": Invite,

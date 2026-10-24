@@ -45,7 +45,7 @@ select is(
 	(select array_agg(k order by k) from jsonb_object_keys((select r -> 'transaction' from t_income)) k),
 	array['account_id', 'account_name', 'amount_minor', 'card_id', 'card_name', 'category', 'created_at', 'deleted_at',
 		'id', 'installments', 'kind', 'note', 'occurred_on', 'row_version', 'title', 'to_account_id', 'to_account_name',
-		'to_card_id', 'to_card_name', 'updated_at'],
+		'to_card_id', 'to_card_name', 'to_loan_id', 'to_loan_name', 'updated_at'],
 	'işlem alanları'
 );
 select is((select r -> 'transaction' ->> 'account_name' from t_income), 'Maaş Hesabı', 'hesap adı döner');

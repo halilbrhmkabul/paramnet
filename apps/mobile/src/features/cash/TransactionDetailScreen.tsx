@@ -197,11 +197,13 @@ function Detail({ data }: { data: TransactionDetail }) {
 					testID="txDetail.effect.text"
 					style={[typography.caption, styles.grow, { color: colors.pending }]}
 				>
-					{tx.card_id !== null
-						? tr.txDetail.effectCard
-						: tx.to_card_id !== null
-							? tr.txDetail.effectCardPayment
-							: fill(tr.txDetail.effect[tx.kind], { account: sourceName(tx) })}
+					{tx.to_loan_id !== null
+						? tr.txDetail.effectLoan
+						: tx.card_id !== null
+							? tr.txDetail.effectCard
+							: tx.to_card_id !== null
+								? tr.txDetail.effectCardPayment
+								: fill(tr.txDetail.effect[tx.kind], { account: sourceName(tx) })}
 				</Text>
 			</View>
 
@@ -250,7 +252,7 @@ function Detail({ data }: { data: TransactionDetail }) {
 				</View>
 			) : deleted ? null : (
 				<View style={[styles.actions, { gap: spacing.sm }]}>
-					{tx.kind === "adjustment" ? null : (
+					{tx.kind === "adjustment" || tx.to_loan_id !== null ? null : (
 						<ActionButton
 							label={tr.txDetail.edit}
 							icon="create-outline"

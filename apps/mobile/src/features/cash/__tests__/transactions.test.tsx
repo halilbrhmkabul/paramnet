@@ -35,10 +35,11 @@ describe("İşlem merkezi (21)", () => {
 			"action.lend",
 			"action.installment",
 			"action.recurring",
+			"action.loan",
 		]) {
 			expect(screen.getByTestId(id)).toBeTruthy();
 		}
-		for (const hidden of ["Para iste", "Hesap böl", "Ödeme kaydet", "Banka kredisi ekle"]) {
+		for (const hidden of ["Para iste", "Hesap böl", "Ödeme kaydet"]) {
 			expect(screen.queryByText(hidden)).toBeNull();
 		}
 	});

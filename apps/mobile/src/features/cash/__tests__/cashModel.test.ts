@@ -27,6 +27,8 @@ function tx(over: Partial<Transaction>): Transaction {
 		to_card_id: null,
 		to_card_name: null,
 		installments: 1,
+		to_loan_id: null,
+		to_loan_name: null,
 		amount_minor: 84230,
 		category: "bills",
 		title: null,

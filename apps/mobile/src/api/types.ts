@@ -3,6 +3,7 @@ import type {
 	AgreementKind,
 	CardColor,
 	CardState,
+	LoanRow,
 	AgreementStatus,
 	ContactKind,
 	InstallmentState,
@@ -315,6 +316,9 @@ export type Transaction = {
 	to_card_id: string | null;
 	to_card_name: string | null;
 	installments: number;
+	// An installment of the user's own bank loan (ADR-056).
+	to_loan_id: string | null;
+	to_loan_name: string | null;
 	// Signed only for adjustments.
 	amount_minor: number;
 	category: TransactionCategory | null;
@@ -425,3 +429,31 @@ export type CardDetail = {
 	installment_items: Transaction[];
 	payments: Transaction[];
 };
+
+// The user's own bank loans (F4-06, ADR-056); the plan comes from the server (packages/shared loanSchedule).
+export type Loan = {
+	id: string;
+	bank_name: string;
+	loan_type: string;
+	principal_minor: number;
+	monthly_rate_bps: number;
+	term_months: number;
+	first_due_on: IsoDate;
+	installment_minor: number;
+	payment_account_id: string | null;
+	payment_account_name: string | null;
+	archived_at: string | null;
+	row_version: number;
+	created_at: string;
+	schedule: LoanRow[];
+	paid: number;
+	remaining_principal_minor: number;
+	remaining_total_minor: number;
+	total_payment_minor: number;
+	total_interest_minor: number;
+	next: LoanRow | null;
+};
+
+export type LoanList = { loans: Loan[]; remaining_principal_minor: number; monthly_minor: number };
+
+export type LoanDetail = { loan: Loan; payments: Transaction[] };

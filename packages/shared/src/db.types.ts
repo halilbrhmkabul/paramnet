@@ -655,6 +655,76 @@ export type Database = {
 					},
 				];
 			};
+			loans: {
+				Row: {
+					archived_at: string | null;
+					bank_name: string;
+					created_at: string;
+					first_due_on: string;
+					id: string;
+					idempotency_key: string | null;
+					installment_minor: number;
+					loan_type: string;
+					monthly_rate_bps: number;
+					owner_id: string;
+					payment_account_id: string | null;
+					principal_minor: number;
+					row_version: number;
+					term_months: number;
+					updated_at: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					archived_at?: string | null;
+					bank_name: string;
+					created_at?: string;
+					first_due_on: string;
+					id?: string;
+					idempotency_key?: string | null;
+					installment_minor: number;
+					loan_type: string;
+					monthly_rate_bps: number;
+					owner_id: string;
+					payment_account_id?: string | null;
+					principal_minor: number;
+					row_version?: number;
+					term_months: number;
+					updated_at?: string;
+				};
+				Update: {
+					archived_at?: string | null;
+					bank_name?: string;
+					created_at?: string;
+					first_due_on?: string;
+					id?: string;
+					idempotency_key?: string | null;
+					installment_minor?: number;
+					loan_type?: string;
+					monthly_rate_bps?: number;
+					owner_id?: string;
+					payment_account_id?: string | null;
+					principal_minor?: number;
+					row_version?: number;
+					term_months?: number;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "loans_owner_id_fkey";
+						columns: ["owner_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "loans_payment_account_id_fkey";
+						columns: ["payment_account_id"];
+						isOneToOne: false;
+						referencedRelation: "accounts";
+						referencedColumns: ["id"];
+					},
+				];
+			};
 			notification_outbox: {
 				Row: {
 					attempts: number;
@@ -1273,6 +1343,7 @@ export type Database = {
 					title: string | null;
 					to_account_id: string | null;
 					to_card_id: string | null;
+					to_loan_id: string | null;
 					updated_at: string;
 				};
 				ComputedFields: never;
@@ -1294,6 +1365,7 @@ export type Database = {
 					title?: string | null;
 					to_account_id?: string | null;
 					to_card_id?: string | null;
+					to_loan_id?: string | null;
 					updated_at?: string;
 				};
 				Update: {
@@ -1314,6 +1386,7 @@ export type Database = {
 					title?: string | null;
 					to_account_id?: string | null;
 					to_card_id?: string | null;
+					to_loan_id?: string | null;
 					updated_at?: string;
 				};
 				Relationships: [
@@ -1352,6 +1425,13 @@ export type Database = {
 						referencedRelation: "cards";
 						referencedColumns: ["id"];
 					},
+					{
+						foreignKeyName: "transactions_to_loan_id_fkey";
+						columns: ["to_loan_id"];
+						isOneToOne: false;
+						referencedRelation: "loans";
+						referencedColumns: ["id"];
+					},
 				];
 			};
 			user_pins: {
@@ -1384,6 +1464,7 @@ export type Database = {
 			};
 			archive_account: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			archive_card: { Args: { p_id: string; p_row_version: number }; Returns: Json };
+			archive_loan: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			cancel_agreement: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			check_username: { Args: { p_username: string }; Returns: Json };
 			claim_notifications: { Args: { p_limit: number }; Returns: Json };
@@ -1398,6 +1479,7 @@ export type Database = {
 			create_account: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_agreement: { Args: { idem_key: string; input: Json }; Returns: Json };
 			create_card: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
+			create_loan: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_recurring: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_transaction: {
 				Args: { p_idempotency_key: string; p_input: Json };
@@ -1450,6 +1532,7 @@ export type Database = {
 			get_cash_summary: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
+			get_loan: { Args: { p_id: string }; Returns: Json };
 			get_metrics: { Args: { p_days: number }; Returns: Json };
 			get_monthly_report: { Args: { p_month: string }; Returns: Json };
 			get_my_profile: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -1484,6 +1567,7 @@ export type Database = {
 			list_budgets: { Args: { p_month: string }; Returns: Json };
 			list_cards: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
+			list_loans: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_notifications: {
 				Args: { p_before_id: number; p_category: string; p_limit: number };
 				Returns: Json;
@@ -1507,6 +1591,15 @@ export type Database = {
 			pin_mark_set: { Args: { p_phone: string; p_uid: string }; Returns: undefined };
 			propose_amendment: {
 				Args: { p_id: string; p_reason: string; p_row_version: number; p_terms: Json };
+				Returns: Json;
+			};
+			record_loan_payment: {
+				Args: {
+					p_account_id: string;
+					p_idempotency_key: string;
+					p_loan_id: string;
+					p_paid_on: string;
+				};
 				Returns: Json;
 			};
 			record_payment: {
@@ -1552,6 +1645,10 @@ export type Database = {
 				Returns: Json;
 			};
 			update_card: {
+				Args: { p_id: string; p_input: Json; p_row_version: number };
+				Returns: Json;
+			};
+			update_loan: {
 				Args: { p_id: string; p_input: Json; p_row_version: number };
 				Returns: Json;
 			};

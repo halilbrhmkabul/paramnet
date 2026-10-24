@@ -9,6 +9,7 @@ export * from "./allocation";
 export * from "./cards";
 export * from "./dates";
 export * from "./enums";
+export * from "./loans";
 export * from "./money";
 export * from "./pin";
 export * from "./plan";

@@ -2,6 +2,10 @@ import {
 	EXPENSE_CATEGORIES,
 	MAX_ACCOUNTS,
 	cardInputSchema,
+	loanInputSchema,
+	loanSchedule,
+	loanSummary,
+	type LoanInput,
 	deriveCardState,
 	type CardInput,
 	accountInputSchema,
@@ -26,6 +30,7 @@ import { ApiError } from "../errors";
 import type {
 	Account,
 	Card,
+	Loan,
 	RecurringRule,
 	Transaction,
 	TransactionChange,
@@ -44,10 +49,21 @@ export type MockAccountsOptions = {
 type StoredAccount = Omit<Account, "balance_minor"> & { key: string | null };
 type StoredTransaction = Omit<
 	Transaction,
-	"account_name" | "to_account_name" | "card_name" | "to_card_name"
+	"account_name" | "to_account_name" | "card_name" | "to_card_name" | "to_loan_name"
 > & { key: string };
+type StoredLoan = Omit<
+	Loan,
+	| "payment_account_name"
+	| "schedule"
+	| "paid"
+	| "remaining_principal_minor"
+	| "remaining_total_minor"
+	| "total_payment_minor"
+	| "total_interest_minor"
+	| "next"
+> & { key: string | null };
 type StoredCard = Omit<Card, "label" | "state"> & { key: string | null };
-type CardFields = "card_id" | "to_card_id" | "installments";
+type CardFields = "card_id" | "to_card_id" | "installments" | "to_loan_id";
 type StoredRule = Omit<RecurringRule, "account_name" | "next_dates" | "pending_dates"> & {
 	key: string;
 	tracking_from: IsoDate;
@@ -80,6 +96,7 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 
 	const rules: StoredRule[] = [];
 	const cards: StoredCard[] = [];
+	const loans: StoredLoan[] = [];
 	const budgets = new Map<TransactionCategory, number>();
 	const stamp = () => now().toISOString();
 	const today = () => todayInIstanbul(now());
@@ -116,6 +133,7 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 			card_id: null,
 			to_card_id: null,
 			installments: 1,
+			to_loan_id: null,
 			...fields,
 			deleted_at: null,
 			row_version: 1,
@@ -278,12 +296,18 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 		return card === undefined ? null : cardLabel(card);
 	}
 
+	function loanName(id: string | null): string | null {
+		const loan = id === null ? undefined : loans.find((l) => l.id === id);
+		return loan === undefined ? null : `${loan.bank_name} · ${loan.loan_type}`;
+	}
+
 	function txView(tx: StoredTransaction): Transaction {
 		const { key: _key, ...rest } = tx;
 		return {
 			...rest,
 			card_name: cardName(tx.card_id),
 			to_card_name: cardName(tx.to_card_id),
+			to_loan_name: loanName(tx.to_loan_id),
 			account_name:
 				tx.account_id === null
 					? null
@@ -540,6 +564,67 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 		}
 	}
 
+	function ownLoan(id: string): StoredLoan {
+		const loan = loans.find((l) => l.id === id);
+		if (loan === undefined) {
+			throw new ApiError("not_found");
+		}
+		return loan;
+	}
+
+	function loanView(loan: StoredLoan): Loan {
+		const { key: _key, ...rest } = loan;
+		const schedule = loanSchedule(
+			loan.principal_minor,
+			loan.monthly_rate_bps,
+			loan.term_months,
+			loan.first_due_on,
+			loan.installment_minor,
+		);
+		const paidCount = transactions.filter(
+			(t) => t.deleted_at === null && t.to_loan_id === loan.id,
+		).length;
+		const {
+			paid,
+			remaining_principal_minor,
+			remaining_total_minor,
+			total_payment_minor,
+			total_interest_minor,
+			next,
+		} = loanSummary(schedule, loan.principal_minor, paidCount);
+		return {
+			...rest,
+			payment_account_name:
+				loan.payment_account_id === null
+					? null
+					: (accounts.find((a) => a.id === loan.payment_account_id)?.name ?? null),
+			schedule,
+			paid,
+			remaining_principal_minor,
+			remaining_total_minor,
+			total_payment_minor,
+			total_interest_minor,
+			next,
+		};
+	}
+
+	function parseLoan(input: LoanInput): LoanInput {
+		const parsed = loanInputSchema.safeParse(input);
+		if (!parsed.success) {
+			throw invalid(String(parsed.error.issues[0]?.path[0] ?? "input"));
+		}
+		return parsed.data;
+	}
+
+	function writableLoan(loan: StoredLoan, rowVersion: number): void {
+		if (loan.archived_at !== null) {
+			throw new ApiError("invalid_transition");
+		}
+		if (loan.row_version !== rowVersion) {
+			throw new ApiError("conflict");
+		}
+	}
+
 	const expenseIn = (month: IsoDate) =>
 		transactions.filter(
 			(t) =>
@@ -630,7 +715,7 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 		updateTransaction: (id, input, rowVersion) =>
 			wait(() => {
 				const tx = ownTransaction(id);
-				if (tx.deleted_at !== null || tx.kind === "adjustment") {
+				if (tx.deleted_at !== null || tx.kind === "adjustment" || tx.to_loan_id !== null) {
 					throw new ApiError("invalid_transition");
 				}
 				if (tx.row_version !== rowVersion) {
@@ -918,6 +1003,106 @@ export function createMockAccountsApi(options: MockAccountsOptions = {}): Accoun
 						.sort(newestFirst)
 						.map(txView),
 				};
+			}),
+
+		listLoans: () =>
+			wait(() => {
+				const open = loans.filter((l) => l.archived_at === null).map(loanView);
+				return {
+					loans: open,
+					remaining_principal_minor: open.reduce(
+						(sum, l) => sum + l.remaining_principal_minor,
+						0,
+					),
+					monthly_minor: open.reduce((sum, l) => sum + (l.next?.payment_minor ?? 0), 0),
+				};
+			}),
+
+		createLoan: (input, key) =>
+			wait(() => {
+				const replay = loans.find((l) => l.key === key);
+				if (replay !== undefined) {
+					return loanView(replay);
+				}
+				const value = parseLoan(input);
+				if (value.payment_account_id !== null) {
+					ownAccount(value.payment_account_id);
+				}
+				const loan: StoredLoan = {
+					id: newId(),
+					...value,
+					archived_at: null,
+					row_version: 1,
+					created_at: stamp(),
+					key,
+				};
+				loans.push(loan);
+				return loanView(loan);
+			}),
+
+		updateLoan: (id, input, rowVersion) =>
+			wait(() => {
+				const value = parseLoan(input);
+				const loan = ownLoan(id);
+				writableLoan(loan, rowVersion);
+				Object.assign(loan, value, { row_version: loan.row_version + 1 });
+				return loanView(loan);
+			}),
+
+		archiveLoan: (id, rowVersion) =>
+			wait(() => {
+				const loan = ownLoan(id);
+				writableLoan(loan, rowVersion);
+				loan.archived_at = stamp();
+				loan.row_version += 1;
+				return loanView(loan);
+			}),
+
+		getLoan: (id) =>
+			wait(() => {
+				const loan = ownLoan(id);
+				return {
+					loan: loanView(loan),
+					payments: transactions
+						.filter((t) => t.deleted_at === null && t.to_loan_id === id)
+						.sort((a, b) => b.occurred_on.localeCompare(a.occurred_on))
+						.map(txView),
+				};
+			}),
+
+		recordLoanPayment: (id, accountId, paidOn, key) =>
+			wait(() => {
+				const replay = transactions.find((t) => t.key === key);
+				if (replay !== undefined) {
+					return txView(replay);
+				}
+				const loan = ownLoan(id);
+				if (loan.archived_at !== null) {
+					throw invalid("loan_archived");
+				}
+				if (ownAccount(accountId).archived_at !== null) {
+					throw invalid("account_archived");
+				}
+				const next = loanView(loan).next;
+				if (next === null) {
+					throw new ApiError("invalid_transition");
+				}
+				return txView(
+					addTransaction(
+						{
+							kind: "transfer",
+							account_id: accountId,
+							to_account_id: null,
+							to_loan_id: id,
+							amount_minor: next.payment_minor,
+							category: null,
+							title: `${loan.loan_type} ${String(next.seq)}/${String(loan.term_months)}`,
+							note: null,
+							occurred_on: paidOn,
+						},
+						key,
+					),
+				);
 			}),
 	};
 }

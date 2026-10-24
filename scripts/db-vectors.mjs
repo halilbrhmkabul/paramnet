@@ -104,6 +104,17 @@ for (const vector of cards.states) {
 		`select is(private.card_state_from(${json(vector.card)}, ${json(vector.transactions)}, ${text(vector.today)}), ${json(vector.expected)}, ${name(`card: ${vector.name}`)});`,
 	);
 }
+const loans = read("loans.json");
+for (const vector of loans.payments) {
+	lines.push(
+		`select is(private.loan_payment(${String(vector.principal)}, ${String(vector.bps)}, ${String(vector.term)}), ${String(vector.expected)}::bigint, ${name(`loan payment: ${vector.name}`)});`,
+	);
+}
+for (const vector of loans.schedules) {
+	lines.push(
+		`select is(private.loan_schedule(${String(vector.principal)}, ${String(vector.bps)}, ${String(vector.term)}, ${text(vector.first_due)}, ${String(vector.installment)}), ${json(vector.expected)}, ${name(`loan schedule: ${vector.name}`)});`,
+	);
+}
 
 writeFileSync(
 	out,

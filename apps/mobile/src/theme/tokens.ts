@@ -40,6 +40,12 @@ export const palette = {
 		cardBordeaux: "#5A2232",
 		cardChip: "#D4BE7F",
 		onCard: "#FFFFFF",
+		// Loan panel (design 28, 34), the same in both themes.
+		loanBg: "#221D3B",
+		loanMuted: "#C9C1E8",
+		loanPaid: "#A99BEA",
+		loanNext: "#E6B85C",
+		loanTrack: "rgba(255,255,255,0.14)",
 		// Welcome (01) and the intro illustrations (31) stay dark forest in both themes.
 		heroBg: "#0C2F25",
 		heroStage: "#0F3A2E",
@@ -93,6 +99,12 @@ export const palette = {
 		cardBordeaux: "#5A2232",
 		cardChip: "#D4BE7F",
 		onCard: "#FFFFFF",
+		// Loan panel (design 28, 34), the same in both themes.
+		loanBg: "#221D3B",
+		loanMuted: "#C9C1E8",
+		loanPaid: "#A99BEA",
+		loanNext: "#E6B85C",
+		loanTrack: "rgba(255,255,255,0.14)",
 		// Welcome (01) and the intro illustrations (31) stay dark forest in both themes.
 		heroBg: "#0C2F25",
 		heroStage: "#0F3A2E",

@@ -130,7 +130,7 @@ function ModuleTile({
 	line: string;
 	icon: IconName;
 	tone: [ColorToken, ColorToken];
-	href: "/accounts" | "/budget" | "/reports";
+	href: "/accounts" | "/budget" | "/reports" | "/loans";
 	testID: string;
 }) {
 	const { colors, typography, fonts, radius } = useAppTheme();
@@ -224,6 +224,17 @@ export function MenuScreen() {
 						href="/budget"
 						testID="menu.module.budget"
 					/>
+				</View>
+				<View style={[styles.grid, { gap: 10, marginTop: 10 }]}>
+					<ModuleTile
+						title={tr.loans.title}
+						line={tr.loans.menuLine}
+						icon="business-outline"
+						tone={["primary", "primarySoft"]}
+						href="/loans"
+						testID="menu.module.loans"
+					/>
+					<View style={styles.grow} />
 				</View>
 			</View>
 			<RowGroup label={tr.menu.app}>
