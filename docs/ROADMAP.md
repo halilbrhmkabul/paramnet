@@ -411,6 +411,13 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 ### [ ] F4-03 Hesaplar ve işlemler
 - Hesaplar/cüzdan (29), Hesap ekle (33), İşlem merkezi (21), Gider/Gelir/Transfer (22), İşlem geçmişi (36), İşlem detayı (37).
 - Toplam Nakit.
+- Karar: ADR-053. İki parça, iki commit.
+- **İlerleme (2026-10-24):** [x] F4-03a sunucu ve paylaşılan kod:
+	- `accounts`, `transactions`, `transaction_events` (yalnızca ekleme); bakiye türetilir, Toplam Nakit ve ay özeti RPC'den.
+	- RPC'ler: `create_account`, `update_account`, `archive_account`, `list_accounts`, `adjust_account_balance`, `create_transaction`, `update_transaction`, `delete_transaction`, `restore_transaction`, `get_transaction`, `list_transactions`, `get_cash_summary`. Dışa aktarma ve hesap silme yeni tabloları kapsar.
+	- `packages/shared` `accounts`: kategoriler, `accountInputSchema`, `transactionInputSchema`, `deriveCash`, `adjustmentDelta`, `transactionRef`; `test-vectors/accounts.json`.
+	- Testler: pgTAP 270 (52), 280 (56), vektörler 030'a 9 kategori; tüm paket 944 test geçti. Shared Vitest 433. Typecheck, lint, biçim temiz. Migration yalnızca yerelde uygulandı.
+	- [ ] F4-03b ekranlar.
 
 ### [ ] F4-04 Tekrarlayan işlem (38), Bütçe (39), Aylık rapor (27)
 

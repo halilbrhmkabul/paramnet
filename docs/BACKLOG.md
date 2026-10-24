@@ -35,3 +35,4 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Karşı tarafın fotoğrafını anlaşma, Borçlarım ve Talepler satırlarında gösterme (`counterparty.avatar_path` hazır) — F4-02b sırasında.
 - Bildirim kutusunun açıkken canlı güncellenmesi (Realtime ya da push gelince yenileme) ve uygulama simgesinde okunmamış sayısı — F4-02b sırasında.
 - Destek e-posta adresinin belirlenmesi (`EXPO_PUBLIC_SUPPORT_EMAIL`) ya da uygulama içi Yardım ekranı — F4-02b sırasında (ADR-052).
+- Hesaplar ve işlemler: borç ödemelerinin ve kart harcamalarının bir hesabın bakiyesine yazılması, fiş/belge ekleme, kategoriye bölme, özel kategoriler, işlem geçmişinde "Planlı & bekleyen" (anlaşma taksitleri, ekstreler; F4-10) — F4-03 sırasında (ADR-053).

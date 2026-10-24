@@ -70,6 +70,11 @@ for (const vector of ids.username) {
 		`select is(private.normalize_username(${text(vector.input)}), ${textOrNull(vector.expected)}, ${name(`username: ${vector.name}`)});`,
 	);
 }
+for (const vector of read("accounts.json").categories) {
+	lines.push(
+		`select is(private.is_category_for(${text(vector.kind)}, ${text(vector.category)}), ${String(vector.expected)}, ${name(`category: ${vector.name}`)});`,
+	);
+}
 
 writeFileSync(
 	out,

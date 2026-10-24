@@ -565,3 +565,22 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- **Hata eşleme:** sunucunun `detail` alanı `ApiError.details.field` olarak taşınır. `rate_limited` + `paramnet_id` "30 günde bir" mesajını, ID arama ve paylaşımında `rate_limited` "çok fazla ID denemesi" mesajını verir.
 	- **Profili düzenle formu:** üç alan ve canlı kullanıcı adı denetimi için react-hook-form yerine yerel durum kullanıldı (kayıt akışındaki ad ekranı gibi). Kurallar `@paramnet/shared` `usernameProblem` / `normalizeUsername`'den gelir.
 	- **Tasarımdan sapmalar:** Profil'de alt sekme çubuğu ve sağ üstteki Ayarlar ikonu yok (Profil yığına açılır; ikon Menü ile döngü kurardı). Profil'de dışa aktarma satırının "CSV · PDF" etiketi yok (çıktı JSON). Bildirimlerde okunmuş onay bildiriminde "Sonra" düğmesi gizlenir.
+
+## ADR-053 — Hesaplar ve işlemler (F4-03)
+- **Tarih:** 2026-10-24
+- **Bağlam:** Tasarımdaki Hesaplar (29), Hesap ekle (33), İşlem merkezi (21), Gider/Gelir/Transfer (22), İşlem geçmişi (36) ve İşlem detayı (37) veri modelinde yoktu (ADR-043). ADR-044 ile kapsama alındı; plan F4-03 başında kullanıcıyla onaylandı (önerilen varsayılanlar).
+- **Karar (kullanıcı):**
+	- **Kişisel kayıt:** hesaplar ve işlemler yalnızca sahibine aittir; karşı taraf, anlaşma ya da borç bakiyesiyle bağı yoktur. Banka bağlantısı yok, para hareketi yok: "Transfer" kendi iki hesabı arasındaki bir kayıttır. Borç ödemelerinin bir hesabın bakiyesine yazılması kapsam dışı (BACKLOG).
+	- **Bakiye türetilir:** açılış bakiyesi + gelir − gider ± transfer + düzeltme; saklanmaz. Açılış bakiyesi ve düzeltme gelir sayılmaz. Toplam Nakit: arşivlenmemiş ve "dahil" işaretli hesaplar. Aylık gelir/gider tüm hesapları sayar.
+	- **Bakiye düzelt:** kullanıcı gerçek bakiyeyi yazar; fark, bugünün tarihli `adjustment` kaydıdır (yalnızca bu kayıtta tutar işaretlidir). Düzeltme düzenlenmez, yalnızca silinir.
+	- **Silme:** geçici (`deleted_at`) ve `restore_transaction` ile geri alınabilir; arayüz 10 saniye "Geri al" sunar. Her oluşturma, düzenleme, silme ve geri alma `transaction_events`'e (yalnızca ekleme) eski ve yeni değerle yazılır; 37'deki "Son düzenleme" satırı buradan gelir.
+	- **Arşiv:** arşivlenen hesap listeden ve toplamdan çıkar, yeni kayıt almaz; geçmişi kalır. Hesap silinmez (geçmiş tutarlı kalsın); hesap silmede (ADR-039) tüm hesap ve kayıtlar silinir, dışa aktarmaya eklenir.
+	- **Kategoriler:** sabit kod listesi (`packages/shared` ve SQL, `test-vectors/accounts.json`): gider food, groceries, transport, bills, rent, health, clothing, other; gelir salary, freelance, rental_income, refund, other. Özel kategori, kategoriye bölme ve fiş ekleme kapsam dışı.
+	- **İşlem merkezi (21)** alt menüde gerçek sekme olur; henüz yapılmamış satırlar (Para iste, Hesap böl, Ödeme kaydet, Banka kredisi, Tekrarlayan işlem) gizlenir. "Borç ver/al" mevcut formu, "Elden taksit ekle" mevcut tür seçimini açar (F4-09'a kadar). İşlem geçmişindeki "Planlı & bekleyen" filtresi F4-10'a kadar gizli.
+- **Uygulama kararları (F4-03a):**
+	- Tablolar istemciye kapalı; okuma ve yazma `security definer` RPC'lerle. Oluşturma ve düzeltme idempotency anahtarı, düzenleme/silme/geri alma/arşiv `row_version` alır. Başkasının hesabı ya da kaydı `not_found` döner (varlığı sızmaz).
+	- Tutar sınırı ±10¹³ kuruş (100 milyar TL): bakiye toplamları JS'de güvenli tamsayı aralığında kalır. İşlem tarihi 2000-01-01 ile bugün + 366 gün arasında. Kullanıcı başına en fazla 50 açık hesap.
+	- Bakiye ve ay özeti için SQL ile TS'in aynı sonucu verdiği, `accounts.json` vektörüyle aynı veriyi kuran pgTAP testiyle sınanır; kategori kuralı `db:vectors` ile üretilen testtedir.
+	- "Kayıt no" (37) kimliğin ilk 8 karakteridir (`TRX-3F9A1C2B`); ayrı sıra numarası tutulmaz.
+	- Hesap ve kayıtların `created_at`'i `clock_timestamp()`: aynı işlemde eklenenler de eklenme sırasını korur.
+	- Hata kodları: `validation_error` (detail: alan, `account_archived`, `no_change`, `too_many_accounts`, `same_account`), `not_found`, `conflict`, `invalid_transition`.

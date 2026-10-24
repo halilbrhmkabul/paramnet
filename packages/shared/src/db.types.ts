@@ -3,6 +3,60 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
 	public: {
 		Tables: {
+			accounts: {
+				Row: {
+					archived_at: string | null;
+					bank_name: string | null;
+					created_at: string;
+					id: string;
+					idempotency_key: string | null;
+					include_in_total: boolean;
+					kind: Database["public"]["Enums"]["account_kind"];
+					name: string;
+					opening_balance_minor: number;
+					owner_id: string;
+					row_version: number;
+					updated_at: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					archived_at?: string | null;
+					bank_name?: string | null;
+					created_at?: string;
+					id?: string;
+					idempotency_key?: string | null;
+					include_in_total?: boolean;
+					kind: Database["public"]["Enums"]["account_kind"];
+					name: string;
+					opening_balance_minor?: number;
+					owner_id: string;
+					row_version?: number;
+					updated_at?: string;
+				};
+				Update: {
+					archived_at?: string | null;
+					bank_name?: string | null;
+					created_at?: string;
+					id?: string;
+					idempotency_key?: string | null;
+					include_in_total?: boolean;
+					kind?: Database["public"]["Enums"]["account_kind"];
+					name?: string;
+					opening_balance_minor?: number;
+					owner_id?: string;
+					row_version?: number;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "accounts_owner_id_fkey";
+						columns: ["owner_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+				];
+			};
 			agreement_events: {
 				Row: {
 					actor_id: string | null;
@@ -942,6 +996,126 @@ export type Database = {
 				};
 				Relationships: [];
 			};
+			transaction_events: {
+				Row: {
+					changes: NonNullable<Json>;
+					created_at: string;
+					id: number;
+					owner_id: string;
+					transaction_id: string;
+					type: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					changes?: NonNullable<Json>;
+					created_at?: string;
+					id?: never;
+					owner_id: string;
+					transaction_id: string;
+					type: string;
+				};
+				Update: {
+					changes?: NonNullable<Json>;
+					created_at?: string;
+					id?: never;
+					owner_id?: string;
+					transaction_id?: string;
+					type?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "transaction_events_owner_id_fkey";
+						columns: ["owner_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "transaction_events_transaction_id_fkey";
+						columns: ["transaction_id"];
+						isOneToOne: false;
+						referencedRelation: "transactions";
+						referencedColumns: ["id"];
+					},
+				];
+			};
+			transactions: {
+				Row: {
+					account_id: string;
+					amount_minor: number;
+					category: string | null;
+					created_at: string;
+					deleted_at: string | null;
+					id: string;
+					idempotency_key: string;
+					kind: Database["public"]["Enums"]["transaction_kind"];
+					note: string | null;
+					occurred_on: string;
+					owner_id: string;
+					row_version: number;
+					title: string | null;
+					to_account_id: string | null;
+					updated_at: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					account_id: string;
+					amount_minor: number;
+					category?: string | null;
+					created_at?: string;
+					deleted_at?: string | null;
+					id?: string;
+					idempotency_key: string;
+					kind: Database["public"]["Enums"]["transaction_kind"];
+					note?: string | null;
+					occurred_on: string;
+					owner_id: string;
+					row_version?: number;
+					title?: string | null;
+					to_account_id?: string | null;
+					updated_at?: string;
+				};
+				Update: {
+					account_id?: string;
+					amount_minor?: number;
+					category?: string | null;
+					created_at?: string;
+					deleted_at?: string | null;
+					id?: string;
+					idempotency_key?: string;
+					kind?: Database["public"]["Enums"]["transaction_kind"];
+					note?: string | null;
+					occurred_on?: string;
+					owner_id?: string;
+					row_version?: number;
+					title?: string | null;
+					to_account_id?: string | null;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "transactions_account_id_fkey";
+						columns: ["account_id"];
+						isOneToOne: false;
+						referencedRelation: "accounts";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "transactions_owner_id_fkey";
+						columns: ["owner_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "transactions_to_account_id_fkey";
+						columns: ["to_account_id"];
+						isOneToOne: false;
+						referencedRelation: "accounts";
+						referencedColumns: ["id"];
+					},
+				];
+			};
 			user_pins: {
 				Row: {
 					created_at: string;
@@ -966,6 +1140,11 @@ export type Database = {
 			[_ in never]: never;
 		};
 		Functions: {
+			adjust_account_balance: {
+				Args: { p_id: string; p_idempotency_key: string; p_target_balance_minor: number };
+				Returns: Json;
+			};
+			archive_account: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			cancel_agreement: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			check_username: { Args: { p_username: string }; Returns: Json };
 			claim_notifications: { Args: { p_limit: number }; Returns: Json };
@@ -973,7 +1152,12 @@ export type Database = {
 				Args: { p_display_name: string; p_kvkk_version: string; p_terms_version: string };
 				Returns: Json;
 			};
+			create_account: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_agreement: { Args: { idem_key: string; input: Json }; Returns: Json };
+			create_transaction: {
+				Args: { p_idempotency_key: string; p_input: Json };
+				Returns: Json;
+			};
 			decide_agreement: {
 				Args: {
 					p_counter_terms: Json;
@@ -1001,6 +1185,7 @@ export type Database = {
 			};
 			decide_payment: { Args: { p_decision: string; p_payment_id: string }; Returns: Json };
 			delete_account_data: { Args: { p_uid: string }; Returns: Json };
+			delete_transaction: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
 			find_by_paramnet_id: { Args: { p_paramnet_id: string }; Returns: Json };
 			finish_notifications: { Args: { p_results: Json }; Returns: Json };
@@ -1015,11 +1200,13 @@ export type Database = {
 			};
 			get_agreement_detail: { Args: { p_id: string }; Returns: Json };
 			get_calendar: { Args: { p_month: string }; Returns: Json };
+			get_cash_summary: { Args: { p_month: string }; Returns: Json };
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
 			get_metrics: { Args: { p_days: number }; Returns: Json };
 			get_my_profile: { Args: Record<PropertyKey, never>; Returns: Json };
 			get_pending_decision: { Args: { p_id: string }; Returns: Json };
+			get_transaction: { Args: { p_id: string }; Returns: Json };
 			has_pin: { Args: Record<PropertyKey, never>; Returns: boolean };
 			invite_decide: {
 				Args: {
@@ -1044,6 +1231,7 @@ export type Database = {
 				Args: { p_code: string; p_phone: string; p_token: string };
 				Returns: Json;
 			};
+			list_accounts: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_agreements: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_notifications: {
@@ -1051,6 +1239,7 @@ export type Database = {
 				Returns: Json;
 			};
 			list_requests: { Args: Record<PropertyKey, never>; Returns: Json };
+			list_transactions: { Args: { p_account_id: string; p_month: string }; Returns: Json };
 			make_personal: { Args: { p_id: string }; Returns: Json };
 			mark_notifications_read: { Args: { p_ids: number[] }; Returns: Json };
 			open_dispute: {
@@ -1083,6 +1272,7 @@ export type Database = {
 			request_cancel: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			resolve_dispute: { Args: { p_id: string }; Returns: Json };
 			resolve_invite: { Args: { p_token: string }; Returns: Json };
+			restore_transaction: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			set_avatar: { Args: { p_path: string }; Returns: Json };
 			set_id_discoverable: { Args: { p_on: boolean }; Returns: Json };
 			set_reminder_prefs: { Args: { p_days: number[] }; Returns: Json };
@@ -1100,6 +1290,10 @@ export type Database = {
 			};
 			track_event: { Args: { p_name: string; p_props: Json }; Returns: Json };
 			unregister_push_token: { Args: { p_token: string }; Returns: Json };
+			update_account: {
+				Args: { p_id: string; p_input: Json; p_row_version: number };
+				Returns: Json;
+			};
 			update_personal_agreement: {
 				Args: { p_id: string; p_row_version: number; p_terms: Json };
 				Returns: Json;
@@ -1108,11 +1302,16 @@ export type Database = {
 				Args: { p_first_name: string; p_last_name: string; p_username: string };
 				Returns: Json;
 			};
+			update_transaction: {
+				Args: { p_id: string; p_input: Json; p_row_version: number };
+				Returns: Json;
+			};
 			withdraw_amendment: { Args: { p_id: string }; Returns: Json };
 			withdraw_payment: { Args: { p_payment_id: string }; Returns: Json };
 			withdraw_share: { Args: { p_id: string }; Returns: Json };
 		};
 		Enums: {
+			account_kind: "bank" | "cash" | "savings" | "other";
 			agreement_kind: "loan" | "installment_purchase";
 			agreement_status:
 				| "personal"
@@ -1131,6 +1330,7 @@ export type Database = {
 			payment_kind: "payment" | "down_payment" | "discount";
 			payment_method: "cash" | "transfer" | "card" | "other";
 			payment_status: "reported" | "confirmed" | "rejected" | "withdrawn" | "voided";
+			transaction_kind: "expense" | "income" | "transfer" | "adjustment";
 			version_status: "draft" | "proposed" | "accepted" | "rejected" | "superseded";
 		};
 		CompositeTypes: {
@@ -1245,6 +1445,7 @@ export type CompositeTypes<
 export const Constants = {
 	public: {
 		Enums: {
+			account_kind: ["bank", "cash", "savings", "other"],
 			agreement_kind: ["loan", "installment_purchase"],
 			agreement_status: [
 				"personal",
@@ -1264,6 +1465,7 @@ export const Constants = {
 			payment_kind: ["payment", "down_payment", "discount"],
 			payment_method: ["cash", "transfer", "card", "other"],
 			payment_status: ["reported", "confirmed", "rejected", "withdrawn", "voided"],
+			transaction_kind: ["expense", "income", "transfer", "adjustment"],
 			version_status: ["draft", "proposed", "accepted", "rejected", "superseded"],
 		},
 	},

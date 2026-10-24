@@ -1,0 +1,174 @@
+{
+	"categories": [
+		{ "name": "gider: market", "kind": "expense", "category": "groceries", "expected": true },
+		{
+			"name": "gider: gelir kategorisi değil",
+			"kind": "expense",
+			"category": "salary",
+			"expected": false
+		},
+		{ "name": "gider: diğer", "kind": "expense", "category": "other", "expected": true },
+		{ "name": "gelir: maaş", "kind": "income", "category": "salary", "expected": true },
+		{
+			"name": "gelir: gider kategorisi değil",
+			"kind": "income",
+			"category": "rent",
+			"expected": false
+		},
+		{ "name": "gelir: diğer", "kind": "income", "category": "other", "expected": true },
+		{
+			"name": "transfer kategori almaz",
+			"kind": "transfer",
+			"category": "other",
+			"expected": false
+		},
+		{
+			"name": "düzeltme kategori almaz",
+			"kind": "adjustment",
+			"category": "other",
+			"expected": false
+		},
+		{
+			"name": "bilinmeyen kategori",
+			"kind": "expense",
+			"category": "casino",
+			"expected": false
+		}
+	],
+	"balances": [
+		{
+			"name": "açılış bakiyesi, gelir, gider, transfer ve düzeltme",
+			"accounts": [
+				{
+					"id": "a1",
+					"opening_balance_minor": 1000000,
+					"include_in_total": true,
+					"archived": false
+				},
+				{
+					"id": "a2",
+					"opening_balance_minor": 0,
+					"include_in_total": true,
+					"archived": false
+				},
+				{
+					"id": "a3",
+					"opening_balance_minor": 50000,
+					"include_in_total": false,
+					"archived": false
+				}
+			],
+			"transactions": [
+				{
+					"kind": "income",
+					"account_id": "a1",
+					"to_account_id": null,
+					"amount_minor": 3850000,
+					"occurred_on": "2026-10-01",
+					"deleted": false
+				},
+				{
+					"kind": "expense",
+					"account_id": "a1",
+					"to_account_id": null,
+					"amount_minor": 84230,
+					"occurred_on": "2026-10-08",
+					"deleted": false
+				},
+				{
+					"kind": "transfer",
+					"account_id": "a1",
+					"to_account_id": "a2",
+					"amount_minor": 200000,
+					"occurred_on": "2026-10-05",
+					"deleted": false
+				},
+				{
+					"kind": "adjustment",
+					"account_id": "a2",
+					"to_account_id": null,
+					"amount_minor": -1500,
+					"occurred_on": "2026-10-09",
+					"deleted": false
+				},
+				{
+					"kind": "expense",
+					"account_id": "a3",
+					"to_account_id": null,
+					"amount_minor": 10000,
+					"occurred_on": "2026-09-30",
+					"deleted": false
+				},
+				{
+					"kind": "expense",
+					"account_id": "a1",
+					"to_account_id": null,
+					"amount_minor": 999999,
+					"occurred_on": "2026-10-10",
+					"deleted": true
+				}
+			],
+			"month": "2026-10-01",
+			"expected": {
+				"balances": { "a1": 4565770, "a2": 198500, "a3": 40000 },
+				"total_cash_minor": 4764270,
+				"income_minor": 3850000,
+				"expense_minor": 84230
+			}
+		},
+		{
+			"name": "eksi bakiye ve arşivlenmiş hesap toplama girmez",
+			"accounts": [
+				{
+					"id": "a1",
+					"opening_balance_minor": -20000,
+					"include_in_total": true,
+					"archived": false
+				},
+				{
+					"id": "a2",
+					"opening_balance_minor": 70000,
+					"include_in_total": true,
+					"archived": true
+				}
+			],
+			"transactions": [
+				{
+					"kind": "expense",
+					"account_id": "a1",
+					"to_account_id": null,
+					"amount_minor": 5000,
+					"occurred_on": "2026-11-02",
+					"deleted": false
+				},
+				{
+					"kind": "income",
+					"account_id": "a2",
+					"to_account_id": null,
+					"amount_minor": 1000,
+					"occurred_on": "2026-10-31",
+					"deleted": false
+				}
+			],
+			"month": "2026-10-01",
+			"expected": {
+				"balances": { "a1": -25000, "a2": 71000 },
+				"total_cash_minor": -25000,
+				"income_minor": 1000,
+				"expense_minor": 0
+			}
+		},
+		{
+			"name": "hiç hesap yok",
+			"accounts": [],
+			"transactions": [],
+			"month": "2026-10-01",
+			"expected": {
+				"balances": {},
+				"total_cash_minor": 0,
+				"income_minor": 0,
+				"expense_minor": 0
+			}
+		}
+	]
+}

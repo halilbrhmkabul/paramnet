@@ -47,7 +47,7 @@ Pazar araştırması iki sonucu netleştirdi. Birincisi, banka hesabı ve kredi 
 | Hedef kitle             | Bireyler. Esnaf ve veresiye defteri ilk sürümde kapsam dışıdır.                                                                       |
 | Ana farklılaşma         | Karşılıklı onaylı borç anlaşması, ortak ödeme takibi ve mutabakat.                                                                    |
 | İlk sürüm kapsamı       | Kişisel borç defteri, elden taksit, kısmi ödeme, takvim, hatırlatma, davet, karşılıklı onay, ödeme doğrulaması, değişiklik ve itiraz. |
-| Kapsam dışı (ilk sürüm) | Gelir-gider, banka hesapları, kredi kartı, banka kredisi, faiz hesaplama, ekstre okuma, grup harcaması, AI asistan.                   |
+| Kapsam dışı (ilk sürüm) | Gelir-gider, banka hesapları, kredi kartı, banka kredisi, faiz hesaplama, ekstre okuma, grup harcaması, AI asistan. Faz 4'te tasarımla birlikte görev görev eklenir (ADR-044; hesaplar ve gelir-gider: 5.11, ADR-053). |
 | Para hareketi           | Uygulama para tutmaz, transfer başlatmaz. Yalnızca kayıt ve mutabakat sağlar.                                                         |
 | Uzun vadeli vizyon      | Borç merkezli kişisel finans platformu. Diğer modüller kullanıcı verisine göre sırayla eklenir.                                       |
 | Gelir modeli            | Temel özellikler ve davet akışı ücretsiz. Premium: raporlar, PDF çıktı, gelişmiş özellikler.                                          |
@@ -370,6 +370,21 @@ Paylaşılan ve aktif bir anlaşmanın şartları tek taraflı değiştirilemez.
 ## 5.10 Hızlı kayıt (sonraki küçük güncelleme)
 
 Kullanıcı tek cümle yazar: “Ahmet’ten 12.000 TL aldım, 3 taksitte ödeyeceğim, ilk ödeme 25 Kasım”. Uygulama kişi, rol, tutar, taksit sayısı ve tarihi çıkarıp doldurulmuş bir form önerir; kullanıcı onaylamadan kayıt oluşmaz. İlk aşamada kural tabanlı ayrıştırıcı, sonra LLM destekli ayrıştırma. İlk sürümde bunun yerine son kullanılan kişiler, akıllı varsayılanlar ve hızlı şablonlar bulunur.
+
+## 5.11 Hesaplar ve işlemler (kişisel kayıt, ADR-053)
+
+Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle kaydeder; gelir, gider ve hesaplar arası transfer girer. Banka bağlantısı yoktur, uygulama para tutmaz ve transfer başlatmaz: "Transfer" yalnızca kullanıcının kendi iki hesabı arasındaki bir kayıttır. Bu kayıtlar anlaşmalara, karşı tarafa ya da borç bakiyelerine yansımaz.
+
+- **Hesap:** tür (banka hesabı, nakit cüzdan, birikim, diğer), ad, isteğe bağlı banka adı, açılış bakiyesi, "Toplam Nakit'e dahil et". IBAN ya da hesap numarası istenmez. Kullanıcı başına en fazla 50 açık hesap.
+- **Bakiye saklanmaz:** açılış bakiyesi + gelir − gider ± transfer + düzeltme. Açılış bakiyesi gelir sayılmaz; eksi olabilir.
+- **Toplam Nakit:** arşivlenmemiş ve "dahil" işaretli hesapların bakiyeleri toplamı. Ana Sayfa'da ve Hesaplar ekranında gösterilir; "Manuel kayıt · banka verisi değildir" notuyla.
+- **İşlem türleri:** gider ve gelir (kategori zorunlu), transfer (iki farklı kendi hesabı, kategori yok), düzeltme ("Bakiye düzelt": kullanıcı gerçek bakiyeyi yazar, fark bugünün tarihiyle kaydedilir). Transfer ve düzeltme gelir/gider sayılmaz.
+- **Kategoriler** (sabit liste, kodlar `packages/shared`): gider: yeme-içme, market, ulaşım, fatura, kira, sağlık, giyim, diğer; gelir: maaş, freelance, kira geliri, iade, diğer.
+- **Aylık gelir ve gider:** ayın tüm hesaplardaki gelir ve gider kayıtlarının toplamı (arşivlenmiş ve toplama dahil olmayan hesaplar da sayılır).
+- **Düzenleme:** gider, gelir ve transfer düzenlenebilir; her değişiklik eski ve yeni değeriyle geçmişe yazılır. Düzeltme kaydı düzenlenmez, yalnızca silinir.
+- **Silme:** kayıt silindi olarak işaretlenir ve bakiyeden düşer; uygulama 10 saniye "Geri al" sunar. Silinen kayıtlar hesap silinene kadar saklanır.
+- **Arşiv:** arşivlenen hesap listeden ve Toplam Nakit'ten çıkar, yeni kayıt almaz; geçmiş kayıtları kalır.
+- **Tarih:** işlem tarihi `date` (Europe/Istanbul), en fazla bir yıl ileri. Kayıt zamanı ayrıca tutulur.
 
 # 6. Ekranlar ve Bilgi Mimarisi
 
@@ -788,6 +803,12 @@ Diğer tablolar
 
 - retired_paramnet_ids: paramnet_id (PK), retired_at. Kullanılmış ID'ler yeniden verilmez.
 
+- accounts (ADR-053): owner_id, kind (bank, cash, savings, other), name, bank_name null, opening_balance_minor bigint (eksi olabilir), include_in_total, archived_at null, idempotency_key, row_version, updated_at.
+
+- transactions (ADR-053): owner_id, kind (expense, income, transfer, adjustment), account_id, to_account_id null (yalnızca transfer), amount_minor bigint (yalnızca düzeltmede işaretli), category null, title null, note null, occurred_on date, idempotency_key, deleted_at null, row_version, updated_at. Bakiye saklanmaz.
+
+- transaction_events (yalnızca ekleme): transaction_id, owner_id, type (created, updated, deleted, restored), changes jsonb ({alan: [eski, yeni]}).
+
 - Arama, paylaşım ve kullanıcı adı kontrolü sayaçları mevcut `rate_limits` tablosundadır (`pnid:find:`, `pnid:share:`, `username:check:` + kullanıcı).
 
 ## 10.2 Satır düzeyi güvenlik (RLS)
@@ -827,6 +848,12 @@ Diğer tablolar
 | request_cancel(id) / decide_cancel(id, decision)                    | Karşılıklı iptal                                                            |
 | forgive_remaining(id, amount?)                                      | Alacaklının indirimi/affı                                                   |
 | get_dashboard() / get_calendar(month)                               | Okuma için optimize görünümler                                              |
+| create_account(input, idem_key) / update_account(id, input, row_version) / archive_account(id, row_version) | Kendi hesapları (ADR-053)                  |
+| list_accounts()                                                     | Açık hesaplar, türetilmiş bakiyeler, Toplam Nakit                           |
+| adjust_account_balance(id, target_minor, idem_key)                  | Bakiye düzelt: farkı düzeltme kaydı olarak yazar                            |
+| create_transaction(input, idem_key) / update_transaction(id, input, row_version) | Gider, gelir, transfer; değişiklikler geçmişe              |
+| delete_transaction(id, row_version) / restore_transaction(id, row_version) | Geçici silme ve geri alma                                            |
+| get_transaction(id) / list_transactions(month, account_id?) / get_cash_summary(month) | Detay + geçmiş / ay listesi + gelir-gider / Ana Sayfa özeti |
 
 ## 10.4 Edge Functions
 
