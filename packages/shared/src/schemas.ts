@@ -72,7 +72,7 @@ export const isoDateSchema = z
 
 export const uuidSchema = z.uuid({ error: "invalid_id" });
 
-function requiredText(max: number) {
+export function requiredText(max: number) {
 	return z
 		.string({ error: "required" })
 		.trim()
@@ -82,7 +82,7 @@ function requiredText(max: number) {
 }
 
 // NFC so that the same visible text always hashes the same (iOS and Android keyboards may differ).
-function optionalText(max: number) {
+export function optionalText(max: number) {
 	return z
 		.string({ error: "invalid_text" })
 		.nullish()

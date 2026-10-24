@@ -408,9 +408,24 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 	- Testler: RNTL 337 (yeni: profil, düzenleme, bulunabilirlik, menü, bildirimler, ID ile paylaşım, adaptör); shared Vitest 413. Typecheck, lint, biçim temiz.
 	- **Kullanıcı kontrolü (Expo Go):** fotoğraf çekme/seçme ve yükleme (gerçek cihazda, `supabase` modunda Storage'a gidip eski dosyanın silindiği), Kopyala/Paylaş, ID ile paylaşımın karşı hesapta Talepler'e düşmesi, koyu tema, Bildirimler'de "Bildirim tercihleri"nden gelince tercih kartına kaydırma.
 
-### [ ] F4-03 Hesaplar ve işlemler
+### [x] F4-03 Hesaplar ve işlemler
 - Hesaplar/cüzdan (29), Hesap ekle (33), İşlem merkezi (21), Gider/Gelir/Transfer (22), İşlem geçmişi (36), İşlem detayı (37).
 - Toplam Nakit.
+- Karar: ADR-053. İki parça, iki commit.
+- **İlerleme (2026-10-24):** [x] F4-03a sunucu ve paylaşılan kod:
+	- `accounts`, `transactions`, `transaction_events` (yalnızca ekleme); bakiye türetilir, Toplam Nakit ve ay özeti RPC'den.
+	- RPC'ler: `create_account`, `update_account`, `archive_account`, `list_accounts`, `adjust_account_balance`, `create_transaction`, `update_transaction`, `delete_transaction`, `restore_transaction`, `get_transaction`, `list_transactions`, `get_cash_summary`. Dışa aktarma ve hesap silme yeni tabloları kapsar.
+	- `packages/shared` `accounts`: kategoriler, `accountInputSchema`, `transactionInputSchema`, `deriveCash`, `adjustmentDelta`, `transactionRef`; `test-vectors/accounts.json`.
+	- Testler: pgTAP 270 (52), 280 (56), vektörler 030'a 9 kategori; tüm paket 944 test geçti. Shared Vitest 433. Typecheck, lint, biçim temiz. Migration yalnızca yerelde uygulandı.
+- [x] F4-03b ekranlar (2026-10-24, ADR-053):
+	- İşlem merkezi (21) orta "+" sekmesi: Gelir / Gider / Transfer, Borç al / ver, Elden taksit ekle; yapılmamış modüller gizli.
+	- Gider / Gelir / Transfer (22): tuş takımı, kategori çipleri, hesap seçici (transferde Nereden / Nereye), tarih, açıklama, not; hesap yoksa önce hesap ekleme.
+	- Hesaplar (29): Toplam Nakit, Hesap ekle / Transfer / Bakiye düzelt, hesap listesi, seçili hesabın bu ayki hareketleri. Hesap ekle / düzenle (33) ve arşivleme; Bakiye düzelt.
+	- İşlem geçmişi (36): ay seçici, arama, filtreler, ay geliri/gideri, gün grupları. İşlem detayı (37): bilgi satırları, etki notu, düzenleme geçmişi, silme ve 10 saniye geri alma.
+	- Ana Sayfa'da Toplam Nakit kartı (göz düğmesi, ay geliri/gideri); Ana menüde Hesaplar, Profil'de Hesaplarım.
+	- `AccountsApi` (mock + Supabase), `formatSignedTRY`, `components/Chip`, `scrim` token'ı.
+	- Testler: RNTL 391 (yeni: hesaplar 8, işlemler 13, model 11, adaptör 21; menü, profil ve gezinme güncellendi); shared Vitest 434. Typecheck, lint, biçim temiz.
+	- **Kullanıcı kontrolü (Expo Go):** açık ve koyu temada 21, 22, 29, 33, 36, 37 ve Ana Sayfa kartı; tuş takımının küçük ekranda sığması; `supabase` modunda hesap ekleme, işlem kaydı, silip geri alma.
 
 ### [ ] F4-04 Tekrarlayan işlem (38), Bütçe (39), Aylık rapor (27)
 

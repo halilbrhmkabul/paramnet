@@ -1,4 +1,10 @@
-import type { CreateAgreementInput, IsoDate, PaymentInput } from "@paramnet/shared";
+import type {
+	AccountInput,
+	CreateAgreementInput,
+	IsoDate,
+	PaymentInput,
+	TransactionInput,
+} from "@paramnet/shared";
 
 import type {
 	AnalyticsEvent,
@@ -20,7 +26,7 @@ import {
 } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { useApi, useProfileApi } from "./ApiProvider";
+import { useAccountsApi, useApi, useProfileApi } from "./ApiProvider";
 import type { ProfileApi } from "./profile/ProfileApi";
 
 export const queryKeys = {
@@ -38,6 +44,13 @@ export const queryKeys = {
 	username: (name: string) => ["username", name] as const,
 	paramnetId: (id: string) => ["paramnetId", id] as const,
 	inbox: (category: NotificationCategory | null) => ["inbox", category ?? "all"] as const,
+	// Every cash read shares the "cash" prefix: one write refreshes balances, lists and the home card.
+	cash: ["cash"] as const,
+	accounts: ["cash", "accounts"] as const,
+	cashSummary: (month: IsoDate) => ["cash", "summary", month] as const,
+	transactions: (month: IsoDate, accountId: string | null) =>
+		["cash", "transactions", month, accountId ?? "all"] as const,
+	transaction: (id: string) => ["cash", "transaction", id] as const,
 };
 
 export function useDashboard() {
@@ -419,4 +432,114 @@ export function useMarkNotificationsRead() {
 		mutationFn: (ids: number[] | null) => api.markNotificationsRead(ids),
 		onSettled: () => queryClient.invalidateQueries({ queryKey: ["inbox"] }),
 	});
+}
+
+// Accounts and cash records (F4-03) ---------------------------------------------------------------
+
+export function useAccounts() {
+	const api = useAccountsApi();
+	return useQuery({ queryKey: queryKeys.accounts, queryFn: () => api.listAccounts() });
+}
+
+export function useCashSummary(month: IsoDate) {
+	const api = useAccountsApi();
+	return useQuery({
+		queryKey: queryKeys.cashSummary(month),
+		queryFn: () => api.getCashSummary(month),
+	});
+}
+
+export function useTransactions(month: IsoDate, accountId: string | null) {
+	const api = useAccountsApi();
+	return useQuery({
+		queryKey: queryKeys.transactions(month, accountId),
+		queryFn: () => api.listTransactions(month, accountId),
+	});
+}
+
+// null: the form is for a new record and has nothing to load.
+export function useTransaction(id: string | null) {
+	const api = useAccountsApi();
+	return useQuery({
+		queryKey: queryKeys.transaction(id ?? ""),
+		queryFn: () => api.getTransaction(id ?? ""),
+		enabled: id !== null,
+	});
+}
+
+// Success moves balances and lists; a conflict means our copy is stale. Both need the cash reads again.
+function useCashMutation<TArgs, TResult>(run: (args: TArgs) => Promise<TResult>) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: run,
+		onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.cash }),
+	});
+}
+
+export function useCreateAccount() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ input, idempotencyKey }: { input: AccountInput; idempotencyKey: string }) =>
+			api.createAccount(input, idempotencyKey),
+	);
+}
+
+export function useUpdateAccount() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ id, input, rowVersion }: { id: string; input: AccountInput; rowVersion: number }) =>
+			api.updateAccount(id, input, rowVersion),
+	);
+}
+
+export function useArchiveAccount() {
+	const api = useAccountsApi();
+	return useCashMutation(({ id, rowVersion }: { id: string; rowVersion: number }) =>
+		api.archiveAccount(id, rowVersion),
+	);
+}
+
+export function useAdjustBalance() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({
+			id,
+			targetMinor,
+			idempotencyKey,
+		}: {
+			id: string;
+			targetMinor: number;
+			idempotencyKey: string;
+		}) => api.adjustBalance(id, targetMinor, idempotencyKey),
+	);
+}
+
+export function useCreateTransaction() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ input, idempotencyKey }: { input: TransactionInput; idempotencyKey: string }) =>
+			api.createTransaction(input, idempotencyKey),
+	);
+}
+
+export function useUpdateTransaction() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ id, input, rowVersion }: { id: string; input: TransactionInput; rowVersion: number }) =>
+			api.updateTransaction(id, input, rowVersion),
+	);
+}
+
+export function useDeleteTransaction() {
+	const api = useAccountsApi();
+	return useCashMutation(({ id, rowVersion }: { id: string; rowVersion: number }) =>
+		api.deleteTransaction(id, rowVersion),
+	);
+}
+
+export function useRestoreTransaction() {
+	const api = useAccountsApi();
+	return useCashMutation(({ id, rowVersion }: { id: string; rowVersion: number }) =>
+		api.restoreTransaction(id, rowVersion),
+	);
 }

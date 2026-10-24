@@ -5,7 +5,7 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 ## Navigasyon
 
 - `(auth)` grubu: oturum yoksa.
-- `(tabs)` grubu: 4 sekme + ortada "+" (modal açar). Sıra: Ana Sayfa · Kişiler · [+] · Takvim · Talepler.
+- `(tabs)` grubu: Ana Sayfa · Kartlarım · İşlem (+) · Borçlarım · Takvim (F4-01). Ortadaki "+" İşlem merkezi sekmesidir (21, ADR-053).
 - Talepler sekmesinde bekleyen iş sayısı rozeti.
 - Ana Sayfa üst çubuğu: solda Ana menü (`/menu`), sağda zil → Bildirimler (`/inbox`, okunmamış sayısı). Selamlama (fotoğraf + ad) Profil'i (`/me`) açar.
 
@@ -34,12 +34,19 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 | S17 | Geçmiş | `agreement/[id]/history` | Olay zaman çizelgesi | |
 | S18 | Takvim | `(tabs)/calendar` | Ay görünümü (nokta: vade, renk: durum), gün listesi | |
 | S19 | Talepler | `(tabs)/requests` | Sekmeler: Paylaşımlar, Ödemeler, Değişiklikler | Faz 1'de boş durum |
-| S20 | Profil (04) | `me/index` | Fotoğraf, ad, @kullanıcı adı, ParamNet ID kartı (Kopyala, Paylaş), Bildirim tercihleri, ID ile bulunabilirlik, dışa aktarma, Yasal metinler, Hesabı sil, Çıkış yap | Ayrı Ayarlar yok (ADR-051); QR, Hesaplarım, yüz tanıma gizli |
+| S20 | Profil (04) | `me/index` | Fotoğraf, ad, @kullanıcı adı, ParamNet ID kartı (Kopyala, Paylaş), Hesaplarım, Bildirim tercihleri, ID ile bulunabilirlik, dışa aktarma, Yasal metinler, Hesabı sil, Çıkış yap | Ayrı Ayarlar yok (ADR-051); QR, yüz tanıma gizli |
 | S20a | Profili düzenle (35) | `me/edit` (modal) | Kamera/galeri/kaldır, Ad, Soyad, @kullanıcı adı (canlı denetim), salt okunur telefon ve ID | E-posta ve "Değiştirilemez" yok |
 | S20b | ID ile bulunabilirlik | `me/discoverability` | Herkes / Kimse, Yeni ID al (30 günde bir, onaylı) | ADR-050 |
 | S20c | Yasal metinler | `me/legal` | KVKK, Kullanım koşulları | |
 | S21 | Ana menü (05) | `menu` (modal) | Ad + ID, Modüller (yalnızca yapılanlar), Uygulama kartı, para transferi notu, sürüm | ADR-051, ADR-052 |
 | S22 | Bildirimler (06) | `inbox` | Filtre çipleri, gün grupları, okunmamış noktası, satır eylemleri, Tümünü okundu işaretle, hatırlatma tercihleri | ADR-051, ADR-052 |
+| S23 | İşlem merkezi (21) | `(tabs)/add` (orta "+" sekmesi) | Gelir / Gider / Transfer kutucukları; Borç al, Borç ver, Elden taksit ekle | Yapılmamış modüller gizli (ADR-053) |
+| S24 | Gider / Gelir / Transfer (22) | `transaction/new?kind=&account=` (modal), `transaction/[id]/edit` | Tür seçici, tutar tuş takımı, kategori çipleri, hesap (transferde Nereden/Nereye), tarih, açıklama, not | Hesap yoksa "Önce bir hesap ekle" |
+| S25 | Hesaplar (29) | `accounts/index` | Toplam Nakit, Hesap ekle / Transfer / Bakiye düzelt, hesap listesi, seçili hesabın bu ayki hareketleri | "Manuel kayıt · banka verisi değildir" |
+| S26 | Hesap ekle (33) | `accounts/new`, `accounts/[id]/edit` (modal) | Tür (banka, nakit, birikim, diğer), ad, banka, açılış bakiyesi (eksi olabilir), Toplam Nakit'e dahil et; düzenlemede Hesabı arşivle | IBAN yok |
+| S26a | Bakiye düzelt | `accounts/[id]/adjust` (modal) | Şu anki bakiye, gerçek bakiye, fark | Fark gelir/gider sayılmaz |
+| S27 | İşlem geçmişi (36) | `transactions` | Ay seçici, arama, Tümü/Gelir/Gider/Transfer, ay geliri/gideri, gün grupları | "Planlı & bekleyen" F4-10 |
+| S28 | İşlem detayı (37) | `transaction/[id]` | Tutar, rozetler, bilgi satırları, etki notu, Düzenle / Sil (alt panel, 10 sn Geri al), oluşturma ve son düzenleme | Düzeltme düzenlenmez |
 
 Web onay ekranları (W01–W04) `apps/web-confirm`'dedir, bu skill kapsamında değil.
 

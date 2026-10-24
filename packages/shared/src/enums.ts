@@ -29,6 +29,8 @@ export const PAYMENT_STATUSES = [
 ] as const;
 export const PAYMENT_KINDS = ["payment", "down_payment", "discount"] as const;
 export const PAYMENT_METHODS = ["cash", "transfer", "card", "other"] as const;
+export const ACCOUNT_KINDS = ["bank", "cash", "savings", "other"] as const;
+export const TRANSACTION_KINDS = ["expense", "income", "transfer", "adjustment"] as const;
 
 export type AgreementStatus = (typeof AGREEMENT_STATUSES)[number];
 export type AgreementKind = (typeof AGREEMENT_KINDS)[number];
@@ -38,3 +40,5 @@ export type VersionStatus = (typeof VERSION_STATUSES)[number];
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 export type PaymentKind = (typeof PAYMENT_KINDS)[number];
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+export type AccountKind = (typeof ACCOUNT_KINDS)[number];
+export type TransactionKind = (typeof TRANSACTION_KINDS)[number];

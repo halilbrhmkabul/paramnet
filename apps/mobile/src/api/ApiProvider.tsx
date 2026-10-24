@@ -1,6 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
+import type { AccountsApi } from "./accounts/AccountsApi";
+import { createMockAccountsApi } from "./accounts/mockAccounts";
+import { createSupabaseAccountsApi } from "./accounts/supabaseAccounts";
 import type { AgreementsApi } from "./AgreementsApi";
 import type { AuthApi } from "./auth/AuthApi";
 import { createMockAuthApi } from "./auth/mockAuth";
@@ -13,7 +16,12 @@ import { createSupabaseAgreementsApi } from "./supabase/supabaseAgreements";
 import { readConfig } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
 
-type Apis = { agreements: AgreementsApi; auth: AuthApi; profile: ProfileApi };
+type Apis = {
+	agreements: AgreementsApi;
+	auth: AuthApi;
+	profile: ProfileApi;
+	accounts: AccountsApi;
+};
 
 const ApiContext = createContext<Apis | null>(null);
 
@@ -39,6 +47,13 @@ export function createProfileApi(): ProfileApi {
 		: createMockProfileApi();
 }
 
+export function createAccountsApi(): AccountsApi {
+	const config = readConfig();
+	return config.mode === "supabase"
+		? createSupabaseAccountsApi(getSupabase(config.supabaseUrl, config.supabaseKey))
+		: createMockAccountsApi();
+}
+
 export function createQueryClient(): QueryClient {
 	return new QueryClient({
 		defaultOptions: {
@@ -52,12 +67,14 @@ export function ApiProvider({
 	api,
 	authApi,
 	profileApi,
+	accountsApi,
 	queryClient,
 	children,
 }: {
 	api?: AgreementsApi;
 	authApi?: AuthApi;
 	profileApi?: ProfileApi;
+	accountsApi?: AccountsApi;
 	queryClient?: QueryClient;
 	children: ReactNode;
 }) {
@@ -65,6 +82,7 @@ export function ApiProvider({
 		agreements: api ?? createApi(),
 		auth: authApi ?? createAuthApi(),
 		profile: profileApi ?? createProfileApi(),
+		accounts: accountsApi ?? createAccountsApi(),
 	}));
 	const [client] = useState(() => queryClient ?? createQueryClient());
 	return (
@@ -92,4 +110,8 @@ export function useAuthApi(): AuthApi {
 
 export function useProfileApi(): ProfileApi {
 	return useApis().profile;
+}
+
+export function useAccountsApi(): AccountsApi {
+	return useApis().accounts;
 }

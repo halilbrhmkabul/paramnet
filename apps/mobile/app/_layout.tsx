@@ -172,6 +172,42 @@ function AppNavigator() {
 				/>
 				<Stack.Screen name="me/legal" options={{ ...detailHeader, title: tr.me.legal }} />
 				<Stack.Screen name="me/delete" options={detailHeader} />
+				{/* F4-03 (ADR-053): own accounts and cash records. */}
+				<Stack.Screen
+					name="accounts/index"
+					options={{ ...detailHeader, title: tr.accounts.title }}
+				/>
+				<Stack.Screen
+					name="accounts/new"
+					options={{
+						...detailHeader,
+						title: tr.accountForm.titleNew,
+						presentation: "modal",
+					}}
+				/>
+				<Stack.Screen
+					name="accounts/[id]/edit"
+					options={{
+						...detailHeader,
+						title: tr.accountForm.titleEdit,
+						presentation: "modal",
+					}}
+				/>
+				<Stack.Screen
+					name="accounts/[id]/adjust"
+					options={{ ...detailHeader, title: tr.adjust.title, presentation: "modal" }}
+				/>
+				{/* The form draws its own bar: the Gider / Gelir / Transfer switch sits in it (design 22). */}
+				<Stack.Screen name="transaction/new" options={{ presentation: "modal" }} />
+				<Stack.Screen name="transaction/[id]/edit" options={{ presentation: "modal" }} />
+				<Stack.Screen
+					name="transaction/[id]/index"
+					options={{ ...detailHeader, title: tr.txDetail.title }}
+				/>
+				<Stack.Screen
+					name="transactions"
+					options={{ ...detailHeader, title: tr.txHistory.title }}
+				/>
 				{/* Ana menü draws its own header (name, ID and a close button, design 05). */}
 				<Stack.Screen name="menu" options={{ presentation: "modal" }} />
 				{/* Bildirimler draws its own bar: the "mark all read" action lives in it (design 06). */}

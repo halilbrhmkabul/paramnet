@@ -1,6 +1,8 @@
 import { QueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
+import type { AccountsApi } from "@/api/accounts/AccountsApi";
+import { createMockAccountsApi, type MockAccountsOptions } from "@/api/accounts/mockAccounts";
 import { ApiProvider } from "@/api/ApiProvider";
 import type { AuthApi } from "@/api/auth/AuthApi";
 import { createMockAuthApi } from "@/api/auth/mockAuth";
@@ -66,6 +68,32 @@ export function takeTestProfileApi(): ProfileApi {
 	return api;
 }
 
+export function createTestAccountsApi(options: MockAccountsOptions = {}): AccountsApi {
+	let id = 0;
+	return createMockAccountsApi({
+		now: TEST_NOW,
+		latencyMs: 0,
+		// Ordered ids ("00000001-…"): tests can name a record by when it was made.
+		newId: () => {
+			id += 1;
+			return `${String(id).padStart(8, "0")}-0000-4000-8000-000000000000`;
+		},
+		...options,
+	});
+}
+
+let nextAccountsApi: AccountsApi | null = null;
+
+export function provideTestAccountsApi(api: AccountsApi): void {
+	nextAccountsApi = api;
+}
+
+export function takeTestAccountsApi(): AccountsApi {
+	const api = nextAccountsApi ?? createTestAccountsApi();
+	nextAccountsApi = null;
+	return api;
+}
+
 let nextQueryClient: QueryClient | null = null;
 
 export function provideTestQueryClient(client: QueryClient): void {
@@ -99,11 +127,13 @@ export function TestProviders({
 	api = createTestApi(),
 	authApi = createTestAuthApi(),
 	profileApi = createTestProfileApi(),
+	accountsApi = createTestAccountsApi(),
 	children,
 }: {
 	api?: ReturnType<typeof createMockApi>;
 	authApi?: AuthApi;
 	profileApi?: ProfileApi;
+	accountsApi?: AccountsApi;
 	children: ReactNode;
 }) {
 	return (
@@ -111,6 +141,7 @@ export function TestProviders({
 			api={api}
 			authApi={authApi}
 			profileApi={profileApi}
+			accountsApi={accountsApi}
 			queryClient={createTestQueryClient()}
 		>
 			{children}

@@ -48,6 +48,9 @@ jest.mock("@/api/ApiProvider", () => {
 		const [api] = useState(() => props.api ?? mockTesting.takeTestApi());
 		const [authApi] = useState(() => props.authApi ?? mockTesting.takeTestAuthApi());
 		const [profileApi] = useState(() => props.profileApi ?? mockTesting.takeTestProfileApi());
+		const [accountsApi] = useState(
+			() => props.accountsApi ?? mockTesting.takeTestAccountsApi(),
+		);
 		const [queryClient] = useState(
 			() => props.queryClient ?? mockTesting.takeTestQueryClient(),
 		);
@@ -57,6 +60,7 @@ jest.mock("@/api/ApiProvider", () => {
 				api={api}
 				authApi={authApi}
 				profileApi={profileApi}
+				accountsApi={accountsApi}
 				queryClient={queryClient}
 			/>
 		);

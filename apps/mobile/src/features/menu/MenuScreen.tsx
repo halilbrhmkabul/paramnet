@@ -114,6 +114,48 @@ function InstallmentsTile() {
 	);
 }
 
+function AccountsTile() {
+	const { colors, typography, fonts, radius } = useAppTheme();
+	return (
+		<Pressable
+			testID="menu.module.accounts"
+			accessibilityRole="button"
+			accessibilityLabel={`${tr.accounts.title}, ${tr.accounts.menuLine}`}
+			onPress={() => {
+				router.push("/accounts");
+			}}
+			style={({ pressed }) => [
+				styles.tile,
+				{
+					backgroundColor: colors.surface,
+					borderColor: colors.border,
+					borderRadius: 18,
+					padding: 14,
+					gap: 10,
+					opacity: pressed ? 0.7 : 1,
+				},
+			]}
+		>
+			<View
+				style={[
+					styles.tileIcon,
+					{ backgroundColor: colors.pendingSoft, borderRadius: radius.sm - 2 },
+				]}
+			>
+				<Ionicons name="business-outline" size={20} color={colors.pending} />
+			</View>
+			<View style={{ gap: 2 }}>
+				<Text style={{ fontFamily: fonts.extrabold, fontSize: 15, color: colors.text }}>
+					{tr.accounts.title}
+				</Text>
+				<Text style={[typography.caption, { fontSize: 12, color: colors.textMuted }]}>
+					{tr.accounts.menuLine}
+				</Text>
+			</View>
+		</Pressable>
+	);
+}
+
 // Design 05 (ADR-051): only modules that exist are listed; the rest come with their own tasks.
 export function MenuScreen() {
 	const { colors, typography, spacing } = useAppTheme();
@@ -137,8 +179,8 @@ export function MenuScreen() {
 					{tr.menu.modules}
 				</Text>
 				<View style={[styles.grid, { gap: 10 }]}>
+					<AccountsTile />
 					<InstallmentsTile />
-					<View style={styles.grow} />
 				</View>
 			</View>
 			<RowGroup label={tr.menu.app}>

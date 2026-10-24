@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { addMinor, formatTRY, isMinorAmount, parseTRY, subtractMinor } from "./money";
+import {
+	addMinor,
+	formatSignedTRY,
+	formatTRY,
+	isMinorAmount,
+	parseTRY,
+	subtractMinor,
+} from "./money";
 
 describe("isMinorAmount", () => {
 	it.each([0, 1, 12000_00, Number.MAX_SAFE_INTEGER])("accepts %d", (value) => {
@@ -124,5 +131,13 @@ describe("parseTRY", () => {
 		]) {
 			expect(parseTRY(formatTRY(minor))).toEqual({ ok: true, value: minor });
 		}
+	});
+});
+
+describe("formatSignedTRY", () => {
+	it("puts the sign in front, whatever the stored sign", () => {
+		expect(formatSignedTRY(800000, "plus")).toBe("+8.000,00 TL");
+		expect(formatSignedTRY(84230, "minus")).toBe("\u2212842,30 TL");
+		expect(formatSignedTRY(-1500, "none")).toBe("15,00 TL");
 	});
 });

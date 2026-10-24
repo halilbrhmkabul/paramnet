@@ -1,4 +1,5 @@
 import type {
+	AccountKind,
 	AgreementKind,
 	AgreementStatus,
 	ContactKind,
@@ -8,6 +9,8 @@ import type {
 	PaymentKind,
 	PaymentMethod,
 	PaymentStatus,
+	TransactionCategory,
+	TransactionKind,
 } from "@paramnet/shared";
 
 // View models returned by the API layer; the Supabase adapter (F1-17) maps RPC results to the same shapes.
@@ -279,3 +282,62 @@ export type InboxItem = {
 };
 
 export type InboxPage = { items: InboxItem[]; unread_count: number; approval_count: number };
+
+// Own accounts and cash records (F4-03, ADR-053). Balances come from the server; never stored.
+export type Account = {
+	id: string;
+	kind: AccountKind;
+	name: string;
+	bank_name: string | null;
+	opening_balance_minor: number;
+	balance_minor: number;
+	include_in_total: boolean;
+	archived_at: string | null;
+	row_version: number;
+	created_at: string;
+};
+
+export type AccountList = { accounts: Account[]; total_cash_minor: number; included_count: number };
+
+export type Transaction = {
+	id: string;
+	kind: TransactionKind;
+	account_id: string;
+	account_name: string;
+	to_account_id: string | null;
+	to_account_name: string | null;
+	// Signed only for adjustments.
+	amount_minor: number;
+	category: TransactionCategory | null;
+	title: string | null;
+	note: string | null;
+	occurred_on: IsoDate;
+	deleted_at: string | null;
+	row_version: number;
+	created_at: string;
+	updated_at: string;
+};
+
+export type TransactionChange = [unknown, unknown];
+
+export type TransactionEvent = {
+	type: "created" | "updated" | "deleted" | "restored";
+	changes: Record<string, TransactionChange>;
+	created_at: string;
+};
+
+export type TransactionDetail = { transaction: Transaction; events: TransactionEvent[] };
+
+export type TransactionMonth = {
+	items: Transaction[];
+	income_minor: number;
+	expense_minor: number;
+};
+
+export type CashSummary = {
+	total_cash_minor: number;
+	account_count: number;
+	income_minor: number;
+	expense_minor: number;
+	updated_at: string | null;
+};

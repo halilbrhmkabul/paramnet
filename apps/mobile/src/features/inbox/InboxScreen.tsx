@@ -8,6 +8,7 @@ import { messageForError } from "@/api/errors";
 import { useInbox, useMarkNotificationsRead, useMyProfile, useSetReminderPrefs } from "@/api/hooks";
 import type { InboxItem, NotificationCategory, ReminderDay } from "@/api/types";
 import { Avatar } from "@/components/Avatar";
+import { Chip } from "@/components/Chip";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { LoadingState } from "@/components/LoadingState";
@@ -35,57 +36,6 @@ const ICONS: Record<
 	completed: { icon: "checkmark-circle-outline", tone: ["success", "successSoft"] },
 	info: { icon: "information-circle-outline", tone: ["neutral", "neutralSoft"] },
 };
-
-function Chip({
-	label,
-	count,
-	selected,
-	onPress,
-	testID,
-}: {
-	label: string;
-	count: number | null;
-	selected: boolean;
-	onPress: () => void;
-	testID: string;
-}) {
-	const { colors, typography, fonts, radius } = useAppTheme();
-	return (
-		<Pressable
-			testID={testID}
-			accessibilityRole="tab"
-			accessibilityLabel={count === null ? label : `${label}, ${String(count)}`}
-			accessibilityState={{ selected }}
-			onPress={onPress}
-			style={[
-				styles.chip,
-				{
-					borderRadius: radius.pill,
-					backgroundColor: selected ? colors.primary : colors.surface,
-					borderColor: selected ? colors.primary : colors.borderStrong,
-				},
-			]}
-		>
-			<Text
-				style={[
-					typography.label,
-					{ fontSize: 14, color: selected ? colors.onPrimary : colors.textMuted },
-				]}
-			>
-				{label}
-			</Text>
-			{count === null ? null : (
-				<View style={[styles.chipCount, { backgroundColor: colors.primarySoft }]}>
-					<Text
-						style={{ fontFamily: fonts.extrabold, fontSize: 11, color: colors.primary }}
-					>
-						{String(count)}
-					</Text>
-				</View>
-			)}
-		</Pressable>
-	);
-}
 
 function ItemIcon({ item }: { item: InboxItem }) {
 	const { colors } = useAppTheme();
@@ -538,22 +488,6 @@ export function InboxScreen() {
 
 const styles = StyleSheet.create({
 	grow: { flex: 1 },
-	chip: {
-		minHeight: 44,
-		paddingHorizontal: 14,
-		borderWidth: 1,
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 6,
-	},
-	chipCount: {
-		minWidth: 20,
-		height: 20,
-		borderRadius: 10,
-		paddingHorizontal: 5,
-		alignItems: "center",
-		justifyContent: "center",
-	},
 	card: { borderWidth: 1, borderRadius: 18, padding: 14, flexDirection: "row", gap: 12 },
 	column: { flexDirection: "column", gap: 10 },
 	dot: { position: "absolute", left: 6, top: 22, width: 6, height: 6, borderRadius: 3 },
