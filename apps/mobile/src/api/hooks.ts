@@ -3,6 +3,8 @@ import type {
 	CreateAgreementInput,
 	IsoDate,
 	PaymentInput,
+	RecurringInput,
+	TransactionCategory,
 	TransactionInput,
 } from "@paramnet/shared";
 
@@ -51,6 +53,9 @@ export const queryKeys = {
 	transactions: (month: IsoDate, accountId: string | null) =>
 		["cash", "transactions", month, accountId ?? "all"] as const,
 	transaction: (id: string) => ["cash", "transaction", id] as const,
+	recurring: ["cash", "recurring"] as const,
+	budgets: (month: IsoDate) => ["cash", "budgets", month] as const,
+	report: (month: IsoDate) => ["cash", "report", month] as const,
 };
 
 export function useDashboard() {
@@ -542,4 +547,78 @@ export function useRestoreTransaction() {
 	return useCashMutation(({ id, rowVersion }: { id: string; rowVersion: number }) =>
 		api.restoreTransaction(id, rowVersion),
 	);
+}
+
+// Repeating records, budgets and the monthly report (F4-04) -------------------------------------------
+
+export function useRecurring() {
+	const api = useAccountsApi();
+	return useQuery({ queryKey: queryKeys.recurring, queryFn: () => api.listRecurring() });
+}
+
+export function useCreateRecurring() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ input, idempotencyKey }: { input: RecurringInput; idempotencyKey: string }) =>
+			api.createRecurring(input, idempotencyKey),
+	);
+}
+
+export function useUpdateRecurring() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ id, input, rowVersion }: { id: string; input: RecurringInput; rowVersion: number }) =>
+			api.updateRecurring(id, input, rowVersion),
+	);
+}
+
+export function useSetRecurringPaused() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ id, paused, rowVersion }: { id: string; paused: boolean; rowVersion: number }) =>
+			api.setRecurringPaused(id, paused, rowVersion),
+	);
+}
+
+export function useDeleteRecurring() {
+	const api = useAccountsApi();
+	return useCashMutation(({ id, rowVersion }: { id: string; rowVersion: number }) =>
+		api.deleteRecurring(id, rowVersion),
+	);
+}
+
+export function useConfirmRecurring() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ id, date, idempotencyKey }: { id: string; date: IsoDate; idempotencyKey: string }) =>
+			api.confirmRecurring(id, date, idempotencyKey),
+	);
+}
+
+export function useSkipRecurring() {
+	const api = useAccountsApi();
+	return useCashMutation(({ id, date }: { id: string; date: IsoDate }) =>
+		api.skipRecurring(id, date),
+	);
+}
+
+export function useBudgets(month: IsoDate) {
+	const api = useAccountsApi();
+	return useQuery({ queryKey: queryKeys.budgets(month), queryFn: () => api.listBudgets(month) });
+}
+
+export function useSetBudget() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ category, limitMinor }: { category: TransactionCategory; limitMinor: number | null }) =>
+			api.setBudget(category, limitMinor),
+	);
+}
+
+export function useMonthlyReport(month: IsoDate) {
+	const api = useAccountsApi();
+	return useQuery({
+		queryKey: queryKeys.report(month),
+		queryFn: () => api.getMonthlyReport(month),
+	});
 }

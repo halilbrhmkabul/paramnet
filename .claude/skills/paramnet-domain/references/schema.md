@@ -17,6 +17,7 @@ create type invite_status    as enum ('active','consumed','revoked','expired','l
 create type event_channel    as enum ('app','web','system');
 create type account_kind     as enum ('bank','cash','savings','other');
 create type transaction_kind as enum ('expense','income','transfer','adjustment');
+create type recurrence_frequency as enum ('weekly','monthly','yearly');
 ```
 
 ## Tablolar
@@ -156,6 +157,9 @@ create type transaction_kind as enum ('expense','income','transfer','adjustment'
 - `accounts` (istemciye kapalı, ADR-053): id, owner_id, kind, name (≤40), bank_name null (≤40; IBAN yok), opening_balance_minor bigint (±10¹³, eksi olabilir), include_in_total, archived_at null, idempotency_key unique, row_version, updated_at. `created_at` `clock_timestamp()` (ekleme sırası).
 - `transactions` (istemciye kapalı): id, owner_id, kind, account_id, to_account_id null (yalnızca transfer, farklı hesap), amount_minor bigint (>0; yalnızca adjustment işaretli), category null (expense/income'da zorunlu, `private.is_category_for`), title null (≤80), note null (≤500), occurred_on date, idempotency_key unique, deleted_at null (geçici silme), row_version, updated_at. Bakiye saklanmaz: `private.account_balance`.
 - `transaction_events` (yalnızca ekleme): transaction_id, owner_id, type (created, updated, deleted, restored), changes jsonb `{alan: [eski, yeni]}`. Hesap silmede `paramnet.erasure` ile birlikte silinir.
+- `recurring_rules` (istemciye kapalı, ADR-054): id, owner_id, kind (expense/income), name (≤80), amount_minor, category, account_id, frequency, start_on, confirm_each, tracking_from (borç sayılan ilk gün), paused_at null, idempotency_key, row_version. Tarih kuralı `private.recurrence_dates` = `packages/shared` `occurrencesBetween` (`test-vectors/recurrence.json`).
+- `recurring_occurrences`: (rule_id, occurrence_on) pk, status (posted, skipped), transaction_id null, idempotency_key. Saatlik `post_due_recurring` onay istemeyen kuralları yazar.
+- `budgets`: (owner_id, category) pk, limit_minor (>0).
 - Storage `avatars` (özel, 1 MB, JPEG): okuma sahibine ve paylaşılmış anlaşmanın karşı tarafına (`private.avatar_visible`); yazma/silme yalnızca `{uid}/` klasörüne.
 
 ## RLS ilkeleri
@@ -201,6 +205,8 @@ create type transaction_kind as enum ('expense','income','transfer','adjustment'
 | `adjust_account_balance(id, target_minor, idem_key)` | Bakiye düzelt; fark = hedef − bakiye, bugünün tarihiyle |
 | `create_transaction(input, idem_key)` / `update_transaction(id, input, row_version)` / `delete_transaction(id, row_version)` / `restore_transaction(id, row_version)` | Gider, gelir, transfer; düzeltme yalnızca silinir |
 | `get_transaction(id)` / `list_transactions(month, account_id null)` / `get_cash_summary(month)` | Detay + olaylar / ay listesi + gelir-gider / Ana Sayfa özeti |
+| `create_recurring` / `update_recurring` / `set_recurring_paused` / `delete_recurring` / `list_recurring` / `confirm_recurring` / `skip_recurring` | Tekrarlayan işlem (ADR-054) |
+| `set_budget(category, limit)` / `list_budgets(month)` / `get_monthly_report(month)` | Bütçe ve aylık rapor |
 | `has_pin()` | Oturumdaki hesap PIN belirlemiş mi (ADR-046) |
 | `pin_login_check(phone)` / `pin_login_record(phone, ok)` / `pin_mark_set(uid, phone)` | Yalnızca service_role; `pin-login` / `pin-set` kilit sayacı (ADR-049) |
 

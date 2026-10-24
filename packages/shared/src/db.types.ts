@@ -312,6 +312,39 @@ export type Database = {
 					},
 				];
 			};
+			budgets: {
+				Row: {
+					category: string;
+					created_at: string;
+					limit_minor: number;
+					owner_id: string;
+					updated_at: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					category: string;
+					created_at?: string;
+					limit_minor: number;
+					owner_id: string;
+					updated_at?: string;
+				};
+				Update: {
+					category?: string;
+					created_at?: string;
+					limit_minor?: number;
+					owner_id?: string;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "budgets_owner_id_fkey";
+						columns: ["owner_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+				];
+			};
 			consents: {
 				Row: {
 					accepted_at: string;
@@ -892,6 +925,122 @@ export type Database = {
 				};
 				Relationships: [];
 			};
+			recurring_occurrences: {
+				Row: {
+					created_at: string;
+					idempotency_key: string | null;
+					occurrence_on: string;
+					rule_id: string;
+					status: string;
+					transaction_id: string | null;
+				};
+				ComputedFields: never;
+				Insert: {
+					created_at?: string;
+					idempotency_key?: string | null;
+					occurrence_on: string;
+					rule_id: string;
+					status: string;
+					transaction_id?: string | null;
+				};
+				Update: {
+					created_at?: string;
+					idempotency_key?: string | null;
+					occurrence_on?: string;
+					rule_id?: string;
+					status?: string;
+					transaction_id?: string | null;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "recurring_occurrences_rule_id_fkey";
+						columns: ["rule_id"];
+						isOneToOne: false;
+						referencedRelation: "recurring_rules";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "recurring_occurrences_transaction_id_fkey";
+						columns: ["transaction_id"];
+						isOneToOne: false;
+						referencedRelation: "transactions";
+						referencedColumns: ["id"];
+					},
+				];
+			};
+			recurring_rules: {
+				Row: {
+					account_id: string;
+					amount_minor: number;
+					category: string;
+					confirm_each: boolean;
+					created_at: string;
+					frequency: Database["public"]["Enums"]["recurrence_frequency"];
+					id: string;
+					idempotency_key: string | null;
+					kind: Database["public"]["Enums"]["transaction_kind"];
+					name: string;
+					owner_id: string;
+					paused_at: string | null;
+					row_version: number;
+					start_on: string;
+					tracking_from: string;
+					updated_at: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					account_id: string;
+					amount_minor: number;
+					category: string;
+					confirm_each?: boolean;
+					created_at?: string;
+					frequency: Database["public"]["Enums"]["recurrence_frequency"];
+					id?: string;
+					idempotency_key?: string | null;
+					kind: Database["public"]["Enums"]["transaction_kind"];
+					name: string;
+					owner_id: string;
+					paused_at?: string | null;
+					row_version?: number;
+					start_on: string;
+					tracking_from: string;
+					updated_at?: string;
+				};
+				Update: {
+					account_id?: string;
+					amount_minor?: number;
+					category?: string;
+					confirm_each?: boolean;
+					created_at?: string;
+					frequency?: Database["public"]["Enums"]["recurrence_frequency"];
+					id?: string;
+					idempotency_key?: string | null;
+					kind?: Database["public"]["Enums"]["transaction_kind"];
+					name?: string;
+					owner_id?: string;
+					paused_at?: string | null;
+					row_version?: number;
+					start_on?: string;
+					tracking_from?: string;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "recurring_rules_account_id_fkey";
+						columns: ["account_id"];
+						isOneToOne: false;
+						referencedRelation: "accounts";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "recurring_rules_owner_id_fkey";
+						columns: ["owner_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+				];
+			};
 			reminders: {
 				Row: {
 					agreement_id: string;
@@ -1152,8 +1301,13 @@ export type Database = {
 				Args: { p_display_name: string; p_kvkk_version: string; p_terms_version: string };
 				Returns: Json;
 			};
+			confirm_recurring: {
+				Args: { p_idempotency_key: string; p_occurrence_on: string; p_rule_id: string };
+				Returns: Json;
+			};
 			create_account: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_agreement: { Args: { idem_key: string; input: Json }; Returns: Json };
+			create_recurring: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_transaction: {
 				Args: { p_idempotency_key: string; p_input: Json };
 				Returns: Json;
@@ -1185,6 +1339,7 @@ export type Database = {
 			};
 			decide_payment: { Args: { p_decision: string; p_payment_id: string }; Returns: Json };
 			delete_account_data: { Args: { p_uid: string }; Returns: Json };
+			delete_recurring: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			delete_transaction: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
 			find_by_paramnet_id: { Args: { p_paramnet_id: string }; Returns: Json };
@@ -1204,6 +1359,7 @@ export type Database = {
 			get_contact_detail: { Args: { p_id: string }; Returns: Json };
 			get_dashboard: { Args: Record<PropertyKey, never>; Returns: Json };
 			get_metrics: { Args: { p_days: number }; Returns: Json };
+			get_monthly_report: { Args: { p_month: string }; Returns: Json };
 			get_my_profile: { Args: Record<PropertyKey, never>; Returns: Json };
 			get_pending_decision: { Args: { p_id: string }; Returns: Json };
 			get_transaction: { Args: { p_id: string }; Returns: Json };
@@ -1233,11 +1389,13 @@ export type Database = {
 			};
 			list_accounts: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_agreements: { Args: Record<PropertyKey, never>; Returns: Json };
+			list_budgets: { Args: { p_month: string }; Returns: Json };
 			list_contacts_with_balance: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_notifications: {
 				Args: { p_before_id: number; p_category: string; p_limit: number };
 				Returns: Json;
 			};
+			list_recurring: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_requests: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_transactions: { Args: { p_account_id: string; p_month: string }; Returns: Json };
 			make_personal: { Args: { p_id: string }; Returns: Json };
@@ -1274,7 +1432,12 @@ export type Database = {
 			resolve_invite: { Args: { p_token: string }; Returns: Json };
 			restore_transaction: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			set_avatar: { Args: { p_path: string }; Returns: Json };
+			set_budget: { Args: { p_category: string; p_limit_minor: number }; Returns: Json };
 			set_id_discoverable: { Args: { p_on: boolean }; Returns: Json };
+			set_recurring_paused: {
+				Args: { p_id: string; p_paused: boolean; p_row_version: number };
+				Returns: Json;
+			};
 			set_reminder_prefs: { Args: { p_days: number[] }; Returns: Json };
 			share_agreement: {
 				Args: { p_id: string; p_phone: string; p_row_version: number };
@@ -1284,6 +1447,7 @@ export type Database = {
 				Args: { p_id: string; p_paramnet_id: string; p_row_version: number };
 				Returns: Json;
 			};
+			skip_recurring: { Args: { p_occurrence_on: string; p_rule_id: string }; Returns: Json };
 			take_sms_budget: {
 				Args: { p_channel: string; p_daily_limit: number; p_phone: string };
 				Returns: Json;
@@ -1300,6 +1464,10 @@ export type Database = {
 			};
 			update_profile: {
 				Args: { p_first_name: string; p_last_name: string; p_username: string };
+				Returns: Json;
+			};
+			update_recurring: {
+				Args: { p_id: string; p_input: Json; p_row_version: number };
 				Returns: Json;
 			};
 			update_transaction: {
@@ -1330,6 +1498,7 @@ export type Database = {
 			payment_kind: "payment" | "down_payment" | "discount";
 			payment_method: "cash" | "transfer" | "card" | "other";
 			payment_status: "reported" | "confirmed" | "rejected" | "withdrawn" | "voided";
+			recurrence_frequency: "weekly" | "monthly" | "yearly";
 			transaction_kind: "expense" | "income" | "transfer" | "adjustment";
 			version_status: "draft" | "proposed" | "accepted" | "rejected" | "superseded";
 		};
@@ -1465,6 +1634,7 @@ export const Constants = {
 			payment_kind: ["payment", "down_payment", "discount"],
 			payment_method: ["cash", "transfer", "card", "other"],
 			payment_status: ["reported", "confirmed", "rejected", "withdrawn", "voided"],
+			recurrence_frequency: ["weekly", "monthly", "yearly"],
 			transaction_kind: ["expense", "income", "transfer", "adjustment"],
 			version_status: ["draft", "proposed", "accepted", "rejected", "superseded"],
 		},

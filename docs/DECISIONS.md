@@ -593,3 +593,16 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- **İşlem formu (22):** tasarıma "Açıklama" ve "Not" alanları eklendi (37'deki başlık ve not için). Transferde kategori çipleri yerine Nereden / Nereye seçicileri var. Boş açıklamada başlık kategori adıdır.
 	- **Silme (37):** onay alt panelinden sonra ekranda "İşlem silindi · Geri al" bandı 10 saniye durur; süre dolunca geri dönülür. Fiş ekleme ve "Kategoriye böl" gizli.
 	- **Ortak bileşenler:** Bildirimler'deki filtre çipi `components/Chip`'e taşındı ve kategori seçiminde de kullanılıyor. Alt panel arka planı için `scrim` renk token'ı eklendi.
+
+## ADR-054 — Tekrarlayan işlem, bütçe ve aylık rapor (F4-04)
+- **Tarih:** 2026-10-24
+- **Bağlam:** Tasarım 38, 39 ve 27 veri modelinde yoktu. Kullanıcı Faz 4'ün kalan görevlerinde kararları bana bıraktı; aşağıdakiler bu yetkiyle verilen varsayılanlardır.
+- **Karar:**
+	- **Tekrarlayan işlem:** yalnızca gelir ve gider (transfer yok). Sıklık haftalık, aylık, yıllık; tarihler ilk tarihten sayılır, ay sonu kısalırsa son gün. Kural `packages/shared` `recurrence` ve SQL'de aynıdır (`test-vectors/recurrence.json`, `db:vectors`).
+	- **"Her seferinde onay iste" (varsayılan açık):** günü gelen tarih "Onay bekleyenler"de durur; Onayla gerçekleşen kaydı yazar, Atla yazmaz. Kapalıysa saatlik `post_due_recurring` işi günü gelen tarihi kaydeder. Her tarih bir kez işlenir (`recurring_occurrences`).
+	- **Geçmiş tarihler:** kural oluşturulurken en fazla 31 gün geriye bakılır; daha eski tarihler borç sayılmaz (yıllar önceki ilk tarih sel gibi kayıt üretmesin). Sürdürülen kuralda durdurma süresindeki tarihler sayılmaz.
+	- **Takvime ekleme** (tasarımdaki "Kaydet ve takvime ekle") F4-10'da: takvim tüm modülleri o görevde gösterir. Bu görevde düğme "Kaydet"tir.
+	- **Bütçe:** yalnızca gider kategorileri, aylık sınır; harcanan aynı ayın silinmemiş giderleri. Uyarı %80'de "sınıra yakın", %100'ü aşınca "aşıldı" (`budgetLevel`). Tasarımdaki "Sabit · ödendi" etiketi ve "Kira dışında harcaman" cümlesi yok (veri modelinde sabit gider kavramı yok).
+	- **Aylık rapor:** varsayılan son tamamlanan ay; bulunulan ay "bugüne kadar" diye işaretlenir. Borç ve alacak dengesinde yalnızca anlaşmalar (kişisel borç + elden taksit, alacaklar, bu ay ödenecek); kart ve kredi satırları F4-05/F4-06'da. Dışa aktarma düğmesi yok (PDF premium, BACKLOG).
+	- **Gezinme:** Tekrarlayan işlem İşlem merkezinden (21), Bütçe ve Raporlar Ana menüden (05) açılır. Tasarımdaki satır içi form ayrı bir ekran (`/recurring/new`); liste kısa kalır.
+- **Uygulama notları:** tüm tablolar istemciye kapalı, yazmalar idempotency anahtarı ya da `row_version` ile. Hesap silme kuralları (hesaplarla birlikte) ve bütçeleri siler; dışa aktarma ikisini de içerir. Mock adaptör saatlik işi liste açılırken taklit eder.

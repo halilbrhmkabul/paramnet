@@ -122,8 +122,8 @@ function HintRow({
 	);
 }
 
-// Design 21. Rows for modules that are not built yet (Para iste, Hesap böl, Ödeme kaydet, Banka kredisi,
-// Tekrarlayan işlem) stay hidden until their tasks (ADR-053).
+// Design 21. Rows for modules that are not built yet (Para iste, Hesap böl, Ödeme kaydet, Banka kredisi)
+// stay hidden until their tasks (ADR-053).
 export function ActionCenterScreen() {
 	const { colors, typography, spacing } = useAppTheme();
 	const start = useNewDraft((state) => state.start);
@@ -201,6 +201,16 @@ export function ActionCenterScreen() {
 						router.push("/new");
 					}}
 					testID="action.installment"
+				/>
+				<HintRow
+					title={tr.action.recurring}
+					hint={tr.action.recurringHint}
+					icon="repeat-outline"
+					tone={["neutral", "neutralSoft"]}
+					onPress={() => {
+						router.push("/recurring");
+					}}
+					testID="action.recurring"
 				/>
 			</RowGroup>
 		</Screen>

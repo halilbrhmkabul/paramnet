@@ -1,0 +1,78 @@
+{
+	"next": [
+		{
+			"name": "aylık: ayın 20'si",
+			"start": "2026-10-20",
+			"frequency": "monthly",
+			"from": "2026-10-12",
+			"count": 3,
+			"expected": ["2026-10-20", "2026-11-20", "2026-12-20"]
+		},
+		{
+			"name": "aylık: başlangıç geçmişte, bugünden sonrakiler",
+			"start": "2026-01-01",
+			"frequency": "monthly",
+			"from": "2026-10-02",
+			"count": 2,
+			"expected": ["2026-11-01", "2026-12-01"]
+		},
+		{
+			"name": "aylık: 31'i olmayan aylarda ay sonu, sonra yine 31",
+			"start": "2026-01-31",
+			"frequency": "monthly",
+			"from": "2026-01-31",
+			"count": 4,
+			"expected": ["2026-01-31", "2026-02-28", "2026-03-31", "2026-04-30"]
+		},
+		{
+			"name": "haftalık",
+			"start": "2026-10-19",
+			"frequency": "weekly",
+			"from": "2026-10-12",
+			"count": 3,
+			"expected": ["2026-10-19", "2026-10-26", "2026-11-02"]
+		},
+		{
+			"name": "haftalık: bugün de sayılır",
+			"start": "2026-10-05",
+			"frequency": "weekly",
+			"from": "2026-10-19",
+			"count": 2,
+			"expected": ["2026-10-19", "2026-10-26"]
+		},
+		{
+			"name": "yıllık: 29 Şubat artık olmayan yılda 28",
+			"start": "2028-02-29",
+			"frequency": "yearly",
+			"from": "2028-03-01",
+			"count": 2,
+			"expected": ["2029-02-28", "2030-02-28"]
+		}
+	],
+	"between": [
+		{
+			"name": "aylık: başlangıçtan bugüne kaçırılanlar",
+			"start": "2026-08-15",
+			"frequency": "monthly",
+			"from": "2026-08-15",
+			"to": "2026-10-14",
+			"expected": ["2026-08-15", "2026-09-15"]
+		},
+		{
+			"name": "haftalık: aralığın iki ucu dahil",
+			"start": "2026-10-01",
+			"frequency": "weekly",
+			"from": "2026-10-08",
+			"to": "2026-10-22",
+			"expected": ["2026-10-08", "2026-10-15", "2026-10-22"]
+		},
+		{
+			"name": "başlangıç aralıktan sonra",
+			"start": "2026-12-01",
+			"frequency": "monthly",
+			"from": "2026-10-01",
+			"to": "2026-10-31",
+			"expected": []
+		}
+	]
+}

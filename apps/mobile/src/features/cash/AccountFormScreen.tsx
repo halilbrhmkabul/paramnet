@@ -21,7 +21,7 @@ import { useAppTheme } from "@/theme/useAppTheme";
 import { ACCOUNT_LOOK, ConfirmSheet } from "./parts";
 
 // Design ".sw": the "Toplam Nakit'e dahil et" toggle.
-function Toggle({
+export function Toggle({
 	label,
 	hint,
 	value,

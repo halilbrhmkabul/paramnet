@@ -28,12 +28,9 @@ describe("Ana menü (05)", () => {
 		expect(screen.getByTestId("menu.module.accounts")).toHaveTextContent(tr.accounts.menuLine, {
 			exact: false,
 		});
-		for (const hidden of [
-			"Banka Kredileri",
-			"Raporlar",
-			"Bütçe Kategorileri",
-			"Faiz Hesaplayıcı",
-		]) {
+		expect(screen.getByTestId("menu.module.reports")).toBeTruthy();
+		expect(screen.getByTestId("menu.module.budget")).toBeTruthy();
+		for (const hidden of ["Banka Kredileri", "Faiz Hesaplayıcı"]) {
 			expect(screen.queryByText(hidden)).toBeNull();
 		}
 		await waitFor(() => {

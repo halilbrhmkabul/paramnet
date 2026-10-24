@@ -9,6 +9,7 @@ import type {
 	PaymentKind,
 	PaymentMethod,
 	PaymentStatus,
+	RecurrenceFrequency,
 	TransactionCategory,
 	TransactionKind,
 } from "@paramnet/shared";
@@ -340,4 +341,46 @@ export type CashSummary = {
 	income_minor: number;
 	expense_minor: number;
 	updated_at: string | null;
+};
+
+// Repeating records, budgets and the monthly report (F4-04, ADR-054).
+export type RecurringRule = {
+	id: string;
+	kind: "expense" | "income";
+	name: string;
+	amount_minor: number;
+	category: TransactionCategory;
+	account_id: string;
+	account_name: string;
+	frequency: RecurrenceFrequency;
+	start_on: IsoDate;
+	confirm_each: boolean;
+	paused_at: string | null;
+	next_dates: IsoDate[];
+	// Due and waiting for "Onayla" / "Atla" (only rules that ask each time).
+	pending_dates: IsoDate[];
+	row_version: number;
+	created_at: string;
+};
+
+export type BudgetItem = {
+	category: TransactionCategory;
+	limit_minor: number;
+	spent_minor: number;
+	count: number;
+};
+
+export type BudgetMonth = {
+	items: BudgetItem[];
+	total_limit_minor: number;
+	total_spent_minor: number;
+	month_expense_minor: number;
+};
+
+export type MonthlyReport = {
+	month: IsoDate;
+	income_minor: number;
+	expense_minor: number;
+	by_category: { category: TransactionCategory; amount_minor: number }[];
+	series: { month: IsoDate; income_minor: number; expense_minor: number }[];
 };

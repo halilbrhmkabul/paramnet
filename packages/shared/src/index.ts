@@ -12,6 +12,7 @@ export * from "./money";
 export * from "./pin";
 export * from "./plan";
 export * from "./profile-ids";
+export * from "./recurrence";
 export * from "./schemas";
 export * from "./terms-hash";
 export * from "./telemetry";

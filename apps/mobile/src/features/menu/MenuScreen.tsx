@@ -13,6 +13,7 @@ import { useSession } from "@/features/auth/sessionStore";
 import { useMyAvatar } from "@/features/me/useMyAvatar";
 import { fill, tr } from "@/i18n/tr";
 import { supportEmail } from "@/lib/config";
+import type { ColorToken } from "@/theme/tokens";
 import { useAppTheme } from "@/theme/useAppTheme";
 
 const CLOSED: readonly AgreementSummary["status"][] = ["settled", "cancelled", "rejected"];
@@ -114,15 +115,32 @@ function InstallmentsTile() {
 	);
 }
 
-function AccountsTile() {
+type IconName = keyof typeof Ionicons.glyphMap;
+
+// Design ".tile" for a module with its own screen.
+function ModuleTile({
+	title,
+	line,
+	icon,
+	tone,
+	href,
+	testID,
+}: {
+	title: string;
+	line: string;
+	icon: IconName;
+	tone: [ColorToken, ColorToken];
+	href: "/accounts" | "/budget" | "/reports";
+	testID: string;
+}) {
 	const { colors, typography, fonts, radius } = useAppTheme();
 	return (
 		<Pressable
-			testID="menu.module.accounts"
+			testID={testID}
 			accessibilityRole="button"
-			accessibilityLabel={`${tr.accounts.title}, ${tr.accounts.menuLine}`}
+			accessibilityLabel={`${title}, ${line}`}
 			onPress={() => {
-				router.push("/accounts");
+				router.push(href);
 			}}
 			style={({ pressed }) => [
 				styles.tile,
@@ -139,17 +157,17 @@ function AccountsTile() {
 			<View
 				style={[
 					styles.tileIcon,
-					{ backgroundColor: colors.pendingSoft, borderRadius: radius.sm - 2 },
+					{ backgroundColor: colors[tone[1]], borderRadius: radius.sm - 2 },
 				]}
 			>
-				<Ionicons name="business-outline" size={20} color={colors.pending} />
+				<Ionicons name={icon} size={20} color={colors[tone[0]]} />
 			</View>
 			<View style={{ gap: 2 }}>
 				<Text style={{ fontFamily: fonts.extrabold, fontSize: 15, color: colors.text }}>
-					{tr.accounts.title}
+					{title}
 				</Text>
 				<Text style={[typography.caption, { fontSize: 12, color: colors.textMuted }]}>
-					{tr.accounts.menuLine}
+					{line}
 				</Text>
 			</View>
 		</Pressable>
@@ -179,8 +197,33 @@ export function MenuScreen() {
 					{tr.menu.modules}
 				</Text>
 				<View style={[styles.grid, { gap: 10 }]}>
-					<AccountsTile />
+					<ModuleTile
+						title={tr.accounts.title}
+						line={tr.accounts.menuLine}
+						icon="business-outline"
+						tone={["pending", "pendingSoft"]}
+						href="/accounts"
+						testID="menu.module.accounts"
+					/>
 					<InstallmentsTile />
+				</View>
+				<View style={[styles.grid, { gap: 10, marginTop: 10 }]}>
+					<ModuleTile
+						title={tr.report.title}
+						line={tr.report.menuLine}
+						icon="bar-chart-outline"
+						tone={["success", "successSoft"]}
+						href="/reports"
+						testID="menu.module.reports"
+					/>
+					<ModuleTile
+						title={tr.budget.menuTitle}
+						line={tr.budget.menuLine}
+						icon="pie-chart-outline"
+						tone={["warning", "warningSoft"]}
+						href="/budget"
+						testID="menu.module.budget"
+					/>
 				</View>
 			</View>
 			<RowGroup label={tr.menu.app}>
