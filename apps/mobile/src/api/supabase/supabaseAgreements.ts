@@ -41,6 +41,18 @@ export function createSupabaseAgreementsApi(client: SupabaseClient): AgreementsA
 		withdrawShare: async (id) => {
 			await call("withdraw_share", { p_id: id });
 		},
+		requestMoney: async (input, paramnetId, idempotencyKey) => {
+			const result = await call<{ agreement_id: string; display_name?: string | null }>(
+				"request_money",
+				{ p_input: input, p_paramnet_id: paramnetId, p_idempotency_key: idempotencyKey },
+			);
+			return { agreement_id: result.agreement_id, display_name: result.display_name ?? null };
+		},
+		getDelivery: (id) => call("get_delivery", { p_id: id }),
+		reportDelivery: (id, rowVersion) =>
+			call("report_delivery", { p_id: id, p_row_version: rowVersion }),
+		confirmDelivery: (id, rowVersion) =>
+			call("confirm_delivery", { p_id: id, p_row_version: rowVersion }),
 		makePersonal: async (id) => {
 			await call("make_personal", { p_id: id });
 		},

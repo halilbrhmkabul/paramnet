@@ -90,3 +90,14 @@ Bir anlaşmada aynı anda tek `active` davet olur; yeni davet eskisini `revoked`
 ## Olay tipleri (`agreement_events.type`)
 
 `created`, `updated_personal`, `shared`, `share_withdrawn`, `invite_expired`, `accepted`, `countered`, `rejected`, `payment_recorded`, `payment_reported`, `payment_confirmed`, `payment_rejected`, `payment_withdrawn`, `payment_voided`, `amendment_proposed`, `amendment_accepted`, `amendment_rejected`, `amendment_withdrawn`, `dispute_opened`, `dispute_resolved`, `cancel_requested`, `cancel_accepted`, `cancel_rejected`, `forgiven`, `settled`, `cancelled`.
+
+## Para teslimi (ADR-058)
+
+Anlaşma durumu değişmez ("active" kalır). `delivery_required` olan anlaşmada:
+
+| Mevcut | Olay | Aktör | Sonraki |
+|---|---|---|---|
+| teslim bekleniyor | delivery_reported | borç veren | onay bekleniyor (`delivery_reported_at`) |
+| onay bekleniyor | delivery_confirmed | borç alan | tamamlandı (`delivery_confirmed_at`) |
+
+Her adım `row_version` ister; başka aktör `forbidden`, sırasız adım `invalid_transition`.

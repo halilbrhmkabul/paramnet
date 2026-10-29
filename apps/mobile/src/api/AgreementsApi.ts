@@ -10,7 +10,9 @@ import type {
 	IdShareResult,
 	Dashboard,
 	Decision,
+	DeliveryState,
 	InviteResolution,
+	MoneyRequestResult,
 	PendingDecision,
 	RequestItem,
 	ShareResult,
@@ -89,6 +91,16 @@ export interface AgreementsApi {
 		rowVersion: number,
 		idempotencyKey: string,
 	): Promise<{ payment_id: string; replayed: boolean; settled: boolean }>;
+	// "Para iste" (F4-08, ADR-058): the borrower's loan record, shared by ParamNet ID in one step.
+	requestMoney(
+		input: CreateAgreementInput,
+		paramnetId: string,
+		idempotencyKey: string,
+	): Promise<MoneyRequestResult>;
+	getDelivery(id: string): Promise<DeliveryState>;
+	// Lender: "Parayı verdim". Borrower: "Aldım".
+	reportDelivery(id: string, rowVersion: number): Promise<DeliveryState>;
+	confirmDelivery(id: string, rowVersion: number): Promise<DeliveryState>;
 	// KVKK m.11 (F3-03): everything kept about the signed-in user, as JSON.
 	exportMyData(): Promise<Record<string, unknown>>;
 	// Analytics (F3-02): best effort, never throws.

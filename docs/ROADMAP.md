@@ -458,9 +458,11 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 - ADR-045 ile yalnızca hesaplama ve gösterim; karar ADR-057.
 - **İlerleme (2026-10-25):** `packages/shared` `interest` (`cardInterestEstimate`, `earlyPayoff`); Faiz simülasyonu ekranı (kart: asgari/kısmi/tamamı, parametreler, hesaplama satırı; kredi: erken kapama); kart detayı, kart ödemesi, kredi detayı ve Ana menü girişleri. Testler: Vitest 4, RNTL 2. Kayıt yazılmaz.
 
-### [ ] F4-08 Borç talepleri ve teslim
+### [x] F4-08 Borç talepleri ve teslim
 - Para iste (18), Talep önizleme (19), Talep gönderildi (20), Gelen talep (16), Para teslimi bekleniyor (17).
 - Borçlarım (12) ve detaylar (13, 15) birebir; kısmi ödeme (14).
+- Karar: ADR-058 (kullanıcı onaylı model).
+- **İlerleme (2026-10-25):** `request_money`, teslim onayı (`get_delivery`, `report_delivery`, `confirm_delivery`); Para iste (iki adım), Talep gönderildi (geri çek), Para teslimi ekranı ve anlaşma detayında teslim bandı; İşlem merkezinde "Para iste". Testler: pgTAP 330 (20), RNTL 4.
 
 ### [ ] F4-09 Elden taksit birebir: oluştur (23), önizleme (24), detay (25)
 

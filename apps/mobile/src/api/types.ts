@@ -457,3 +457,15 @@ export type Loan = {
 export type LoanList = { loans: Loan[]; remaining_principal_minor: number; monthly_minor: number };
 
 export type LoanDetail = { loan: Loan; payments: Transaction[] };
+
+// "Para iste" and the hand-over of the money (F4-08, ADR-058).
+export type MoneyRequestResult = { agreement_id: string; display_name: string | null };
+
+export type DeliveryState = {
+	required: boolean;
+	reported_at: string | null;
+	confirmed_at: string | null;
+	my_role: PartyRole;
+	status: AgreementStatus;
+	row_version: number;
+};

@@ -122,7 +122,7 @@ function HintRow({
 	);
 }
 
-// Design 21. Rows for modules that are not built yet (Para iste, Hesap böl, Ödeme kaydet)
+// Design 21. Rows for modules that are not built yet (Hesap böl, Ödeme kaydet)
 // stay hidden until their tasks (ADR-053).
 export function ActionCenterScreen() {
 	const { colors, typography, spacing } = useAppTheme();
@@ -169,6 +169,16 @@ export function ActionCenterScreen() {
 				</View>
 			</View>
 			<RowGroup label={tr.action.debts}>
+				<HintRow
+					title={tr.action.request}
+					hint={tr.request.menuHint}
+					icon="download-outline"
+					tone={["pending", "pendingSoft"]}
+					onPress={() => {
+						router.push("/request");
+					}}
+					testID="action.request"
+				/>
 				<HintRow
 					title={tr.action.borrow}
 					hint={tr.action.borrowHint}
