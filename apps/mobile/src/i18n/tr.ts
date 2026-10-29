@@ -1064,6 +1064,7 @@ export const tr = {
 			overdue: "Gecikti",
 			paid: "Ödendi",
 		},
+		undated: "Vadesiz",
 		partial: "Kısmen ödendi",
 		position: "{seq}/{count}. taksit",
 		single: "Tek ödeme",

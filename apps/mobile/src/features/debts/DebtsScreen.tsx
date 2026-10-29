@@ -96,6 +96,7 @@ function AgreementRow({ agreement }: { agreement: AgreementSummary }) {
 					<InstallmentStatusBadge
 						status={next.state.status}
 						partial={next.state.partial}
+						undated={next.due_date === null}
 					/>
 				)}
 				<Text style={[typography.caption, { color: colors.textMuted }]}>

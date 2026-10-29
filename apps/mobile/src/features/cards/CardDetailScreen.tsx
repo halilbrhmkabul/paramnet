@@ -1,5 +1,5 @@
 import { addDays, formatDateTR, formatTRY, monthName } from "@paramnet/shared";
-import { router } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -476,6 +476,27 @@ export function CardDetailScreen({ id }: { id: string }) {
 	const s = card.state;
 	return (
 		<Screen testID="cardDetail.screen" edges={["bottom"]}>
+			{/* Design 08: the card's name and the edit button live in the top bar. */}
+			<Stack.Screen
+				options={{
+					title: [card.bank_name, card.card_name]
+						.filter((p) => p !== null && p !== "")
+						.join(" "),
+					headerRight: () => (
+						<IconButton
+							icon="create-outline"
+							label={tr.cardDetail.edit}
+							onPress={() => {
+								router.push({
+									pathname: "/cards/[id]/edit",
+									params: { id: card.id },
+								});
+							}}
+							testID="cardDetail.edit.button"
+						/>
+					),
+				}}
+			/>
 			<View style={[styles.head, { gap: 14 }]}>
 				<MiniCard color={card.color} bank={card.bank_name} last4={card.last4} />
 				<View style={styles.grow}>
@@ -484,6 +505,9 @@ export function CardDetailScreen({ id }: { id: string }) {
 					</Text>
 					<Text
 						testID="cardDetail.totalDebt"
+						numberOfLines={1}
+						adjustsFontSizeToFit
+						minimumFontScale={0.6}
 						style={[typography.amountL, { color: colors.text }]}
 					>
 						{formatTRY(s.total_debt_minor)}
@@ -495,14 +519,6 @@ export function CardDetailScreen({ id }: { id: string }) {
 						})}
 					</Text>
 				</View>
-				<IconButton
-					icon="create-outline"
-					label={tr.cardDetail.edit}
-					onPress={() => {
-						router.push({ pathname: "/cards/[id]/edit", params: { id: card.id } });
-					}}
-					testID="cardDetail.edit.button"
-				/>
 			</View>
 			<SegmentedControl
 				label={tr.cardDetail.tabs.statement}

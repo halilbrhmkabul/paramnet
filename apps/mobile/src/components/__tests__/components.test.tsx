@@ -123,6 +123,17 @@ describe("Status badges", () => {
 			`${tr.installment.status.overdue} · ${tr.installment.partial}`,
 		);
 	});
+
+	it("an open installment without a due date is not coming up", async () => {
+		await render(
+			<>
+				<InstallmentStatusBadge status="upcoming" partial={false} undated testID="open" />
+				<InstallmentStatusBadge status="overdue" partial={false} undated testID="late" />
+			</>,
+		);
+		expect(screen.getByTestId("open")).toHaveTextContent(tr.installment.undated);
+		expect(screen.getByTestId("late")).toHaveTextContent(tr.installment.status.overdue);
+	});
 });
 
 describe("EmptyState / ErrorState / LoadingState", () => {

@@ -68,18 +68,21 @@ export function AgreementStatusBadge({
 	);
 }
 
+// undated: an open installment with no due date (a single "vadesiz" payment) is not "coming up".
 export function InstallmentStatusBadge({
 	status,
 	partial,
+	undated = false,
 	testID,
 }: {
 	status: InstallmentStatus;
 	partial: boolean;
+	undated?: boolean;
 	testID?: string;
 }) {
-	const label = partial
-		? `${tr.installment.status[status]} · ${tr.installment.partial}`
-		: tr.installment.status[status];
+	const name =
+		undated && status === "upcoming" ? tr.installment.undated : tr.installment.status[status];
+	const label = partial ? `${name} · ${tr.installment.partial}` : name;
 	return <Badge label={label} tone={INSTALLMENT_TONE[status]} testID={testID} />;
 }
 

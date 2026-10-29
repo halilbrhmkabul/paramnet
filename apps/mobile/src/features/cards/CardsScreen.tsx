@@ -177,8 +177,12 @@ export function CardsScreen() {
 			<Text style={[typography.caption, { fontSize: 12, color: colors.textMuted }]}>
 				{label}
 			</Text>
+			{/* Three amounts share one row; a long one shrinks instead of wrapping (F4-12). */}
 			<Text
 				testID={testID}
+				numberOfLines={1}
+				adjustsFontSizeToFit
+				minimumFontScale={0.7}
 				style={{ fontFamily: fonts.extrabold, fontSize: 16, color: tone }}
 			>
 				{value}
