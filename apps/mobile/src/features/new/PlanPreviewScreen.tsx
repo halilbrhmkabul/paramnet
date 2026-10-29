@@ -187,6 +187,9 @@ function PlanRow({
 			<View style={styles.grow}>
 				<Text
 					testID={`plan.row.${String(row.seq)}.date`}
+					numberOfLines={1}
+					adjustsFontSizeToFit
+					minimumFontScale={0.8}
 					style={[typography.rowTitle, { color: colors.text }]}
 				>
 					{row.due_date === null ? tr.plan.noDueDate : formatDateTR(row.due_date, "long")}

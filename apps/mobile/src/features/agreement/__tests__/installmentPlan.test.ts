@@ -121,4 +121,32 @@ describe("paidOnDates", () => {
 			),
 		).toEqual(["2026-08-14", "2026-09-14", null]);
 	});
+	// create_agreement_with_paid writes several payments in one transaction: same created_at, and the list
+	// may come back newest first. Due-date order is the recording order then.
+	it("breaks a created_at tie by payment date", () => {
+		expect(
+			paidOnDates(
+				[
+					{ amount_minor: 100, paid_minor: 100 },
+					{ amount_minor: 100, paid_minor: 100 },
+				],
+				[
+					{
+						amount_minor: 100,
+						paid_on: "2026-09-15",
+						kind: "payment",
+						status: "confirmed",
+						created_at: "2026-10-29T09:00:00Z",
+					},
+					{
+						amount_minor: 100,
+						paid_on: "2026-08-15",
+						kind: "payment",
+						status: "confirmed",
+						created_at: "2026-10-29T09:00:00Z",
+					},
+				],
+			),
+		).toEqual(["2026-08-15", "2026-09-15"]);
+	});
 });

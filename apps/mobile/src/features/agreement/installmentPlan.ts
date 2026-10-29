@@ -77,7 +77,11 @@ export function paidOnDates(
 ): (string | null)[] {
 	const applied = payments
 		.filter((p) => p.status === "confirmed" && p.kind !== "down_payment")
-		.sort((a, b) => a.created_at.localeCompare(b.created_at));
+		// Payments written in one transaction share created_at; they were recorded in date order.
+		.sort(
+			(a, b) =>
+				a.created_at.localeCompare(b.created_at) || a.paid_on.localeCompare(b.paid_on),
+		);
 	const dates: (string | null)[] = [];
 	let need = 0;
 	let paid = 0;
