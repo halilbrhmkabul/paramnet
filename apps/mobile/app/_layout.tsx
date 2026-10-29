@@ -278,6 +278,10 @@ function AppNavigator() {
 					name="loans/[id]/pay"
 					options={{ ...detailHeader, title: tr.loanPay.title, presentation: "modal" }}
 				/>
+				<Stack.Screen
+					name="interest"
+					options={{ ...detailHeader, title: tr.interest.title }}
+				/>
 				<Stack.Screen name="budget" options={detailHeader} />
 				<Stack.Screen
 					name="reports"

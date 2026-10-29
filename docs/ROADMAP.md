@@ -454,8 +454,9 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 	- Ekranlar: kredi listesi, Kredi detayı (panel, plan tablosu, ödenen taksitler), Kredi ekle/düzenle/arşivle, taksit kaydı. Ana menü, İşlem merkezi ve Aylık rapor girişleri.
 	- Testler: pgTAP 320 (28) ve plan vektörleri; RNTL krediler 2. Typecheck, lint, biçim temiz.
 
-### [ ] F4-07 Faiz simülasyonu (10)
-- **Açık karar:** aynı çelişki (F4-06).
+### [x] F4-07 Faiz simülasyonu (10)
+- ADR-045 ile yalnızca hesaplama ve gösterim; karar ADR-057.
+- **İlerleme (2026-10-25):** `packages/shared` `interest` (`cardInterestEstimate`, `earlyPayoff`); Faiz simülasyonu ekranı (kart: asgari/kısmi/tamamı, parametreler, hesaplama satırı; kredi: erken kapama); kart detayı, kart ödemesi, kredi detayı ve Ana menü girişleri. Testler: Vitest 4, RNTL 2. Kayıt yazılmaz.
 
 ### [ ] F4-08 Borç talepleri ve teslim
 - Para iste (18), Talep önizleme (19), Talep gönderildi (20), Gelen talep (16), Para teslimi bekleniyor (17).

@@ -326,6 +326,25 @@ function Form({ data, accounts }: { data: CardDetail; accounts: readonly Account
 					<Text style={[typography.caption, { color: colors.warning }]}>
 						{tr.cardPay.partialNote}
 					</Text>
+					<Pressable
+						testID="cardPay.interest.link"
+						accessibilityRole="link"
+						onPress={() => {
+							router.push({ pathname: "/interest", params: { card: card.id } });
+						}}
+						style={styles.link}
+					>
+						<Text
+							style={{
+								fontFamily: fonts.extrabold,
+								fontSize: 13,
+								color: colors.warning,
+								textDecorationLine: "underline",
+							}}
+						>
+							{tr.cardPay.partialLink}
+						</Text>
+					</Pressable>
 				</View>
 			) : null}
 			<AccountPickerSheet
@@ -425,5 +444,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 11,
 		gap: 12,
 	},
+	link: { minHeight: 44, justifyContent: "center" },
 	warn: { paddingHorizontal: 14, paddingVertical: 12 },
 });

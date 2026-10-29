@@ -628,3 +628,12 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- **Oran** yüzdenin yüzde biri olarak saklanır (`monthly_rate_bps`, 339 = %3,39); en fazla %20 aylık, vade en fazla 120 ay.
 	- **Taksit kaydı** hesaptan krediye `transfer` (`to_loan_id`), sıradaki taksitin tutarıyla; gider değildir. Düzenlenmez, yalnızca silinir (silinince plan geri açılır). Kapanan krediye taksit yazılmaz.
 	- **Ekranlar:** Ana menüde "Banka Kredileri" kutucuğu, liste (tasarımda yok), detay (28), ekle/düzenle (34), taksit kaydı. İşlem merkezinde "Banka kredisi ekle". Aylık raporda kalan anapara. "Erken ödeme hesapla" F4-07'de (faiz simülasyonu).
+
+## ADR-057 — Faiz simülasyonu (F4-07)
+- **Tarih:** 2026-10-25
+- **Bağlam:** Tasarım 10 (ve 28'deki "Erken ödeme hesapla"). ADR-045 kullanıcının kendi kartı ve kredisi için faizin yalnızca hesaplanıp gösterilmesine izin verir.
+- **Karar:**
+	- **Kart:** kalan ekstre × aylık akdi faiz × gün / 30; KKDF ve BSMV faiz üzerinden. Varsayılanlar: oran %3,75 (kullanıcı değiştirir), gün iki kesim arası, KKDF ve BSMV %15. Ödeme seçenekleri asgari, kısmi, tamamı.
+	- **Kredi:** bugün kapatma tutarı = kalan anapara + erken ödeme ücreti (kalan vade 36 aydan uzunsa %2, değilse %1); kazanç = kalan taksitlerin toplamı − bu tutar.
+	- **Hiçbiri kayda geçmez:** tasarımdaki "Tahmini tutarı ayrı kayıt olarak ekle" düğmesi yok; faiz bir bakiyeye, karta ya da anlaşmaya yazılmaz. Ekran sunucu çağrısı yapmaz, hesap `packages/shared` `interest`'te (kuruşta tam, BigInt).
+	- **Girişler:** Kart detayında "Faiz simüle et", kart ödemesinde kısmi ödeme uyarısındaki "Tahmini faizi gör", kredi detayında "Erken ödeme hesapla", Ana menüde "Faiz Hesaplayıcı" (kart ya da kredi seçimi). Oranlar saklanmaz.

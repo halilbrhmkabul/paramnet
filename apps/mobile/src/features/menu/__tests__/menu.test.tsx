@@ -31,9 +31,7 @@ describe("Ana menü (05)", () => {
 		expect(screen.getByTestId("menu.module.reports")).toBeTruthy();
 		expect(screen.getByTestId("menu.module.budget")).toBeTruthy();
 		expect(screen.getByTestId("menu.module.loans")).toBeTruthy();
-		for (const hidden of ["Faiz Hesaplayıcı"]) {
-			expect(screen.queryByText(hidden)).toBeNull();
-		}
+		expect(screen.getByTestId("menu.module.interest")).toBeTruthy();
 		await waitFor(() => {
 			expect(screen.getByTestId("menu.module.installments")).toHaveTextContent(
 				fill(tr.menu.activePlans, { count: "2" }),
