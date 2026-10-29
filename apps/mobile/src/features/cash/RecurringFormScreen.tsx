@@ -136,7 +136,8 @@ function Form({ accounts, rule }: { accounts: readonly Account[]; rule: Recurrin
 						</Text>
 					)}
 					<Button
-						label={tr.recurring.save}
+						// Design 38: a new rule's dates show up in the calendar (26) at once.
+						label={rule === null ? tr.recurring.saveToCalendar : tr.recurring.save}
 						loading={saving}
 						onPress={submit}
 						testID="recurringForm.save.button"

@@ -41,3 +41,5 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Kartlar: banka ekstresi PDF okuma, kart bazlı harcama kategorisi raporu, son ödeme hatırlatması (push), kart taksitlerini erken kapatma — F4-05 sırasında (ADR-055).
 - Elden taksit: kişisel kaydın planını düzenleme ekranı (`update_personal_agreement` hazır; 25'teki kalem), ödeme yöntemini kayda yazıp "Ödeme yöntemi" satırını gösterme, anlaşma bazında hatırlatma, taksit sayısında basılı tutunca hızlı artırma — F4-09 sırasında (ADR-059).
 - Para iste: teslim onayından önce talebi Borçlarım toplamlarının dışında tutma, teslim adımları için push bildirimi, rehberden ID ile kişi seçimi — F4-08 sırasında (ADR-058).
+
+- Ana Sayfa "Son İşlemler"de anlaşma ödemeleri (ör. "Ayşe Demir · Alacak tahsilatı"), takvimde ödenmemiş eski kart ekstrelerinin günleri, projeksiyonda ada göre uyarı cümlesi — F4-10 sırasında (ADR-060).

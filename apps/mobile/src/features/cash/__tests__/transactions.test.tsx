@@ -276,8 +276,9 @@ describe("Ana Sayfa · Toplam Nakit (03)", () => {
 		await waitFor(() => {
 			expect(screen.getByTestId("home.cash.amount")).toHaveTextContent("67.257,70 TL");
 		});
-		expect(screen.getByTestId("home.cash.income")).toHaveTextContent("46.500,00 TL");
-		expect(screen.getByTestId("home.cash.expense")).toHaveTextContent("842,30 TL");
+		// Design 03 signs the month's income and expense.
+		expect(screen.getByTestId("home.cash.income")).toHaveTextContent("+46.500,00 TL");
+		expect(screen.getByTestId("home.cash.expense")).toHaveTextContent("\u2212842,30 TL");
 		await fireEvent.press(screen.getByTestId("home.cash.toggle"));
 		expect(screen.getByTestId("home.cash.amount")).toHaveTextContent(tr.accounts.hidden);
 		await fireEvent.press(screen.getByTestId("home.cash.link"));

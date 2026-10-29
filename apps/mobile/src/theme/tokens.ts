@@ -45,6 +45,14 @@ export const palette = {
 		cardBordeaux: "#5A2232",
 		cardChip: "#D4BE7F",
 		onCard: "#FFFFFF",
+		// Design 26: the calendar legend and the projection bars.
+		calPay: "#C98A12",
+		calLoan: "#6A55B0",
+		calLoanSoft: "#ECE8F4",
+		calExpected: "#2F6CA8",
+		calIncome: "#1F8A68",
+		calDone: "#9AA69F",
+		barSoft: "#B9DDC8",
 		// Loan panel (design 28, 34), the same in both themes.
 		loanBg: "#221D3B",
 		loanMuted: "#C9C1E8",
@@ -108,6 +116,14 @@ export const palette = {
 		cardBordeaux: "#5A2232",
 		cardChip: "#D4BE7F",
 		onCard: "#FFFFFF",
+		// Design 26: the calendar legend and the projection bars.
+		calPay: "#E0A93A",
+		calLoan: "#A694E6",
+		calLoanSoft: "#2A2440",
+		calExpected: "#6FA3DB",
+		calIncome: "#5CC49A",
+		calDone: "#5F6E66",
+		barSoft: "#2C5A45",
 		// Loan panel (design 28, 34), the same in both themes.
 		loanBg: "#221D3B",
 		loanMuted: "#C9C1E8",
