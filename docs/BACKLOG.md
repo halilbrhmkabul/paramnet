@@ -43,3 +43,4 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Para iste: teslim onayından önce talebi Borçlarım toplamlarının dışında tutma, teslim adımları için push bildirimi, rehberden ID ile kişi seçimi — F4-08 sırasında (ADR-058).
 
 - Ana Sayfa "Son İşlemler"de anlaşma ödemeleri (ör. "Ayşe Demir · Alacak tahsilatı"), takvimde ödenmemiş eski kart ekstrelerinin günleri, projeksiyonda ada göre uyarı cümlesi — F4-10 sırasında (ADR-060).
+- Tasarımdaki para biçimi `₺12.000,00` (CLAUDE.md'deki `12.000,00 TL` kuralının yerine) ve Ionicons yerine tasarımın SVG ikonları — F4-01c (PR #50) hiç birleşmedi ve kapatıldı. Görsel farklar F4-12 kapısında tasarımla karşılaştırılır.
