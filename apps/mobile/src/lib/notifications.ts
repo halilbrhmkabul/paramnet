@@ -10,11 +10,13 @@ type NotificationResponse = import("expo-notifications").NotificationResponse;
 
 // Expo Go on Android dropped expo-notifications in SDK 53 and the module throws as soon as it is
 // imported, which took every importing route down with it. It is therefore loaded lazily and never
-// there; reminders simply stay off until a development build is used.
+// there; reminders simply stay off until a development build is used. The web build only exists for
+// the design comparison (F4-12) and has no push either.
 function unsupported(): boolean {
 	return (
-		Platform.OS === "android" &&
-		Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+		Platform.OS === "web" ||
+		(Platform.OS === "android" &&
+			Constants.executionEnvironment === ExecutionEnvironment.StoreClient)
 	);
 }
 

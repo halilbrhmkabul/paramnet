@@ -75,6 +75,7 @@ function InstallmentRow({ installment, count }: { installment: InstallmentView; 
 					<InstallmentStatusBadge
 						status={installment.state.status}
 						partial={installment.state.partial}
+						undated={installment.due_date === null}
 					/>
 				</View>
 			}

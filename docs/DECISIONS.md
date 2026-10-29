@@ -680,3 +680,11 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- **Giriş noktaları:** İşlem merkezinde "Hesap böl" (Yeni rozetiyle), Borçlarım'da "Ortak hesaplar" listesi (tasarımda yok), payın kayıt detayında ortak hesaba bant.
 	- **Yeni bağımlılık:** `qrcode-generator` (MIT, bağımlılıksız, saf JS). Kare kod `react-native-svg` olmadan, satır başına koyu bloklar halinde view'larla çizilir; koyu temada da beyaz zemin üzerinde koyu kalır.
 	- **Tasarımdan sapmalar:** fiş ekleme ve fiş görseli yok. "Ödeyen: Sen · YK World" yalnızca "Ödeyen: Sen" olarak var; hesap ya da kart seçilmez, gider yazılmaz. "Payları düzenle" yok. Davet linkinde Mesajla / E-posta / Paylaş yerine tek bir sistem paylaşım düğmesi var. 43'te "Payıma itiraz et" payı reddeder (karşı teklif değil). Katılım isteği için ödeyene push gitmez. `/h/` için web sayfası yok (hepsi BACKLOG). İstemci yazmaz; para hareketi yoktur.
+
+## ADR-062 — Faz 4 kapısında görsel karşılaştırma yöntemi (F4-12)
+- **Tarih:** 2026-10-30
+- **Bağlam:** Bu makinede Xcode/simülatör yok; deneme Expo Go ile yapılıyor. Kanvasın claude.ai sürümü oturum ister.
+- **Karar:**
+	- Uygulama, yalnızca karşılaştırma için Expo web'de çizdirilir: `PARAMNET_WEB_PREVIEW=1` `app.config.ts`'de `platforms`'a `web` ekler (`EXPO_NO_WEB_SETUP=1` ile). Web bir ürün hedefi değildir; push web'de kapalıdır (`notifications.ts`).
+	- Referans, kanvasın güncel sayfaları ve paketten çıkarılan `support.js` ile yerelde statik sunulur (oturum dışı kopya, depoda değil).
+	- Web görüntüsü cihazın yerini tutmaz: `adjustsFontSizeToFit` web'de çalışmaz, yazı tipleri ve gölgeler farklıdır. Kapı, kullanıcının Expo Go kontrolüyle kapanır.

@@ -94,9 +94,9 @@ describe("buildSplitInput", () => {
 });
 
 describe("links and QR", () => {
-	const domain: string | undefined = process.env.EXPO_PUBLIC_APP_DOMAIN as string | undefined;
+	const domain: unknown = process.env.EXPO_PUBLIC_APP_DOMAIN;
 	afterEach(() => {
-		process.env.EXPO_PUBLIC_APP_DOMAIN = domain;
+		process.env.EXPO_PUBLIC_APP_DOMAIN = typeof domain === "string" ? domain : "";
 	});
 
 	it("uses the https link when a domain is set, the app URL otherwise", () => {

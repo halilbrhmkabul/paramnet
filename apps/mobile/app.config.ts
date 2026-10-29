@@ -11,6 +11,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 		...config,
 		name: config.name ?? "Paramnet",
 		slug: config.slug ?? "paramnet",
+		// Web is not shipped; PARAMNET_WEB_PREVIEW=1 renders the screens in a browser for the design
+		// comparison of the phase gate (F4-12).
+		platforms:
+			process.env.PARAMNET_WEB_PREVIEW === "1"
+				? [...(config.platforms ?? []), "web" as const]
+				: config.platforms,
 		// The permission text is Turkish copy too (src/i18n, shared with tr.ts).
 		plugins: [
 			...(config.plugins ?? []),

@@ -488,6 +488,13 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 
 ### [ ] F4-12 Faz 4 kapısı
 - Her ekranın referansla karşılaştırması, açık ve koyu tema, testler.
+- **Durum (2026-10-30):** Kapı açık; cihazda (Expo Go) son bakış kullanıcıda. Yapılanlar (ADR-062):
+	- Tasarım kanvasının güncel 43 sayfası (claude.ai Design) yerelde çizdirildi; uygulama Expo web önizlemesiyle (`PARAMNET_WEB_PREVIEW=1`, mock, 390 pt) açık ve koyu temada açıldı.
+	- Bakılanlar: Ana Sayfa, Kartlarım, Kart detayı, Borçlarım, kayıt detayları (borç, elden taksit), Takvim, İşlem merkezi, Ana menü, Bildirimler, Profil, Hesaplar, İşlem geçmişi, Aylık rapor, Bütçe, Krediler (boş), Faiz simülasyonu, Para iste, Gider / Kart / Kredi / Tekrarlayan işlem formları, Hesabı böl (40–43).
+	- Düzeltilenler: vadesiz taksit rozeti "Yaklaşıyor" yerine "Vadesiz" (Borçlarım, kayıt detayı); Kart detayında kart adı ve düzenle düğmesi üst çubukta (tasarım 08), toplam borç tek satır; Kartlarım özetinde tutarlar tek satır.
+	- Bakılmayanlar: giriş öncesi ekranlar (01, 02, 31; F4-01b'de karşılaştırıldı), kredi detayı (mock'ta kredi yok), teslim, gelen talep, kısmi ödeme, profil düzenleme.
+	- Bilinen farklar: para biçimi `12.000,00 TL` (tasarımda `₺`; F4-01c kapatıldı, BACKLOG) ve Ionicons; uzun tutarlar bu yüzden bazı yerlerde küçülerek sığar. Hesabı böl (40) formu etiketli alanlarla, tasarımdaki büyük başlık ve tutar satırı yerine.
+	- **Kapıyı kapatmak için (kullanıcı):** Expo Go'da açık ve koyu temada her ekran; küçük ekranda (iPhone SE) tutar taşması; `supabase` modunda iki hesapla hesap bölme ve kare kod.
 
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
 ### [ ] F3-09 Faz 3 kapısı: mağaza yayını
