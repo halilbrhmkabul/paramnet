@@ -93,7 +93,8 @@ describe("Home (design 03)", () => {
 		await waitFor(() => {
 			expect(upcoming.getAllByTestId(/^home\.upcoming\.item\./)).toHaveLength(3);
 		});
-		expect(upcoming.getAllByText(tr.calendar.status.overdue).length).toBeGreaterThan(0);
+		// The unconfirmed rent comes first and waits for "Onayla"; it is not late.
+		expect(upcoming.getAllByText(tr.calendar.status.waiting).length).toBeGreaterThan(0);
 		await fireEvent.press(screen.getByTestId("home.upcoming.calendar"));
 		await waitFor(() => {
 			expect(screen.getByTestId("calendar.screen")).toBeTruthy();
