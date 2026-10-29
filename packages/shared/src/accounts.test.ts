@@ -106,7 +106,44 @@ describe("transactionInputSchema", () => {
 	};
 
 	it("accepts an expense and empties a blank note", () => {
-		expect(transactionInputSchema.parse(expense)).toEqual({ ...expense, note: null });
+		expect(transactionInputSchema.parse(expense)).toEqual({
+			...expense,
+			note: null,
+			card_id: null,
+			to_card_id: null,
+			installments: 1,
+		});
+	});
+
+	it("puts a card purchase on the card, in instalments if asked (ADR-055)", () => {
+		const onCard = { ...expense, account_id: null, card_id: OTHER_ID, installments: 3 };
+		expect(transactionInputSchema.parse(onCard)).toMatchObject({
+			card_id: OTHER_ID,
+			installments: 3,
+		});
+		const issue = (input: unknown) =>
+			transactionInputSchema.safeParse(input).error?.issues[0]?.message;
+		expect(issue({ ...expense, installments: 3 })).toBe("invalid_installments");
+		expect(issue({ ...expense, card_id: OTHER_ID })).toBe("invalid_source");
+		expect(issue({ ...expense, account_id: null })).toBe("invalid_source");
+		expect(
+			issue({
+				...expense,
+				kind: "transfer",
+				category: null,
+				title: null,
+				to_card_id: OTHER_ID,
+			}),
+		).toBeUndefined();
+		expect(
+			issue({
+				...expense,
+				kind: "transfer",
+				category: null,
+				to_card_id: OTHER_ID,
+				to_account_id: OTHER_ID,
+			}),
+		).toBe("invalid_transfer");
 	});
 
 	it("accepts a transfer without a category", () => {
@@ -117,7 +154,13 @@ describe("transactionInputSchema", () => {
 			category: null,
 			title: null,
 		};
-		expect(transactionInputSchema.parse(transfer)).toEqual({ ...transfer, note: null });
+		expect(transactionInputSchema.parse(transfer)).toEqual({
+			...transfer,
+			note: null,
+			card_id: null,
+			to_card_id: null,
+			installments: 1,
+		});
 	});
 
 	it("rejects wrong combinations", () => {

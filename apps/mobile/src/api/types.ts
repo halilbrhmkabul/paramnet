@@ -1,6 +1,8 @@
 import type {
 	AccountKind,
 	AgreementKind,
+	CardColor,
+	CardState,
 	AgreementStatus,
 	ContactKind,
 	InstallmentState,
@@ -303,10 +305,16 @@ export type AccountList = { accounts: Account[]; total_cash_minor: number; inclu
 export type Transaction = {
 	id: string;
 	kind: TransactionKind;
-	account_id: string;
-	account_name: string;
+	account_id: string | null;
+	account_name: string | null;
 	to_account_id: string | null;
 	to_account_name: string | null;
+	// A card purchase or refund (no account), or a card payment (to_card_id); ADR-055.
+	card_id: string | null;
+	card_name: string | null;
+	to_card_id: string | null;
+	to_card_name: string | null;
+	installments: number;
 	// Signed only for adjustments.
 	amount_minor: number;
 	category: TransactionCategory | null;
@@ -383,4 +391,37 @@ export type MonthlyReport = {
 	expense_minor: number;
 	by_category: { category: TransactionCategory; amount_minor: number }[];
 	series: { month: IsoDate; income_minor: number; expense_minor: number }[];
+};
+
+// Credit cards (F4-05, ADR-055); state is derived on the server (packages/shared deriveCardState).
+export type Card = {
+	id: string;
+	bank_name: string;
+	card_name: string | null;
+	last4: string;
+	label: string;
+	color: CardColor;
+	limit_minor: number;
+	opening_debt_minor: number;
+	statement_day: number;
+	due_offset_days: number;
+	min_payment_rate: number;
+	archived_at: string | null;
+	row_version: number;
+	created_at: string;
+	state: CardState;
+};
+
+export type CardList = {
+	cards: Card[];
+	total_debt_minor: number;
+	available_minor: number;
+	limit_minor: number;
+};
+
+export type CardDetail = {
+	card: Card;
+	period_items: Transaction[];
+	installment_items: Transaction[];
+	payments: Transaction[];
 };

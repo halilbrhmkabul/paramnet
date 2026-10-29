@@ -436,8 +436,15 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 	- Testler: pgTAP 290 (38), 300 (24) ve tarih vektörleri; RNTL (ekranlar 8, model 12, adaptör 3 yeni). Typecheck, lint, biçim temiz.
 	- **Kullanıcı kontrolü:** koyu temada 38, 39, 27; `supabase` modunda saatlik işin onay istemeyen kuralı kaydetmesi (yerelde pg_cron).
 
-### [ ] F4-05 Kartlar
+### [x] F4-05 Kartlar
 - Kartlarım (07), Kart detayı ve ekstre (08), Kart ödemesi (09), Kart ekle (32), Ödeme kaydedildi (11).
+- Karar: ADR-055.
+- **İlerleme (2026-10-24):**
+	- Sunucu: `cards`; `transactions`'a `card_id`, `to_card_id`, `installments`. `create_card`, `update_card`, `archive_card`, `list_cards`, `get_card`; ekstre `private.card_state_from` (paylaşılan vektörlerle aynı). Hesap silme ve dışa aktarma kapsar.
+	- Paylaşılan: `cards` (`cardInputSchema`, `deriveCardState`, `installmentParts`, `cutsAround`, `suggestedMinimumRate`), `daysBetween`, `transactionInputSchema` kart alanları.
+	- Ekranlar: Kartlarım, Kart ekle/düzenle/arşivle, Kart detayı (Ekstre / Taksitler / Geçmiş), Kart ödemesi, Ödeme kaydedildi (Geri al). İşlem formunda kart kaynağı ve taksit, transferde kart hedefi; işlem detayında kart notu; Aylık raporda kart borcu.
+	- Testler: pgTAP 310 (37) ve kart vektörleri; RNTL kartlar 7. Typecheck, lint, biçim temiz.
+	- **Kullanıcı kontrolü:** koyu temada kart yüzlerinin okunurluğu; kesim gününden sonra yeni ekstrenin doğru tutarla açılması (gerçek tarih geçince).
 
 ### [ ] F4-06 Banka kredileri: Kredi detayı (28), Kredi ekle (34)
 - **Açık karar:** banka kredisi taksit ve faiz hesabı CLAUDE.md "Faiz yok" kuralıyla çelişir. Kullanıcı kuralı değiştirmeden yapılmaz.

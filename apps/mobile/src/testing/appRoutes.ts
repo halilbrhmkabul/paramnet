@@ -51,6 +51,11 @@ import RecurringNew from "../../app/recurring/new";
 import RecurringEdit from "../../app/recurring/[id]";
 import Budget from "../../app/budget";
 import Reports from "../../app/reports";
+import CardNew from "../../app/cards/new";
+import CardDetail from "../../app/cards/[id]/index";
+import CardEdit from "../../app/cards/[id]/edit";
+import CardPay from "../../app/cards/[id]/pay";
+import CardPaid from "../../app/cards/[id]/paid";
 
 // Every route of the app for expo-router's renderRouter; extend when a route file is added.
 export const appRoutes = {
@@ -104,6 +109,11 @@ export const appRoutes = {
 	"recurring/[id]": RecurringEdit,
 	budget: Budget,
 	reports: Reports,
+	"cards/new": CardNew,
+	"cards/[id]/index": CardDetail,
+	"cards/[id]/edit": CardEdit,
+	"cards/[id]/pay": CardPay,
+	"cards/[id]/paid": CardPaid,
 	inbox: Inbox,
 	"legal/[doc]": Legal,
 	"invite/[token]": Invite,

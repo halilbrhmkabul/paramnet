@@ -14,7 +14,14 @@ import { Badge } from "@/components/StatusBadge";
 import { fill, tr } from "@/i18n/tr";
 import { useAppTheme } from "@/theme/useAppTheme";
 
-import { categoryLabel, lastEditLine, monogram, titleOf } from "./cashModel";
+import {
+	categoryLabel,
+	lastEditLine,
+	monogram,
+	sourceName,
+	targetName,
+	titleOf,
+} from "./cashModel";
 import { ConfirmSheet, amountTone, signedAmount } from "./parts";
 
 // Design 37: "10 saniye içinde geri alabilirsin".
@@ -57,10 +64,17 @@ function rows(tx: Transaction): { label: string; value: string; key: string; mon
 		list.push({ label: tr.txDetail.category, value: category, key: "category" });
 	}
 	if (tx.kind === "transfer") {
-		list.push({ label: tr.txDetail.from, value: tx.account_name, key: "from" });
-		list.push({ label: tr.txDetail.to, value: tx.to_account_name ?? "", key: "to" });
+		list.push({ label: tr.txDetail.from, value: sourceName(tx), key: "from" });
+		list.push({ label: tr.txDetail.to, value: targetName(tx), key: "to" });
 	} else {
-		list.push({ label: tr.txDetail.account, value: tx.account_name, key: "account" });
+		list.push({ label: tr.txDetail.account, value: sourceName(tx), key: "account" });
+	}
+	if (tx.installments > 1) {
+		list.push({
+			label: tr.txDetail.installments,
+			value: fill(tr.txDetail.installmentsValue, { count: String(tx.installments) }),
+			key: "installments",
+		});
 	}
 	list.push({
 		label: tr.txDetail.date,
@@ -183,7 +197,11 @@ function Detail({ data }: { data: TransactionDetail }) {
 					testID="txDetail.effect.text"
 					style={[typography.caption, styles.grow, { color: colors.pending }]}
 				>
-					{fill(tr.txDetail.effect[tx.kind], { account: tx.account_name })}
+					{tx.card_id !== null
+						? tr.txDetail.effectCard
+						: tx.to_card_id !== null
+							? tr.txDetail.effectCardPayment
+							: fill(tr.txDetail.effect[tx.kind], { account: sourceName(tx) })}
 				</Text>
 			</View>
 
@@ -288,7 +306,7 @@ function Detail({ data }: { data: TransactionDetail }) {
 			<ConfirmSheet
 				visible={confirmOpen}
 				title={tr.txDetail.deleteTitle}
-				body={fill(tr.txDetail.deleteBody, { title, amount, account: tx.account_name })}
+				body={fill(tr.txDetail.deleteBody, { title, amount, account: sourceName(tx) })}
 				confirmLabel={tr.txDetail.delete}
 				busy={remove.isPending}
 				onCancel={() => {

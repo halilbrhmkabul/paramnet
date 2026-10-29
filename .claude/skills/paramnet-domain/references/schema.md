@@ -18,6 +18,7 @@ create type event_channel    as enum ('app','web','system');
 create type account_kind     as enum ('bank','cash','savings','other');
 create type transaction_kind as enum ('expense','income','transfer','adjustment');
 create type recurrence_frequency as enum ('weekly','monthly','yearly');
+create type card_color as enum ('navy','graphite','midnight','bordeaux');
 ```
 
 ## Tablolar
@@ -160,6 +161,8 @@ create type recurrence_frequency as enum ('weekly','monthly','yearly');
 - `recurring_rules` (istemciye kapalı, ADR-054): id, owner_id, kind (expense/income), name (≤80), amount_minor, category, account_id, frequency, start_on, confirm_each, tracking_from (borç sayılan ilk gün), paused_at null, idempotency_key, row_version. Tarih kuralı `private.recurrence_dates` = `packages/shared` `occurrencesBetween` (`test-vectors/recurrence.json`).
 - `recurring_occurrences`: (rule_id, occurrence_on) pk, status (posted, skipped), transaction_id null, idempotency_key. Saatlik `post_due_recurring` onay istemeyen kuralları yazar.
 - `budgets`: (owner_id, category) pk, limit_minor (>0).
+- `cards` (istemciye kapalı, ADR-055): id, owner_id, bank_name, card_name null, last4 (4 rakam), color, limit_minor, opening_debt_minor, statement_day 1–28, due_offset_days 1–28, min_payment_rate 1–100, archived_at null, idempotency_key, row_version. Ekstre `private.card_state_from` = `packages/shared` `deriveCardState` (`test-vectors/cards.json`).
+- `transactions` F4-05 ekleri: card_id null (kart harcaması/iadesi; account_id boş), to_card_id null (hesaptan karta ödeme, kind transfer), installments 1–36 (yalnızca kartta gider).
 - Storage `avatars` (özel, 1 MB, JPEG): okuma sahibine ve paylaşılmış anlaşmanın karşı tarafına (`private.avatar_visible`); yazma/silme yalnızca `{uid}/` klasörüne.
 
 ## RLS ilkeleri
@@ -207,6 +210,7 @@ create type recurrence_frequency as enum ('weekly','monthly','yearly');
 | `get_transaction(id)` / `list_transactions(month, account_id null)` / `get_cash_summary(month)` | Detay + olaylar / ay listesi + gelir-gider / Ana Sayfa özeti |
 | `create_recurring` / `update_recurring` / `set_recurring_paused` / `delete_recurring` / `list_recurring` / `confirm_recurring` / `skip_recurring` | Tekrarlayan işlem (ADR-054) |
 | `set_budget(category, limit)` / `list_budgets(month)` / `get_monthly_report(month)` | Bütçe ve aylık rapor |
+| `create_card` / `update_card` / `archive_card` / `list_cards` / `get_card` | Kartlar ve türetilmiş ekstre (ADR-055) |
 | `has_pin()` | Oturumdaki hesap PIN belirlemiş mi (ADR-046) |
 | `pin_login_check(phone)` / `pin_login_record(phone, ok)` / `pin_mark_set(uid, phone)` | Yalnızca service_role; `pin-login` / `pin-set` kilit sayacı (ADR-049) |
 

@@ -60,15 +60,21 @@ export function categoryLabel(tx: {
 	return labels[tx.category] ?? null;
 }
 
+// Where the money sat: an account, or a card for card purchases and refunds (ADR-055).
+export function sourceName(tx: Pick<Transaction, "account_name" | "card_name">): string {
+	return tx.account_name ?? tx.card_name ?? "";
+}
+
+export function targetName(tx: Pick<Transaction, "to_account_name" | "to_card_name">): string {
+	return tx.to_account_name ?? tx.to_card_name ?? "";
+}
+
 export function titleOf(tx: Transaction): string {
 	if (tx.title !== null) {
 		return tx.title;
 	}
 	if (tx.kind === "transfer") {
-		return fill(tr.txHistory.transferTitle, {
-			from: tx.account_name,
-			to: tx.to_account_name ?? "",
-		});
+		return fill(tr.txHistory.transferTitle, { from: sourceName(tx), to: targetName(tx) });
 	}
 	if (tx.kind === "adjustment") {
 		return tr.txHistory.adjustmentTitle;
@@ -87,7 +93,7 @@ export function signOf(tx: Pick<Transaction, "kind" | "amount_minor">): "plus" |
 }
 
 // Turkish dotted/dotless i, without relying on the engine's locale support (Hermes).
-function upperTR(text: string): string {
+export function upperTR(text: string): string {
 	return text.replace(/i/g, "İ").replace(/ı/g, "I").toUpperCase();
 }
 

@@ -88,6 +88,22 @@ for (const vector of recurrence.between) {
 		`select is(${dates(`private.recurrence_dates(${text(vector.start)}, ${text(vector.frequency)}, ${text(vector.from)}, ${text(vector.to)})`)}, ${json(vector.expected)}, ${name(`between: ${vector.name}`)});`,
 	);
 }
+const cards = read("cards.json");
+for (const vector of cards.cuts) {
+	lines.push(
+		`select is(private.card_cuts(${text(vector.today)}, ${String(vector.statement_day)}), ${json({ last: vector.last, next: vector.next })}, ${name(`card cuts: ${vector.name}`)});`,
+	);
+}
+for (const vector of cards.parts) {
+	lines.push(
+		`select is(to_jsonb(private.installment_parts(${String(vector.amount)}, ${String(vector.count)})), ${json(vector.expected)}, ${name(`parts: ${vector.name}`)});`,
+	);
+}
+for (const vector of cards.states) {
+	lines.push(
+		`select is(private.card_state_from(${json(vector.card)}, ${json(vector.transactions)}, ${text(vector.today)}), ${json(vector.expected)}, ${name(`card: ${vector.name}`)});`,
+	);
+}
 
 writeFileSync(
 	out,

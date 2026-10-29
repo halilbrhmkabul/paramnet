@@ -606,3 +606,16 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- **Aylık rapor:** varsayılan son tamamlanan ay; bulunulan ay "bugüne kadar" diye işaretlenir. Borç ve alacak dengesinde yalnızca anlaşmalar (kişisel borç + elden taksit, alacaklar, bu ay ödenecek); kart ve kredi satırları F4-05/F4-06'da. Dışa aktarma düğmesi yok (PDF premium, BACKLOG).
 	- **Gezinme:** Tekrarlayan işlem İşlem merkezinden (21), Bütçe ve Raporlar Ana menüden (05) açılır. Tasarımdaki satır içi form ayrı bir ekran (`/recurring/new`); liste kısa kalır.
 - **Uygulama notları:** tüm tablolar istemciye kapalı, yazmalar idempotency anahtarı ya da `row_version` ile. Hesap silme kuralları (hesaplarla birlikte) ve bütçeleri siler; dışa aktarma ikisini de içerir. Mock adaptör saatlik işi liste açılırken taklit eder.
+
+## ADR-055 — Kredi kartları (F4-05)
+- **Tarih:** 2026-10-24
+- **Bağlam:** Tasarım 07, 08, 09, 11 ve 32 veri modelinde yoktu. Kararlar kullanıcının verdiği yetkiyle varsayılanlardan verildi.
+- **Karar:**
+	- **Kart elle takip edilir:** banka, son 4 hane, limit, güncel borç, kesim günü (1–28, her ayda olsun diye), son ödeme (kesimden gün sayısı, varsayılan 10) ve asgari oran (limit 50.000 TL'ye kadar %20, üstü %40 önerilir). Tam numara, CVV, şifre yok. Kartın görünen rengi dört seçenekten biri (tasarım 32); renkler iki temada aynıdır.
+	- **Kart harcaması bir kez gider sayılır:** `transactions.card_id` ile karta yazılır; hesap bakiyesini ve Toplam Nakit'i etkilemez. Kart ödemesi hesaptan karta `transfer` (`to_card_id`); gider değildir. İade kartta gelir kaydıdır.
+	- **Taksit:** kart harcaması 2–36 eşit parçaya bölünür (kalan kuruş ilk parçada); her parça başlangıç tarihinden ay ay ilerleyen tarihte faturalanır. Kullanılabilir limit tüm tutarı hemen düşer.
+	- **Ekstre türetilir, saklanmaz:** `deriveCardState` (TS) ve `private.card_state_from` (SQL) aynı vektörlerle sınanır (`test-vectors/cards.json`). Açılış borcu her zaman son ekstrede sayılır; önceki ekstreler kart eklendiği günden sonrakilerle sınırlı listelenir.
+	- **Faiz yok:** kısmi ödemede yalnızca "bankan faiz uygulayabilir" notu; simülasyon F4-07'de (ADR-045). "Faiz simüle et" düğmesi o göreve kadar gizli.
+	- **Ödeme kaydedildi (11):** kart ödemesinden sonra açılır; "Geri al" ödeme kaydını siler. Önce/sonra bakiyesi ödeme anındaki değerdir (ekran parametresi).
+	- **Ekranlar:** Kartlarım sekmesi (07) boş durumdan gerçek listeye geçer; işlem formunda (22) kaynak "Hesap / kart" olur, kartta taksit çipleri çıkar; transferin hedefi kart olabilir.
+- **Uygulama notları:** `transactions.account_id` artık boş olabilir (kart kaydı); kısıtlar türe göre hesap/kart kombinasyonunu zorlar. İşlem girişinde kart alanları isteğe bağlıdır (eski istemciler hesap kaydı gönderir). Hesap silme kartları ve kayıtlarını siler, dışa aktarma kartları içerir. Mock adaptör gecikme 0 iken mikro görevle yanıt verir (testlerde sahte zamanlayıcılar).
