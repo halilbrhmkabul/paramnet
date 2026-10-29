@@ -477,7 +477,14 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 ### [x] F4-10 Takvim (26) ve Ana Sayfa (03) tüm modüllerle birebir
 - Not: tüm modüller cihazda birleştirilir (ADR-060); sunucu değişikliği yok.
 
-### [ ] F4-11 Hesap bölme: oluştur (40), kişi ekle/QR/link (41), ortak hesap (42), davet edilen kişinin ekranı (43)
+### [x] F4-11 Hesap bölme: oluştur (40), kişi ekle/QR/link (41), ortak hesap (42), davet edilen kişinin ekranı (43)
+- Karar: ADR-061 (Faz 4 yetkisiyle varsayılanlar). Tasarım kaynağı claude.ai Design kanvası (40–43 `~/Downloads/ParamNet.html` kopyasında yok).
+- **İlerleme (2026-10-30):**
+	- Sunucu: `splits`, `split_members`, `split_events`; `create_split`, `get_split`, `list_splits`, `split_for_agreement`, `get_split_invite`, `request_split_join`, `decide_split_join`, `assign_split_member`, `remind_split_member`. Her pay tek ödemeli bir borç kaydı; kabul ve ödeme mevcut RPC'lerle. Hesap silme ve dışa aktarma kapsar; `splitReminder` bildirimi.
+	- Paylaşılan: `splits` (`equalShares`, `percentShares`, `parsePercentBps`, `splitInputSchema`).
+	- Ekranlar: Hesabı böl (40: eşit / tutar / yüzde, ID, isim, rehber), Kişi ekle (41: kare kod, davet linki, katılım onayı, boş yere ID), Ortak hesap (42: toplanan çubuğu, ödeme onayı, hatırlat, hareketler), davet edilen kişi (43: yer seçme, payı kabul / itiraz, ödedim bildir). İşlem merkezi girişi, Borçlarım'da "Ortak hesaplar", kayıt detayında bant. Derin bağlantı `/h/<kod>` (AASA ve Android intent filtresi).
+	- Testler: pgTAP 350 (46); Vitest splits 18, bildirim sözleşmesi 1; RNTL hesap bölme 14 (model 9, akış 5), derin bağlantı 3.
+	- **Kullanıcı kontrolü (Expo Go):** açık ve koyu temada 40–43; kare kodu başka bir telefonun kamerasıyla okutup katılma (`supabase` modunda iki hesapla); küçük ekranda tutar ve yüzde alanlarının sığması.
 
 ### [ ] F4-12 Faz 4 kapısı
 - Her ekranın referansla karşılaştırması, açık ve koyu tema, testler.

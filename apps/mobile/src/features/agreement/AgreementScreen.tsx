@@ -4,7 +4,13 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
-import { useAgreement, useDecidePayment, useDelivery, useWithdrawPayment } from "@/api/hooks";
+import {
+	useAgreement,
+	useDecidePayment,
+	useDelivery,
+	useSplitForAgreement,
+	useWithdrawPayment,
+} from "@/api/hooks";
 import type { AgreementDetail, InstallmentView, PaymentView } from "@/api/types";
 import { AmountText } from "@/components/AmountText";
 import { Avatar } from "@/components/Avatar";
@@ -234,6 +240,47 @@ function DeliveryBanner({ agreement }: { agreement: AgreementDetail }) {
 	);
 }
 
+// ADR-061: a share of a split links back to the split (design 42).
+function SplitBanner({ agreement }: { agreement: AgreementDetail }) {
+	const { colors, typography, spacing, radius } = useAppTheme();
+	const split = useSplitForAgreement(agreement.id).data;
+	if (split === undefined || split === null) {
+		return null;
+	}
+	return (
+		<Pressable
+			testID="agreement.split.banner"
+			accessibilityRole="button"
+			accessibilityLabel={tr.split.bannerOpen}
+			onPress={() => {
+				router.push({ pathname: "/split/[id]", params: { id: split.split_id } });
+			}}
+			style={[
+				styles.row,
+				{
+					gap: spacing.sm,
+					backgroundColor: colors.primarySoft,
+					borderRadius: radius.md,
+					paddingHorizontal: 16,
+					paddingVertical: 10,
+					minHeight: 56,
+				},
+			]}
+		>
+			<Ionicons name="receipt-outline" size={20} color={colors.primary} />
+			<View style={styles.grow}>
+				<Text style={[typography.caption, { color: colors.primary }]}>
+					{fill(tr.split.bannerOwner, { title: split.title })}
+				</Text>
+				<Text style={[typography.rowTitle, { color: colors.primary }]}>
+					{tr.split.bannerOpen}
+				</Text>
+			</View>
+			<Ionicons name="chevron-forward" size={18} color={colors.primary} />
+		</Pressable>
+	);
+}
+
 function Detail({ agreement }: { agreement: AgreementDetail }) {
 	const { colors, typography, spacing } = useAppTheme();
 	const online = useIsOnline();
@@ -294,6 +341,7 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 			) : (
 				<>
 					<DeliveryBanner agreement={agreement} />
+					<SplitBanner agreement={agreement} />
 					{/* Design 13 / 15: who, how much is left of what, and the next step, in one card. */}
 					<Card testID="agreement.summary" style={{ gap: spacing.md }}>
 						<View style={[styles.row, { gap: spacing.md }]}>

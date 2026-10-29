@@ -11,6 +11,10 @@ describe("invite links (F2-05)", () => {
 		["https://paramnet.app/i/abcDEF_-123", "/invite/abcDEF_-123"],
 		["/i/abcDEF_-123", "/invite/abcDEF_-123"],
 		["paramnet://i/abc", "/invite/abc"],
+		// Split joins (F4-11).
+		["https://paramnet.app/h/KRD-7Q2X", "/split/join/KRD-7Q2X"],
+		["paramnet://h/krd-7q2x", "/split/join/KRD-7Q2X"],
+		["https://paramnet.app/h/KRD-7Q2X?v=qr", "/split/join/KRD-7Q2X?via=qr"],
 		["https://paramnet.app/other", "https://paramnet.app/other"],
 		["/agreement/1", "/agreement/1"],
 	])("%s → %s", (input, output) => {

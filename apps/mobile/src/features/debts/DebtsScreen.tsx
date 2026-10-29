@@ -261,25 +261,46 @@ export function DebtsScreen() {
 		>
 			<View style={styles.between}>
 				<ScreenTitle>{tr.debts.title}</ScreenTitle>
-				<Pressable
-					testID="debts.contacts.button"
-					accessibilityRole="button"
-					accessibilityLabel={tr.tabs.contacts}
-					onPress={() => {
-						router.push("/contacts");
-					}}
-					style={[
-						styles.iconButton,
-						{
-							width: sizes.iconButton,
-							height: sizes.iconButton,
-							backgroundColor: colors.surface,
-							borderColor: colors.border,
-						},
-					]}
-				>
-					<Ionicons name="people-outline" size={22} color={colors.text} />
-				</Pressable>
+				<View style={[styles.row, { gap: 8 }]}>
+					<Pressable
+						testID="debts.splits.button"
+						accessibilityRole="button"
+						accessibilityLabel={tr.split.listOpen}
+						onPress={() => {
+							router.push("/split");
+						}}
+						style={[
+							styles.iconButton,
+							{
+								width: sizes.iconButton,
+								height: sizes.iconButton,
+								backgroundColor: colors.surface,
+								borderColor: colors.border,
+							},
+						]}
+					>
+						<Ionicons name="receipt-outline" size={22} color={colors.text} />
+					</Pressable>
+					<Pressable
+						testID="debts.contacts.button"
+						accessibilityRole="button"
+						accessibilityLabel={tr.tabs.contacts}
+						onPress={() => {
+							router.push("/contacts");
+						}}
+						style={[
+							styles.iconButton,
+							{
+								width: sizes.iconButton,
+								height: sizes.iconButton,
+								backgroundColor: colors.surface,
+								borderColor: colors.border,
+							},
+						]}
+					>
+						<Ionicons name="people-outline" size={22} color={colors.text} />
+					</Pressable>
+				</View>
 			</View>
 			<SegmentedControl
 				label={tr.debts.title}

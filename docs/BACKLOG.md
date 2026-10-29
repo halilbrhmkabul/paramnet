@@ -43,3 +43,4 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Para iste: teslim onayından önce talebi Borçlarım toplamlarının dışında tutma, teslim adımları için push bildirimi, rehberden ID ile kişi seçimi — F4-08 sırasında (ADR-058).
 
 - Ana Sayfa "Son İşlemler"de anlaşma ödemeleri (ör. "Ayşe Demir · Alacak tahsilatı"), takvimde ödenmemiş eski kart ekstrelerinin günleri, projeksiyonda ada göre uyarı cümlesi — F4-10 sırasında (ADR-060).
+- Hesabı böl: "Payları düzenle" (kabul edilmiş paylarda değişiklik önerisi, bekleyenlerde paylaşımı yenileme), fiş fotoğrafı, ödeyenin kart/hesabını seçip gideri tek kayıtta yazma, ParamNet'i olmayanlar için `/h/<kod>` web sayfası ve kayıttan sonra davete dönüş, katılma isteği için ödeyene push, süresi dolan linki yenileme, süresi dolan paylaşımı yeniden gönderme, mesaj ve e-posta için ayrı paylaşım düğmeleri — F4-11 sırasında (ADR-061).

@@ -12,6 +12,9 @@ import { createMockApi } from "./mock/mockApi";
 import { createMockProfileApi } from "./profile/mockProfile";
 import type { ProfileApi } from "./profile/ProfileApi";
 import { createSupabaseProfileApi } from "./profile/supabaseProfile";
+import { createMockSplitsApi } from "./splits/mockSplits";
+import type { SplitsApi } from "./splits/SplitsApi";
+import { createSupabaseSplitsApi } from "./splits/supabaseSplits";
 import { createSupabaseAgreementsApi } from "./supabase/supabaseAgreements";
 import { readConfig } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
@@ -21,6 +24,7 @@ type Apis = {
 	auth: AuthApi;
 	profile: ProfileApi;
 	accounts: AccountsApi;
+	splits: SplitsApi;
 };
 
 const ApiContext = createContext<Apis | null>(null);
@@ -54,6 +58,13 @@ export function createAccountsApi(): AccountsApi {
 		: createMockAccountsApi();
 }
 
+export function createSplitsApi(): SplitsApi {
+	const config = readConfig();
+	return config.mode === "supabase"
+		? createSupabaseSplitsApi(getSupabase(config.supabaseUrl, config.supabaseKey))
+		: createMockSplitsApi();
+}
+
 export function createQueryClient(): QueryClient {
 	return new QueryClient({
 		defaultOptions: {
@@ -68,6 +79,7 @@ export function ApiProvider({
 	authApi,
 	profileApi,
 	accountsApi,
+	splitsApi,
 	queryClient,
 	children,
 }: {
@@ -75,6 +87,7 @@ export function ApiProvider({
 	authApi?: AuthApi;
 	profileApi?: ProfileApi;
 	accountsApi?: AccountsApi;
+	splitsApi?: SplitsApi;
 	queryClient?: QueryClient;
 	children: ReactNode;
 }) {
@@ -83,6 +96,7 @@ export function ApiProvider({
 		auth: authApi ?? createAuthApi(),
 		profile: profileApi ?? createProfileApi(),
 		accounts: accountsApi ?? createAccountsApi(),
+		splits: splitsApi ?? createSplitsApi(),
 	}));
 	const [client] = useState(() => queryClient ?? createQueryClient());
 	return (
@@ -114,4 +128,8 @@ export function useProfileApi(): ProfileApi {
 
 export function useAccountsApi(): AccountsApi {
 	return useApis().accounts;
+}
+
+export function useSplitsApi(): SplitsApi {
+	return useApis().splits;
 }

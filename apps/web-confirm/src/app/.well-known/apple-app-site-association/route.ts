@@ -1,4 +1,4 @@
-// iOS Universal Links (deep-links.md): only /i/* opens the app. Served as JSON without redirects;
+// iOS Universal Links (deep-links.md): only /i/* (invites) and /h/* (split joins, F4-11) open the app. Served as JSON without redirects;
 // absent until the Apple team id is known (F3-06).
 export const dynamic = "force-dynamic";
 
@@ -9,7 +9,12 @@ export function GET(): Response {
 	}
 	return Response.json({
 		applinks: {
-			details: [{ appIDs: [`${team}.com.paramnet.app`], components: [{ "/": "/i/*" }] }],
+			details: [
+				{
+					appIDs: [`${team}.com.paramnet.app`],
+					components: [{ "/": "/i/*" }, { "/": "/h/*" }],
+				},
+			],
 		},
 	});
 }

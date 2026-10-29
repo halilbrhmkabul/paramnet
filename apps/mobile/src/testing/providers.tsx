@@ -9,6 +9,8 @@ import { createMockAuthApi } from "@/api/auth/mockAuth";
 import { createMockApi, type MockApiOptions } from "@/api/mock/mockApi";
 import { createMockProfileApi, type MockProfileOptions } from "@/api/profile/mockProfile";
 import type { ProfileApi } from "@/api/profile/ProfileApi";
+import { createMockSplitsApi, type MockSplitsOptions } from "@/api/splits/mockSplits";
+import type { SplitsApi } from "@/api/splits/SplitsApi";
 
 export const TEST_NOW = () => new Date("2026-10-11T09:00:00Z");
 
@@ -94,6 +96,22 @@ export function takeTestAccountsApi(): AccountsApi {
 	return api;
 }
 
+export function createTestSplitsApi(options: MockSplitsOptions = {}): SplitsApi {
+	return createMockSplitsApi({ now: TEST_NOW, latencyMs: 0, ...options });
+}
+
+let nextSplitsApi: SplitsApi | null = null;
+
+export function provideTestSplitsApi(api: SplitsApi): void {
+	nextSplitsApi = api;
+}
+
+export function takeTestSplitsApi(): SplitsApi {
+	const api = nextSplitsApi ?? createTestSplitsApi();
+	nextSplitsApi = null;
+	return api;
+}
+
 let nextQueryClient: QueryClient | null = null;
 
 export function provideTestQueryClient(client: QueryClient): void {
@@ -128,12 +146,14 @@ export function TestProviders({
 	authApi = createTestAuthApi(),
 	profileApi = createTestProfileApi(),
 	accountsApi = createTestAccountsApi(),
+	splitsApi = createTestSplitsApi(),
 	children,
 }: {
 	api?: ReturnType<typeof createMockApi>;
 	authApi?: AuthApi;
 	profileApi?: ProfileApi;
 	accountsApi?: AccountsApi;
+	splitsApi?: SplitsApi;
 	children: ReactNode;
 }) {
 	return (
@@ -142,6 +162,7 @@ export function TestProviders({
 			authApi={authApi}
 			profileApi={profileApi}
 			accountsApi={accountsApi}
+			splitsApi={splitsApi}
 			queryClient={createTestQueryClient()}
 		>
 			{children}

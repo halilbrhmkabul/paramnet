@@ -37,12 +37,11 @@ describe("İşlem merkezi (21)", () => {
 			"action.recurring",
 			"action.loan",
 			"action.request",
+			"action.split",
 		]) {
 			expect(screen.getByTestId(id)).toBeTruthy();
 		}
-		for (const hidden of ["Hesap böl", "Ödeme kaydet"]) {
-			expect(screen.queryByText(hidden)).toBeNull();
-		}
+		expect(screen.queryByText("Ödeme kaydet")).toBeNull();
 	});
 
 	it("starts a loan record and the instalment type picker", async () => {
