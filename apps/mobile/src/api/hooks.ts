@@ -2,6 +2,7 @@ import type {
 	AccountInput,
 	CardInput,
 	CreateAgreementInput,
+	LoanInput,
 	IsoDate,
 	PaymentInput,
 	RecurringInput,
@@ -59,6 +60,8 @@ export const queryKeys = {
 	report: (month: IsoDate) => ["cash", "report", month] as const,
 	cards: ["cash", "cards"] as const,
 	card: (id: string) => ["cash", "card", id] as const,
+	loans: ["cash", "loans"] as const,
+	loan: (id: string) => ["cash", "loan", id] as const,
 };
 
 export function useDashboard() {
@@ -658,5 +661,57 @@ export function useArchiveCard() {
 	const api = useAccountsApi();
 	return useCashMutation(({ id, rowVersion }: { id: string; rowVersion: number }) =>
 		api.archiveCard(id, rowVersion),
+	);
+}
+
+// Bank loans (F4-06) -----------------------------------------------------------------------------------
+
+export function useLoans() {
+	const api = useAccountsApi();
+	return useQuery({ queryKey: queryKeys.loans, queryFn: () => api.listLoans() });
+}
+
+export function useLoan(id: string) {
+	const api = useAccountsApi();
+	return useQuery({ queryKey: queryKeys.loan(id), queryFn: () => api.getLoan(id) });
+}
+
+export function useCreateLoan() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ input, idempotencyKey }: { input: LoanInput; idempotencyKey: string }) =>
+			api.createLoan(input, idempotencyKey),
+	);
+}
+
+export function useUpdateLoan() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({ id, input, rowVersion }: { id: string; input: LoanInput; rowVersion: number }) =>
+			api.updateLoan(id, input, rowVersion),
+	);
+}
+
+export function useArchiveLoan() {
+	const api = useAccountsApi();
+	return useCashMutation(({ id, rowVersion }: { id: string; rowVersion: number }) =>
+		api.archiveLoan(id, rowVersion),
+	);
+}
+
+export function useRecordLoanPayment() {
+	const api = useAccountsApi();
+	return useCashMutation(
+		({
+			id,
+			accountId,
+			paidOn,
+			idempotencyKey,
+		}: {
+			id: string;
+			accountId: string;
+			paidOn: IsoDate;
+			idempotencyKey: string;
+		}) => api.recordLoanPayment(id, accountId, paidOn, idempotencyKey),
 	);
 }

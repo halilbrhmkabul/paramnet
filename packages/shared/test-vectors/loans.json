@@ -1,0 +1,136 @@
+{
+	"payments": [
+		{
+			"name": "tasarım 28: 120.000 TL, %3,39, 24 ay",
+			"principal": 12000000,
+			"bps": 339,
+			"term": 24,
+			"expected": 738667
+		},
+		{
+			"name": "tasarım 34: 250.000 TL, %2,99, 24 ay",
+			"principal": 25000000,
+			"bps": 299,
+			"term": 24,
+			"expected": 1474596
+		},
+		{
+			"name": "faizsiz: eşit bölünür",
+			"principal": 1000000,
+			"bps": 0,
+			"term": 3,
+			"expected": 333333
+		},
+		{
+			"name": "tek taksit",
+			"principal": 500000,
+			"bps": 250,
+			"term": 1,
+			"expected": 512500
+		}
+	],
+	"schedules": [
+		{
+			"name": "3 ay, %2: son taksit kalanı kapatır",
+			"principal": 1000000,
+			"bps": 200,
+			"term": 3,
+			"first_due": "2026-01-31",
+			"installment": 346755,
+			"expected": [
+				{
+					"seq": 1,
+					"due_date": "2026-01-31",
+					"payment_minor": 346755,
+					"principal_minor": 326755,
+					"interest_minor": 20000,
+					"balance_minor": 673245
+				},
+				{
+					"seq": 2,
+					"due_date": "2026-02-28",
+					"payment_minor": 346755,
+					"principal_minor": 333290,
+					"interest_minor": 13465,
+					"balance_minor": 339955
+				},
+				{
+					"seq": 3,
+					"due_date": "2026-03-31",
+					"payment_minor": 346754,
+					"principal_minor": 339955,
+					"interest_minor": 6799,
+					"balance_minor": 0
+				}
+			]
+		},
+		{
+			"name": "banka taksiti farklı: son taksit farkı alır",
+			"principal": 1000000,
+			"bps": 200,
+			"term": 3,
+			"first_due": "2026-11-15",
+			"installment": 350000,
+			"expected": [
+				{
+					"seq": 1,
+					"due_date": "2026-11-15",
+					"payment_minor": 350000,
+					"principal_minor": 330000,
+					"interest_minor": 20000,
+					"balance_minor": 670000
+				},
+				{
+					"seq": 2,
+					"due_date": "2026-12-15",
+					"payment_minor": 350000,
+					"principal_minor": 336600,
+					"interest_minor": 13400,
+					"balance_minor": 333400
+				},
+				{
+					"seq": 3,
+					"due_date": "2027-01-15",
+					"payment_minor": 340068,
+					"principal_minor": 333400,
+					"interest_minor": 6668,
+					"balance_minor": 0
+				}
+			]
+		},
+		{
+			"name": "faizsiz",
+			"principal": 1000000,
+			"bps": 0,
+			"term": 3,
+			"first_due": "2026-11-15",
+			"installment": 333333,
+			"expected": [
+				{
+					"seq": 1,
+					"due_date": "2026-11-15",
+					"payment_minor": 333333,
+					"principal_minor": 333333,
+					"interest_minor": 0,
+					"balance_minor": 666667
+				},
+				{
+					"seq": 2,
+					"due_date": "2026-12-15",
+					"payment_minor": 333333,
+					"principal_minor": 333333,
+					"interest_minor": 0,
+					"balance_minor": 333334
+				},
+				{
+					"seq": 3,
+					"due_date": "2027-01-15",
+					"payment_minor": 333334,
+					"principal_minor": 333334,
+					"interest_minor": 0,
+					"balance_minor": 0
+				}
+			]
+		}
+	]
+}

@@ -30,7 +30,8 @@ describe("Ana menü (05)", () => {
 		});
 		expect(screen.getByTestId("menu.module.reports")).toBeTruthy();
 		expect(screen.getByTestId("menu.module.budget")).toBeTruthy();
-		for (const hidden of ["Banka Kredileri", "Faiz Hesaplayıcı"]) {
+		expect(screen.getByTestId("menu.module.loans")).toBeTruthy();
+		for (const hidden of ["Faiz Hesaplayıcı"]) {
 			expect(screen.queryByText(hidden)).toBeNull();
 		}
 		await waitFor(() => {

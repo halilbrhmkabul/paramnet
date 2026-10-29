@@ -55,6 +55,10 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 | S34 | Kart detayı (08) | `cards/[id]` | Toplam borç; Ekstre (durum, asgari çizgisi, kalan, son ödeme, Ödeme kaydet, dönem içi, kart bilgileri) / Taksitler / Geçmiş (ekstreler, ödemeler) | Faiz simülasyonu F4-07 |
 | S35 | Kart ödemesi (09) | `cards/[id]/pay` (modal) | Tamamı / asgari / başka tutar, kaynak hesap, tarih, kalan ve yeni bakiye, kısmi ödeme uyarısı | Ödeme = hesaptan karta transfer |
 | S36 | Ödeme kaydedildi (11) | `cards/[id]/paid` (modal) | Tutar, kalan ekstre, hesap önce → sonra, tarih, kayıt no, "gider sayılmadı" notu, Ana sayfaya dön / Geri al | |
+| S37 | Banka kredileri | `loans/index` | Kalan anapara, bu ayki taksitler, kredi panelleri | Tasarımda yok; birden çok kredi için |
+| S38 | Kredi detayı (28) | `loans/[id]` | Kalan anapara paneli (taksit hücreleri), Taksit ödedim kaydet, kredi bilgileri, ödeme planı tablosu (tümünü göster), ödenen taksitler | ADR-056 |
+| S39 | Kredi ekle (34) | `loans/new`, `loans/[id]/edit` (modal) | Banka, tür, tutar, aylık faiz, ilk taksit, vade çipleri, hesaplanan taksit / toplam / faiz / son taksit, bankanın taksiti, ödeme hesabı; düzenlemede arşivle | |
+| S40 | Taksit ödemesi | `loans/[id]/pay` (modal) | Sıradaki taksit, ödeme hesabı, tarih, yeni bakiye | Transfer, gider değil |
 
 Web onay ekranları (W01–W04) `apps/web-confirm`'dedir, bu skill kapsamında değil.
 

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
-import { useCards, useDashboard, useMonthlyReport } from "@/api/hooks";
+import { useCards, useDashboard, useLoans, useMonthlyReport } from "@/api/hooks";
 import type { MonthlyReport } from "@/api/types";
 import { ErrorState } from "@/components/ErrorState";
 import { LoadingState } from "@/components/LoadingState";
@@ -238,11 +238,12 @@ function Breakdown({ data }: { data: MonthlyReport }) {
 	);
 }
 
-// Debts from the agreements and the cards; bank loans join with F4-06.
+// Debts from the agreements, the cards and the bank loans.
 function Balance() {
 	const { colors, typography, fonts, radius } = useAppTheme();
 	const dashboard = useDashboard();
 	const cards = useCards();
+	const loans = useLoans();
 	if (dashboard.data === undefined) {
 		return null;
 	}
@@ -261,6 +262,16 @@ function Balance() {
 						value: formatTRY(cards.data.total_debt_minor),
 						tone: colors.text,
 						id: "cards",
+					},
+				]),
+		...(loans.data === undefined || loans.data.loans.length === 0
+			? []
+			: [
+					{
+						label: tr.report.loans,
+						value: formatTRY(loans.data.remaining_principal_minor),
+						tone: colors.text,
+						id: "loans",
 					},
 				]),
 		{

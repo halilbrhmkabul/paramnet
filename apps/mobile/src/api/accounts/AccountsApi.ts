@@ -1,6 +1,7 @@
 import type {
 	AccountInput,
 	CardInput,
+	LoanInput,
 	IsoDate,
 	RecurringInput,
 	TransactionCategory,
@@ -14,6 +15,9 @@ import type {
 	Card,
 	CardDetail,
 	CardList,
+	Loan,
+	LoanDetail,
+	LoanList,
 	CashSummary,
 	MonthlyReport,
 	RecurringRule,
@@ -61,4 +65,16 @@ export interface AccountsApi {
 	updateCard(id: string, input: CardInput, rowVersion: number): Promise<Card>;
 	archiveCard(id: string, rowVersion: number): Promise<Card>;
 	getCard(id: string): Promise<CardDetail>;
+	// F4-06 (ADR-056). An installment is a transfer from an account to the loan.
+	listLoans(): Promise<LoanList>;
+	createLoan(input: LoanInput, idempotencyKey: string): Promise<Loan>;
+	updateLoan(id: string, input: LoanInput, rowVersion: number): Promise<Loan>;
+	archiveLoan(id: string, rowVersion: number): Promise<Loan>;
+	getLoan(id: string): Promise<LoanDetail>;
+	recordLoanPayment(
+		id: string,
+		accountId: string,
+		paidOn: IsoDate,
+		idempotencyKey: string,
+	): Promise<Transaction>;
 }

@@ -446,8 +446,13 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 	- Testler: pgTAP 310 (37) ve kart vektörleri; RNTL kartlar 7. Typecheck, lint, biçim temiz.
 	- **Kullanıcı kontrolü:** koyu temada kart yüzlerinin okunurluğu; kesim gününden sonra yeni ekstrenin doğru tutarla açılması (gerçek tarih geçince).
 
-### [ ] F4-06 Banka kredileri: Kredi detayı (28), Kredi ekle (34)
-- **Açık karar:** banka kredisi taksit ve faiz hesabı CLAUDE.md "Faiz yok" kuralıyla çelişir. Kullanıcı kuralı değiştirmeden yapılmaz.
+### [x] F4-06 Banka kredileri: Kredi detayı (28), Kredi ekle (34)
+- Faiz çelişkisi ADR-045 ile çözüldü (yalnızca hesaplama ve gösterim). Karar: ADR-056.
+- **İlerleme (2026-10-25):**
+	- Sunucu: `loans`, `transactions.to_loan_id`; `create_loan`, `update_loan`, `archive_loan`, `list_loans`, `get_loan`, `record_loan_payment`; plan `private.loan_payment` / `private.loan_schedule`. Hesap silme ve dışa aktarma kapsar.
+	- Paylaşılan: `loans` (`annuityPayment`, `loanSchedule`, `loanSummary`, `loanInputSchema`, oran metni), `test-vectors/loans.json`.
+	- Ekranlar: kredi listesi, Kredi detayı (panel, plan tablosu, ödenen taksitler), Kredi ekle/düzenle/arşivle, taksit kaydı. Ana menü, İşlem merkezi ve Aylık rapor girişleri.
+	- Testler: pgTAP 320 (28) ve plan vektörleri; RNTL krediler 2. Typecheck, lint, biçim temiz.
 
 ### [ ] F4-07 Faiz simülasyonu (10)
 - **Açık karar:** aynı çelişki (F4-06).

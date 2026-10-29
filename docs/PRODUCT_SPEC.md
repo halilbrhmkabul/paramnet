@@ -403,6 +403,13 @@ Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle 
 - **Ekstre türetilir:** son kesimde kartta biriken (açılış borcu + o güne kadar faturalanan taksitler ve harcamalar − o güne kadar yapılan ödeme ve iadeler, sıfırın altına inmez). Kalan ekstre borcu = ekstre − kesimden sonraki ödemeler. Asgari = ekstre × oran (yukarı yuvarlanır). Son ödeme = kesim + gün. Dönem içi harcama = son kesimden sonraki kesime kadar faturalanacak taksitler. Kullanılabilir limit = limit − (açılış borcu + tüm harcamalar − ödeme ve iadeler).
 - **Faiz hesaplanmaz** (simülasyon F4-07). Uygulama banka ile konuşmaz; ödeme bir kayıttır.
 
+## 5.14 Banka kredileri (ADR-056)
+
+- Kullanıcının kendi banka kredisi: banka, kredi türü, çekilen tutar, aylık faiz (vergiler dahil, yüzde ikinci haneye kadar), vade (1–120 ay), ilk taksit tarihi, isteğe bağlı bankanın taksiti ve ödeme hesabı.
+- **Ödeme planı türetilir:** eşit taksit P·r / (1 − (1 + r)^−n), ondalıklı sayı kullanılmadan kuruşta tam hesaplanır; her ay faiz kalan anapara × r (yarım yukarı yuvarlanır), taksitin kalanı anaparadır, son taksit kalanı kapatır. Bankanın taksiti girilirse o kullanılır.
+- **Faiz yalnızca planı göstermek için** hesaplanır (ADR-045); kişiler arası anlaşmalara, Toplam Nakit'e ya da karşı tarafa yansımaz.
+- **Taksit kaydı** bir hesaptan krediye transferdir: hesap bakiyesi düşer, gider sayılmaz; sıradaki taksitin tutarıyla yazılır, düzenlenmez, yalnızca silinir. Ödenen taksit sayısı bu kayıtlardan gelir.
+
 # 6. Ekranlar ve Bilgi Mimarisi
 
 ## 6.1 Navigasyon
@@ -834,6 +841,8 @@ Diğer tablolar
 
 - cards (ADR-055): owner_id, bank_name, card_name null, last4, color, limit_minor, opening_debt_minor, statement_day (1–28), due_offset_days, min_payment_rate, archived_at null, idempotency_key, row_version. transactions'a card_id, to_card_id ve installments eklendi; kart harcamasında account_id boştur.
 
+- loans (ADR-056): owner_id, bank_name, loan_type, principal_minor, monthly_rate_bps (339 = %3,39), term_months, first_due_on, installment_minor, payment_account_id null, archived_at null. transactions.to_loan_id taksit kaydını krediye bağlar.
+
 - Arama, paylaşım ve kullanıcı adı kontrolü sayaçları mevcut `rate_limits` tablosundadır (`pnid:find:`, `pnid:share:`, `username:check:` + kullanıcı).
 
 ## 10.2 Satır düzeyi güvenlik (RLS)
@@ -884,6 +893,7 @@ Diğer tablolar
 | set_budget(category, limit) / list_budgets(month) | Kategori bütçesi; harcananla birlikte |
 | get_monthly_report(month) | Gelir, gider, kategori dağılımı, 6 aylık seri |
 | create_card / update_card / archive_card / list_cards / get_card | Kartlar; türetilmiş ekstre, asgari, son ödeme, kullanılabilir limit (ADR-055) |
+| create_loan / update_loan / archive_loan / list_loans / get_loan / record_loan_payment | Banka kredileri, türetilmiş ödeme planı, taksit kaydı (ADR-056) |
 
 ## 10.4 Edge Functions
 

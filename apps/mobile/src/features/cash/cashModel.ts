@@ -65,8 +65,10 @@ export function sourceName(tx: Pick<Transaction, "account_name" | "card_name">):
 	return tx.account_name ?? tx.card_name ?? "";
 }
 
-export function targetName(tx: Pick<Transaction, "to_account_name" | "to_card_name">): string {
-	return tx.to_account_name ?? tx.to_card_name ?? "";
+export function targetName(
+	tx: Pick<Transaction, "to_account_name" | "to_card_name" | "to_loan_name">,
+): string {
+	return tx.to_account_name ?? tx.to_card_name ?? tx.to_loan_name ?? "";
 }
 
 export function titleOf(tx: Transaction): string {

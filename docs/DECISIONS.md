@@ -619,3 +619,12 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- **Ödeme kaydedildi (11):** kart ödemesinden sonra açılır; "Geri al" ödeme kaydını siler. Önce/sonra bakiyesi ödeme anındaki değerdir (ekran parametresi).
 	- **Ekranlar:** Kartlarım sekmesi (07) boş durumdan gerçek listeye geçer; işlem formunda (22) kaynak "Hesap / kart" olur, kartta taksit çipleri çıkar; transferin hedefi kart olabilir.
 - **Uygulama notları:** `transactions.account_id` artık boş olabilir (kart kaydı); kısıtlar türe göre hesap/kart kombinasyonunu zorlar. İşlem girişinde kart alanları isteğe bağlıdır (eski istemciler hesap kaydı gönderir). Hesap silme kartları ve kayıtlarını siler, dışa aktarma kartları içerir. Mock adaptör gecikme 0 iken mikro görevle yanıt verir (testlerde sahte zamanlayıcılar).
+
+## ADR-056 — Banka kredileri (F4-06)
+- **Tarih:** 2026-10-25
+- **Bağlam:** Tasarım 28 ve 34 veri modelinde yoktu. ADR-045 kullanıcının kendi kredisi için faizin hesaplanıp gösterilmesine izin verir. Kararlar kullanıcının verdiği yetkiyle varsayılanlardan verildi.
+- **Karar:**
+	- **Plan türetilir:** eşit taksit (annüite), kuruşta tam; TS'de BigInt, SQL'de `numeric` döngüsüyle, ondalıklı sayı yok. Faiz her ay kalan anapara × aylık oran (yarım yukarı), son taksit kalanı kapatır. TS ve SQL aynı vektörlerle sınanır (`test-vectors/loans.json`). Tasarımdaki 7.386,40 TL yerine kesin hesap 7.386,67 TL verir; bankanın taksiti girilirse plan onunla kurulur.
+	- **Oran** yüzdenin yüzde biri olarak saklanır (`monthly_rate_bps`, 339 = %3,39); en fazla %20 aylık, vade en fazla 120 ay.
+	- **Taksit kaydı** hesaptan krediye `transfer` (`to_loan_id`), sıradaki taksitin tutarıyla; gider değildir. Düzenlenmez, yalnızca silinir (silinince plan geri açılır). Kapanan krediye taksit yazılmaz.
+	- **Ekranlar:** Ana menüde "Banka Kredileri" kutucuğu, liste (tasarımda yok), detay (28), ekle/düzenle (34), taksit kaydı. İşlem merkezinde "Banka kredisi ekle". Aylık raporda kalan anapara. "Erken ödeme hesapla" F4-07'de (faiz simülasyonu).
