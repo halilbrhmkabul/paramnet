@@ -164,6 +164,8 @@ create type card_color as enum ('navy','graphite','midnight','bordeaux');
 - `cards` (istemciye kapalı, ADR-055): id, owner_id, bank_name, card_name null, last4 (4 rakam), color, limit_minor, opening_debt_minor, statement_day 1–28, due_offset_days 1–28, min_payment_rate 1–100, archived_at null, idempotency_key, row_version. Ekstre `private.card_state_from` = `packages/shared` `deriveCardState` (`test-vectors/cards.json`).
 - `transactions` F4-05 ekleri: card_id null (kart harcaması/iadesi; account_id boş), to_card_id null (hesaptan karta ödeme, kind transfer), installments 1–36 (yalnızca kartta gider).
 - `loans` (istemciye kapalı, ADR-056): id, owner_id, bank_name, loan_type, principal_minor, monthly_rate_bps (0–2000; 339 = %3,39), term_months 1–120, first_due_on, installment_minor, payment_account_id null, archived_at null, idempotency_key, row_version. Plan `private.loan_payment` / `private.loan_schedule` = `packages/shared` `annuityPayment` / `loanSchedule` (`test-vectors/loans.json`).
+
+- `splits`, `split_members`, `split_events` (istemciye kapalı, ADR-061): hesabı böl. Her üyenin payı `split_members.agreement_id` ile ödeyenin alacaklı olduğu tek ödemeli, vadesiz bir `loan` kaydına bağlanır; pay durumu o kayıttan türetilir. `join_code` (`ABC-DEFG`, 48 saat) kare kod ve `/h/<kod>` linkidir.
 - `transactions.to_loan_id`: taksit kaydı (transfer, hesaptan krediye); düzenlenmez, yalnızca silinir.
 - Storage `avatars` (özel, 1 MB, JPEG): okuma sahibine ve paylaşılmış anlaşmanın karşı tarafına (`private.avatar_visible`); yazma/silme yalnızca `{uid}/` klasörüne.
 
@@ -214,6 +216,7 @@ create type card_color as enum ('navy','graphite','midnight','bordeaux');
 | `create_recurring` / `update_recurring` / `set_recurring_paused` / `delete_recurring` / `list_recurring` / `confirm_recurring` / `skip_recurring` | Tekrarlayan işlem (ADR-054) |
 | `set_budget(category, limit)` / `list_budgets(month)` / `get_monthly_report(month)` | Bütçe ve aylık rapor |
 | `create_card` / `update_card` / `archive_card` / `list_cards` / `get_card` | Kartlar ve türetilmiş ekstre (ADR-055) |
+| `create_split` / `get_split` / `list_splits` / `split_for_agreement` / `get_split_invite` / `request_split_join` / `decide_split_join` / `assign_split_member` / `remind_split_member` | Hesabı böl; paylar borç kaydı (ADR-061) |
 | `create_loan` / `update_loan` / `archive_loan` / `list_loans` / `get_loan` / `record_loan_payment` | Banka kredileri ve taksit kaydı (ADR-056) |
 | `has_pin()` | Oturumdaki hesap PIN belirlemiş mi (ADR-046) |
 | `pin_login_check(phone)` / `pin_login_record(phone, ok)` / `pin_mark_set(uid, phone)` | Yalnızca service_role; `pin-login` / `pin-set` kilit sayacı (ADR-049) |

@@ -17,5 +17,6 @@ export * from "./plan";
 export * from "./profile-ids";
 export * from "./recurrence";
 export * from "./schemas";
+export * from "./splits";
 export * from "./terms-hash";
 export * from "./telemetry";

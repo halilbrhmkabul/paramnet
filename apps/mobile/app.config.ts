@@ -37,7 +37,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 				{
 					action: "VIEW",
 					autoVerify: true,
-					data: [{ scheme: "https", host: domain, pathPrefix: "/i/" }],
+					data: [
+						{ scheme: "https", host: domain, pathPrefix: "/i/" },
+						{ scheme: "https", host: domain, pathPrefix: "/h/" },
+					],
 					category: ["BROWSABLE", "DEFAULT"],
 				},
 			],

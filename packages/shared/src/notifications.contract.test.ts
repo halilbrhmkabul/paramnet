@@ -31,6 +31,15 @@ describe("render (copy-tr.md notif.*)", () => {
 		expect(render(template, payload)).toEqual({ title: "Yıldız Mobilya", body });
 	});
 
+	it("splitReminder names the bill", () => {
+		expect(
+			render("splitReminder", { ...payload, name: "Akşam yemeği", amount_minor: 90000 }),
+		).toEqual({
+			title: "Akşam yemeği",
+			body: "Ortak hesapta 900,00 TL payın açık görünüyor. Ödediysen bildir.",
+		});
+	});
+
 	it("single-installment plans do not say 1/1", () => {
 		expect(render("dueToday", { ...payload, seq: 1, count: 1 })?.body).toBe(
 			"Bugün ödeme günü: 4.000,00 TL.",

@@ -6,6 +6,7 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5.4, 11.2. Faz 2.
 
 ```
 https://<APP_DOMAIN>/i/<token>
+https://<APP_DOMAIN>/h/<kod>[?v=qr]   → /split/join/<kod> (hesabı böl kare kodu ve linki, ADR-061)
 ```
 
 - `<APP_DOMAIN>` henüz belirlenmedi; `EXPO_PUBLIC_APP_DOMAIN` ortam değişkeninden okunur. Kod ve testlerde sabit yazılmaz.
@@ -30,8 +31,8 @@ https://<APP_DOMAIN>/i/<token>
 
 ## Yapılandırma
 
-- **iOS:** `app.json` → `ios.associatedDomains: ["applinks:<APP_DOMAIN>"]`. `https://<APP_DOMAIN>/.well-known/apple-app-site-association` dosyası `apps/web-confirm` tarafından `application/json` olarak, yönlendirmesiz sunulur; `paths`/`components` yalnızca `/i/*`.
-- **Android:** `app.json` → `android.intentFilters` (`autoVerify: true`, `https`, host `<APP_DOMAIN>`, `pathPrefix: /i/`). `https://<APP_DOMAIN>/.well-known/assetlinks.json` yayın imzalama sertifikasının SHA-256 parmak iziyle.
+- **iOS:** `app.json` → `ios.associatedDomains: ["applinks:<APP_DOMAIN>"]`. `https://<APP_DOMAIN>/.well-known/apple-app-site-association` dosyası `apps/web-confirm` tarafından `application/json` olarak, yönlendirmesiz sunulur; `paths`/`components` yalnızca `/i/*` ve `/h/*` (hesabı böl, ADR-061).
+- **Android:** `app.json` → `android.intentFilters` (`autoVerify: true`, `https`, host `<APP_DOMAIN>`, `pathPrefix: /i/` ve `/h/`). `https://<APP_DOMAIN>/.well-known/assetlinks.json` yayın imzalama sertifikasının SHA-256 parmak iziyle.
 - AASA ayrıntıları için `expo` skill'indeki `expo-app-clip` (associated domains bölümü) kullanılır.
 
 ## Test

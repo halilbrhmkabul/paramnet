@@ -65,6 +65,11 @@ import Interest from "../../app/interest";
 import RequestMoney from "../../app/request/index";
 import RequestSent from "../../app/request/sent";
 import AgreementDelivery from "../../app/agreement/[id]/delivery";
+import SplitList from "../../app/split/index";
+import SplitNew from "../../app/split/new";
+import SplitDetail from "../../app/split/[id]/index";
+import SplitInvite from "../../app/split/[id]/invite";
+import SplitJoin from "../../app/split/join/[code]";
 
 // Every route of the app for expo-router's renderRouter; extend when a route file is added.
 export const appRoutes = {
@@ -132,6 +137,11 @@ export const appRoutes = {
 	"request/index": RequestMoney,
 	"request/sent": RequestSent,
 	"agreement/[id]/delivery": AgreementDelivery,
+	"split/index": SplitList,
+	"split/new": SplitNew,
+	"split/[id]/index": SplitDetail,
+	"split/[id]/invite": SplitInvite,
+	"split/join/[code]": SplitJoin,
 	inbox: Inbox,
 	"legal/[doc]": Legal,
 	"invite/[token]": Invite,

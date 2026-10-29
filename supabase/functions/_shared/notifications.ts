@@ -99,6 +99,12 @@ export function render(
 					? "Ödeme 7 gündür açık görünüyor."
 					: `${seq}. taksit 7 gündür açık görünüyor.`,
 			};
+		// "Hatırlat" on a shared bill (F4-11); the name is the bill's title.
+		case "splitReminder":
+			return {
+				title: p.name,
+				body: `Ortak hesapta ${amount} payın açık görünüyor. Ödediysen bildir.`,
+			};
 		// Payment events on a shared agreement (F2-07); the other party's name is in the text.
 		case "paymentReported":
 			return {

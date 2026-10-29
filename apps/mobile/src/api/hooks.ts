@@ -6,6 +6,7 @@ import type {
 	IsoDate,
 	PaymentInput,
 	RecurringInput,
+	SplitInput,
 	TransactionCategory,
 	TransactionInput,
 } from "@paramnet/shared";
@@ -31,7 +32,7 @@ import {
 } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { useAccountsApi, useApi, useProfileApi } from "./ApiProvider";
+import { useAccountsApi, useApi, useProfileApi, useSplitsApi } from "./ApiProvider";
 import type { ProfileApi } from "./profile/ProfileApi";
 
 export const queryKeys = {
@@ -64,6 +65,11 @@ export const queryKeys = {
 	card: (id: string) => ["cash", "card", id] as const,
 	loans: ["cash", "loans"] as const,
 	loan: (id: string) => ["cash", "loan", id] as const,
+	// F4-11: every split read shares the "split" prefix.
+	splits: ["split", "list"] as const,
+	split: (id: string) => ["split", "detail", id] as const,
+	splitInvite: (code: string) => ["split", "invite", code] as const,
+	splitForAgreement: (agreementId: string) => ["split", "agreement", agreementId] as const,
 };
 
 export function useDashboard() {
@@ -782,6 +788,109 @@ export function useDeliveryStep() {
 				? api.reportDelivery(id, rowVersion)
 				: api.confirmDelivery(id, rowVersion),
 		// The agreement's row_version moved too.
+		onSettled: () => queryClient.invalidateQueries(),
+	});
+}
+
+// "Hesabı böl" (F4-11, ADR-061). A share is an agreement, so every write refreshes agreement reads too.
+export function useSplits() {
+	const api = useSplitsApi();
+	return useQuery({ queryKey: queryKeys.splits, queryFn: () => api.listSplits() });
+}
+
+export function useSplit(id: string) {
+	const api = useSplitsApi();
+	return useQuery({ queryKey: queryKeys.split(id), queryFn: () => api.getSplit(id) });
+}
+
+export function useSplitInvite(code: string) {
+	const api = useSplitsApi();
+	return useQuery({
+		queryKey: queryKeys.splitInvite(code),
+		queryFn: () => api.getSplitInvite(code),
+		staleTime: 0,
+	});
+}
+
+export function useSplitForAgreement(agreementId: string) {
+	const api = useSplitsApi();
+	return useQuery({
+		queryKey: queryKeys.splitForAgreement(agreementId),
+		queryFn: () => api.splitForAgreement(agreementId),
+	});
+}
+
+export function useCreateSplit() {
+	const api = useSplitsApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ input, idempotencyKey }: { input: SplitInput; idempotencyKey: string }) =>
+			api.createSplit(input, idempotencyKey),
+		onSuccess: () => queryClient.invalidateQueries(),
+	});
+}
+
+export function useRequestSplitJoin() {
+	const api = useSplitsApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			code,
+			memberId,
+			via,
+		}: {
+			code: string;
+			memberId: string;
+			via: "link" | "qr";
+		}) => api.requestSplitJoin(code, memberId, via),
+		onSettled: () => queryClient.invalidateQueries({ queryKey: ["split"] }),
+	});
+}
+
+export type SplitAction =
+	| { kind: "approve" | "reject"; memberId: string }
+	| { kind: "assign"; memberId: string; paramnetId: string }
+	| { kind: "remind"; memberId: string }
+	| { kind: "confirmPayment" | "rejectPayment"; paymentId: string }
+	| { kind: "accept" | "decline"; agreementId: string }
+	| { kind: "report"; agreementId: string; amountMinor: number; idempotencyKey: string };
+
+export function useSplitAction() {
+	const api = useSplitsApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async (action: SplitAction): Promise<void> => {
+			switch (action.kind) {
+				case "approve":
+				case "reject":
+					await api.decideSplitJoin(action.memberId, action.kind);
+					return;
+				case "assign":
+					await api.assignSplitMember(action.memberId, action.paramnetId);
+					return;
+				case "remind":
+					await api.remindSplitMember(action.memberId);
+					return;
+				case "confirmPayment":
+					await api.confirmSharePayment(action.paymentId, "confirm");
+					return;
+				case "rejectPayment":
+					await api.confirmSharePayment(action.paymentId, "reject");
+					return;
+				case "accept":
+					await api.answerShare(action.agreementId, "accept");
+					return;
+				case "decline":
+					await api.answerShare(action.agreementId, "reject");
+					return;
+				case "report":
+					await api.reportSharePayment(
+						action.agreementId,
+						action.amountMinor,
+						action.idempotencyKey,
+					);
+			}
+		},
 		onSettled: () => queryClient.invalidateQueries(),
 	});
 }

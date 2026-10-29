@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 describe("apple-app-site-association", () => {
-	it("opens only /i/* links in the app, as JSON without redirects", async () => {
+	it("opens only /i/* and /h/* links in the app, as JSON without redirects", async () => {
 		vi.stubEnv("APPLE_TEAM_ID", "ABCDE12345");
 		const response = aasa();
 		expect(response.status).toBe(200);
@@ -16,7 +16,10 @@ describe("apple-app-site-association", () => {
 		expect(await response.json()).toEqual({
 			applinks: {
 				details: [
-					{ appIDs: ["ABCDE12345.com.paramnet.app"], components: [{ "/": "/i/*" }] },
+					{
+						appIDs: ["ABCDE12345.com.paramnet.app"],
+						components: [{ "/": "/i/*" }, { "/": "/h/*" }],
+					},
 				],
 			},
 		});

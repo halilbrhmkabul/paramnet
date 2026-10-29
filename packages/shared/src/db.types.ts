@@ -1290,6 +1290,178 @@ export type Database = {
 				};
 				Relationships: [];
 			};
+			split_events: {
+				Row: {
+					actor_id: string | null;
+					created_at: string;
+					id: number;
+					member_id: string | null;
+					payload: NonNullable<Json>;
+					split_id: string;
+					type: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					actor_id?: string | null;
+					created_at?: string;
+					id?: never;
+					member_id?: string | null;
+					payload?: NonNullable<Json>;
+					split_id: string;
+					type: string;
+				};
+				Update: {
+					actor_id?: string | null;
+					created_at?: string;
+					id?: never;
+					member_id?: string | null;
+					payload?: NonNullable<Json>;
+					split_id?: string;
+					type?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "split_events_actor_id_fkey";
+						columns: ["actor_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "split_events_member_id_fkey";
+						columns: ["member_id"];
+						isOneToOne: false;
+						referencedRelation: "split_members";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "split_events_split_id_fkey";
+						columns: ["split_id"];
+						isOneToOne: false;
+						referencedRelation: "splits";
+						referencedColumns: ["id"];
+					},
+				];
+			};
+			split_members: {
+				Row: {
+					agreement_id: string | null;
+					created_at: string;
+					display_name: string;
+					id: string;
+					is_owner: boolean;
+					join_state: Database["public"]["Enums"]["split_join_state"];
+					joined_via: string | null;
+					profile_id: string | null;
+					requested_at: string | null;
+					seq: number;
+					share_minor: number;
+					split_id: string;
+				};
+				ComputedFields: never;
+				Insert: {
+					agreement_id?: string | null;
+					created_at?: string;
+					display_name: string;
+					id?: string;
+					is_owner?: boolean;
+					join_state?: Database["public"]["Enums"]["split_join_state"];
+					joined_via?: string | null;
+					profile_id?: string | null;
+					requested_at?: string | null;
+					seq: number;
+					share_minor: number;
+					split_id: string;
+				};
+				Update: {
+					agreement_id?: string | null;
+					created_at?: string;
+					display_name?: string;
+					id?: string;
+					is_owner?: boolean;
+					join_state?: Database["public"]["Enums"]["split_join_state"];
+					joined_via?: string | null;
+					profile_id?: string | null;
+					requested_at?: string | null;
+					seq?: number;
+					share_minor?: number;
+					split_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "split_members_agreement_id_fkey";
+						columns: ["agreement_id"];
+						isOneToOne: true;
+						referencedRelation: "agreements";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "split_members_profile_id_fkey";
+						columns: ["profile_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+					{
+						foreignKeyName: "split_members_split_id_fkey";
+						columns: ["split_id"];
+						isOneToOne: false;
+						referencedRelation: "splits";
+						referencedColumns: ["id"];
+					},
+				];
+			};
+			splits: {
+				Row: {
+					created_at: string;
+					id: string;
+					idempotency_key: string;
+					join_code: string;
+					join_expires_at: string;
+					mode: Database["public"]["Enums"]["split_mode"];
+					owner_id: string;
+					row_version: number;
+					spent_on: string;
+					title: string;
+					total_minor: number;
+				};
+				ComputedFields: never;
+				Insert: {
+					created_at?: string;
+					id?: string;
+					idempotency_key: string;
+					join_code: string;
+					join_expires_at: string;
+					mode: Database["public"]["Enums"]["split_mode"];
+					owner_id: string;
+					row_version?: number;
+					spent_on: string;
+					title: string;
+					total_minor: number;
+				};
+				Update: {
+					created_at?: string;
+					id?: string;
+					idempotency_key?: string;
+					join_code?: string;
+					join_expires_at?: string;
+					mode?: Database["public"]["Enums"]["split_mode"];
+					owner_id?: string;
+					row_version?: number;
+					spent_on?: string;
+					title?: string;
+					total_minor?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: "splits_owner_id_fkey";
+						columns: ["owner_id"];
+						isOneToOne: false;
+						referencedRelation: "profiles";
+						referencedColumns: ["id"];
+					},
+				];
+			};
 			transaction_events: {
 				Row: {
 					changes: NonNullable<Json>;
@@ -1474,6 +1646,10 @@ export type Database = {
 			archive_account: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			archive_card: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			archive_loan: { Args: { p_id: string; p_row_version: number }; Returns: Json };
+			assign_split_member: {
+				Args: { p_member_id: string; p_paramnet_id: string };
+				Returns: Json;
+			};
 			cancel_agreement: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			check_username: { Args: { p_username: string }; Returns: Json };
 			claim_notifications: { Args: { p_limit: number }; Returns: Json };
@@ -1495,6 +1671,7 @@ export type Database = {
 			create_card: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_loan: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_recurring: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
+			create_split: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_transaction: {
 				Args: { p_idempotency_key: string; p_input: Json };
 				Returns: Json;
@@ -1525,6 +1702,7 @@ export type Database = {
 				Returns: Json;
 			};
 			decide_payment: { Args: { p_decision: string; p_payment_id: string }; Returns: Json };
+			decide_split_join: { Args: { p_decision: string; p_member_id: string }; Returns: Json };
 			delete_account_data: { Args: { p_uid: string }; Returns: Json };
 			delete_recurring: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			delete_transaction: { Args: { p_id: string; p_row_version: number }; Returns: Json };
@@ -1552,6 +1730,8 @@ export type Database = {
 			get_monthly_report: { Args: { p_month: string }; Returns: Json };
 			get_my_profile: { Args: Record<PropertyKey, never>; Returns: Json };
 			get_pending_decision: { Args: { p_id: string }; Returns: Json };
+			get_split: { Args: { p_id: string }; Returns: Json };
+			get_split_invite: { Args: { p_code: string }; Returns: Json };
 			get_transaction: { Args: { p_id: string }; Returns: Json };
 			has_pin: { Args: Record<PropertyKey, never>; Returns: boolean };
 			invite_decide: {
@@ -1589,6 +1769,7 @@ export type Database = {
 			};
 			list_recurring: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_requests: { Args: Record<PropertyKey, never>; Returns: Json };
+			list_splits: { Args: Record<PropertyKey, never>; Returns: Json };
 			list_transactions: { Args: { p_account_id: string; p_month: string }; Returns: Json };
 			make_personal: { Args: { p_id: string }; Returns: Json };
 			mark_notifications_read: { Args: { p_ids: number[] }; Returns: Json };
@@ -1628,10 +1809,15 @@ export type Database = {
 			};
 			regenerate_paramnet_id: { Args: Record<PropertyKey, never>; Returns: Json };
 			register_push_token: { Args: { p_platform: string; p_token: string }; Returns: Json };
+			remind_split_member: { Args: { p_member_id: string }; Returns: Json };
 			report_delivery: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			request_cancel: { Args: { p_id: string; p_row_version: number }; Returns: Json };
 			request_money: {
 				Args: { p_idempotency_key: string; p_input: Json; p_paramnet_id: string };
+				Returns: Json;
+			};
+			request_split_join: {
+				Args: { p_code: string; p_member_id: string; p_via: string };
 				Returns: Json;
 			};
 			resolve_dispute: { Args: { p_id: string }; Returns: Json };
@@ -1654,6 +1840,7 @@ export type Database = {
 				Returns: Json;
 			};
 			skip_recurring: { Args: { p_occurrence_on: string; p_rule_id: string }; Returns: Json };
+			split_for_agreement: { Args: { p_agreement_id: string }; Returns: Json };
 			take_sms_budget: {
 				Args: { p_channel: string; p_daily_limit: number; p_phone: string };
 				Returns: Json;
@@ -1714,6 +1901,8 @@ export type Database = {
 			payment_method: "cash" | "transfer" | "card" | "other";
 			payment_status: "reported" | "confirmed" | "rejected" | "withdrawn" | "voided";
 			recurrence_frequency: "weekly" | "monthly" | "yearly";
+			split_join_state: "none" | "requested" | "approved";
+			split_mode: "equal" | "amount" | "percent";
 			transaction_kind: "expense" | "income" | "transfer" | "adjustment";
 			version_status: "draft" | "proposed" | "accepted" | "rejected" | "superseded";
 		};
@@ -1851,6 +2040,8 @@ export const Constants = {
 			payment_method: ["cash", "transfer", "card", "other"],
 			payment_status: ["reported", "confirmed", "rejected", "withdrawn", "voided"],
 			recurrence_frequency: ["weekly", "monthly", "yearly"],
+			split_join_state: ["none", "requested", "approved"],
+			split_mode: ["equal", "amount", "percent"],
 			transaction_kind: ["expense", "income", "transfer", "adjustment"],
 			version_status: ["draft", "proposed", "accepted", "rejected", "superseded"],
 		},

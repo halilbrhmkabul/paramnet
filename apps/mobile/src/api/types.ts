@@ -13,6 +13,7 @@ import type {
 	PaymentMethod,
 	PaymentStatus,
 	RecurrenceFrequency,
+	SplitMode,
 	TransactionCategory,
 	TransactionKind,
 } from "@paramnet/shared";
@@ -469,3 +470,91 @@ export type DeliveryState = {
 	status: AgreementStatus;
 	row_version: number;
 };
+
+// "Hesabı böl" (F4-11, ADR-061): each share is a loan record from the payer; state comes from it.
+export type SplitMemberState =
+	| "payer"
+	| "open"
+	| "requested"
+	| "invited"
+	| "accepted"
+	| "reported"
+	| "paid"
+	| "disputed"
+	| "declined";
+
+export type SplitMember = {
+	id: string;
+	display_name: string;
+	share_minor: number;
+	is_owner: boolean;
+	is_me: boolean;
+	state: SplitMemberState;
+	joined_via: "paramnet_id" | "link" | "qr" | null;
+	requested_at: string | null;
+	// Only the payer and that member see the record behind a share.
+	agreement_id: string | null;
+	paid_minor: number;
+	reported_payment: { id: string; amount_minor: number; reported_at: string } | null;
+	paid_at: string | null;
+};
+
+export type SplitEvent = {
+	type:
+		| "join_requested"
+		| "join_approved"
+		| "join_rejected"
+		| "member_assigned"
+		| "accepted"
+		| "rejected"
+		| "countered"
+		| "payment_reported"
+		| "payment_confirmed"
+		| "payment_rejected";
+	name: string | null;
+	at: string;
+	via: string | null;
+};
+
+export type SplitDetail = {
+	id: string;
+	title: string;
+	total_minor: number;
+	spent_on: IsoDate;
+	mode: SplitMode;
+	is_owner: boolean;
+	owner_name: string;
+	// The payer's only: what the QR code and the link carry.
+	join_code: string | null;
+	join_expires_at: string | null;
+	collected_minor: number;
+	members: SplitMember[];
+	events: SplitEvent[];
+	row_version: number;
+};
+
+export type SplitSummary = {
+	id: string;
+	title: string;
+	total_minor: number;
+	spent_on: IsoDate;
+	is_owner: boolean;
+	owner_name: string;
+	member_count: number;
+	my_share_minor: number | null;
+};
+
+export type SplitSeat = { id: string; display_name: string; share_minor: number };
+
+export type SplitInvite =
+	| { status: "not_found" | "expired" }
+	| { status: "owner" | "member"; split_id: string }
+	| {
+			status: "open";
+			title: string;
+			total_minor: number;
+			spent_on: IsoDate;
+			owner_name: string;
+			member_count: number;
+			seats: SplitSeat[];
+	  };

@@ -87,6 +87,7 @@ function HintRow({
 	hint,
 	icon,
 	tone,
+	badge,
 	onPress,
 	testID,
 }: {
@@ -94,10 +95,11 @@ function HintRow({
 	hint: string;
 	icon: IconName;
 	tone: [ColorToken, ColorToken];
+	badge?: string;
 	onPress: () => void;
 	testID: string;
 }) {
-	const { colors, typography, spacing } = useAppTheme();
+	const { colors, typography, spacing, radius, fonts } = useAppTheme();
 	return (
 		<Pressable
 			testID={testID}
@@ -118,12 +120,25 @@ function HintRow({
 					{hint}
 				</Text>
 			</View>
+			{badge === undefined ? null : (
+				<View
+					style={[
+						styles.badge,
+						{ backgroundColor: colors.primarySoft, borderRadius: radius.pill },
+					]}
+				>
+					<Text
+						style={{ fontFamily: fonts.extrabold, fontSize: 11, color: colors.primary }}
+					>
+						{badge}
+					</Text>
+				</View>
+			)}
 		</Pressable>
 	);
 }
 
-// Design 21. Rows for modules that are not built yet (Hesap böl, Ödeme kaydet)
-// stay hidden until their tasks (ADR-053).
+// Design 21. "Ödeme kaydet" stays hidden: it is the card or loan payment of the module itself (ADR-053).
 export function ActionCenterScreen() {
 	const { colors, typography, spacing } = useAppTheme();
 	const start = useNewDraft((state) => state.start);
@@ -178,6 +193,17 @@ export function ActionCenterScreen() {
 						router.push("/request");
 					}}
 					testID="action.request"
+				/>
+				<HintRow
+					title={tr.action.split}
+					hint={tr.action.splitHint}
+					icon="receipt-outline"
+					tone={["primary", "primarySoft"]}
+					badge={tr.action.newBadge}
+					onPress={() => {
+						router.push("/split/new");
+					}}
+					testID="action.split"
 				/>
 				<HintRow
 					title={tr.action.borrow}
@@ -238,6 +264,7 @@ export function ActionCenterScreen() {
 }
 
 const styles = StyleSheet.create({
+	badge: { height: 22, paddingHorizontal: 8, justifyContent: "center" },
 	tiles: { flexDirection: "row" },
 	tile: {
 		flex: 1,

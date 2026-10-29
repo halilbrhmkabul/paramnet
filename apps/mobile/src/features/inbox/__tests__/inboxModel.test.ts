@@ -80,6 +80,7 @@ describe("inbox model", () => {
 			"shareWithdrawn",
 			"inviteExpired",
 			"settled",
+			"splitReminder",
 		];
 		expect(Object.keys(tr.inbox.titles).sort()).toEqual([...templates].sort());
 	});

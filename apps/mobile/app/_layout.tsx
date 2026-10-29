@@ -270,6 +270,31 @@ function AppNavigator() {
 					name="agreement/[id]/delivery"
 					options={{ ...detailHeader, title: tr.delivery.title }}
 				/>
+				{/* F4-11 (ADR-061). */}
+				<Stack.Screen
+					name="split/index"
+					options={{ ...detailHeader, title: tr.split.listTitle }}
+				/>
+				<Stack.Screen
+					name="split/new"
+					options={{
+						...topBarHeader({ close: true }),
+						title: tr.split.createTitle,
+						presentation: "modal",
+					}}
+				/>
+				<Stack.Screen
+					name="split/[id]/index"
+					options={{ ...detailHeader, title: tr.split.detailTitle }}
+				/>
+				<Stack.Screen
+					name="split/[id]/invite"
+					options={{ ...detailHeader, title: tr.split.inviteTitle }}
+				/>
+				<Stack.Screen
+					name="split/join/[code]"
+					options={{ ...detailHeader, title: tr.split.joinTitle }}
+				/>
 				<Stack.Screen name="budget" options={detailHeader} />
 				<Stack.Screen
 					name="reports"

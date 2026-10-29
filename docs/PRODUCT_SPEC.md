@@ -93,7 +93,7 @@ Bunun sonuçları: unutulan ödeme günleri, tarafların farklı hatırladığı
 
 ## 3.1 Konumlandırma
 
-Uygulama ne bir bütçe uygulaması ne de bir harcama bölüştürme uygulamasıdır. **Bireyler arası borç ve vadeli ödeme anlaşmalarının dijital mutabakat aracıdır.**
+Uygulama ne bir bütçe uygulaması ne de bir harcama bölüştürme uygulamasıdır. **Bireyler arası borç ve vadeli ödeme anlaşmalarının dijital mutabakat aracıdır.** Faz 4'te eklenen "Hesabı böl" (5.17) da bir bölüştürme defteri değildir: her pay, ödeyene karşı kişinin kabul ettiği ayrı bir borç kaydıdır (ADR-061).
 
 | **Biz neyiz**                                     | **Biz ne değiliz**                        |
 |---------------------------------------------------|-------------------------------------------|
@@ -419,6 +419,14 @@ Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle 
 
 - Taksitli alım ya da satışta alış (satış) tarihi tutulur; peşinat bu tarihle kaydedilir.
 - Planın ilk taksitlerinin tarihi geçmişse önizlemede "Ödendi" işaretlenebilir. İşaretlenen taksitler kendi vade gününde ödenmiş sayılır ve kayıtla aynı işlemde yazılır. Ödemeler sırayla dağıtıldığı için yalnızca baştan ardışık taksitler işaretlenir.
+
+## 5.17 Hesabı böl (ADR-061)
+
+- **Ödeyen** hesabın adını, toplamını, tarihini ve kişileri girer; paylar eşit, tutarla ya da yüzdeyle bölünür. Kuruş farkı ödeyenin payına eklenir. Paylar toplamı hesaba eşit olmalıdır.
+- **Her pay ayrı bir borç kaydıdır:** ödeyen alacaklı, kişi borçlu, tek ödemeli ve vadesiz. Kişi payını kabul edince kayıt "active" olur ve Borçlarım / Alacaklarım'da görünür; ödemesini bildirir, ödeyen "Aldım, onayla" der (5.6'daki ödeme onayı). Anlaşma durum makinesine yeni durum eklenmez; hesap bu kayıtları gruplayan bir başlıktır.
+- **Kişi ekleme:** ParamNet ID ile eklenen kişiye pay hemen gönderilir (5.4'teki ID ile paylaşım). Diğerleri adıyla eklenir ve 48 saat geçerli kare kod ya da davet linkiyle (`/h/<kod>`) kendi adını seçerek katılmak ister; ödeyen katılımı onaylayınca pay o hesaba gönderilir. Reddedilen yer yeniden açılır.
+- **Görünürlük:** hesabı ödeyen ve payı olan herkes görür: toplam, herkesin adı, payı ve ödeme durumu. Borç kaydının kendisini yalnızca o iki taraf görür; kimse diğerlerinin bakiyesini görmez.
+- **Hatırlatma:** ödeyen, açık bir payın sahibine günde en fazla bir kez "Hatırlat" gönderebilir.
 
 # 6. Ekranlar ve Bilgi Mimarisi
 
@@ -853,6 +861,8 @@ Diğer tablolar
 
 - loans (ADR-056): owner_id, bank_name, loan_type, principal_minor, monthly_rate_bps (339 = %3,39), term_months, first_due_on, installment_minor, payment_account_id null, archived_at null. transactions.to_loan_id taksit kaydını krediye bağlar.
 
+- splits (ADR-061): owner_id, title, total_minor, spent_on, mode (equal, amount, percent), join_code (`ABC-DEFG`), join_expires_at (48 saat), idempotency_key, row_version. split_members: split_id, seq (ödeyen 0), display_name, share_minor, is_owner, profile_id null, join_state (none, requested, approved), joined_via (paramnet_id, link, qr), agreement_id null (payın borç kaydı). split_events yalnızca katılım olaylarını tutar; ödeme ve kabul olayları payların agreement_events kayıtlarından okunur.
+
 - Arama, paylaşım ve kullanıcı adı kontrolü sayaçları mevcut `rate_limits` tablosundadır (`pnid:find:`, `pnid:share:`, `username:check:` + kullanıcı).
 
 ## 10.2 Satır düzeyi güvenlik (RLS)
@@ -907,6 +917,9 @@ Diğer tablolar
 | request_money(input, paramnet_id, idem_key) | Borç alanın kaydı + ID ile paylaşım, tek işlemde (ADR-058) |
 | get_delivery(id) / report_delivery(id, row_version) / confirm_delivery(id, row_version) | Para teslimi: borç veren bildirir, borç alan onaylar |
 | create_agreement_with_paid(input, paid_count, idem_key) | Kayıt + geçmiş ilk n taksitin ödemesi, tek işlemde (ADR-059) |
+| create_split(input, idem_key) / get_split(id) / list_splits() / split_for_agreement(agreement_id) | Hesabı böl: paylar borç kaydı, ID'li kişilere tek işlemde paylaşılır (ADR-061) |
+| get_split_invite(code) / request_split_join(code, member_id, via) | Kare kod ve link: boş yerler; kendi yerini seçip katılma isteği (saatte 20) |
+| decide_split_join(member_id, decision) / assign_split_member(member_id, paramnet_id) / remind_split_member(member_id) | Ödeyen: katılımı onayla/reddet, boş yere ID ile kişi, günde bir hatırlatma |
 
 ## 10.4 Edge Functions
 
