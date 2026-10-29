@@ -59,7 +59,7 @@ describe("mock createAgreement", () => {
 				kind: "down_payment",
 				status: "confirmed",
 				amount_minor: 800000,
-				paid_on: "2026-10-11",
+				paid_on: "2026-10-01",
 			}),
 		]);
 		expect((await api.listContacts()).map((c) => c.display_name)).toEqual(["Kaya Mobilya"]);
@@ -102,5 +102,47 @@ describe("mock createAgreement", () => {
 				"55555555-5555-4555-8555-555555555555",
 			),
 		).rejects.toEqual(new ApiError("validation_error"));
+	});
+
+	// ADR-059: rows already behind the owner are saved as paid, each on its own due date.
+	it("records the first rows as paid on their due dates and the down payment on the purchase date", async () => {
+		const api = createMockApi({ now, seed: "empty", latencyMs: 0 });
+		const past: CreateAgreementInput = {
+			...furniture,
+			started_on: "2026-07-15",
+			terms: {
+				...furniture.terms,
+				plan: [
+					{ seq: 1, due_date: "2026-08-15", amount_minor: 1000000 },
+					{ seq: 2, due_date: "2026-09-15", amount_minor: 500000 },
+					{ seq: 3, due_date: "2026-11-15", amount_minor: 500000 },
+				],
+			},
+		};
+		const { agreement_id } = await api.createAgreement(
+			past,
+			"66666666-6666-4666-8666-666666666666",
+			2,
+		);
+		const detail = await api.getAgreement(agreement_id);
+		expect(detail.outstanding_minor).toBe(500000);
+		expect(detail.payments.map((p) => [p.kind, p.paid_on, p.amount_minor])).toEqual(
+			expect.arrayContaining([
+				["down_payment", "2026-07-15", 800000],
+				["payment", "2026-08-15", 1000000],
+				["payment", "2026-09-15", 500000],
+			]),
+		);
+		const again = await api.createAgreement(past, "66666666-6666-4666-8666-666666666666", 2);
+		expect(again.replayed).toBe(true);
+		expect((await api.getAgreement(agreement_id)).payments).toHaveLength(3);
+	});
+
+	it("refuses to mark a row that is not due yet as paid", async () => {
+		const api = createMockApi({ now, seed: "empty", latencyMs: 0 });
+		await expect(
+			api.createAgreement(furniture, "77777777-7777-4777-8777-777777777777", 1),
+		).rejects.toEqual(new ApiError("validation_error"));
+		expect(await api.listAgreements()).toHaveLength(0);
 	});
 });

@@ -4,6 +4,7 @@ import {
 	defaultValues,
 	planFromValues,
 	toCreateInput,
+	tryPlan,
 	validateForm,
 	type NewFormValues,
 } from "../formModel";
@@ -20,6 +21,11 @@ const furniture: NewFormValues = {
 };
 
 describe("defaultValues", () => {
+	it("design 23: an installment purchase starts at 6 rows", () => {
+		expect(defaultValues("2026-10-11", true).count).toBe("6");
+		expect(defaultValues("2026-10-11").count).toBe("3");
+	});
+
 	it("defaults to monthly with the first payment one month from today", () => {
 		expect(defaultValues("2026-01-31")).toMatchObject({
 			period: "monthly",
@@ -92,8 +98,9 @@ describe("planFromValues / toCreateInput", () => {
 		]);
 		const input = toCreateInput("boughtInstallment", furniture, plan);
 		expect(createAgreementInputSchema.safeParse(input).success).toBe(true);
+		// ADR-059: the purchase date is kept; it also dates the down payment.
 		expect(input).toMatchObject({
-			started_on: null,
+			started_on: "2026-10-11",
 			kind: "installment_purchase",
 			creator_role: "debtor",
 			title: "Mobilya",
@@ -119,5 +126,12 @@ describe("planFromValues / toCreateInput", () => {
 			started_on: "2026-10-11",
 			terms: { principal_minor: 1000000, down_payment_minor: 0, notes: "Tatil" },
 		});
+	});
+});
+
+describe("tryPlan", () => {
+	it("is the generated plan when the values make one, null otherwise", () => {
+		expect(tryPlan("boughtInstallment", furniture)).toHaveLength(5);
+		expect(tryPlan("boughtInstallment", { ...furniture, amount_minor: null })).toBeNull();
 	});
 });

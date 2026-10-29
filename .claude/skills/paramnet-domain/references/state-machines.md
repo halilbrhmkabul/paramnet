@@ -23,6 +23,7 @@ Aktör kısaltmaları: **C** = oluşturan (creator), **K** = karşı taraf (coun
 | Mevcut | Olay / RPC | Aktör | Yeni | Koşul / Etki |
 |---|---|---|---|---|
 | — | `create_agreement` | C | `personal` | v1 oluşur, taksitler üretilir, peşinat ödemesi `confirmed` |
+| — | `create_agreement_with_paid` | C | `personal` (hepsi ödendiyse `settled`) | Aynısı + ilk n taksit vade gününde `confirmed` ödeme (ADR-059) |
 | `personal` | `update_personal_agreement` | C | `personal` | Yeni versiyon; onaylı ödemeler korunur |
 | `personal` | `record_payment` | C | `personal` / `settled` | Doğrudan `confirmed`; kalan 0 ise `settled` |
 | `personal` | `cancel_agreement` | C | `cancelled` | |

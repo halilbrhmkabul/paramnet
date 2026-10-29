@@ -28,10 +28,12 @@ export interface AgreementsApi {
 	// Every agreement I am party to (Borçlarım / Alacaklarım, F3-11).
 	listAgreements(): Promise<AgreementSummary[]>;
 	getCalendar(month: IsoDate): Promise<CalendarMonth>;
-	// The key is generated once per draft and reused on retry (BR-09).
+	// The key is generated once per draft and reused on retry (BR-09). paidCount (ADR-059): the first
+	// rows, all already due, are saved as paid in the same transaction.
 	createAgreement(
 		input: CreateAgreementInput,
 		idempotencyKey: string,
+		paidCount?: number,
 	): Promise<{ agreement_id: string; replayed: boolean }>;
 	// record_payment: row_version guards concurrent edits; the key makes retries safe.
 	recordPayment(

@@ -1,16 +1,16 @@
 import { addMonthsClamped, type PlanPeriod } from "@paramnet/shared";
 import { Redirect, router } from "expo-router";
 import { useState } from "react";
-import { Controller, useForm, useWatch, type FieldErrors, type Resolver } from "react-hook-form";
-import { Pressable, Text, View } from "react-native";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { ContactPickerSheet } from "./ContactPickerSheet";
 import { useNewDraft } from "./draftStore";
+import { ContactField, resolverFor } from "./formParts";
+import { InstallmentFormScreen } from "./InstallmentFormScreen";
 import {
 	NEW_TYPES,
 	defaultValues,
 	usesInstallments,
-	validateForm,
 	type NewFormValues,
 	type NewType,
 } from "./formModel";
@@ -25,7 +25,6 @@ import { TextField } from "@/components/TextField";
 import { messageForCode } from "@/features/forms/fieldError";
 import { useToday } from "@/lib/clock";
 import { tr } from "@/i18n/tr";
-import { useAppTheme } from "@/theme/useAppTheme";
 
 const TITLES: Record<NewType, string> = {
 	lent: tr.new.lent,
@@ -40,32 +39,19 @@ const PERIODS: { value: PlanPeriod; label: string }[] = [
 	{ value: "biweekly", label: tr.new.periodBiweekly },
 ];
 
-// react-hook-form owns the state; the rules (including the plan rules) come from formModel / @paramnet/shared.
-function resolverFor(type: NewType): Resolver<NewFormValues> {
-	return (values) => {
-		const codes = validateForm(type, values);
-		const entries = Object.entries(codes);
-		if (entries.length === 0) {
-			return { values, errors: {} };
-		}
-		const errors: FieldErrors<NewFormValues> = {};
-		for (const [field, code] of entries) {
-			errors[field as keyof NewFormValues] = { type: "validate", message: code };
-		}
-		return { values: {}, errors };
-	};
-}
-
 export function NewFormScreen() {
 	const type = useNewDraft((state) => state.type);
 	if (type === null) {
 		return <Redirect href="/new" />;
 	}
-	return <NewForm type={type} />;
+	return NEW_TYPES[type].purchase ? (
+		<InstallmentFormScreen type={type} />
+	) : (
+		<NewForm type={type} />
+	);
 }
 
 function NewForm({ type }: { type: NewType }) {
-	const { colors, typography, radius, spacing, sizes } = useAppTheme();
 	const today = useToday();
 	const draft = useNewDraft();
 	const config = NEW_TYPES[type];
@@ -108,43 +94,14 @@ function NewForm({ type }: { type: NewType }) {
 		>
 			<ScreenTitle>{TITLES[type]}</ScreenTitle>
 
-			<View style={{ gap: spacing.xs }}>
-				<Text style={[typography.callout, { color: colors.textMuted }]}>
-					{contactLabel}
-				</Text>
-				<Pressable
-					testID="newForm.contact.picker"
-					accessibilityRole="button"
-					accessibilityLabel={`${contactLabel}: ${values.contact_label === "" ? tr.new.choosePerson : values.contact_label}`}
-					onPress={() => {
-						setPickerOpen(true);
-					}}
-					style={{
-						minHeight: sizes.minTouch,
-						justifyContent: "center",
-						borderWidth: 1,
-						borderRadius: radius.sm,
-						borderColor:
-							error("contact") === undefined ? colors.border : colors.overdue,
-						backgroundColor: colors.surface,
-						paddingHorizontal: spacing.md,
-					}}
-				>
-					<Text
-						style={[
-							typography.body,
-							{ color: values.contact === null ? colors.textMuted : colors.text },
-						]}
-					>
-						{values.contact === null ? tr.new.choosePerson : values.contact_label}
-					</Text>
-				</Pressable>
-				{error("contact") !== undefined ? (
-					<Text style={[typography.caption, { color: colors.overdue }]}>
-						{error("contact")}
-					</Text>
-				) : null}
-			</View>
+			<ContactField
+				label={contactLabel}
+				value={values.contact === null ? null : values.contact_label}
+				error={error("contact")}
+				onPress={() => {
+					setPickerOpen(true);
+				}}
+			/>
 			<ContactPickerSheet
 				visible={pickerOpen}
 				newContactKind={type === "boughtInstallment" ? "merchant" : "person"}

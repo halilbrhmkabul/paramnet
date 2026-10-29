@@ -102,10 +102,12 @@ export function useCreateAgreement() {
 		mutationFn: ({
 			input,
 			idempotencyKey,
+			paidCount = 0,
 		}: {
 			input: CreateAgreementInput;
 			idempotencyKey: string;
-		}) => api.createAgreement(input, idempotencyKey),
+			paidCount?: number;
+		}) => api.createAgreement(input, idempotencyKey, paidCount),
 		// A new agreement changes the dashboard, contacts and calendar at once.
 		onSuccess: () => queryClient.invalidateQueries(),
 	});

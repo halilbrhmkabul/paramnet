@@ -109,14 +109,20 @@ function PaymentResult({
 	);
 }
 
-function PaymentForm({ agreement }: { agreement: AgreementDetail }) {
+function PaymentForm({
+	agreement,
+	initialAmount,
+}: {
+	agreement: AgreementDetail;
+	initialAmount: number | null;
+}) {
 	const { colors, typography, spacing } = useAppTheme();
 	const today = useToday();
 	const online = useIsOnline();
 	const record = useRecordPayment(agreement.id);
 	// One key per screen visit: a retry after a network error must not record twice (BR-09).
 	const [idempotencyKey] = useState(newIdempotencyKey);
-	const [amount, setAmount] = useState<number | null>(null);
+	const [amount, setAmount] = useState<number | null>(initialAmount);
 	const [paidOn, setPaidOn] = useState<IsoDate>(today);
 	const [method, setMethod] = useState<PaymentMethod>("cash");
 	const [note, setNote] = useState("");
@@ -326,8 +332,10 @@ function PaymentForm({ agreement }: { agreement: AgreementDetail }) {
 }
 
 // S12
+// `amount` (kuruş): design 25 "Ödendi kaydet" opens with the next installment's remainder filled in.
 export function PaymentScreen() {
-	const { id } = useLocalSearchParams<{ id: string }>();
+	const { id, amount } = useLocalSearchParams<{ id: string; amount?: string }>();
+	const initialAmount = amount !== undefined && /^\d+$/.test(amount) ? Number(amount) : null;
 	const agreement = useAgreement(id);
 	if (agreement.isPending) {
 		return (
@@ -349,7 +357,7 @@ export function PaymentScreen() {
 			</Screen>
 		);
 	}
-	return <PaymentForm agreement={agreement.data} />;
+	return <PaymentForm agreement={agreement.data} initialAmount={initialAmount} />;
 }
 
 const styles = StyleSheet.create({

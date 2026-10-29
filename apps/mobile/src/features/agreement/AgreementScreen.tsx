@@ -1,6 +1,6 @@
 import { formatDateTimeTR, formatDateTR, formatTRY } from "@paramnet/shared";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
@@ -16,9 +16,12 @@ import { LoadingState } from "@/components/LoadingState";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Screen } from "@/components/Screen";
 import { SectionHeader } from "@/components/SectionHeader";
+import { IconButton } from "@/components/TopBar";
 import { AgreementStatusBadge, Badge, InstallmentStatusBadge } from "@/components/StatusBadge";
 import { DisputeCancelActions } from "./DisputeCancelActions";
 import { describeEvent } from "./HistoryScreen";
+import { InstallmentDetail } from "./InstallmentDetail";
+import { KeyValue, Rows } from "./parts";
 import { SharedStateActions } from "./SharedStateActions";
 import { installmentPosition } from "@/features/agreements/DueItemRow";
 import { fill, tr } from "@/i18n/tr";
@@ -149,44 +152,6 @@ function PaymentRow({
 	);
 }
 
-// Design "kv": a label and its value on one line.
-function KeyValue({ label, value, testID }: { label: string; value: string; testID?: string }) {
-	const { colors, typography, spacing } = useAppTheme();
-	return (
-		<View style={[styles.rowBetween, styles.kv, { gap: spacing.md }]}>
-			<Text style={[typography.callout, { color: colors.textMuted }]}>{label}</Text>
-			<Text
-				testID={testID}
-				style={[typography.rowTitle, styles.end, { color: colors.text }]}
-				numberOfLines={2}
-			>
-				{value}
-			</Text>
-		</View>
-	);
-}
-
-// Rows inside one card, separated by hairlines (design "card" + "row+row").
-function Rows({ children }: { children: React.ReactNode[] }) {
-	const { colors } = useAppTheme();
-	return (
-		<Card style={{ paddingVertical: 0 }}>
-			{children.map((child, index) => (
-				<View
-					key={index}
-					style={
-						index === 0
-							? undefined
-							: { borderTopWidth: 1, borderTopColor: colors.divider }
-					}
-				>
-					{child}
-				</View>
-			))}
-		</Card>
-	);
-}
-
 function recordLabel(agreement: AgreementDetail): string {
 	if (agreement.status === "personal") {
 		return tr.agreement.recordPersonal;
@@ -274,119 +239,179 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 	const online = useIsOnline();
 	const paid = agreement.principal_minor - agreement.outstanding_minor;
 	const tone = agreement.my_role === "creditor" ? "receivable" : "payable";
+	const installment = agreement.kind === "installment_purchase";
+	// Shared plans change through an amendment the other side accepts (BR-05).
+	const amendable = agreement.status === "active" || agreement.status === "disputed";
 
 	return (
 		<>
-			<DeliveryBanner agreement={agreement} />
-			{/* Design 13 / 15: who, how much is left of what, and the next step, in one card. */}
-			<Card testID="agreement.summary" style={{ gap: spacing.md }}>
-				<View style={[styles.row, { gap: spacing.md }]}>
-					<Avatar name={agreement.counterparty.display_name} size={48} />
-					<View style={styles.grow}>
-						<Text
-							testID="agreement.counterparty.text"
-							style={[typography.headline, { color: colors.text }]}
-							numberOfLines={1}
-						>
-							{agreement.counterparty.display_name}
-						</Text>
-						<Text
-							testID="agreement.title.text"
-							accessibilityRole="header"
-							style={[typography.caption, { color: colors.textMuted }]}
-							numberOfLines={1}
-						>
-							{agreement.title}
-						</Text>
-					</View>
-					<AgreementStatusBadge
-						status={agreement.status}
-						testID="agreement.status.badge"
+			{installment ? (
+				<>
+					<Stack.Screen
+						options={{
+							title: agreement.title,
+							headerRight: amendable
+								? () => (
+										<IconButton
+											icon="create-outline"
+											label={tr.agreement.editPlan}
+											onPress={() => {
+												router.push({
+													pathname: "/agreement/[id]/amend",
+													params: { id: agreement.id },
+												});
+											}}
+											testID="agreement.editPlan.button"
+										/>
+									)
+								: undefined,
+						}}
 					/>
-				</View>
-				<View style={{ gap: 2 }}>
-					<Text
-						testID="agreement.role.text"
-						style={[typography.label, { color: colors.textMuted }]}
-					>
-						{agreement.my_role === "creditor"
-							? tr.agreement.owesYou
-							: tr.agreement.youOwe}
-					</Text>
-					<View style={[styles.baseline, { gap: spacing.sm }]}>
-						<AmountText
-							minor={agreement.outstanding_minor}
-							variant="amountXL"
-							tone={tone}
-							testID="agreement.outstanding.text"
-						/>
-						<Text style={[typography.callout, { color: colors.textMuted }]}>/</Text>
-						<AmountText
-							minor={agreement.principal_minor}
-							variant="callout"
-							tone="textMuted"
-							testID="agreement.total.text"
-						/>
-					</View>
-				</View>
-				<ProgressBar
-					value={agreement.principal_minor === 0 ? 0 : paid / agreement.principal_minor}
-					label={fill(tr.agreement.paidOf, {
-						paid: formatTRY(paid),
-						amount: formatTRY(agreement.principal_minor),
-					})}
-					testID="agreement.progress"
-				/>
-				<Text style={[typography.caption, { color: colors.textMuted }]}>
-					{fill(tr.agreement.paidOf, {
-						paid: formatTRY(paid),
-						amount: formatTRY(agreement.principal_minor),
-					})}
-				</Text>
-				{agreement.reported_minor > 0 ? (
-					<Text
-						testID="agreement.awaiting.text"
-						style={[typography.caption, { color: colors.warning }]}
-					>
-						{fill(tr.payment.awaiting, { amount: formatTRY(agreement.reported_minor) })}
-					</Text>
-				) : null}
-
-				{canAddPayment(agreement) ? (
-					<View style={{ gap: spacing.sm }}>
+					<InstallmentDetail
+						agreement={agreement}
+						primaryLabel={
+							agreement.status === "personal"
+								? tr.agreement.markPaid
+								: paymentActionLabel(agreement)
+						}
+						canPay={canAddPayment(agreement)}
+						record={recordLabel(agreement)}
+					/>
+					{agreement.status === "personal" ? (
 						<Button
-							label={paymentActionLabel(agreement)}
-							disabled={!online}
+							label={tr.share.action}
+							variant="secondary"
 							onPress={() => {
 								router.push({
-									pathname: "/agreement/[id]/payment",
+									pathname: "/agreement/[id]/share",
 									params: { id: agreement.id },
 								});
 							}}
-							testID="agreement.primaryAction.button"
+							testID="agreement.share.button"
 						/>
-						{agreement.status === "personal" ? (
-							<Button
-								label={tr.share.action}
-								variant="secondary"
-								onPress={() => {
-									router.push({
-										pathname: "/agreement/[id]/share",
-										params: { id: agreement.id },
-									});
-								}}
-								testID="agreement.share.button"
+					) : null}
+				</>
+			) : (
+				<>
+					<DeliveryBanner agreement={agreement} />
+					{/* Design 13 / 15: who, how much is left of what, and the next step, in one card. */}
+					<Card testID="agreement.summary" style={{ gap: spacing.md }}>
+						<View style={[styles.row, { gap: spacing.md }]}>
+							<Avatar name={agreement.counterparty.display_name} size={48} />
+							<View style={styles.grow}>
+								<Text
+									testID="agreement.counterparty.text"
+									style={[typography.headline, { color: colors.text }]}
+									numberOfLines={1}
+								>
+									{agreement.counterparty.display_name}
+								</Text>
+								<Text
+									testID="agreement.title.text"
+									accessibilityRole="header"
+									style={[typography.caption, { color: colors.textMuted }]}
+									numberOfLines={1}
+								>
+									{agreement.title}
+								</Text>
+							</View>
+							<AgreementStatusBadge
+								status={agreement.status}
+								testID="agreement.status.badge"
 							/>
-						) : null}
-						{online ? null : (
-							<Text style={[typography.caption, { color: colors.textMuted }]}>
-								{tr.error.offline}
+						</View>
+						<View style={{ gap: 2 }}>
+							<Text
+								testID="agreement.role.text"
+								style={[typography.label, { color: colors.textMuted }]}
+							>
+								{agreement.my_role === "creditor"
+									? tr.agreement.owesYou
+									: tr.agreement.youOwe}
 							</Text>
-						)}
-					</View>
-				) : null}
-			</Card>
+							<View style={[styles.baseline, { gap: spacing.sm }]}>
+								<AmountText
+									minor={agreement.outstanding_minor}
+									variant="amountXL"
+									tone={tone}
+									testID="agreement.outstanding.text"
+								/>
+								<Text style={[typography.callout, { color: colors.textMuted }]}>
+									/
+								</Text>
+								<AmountText
+									minor={agreement.principal_minor}
+									variant="callout"
+									tone="textMuted"
+									testID="agreement.total.text"
+								/>
+							</View>
+						</View>
+						<ProgressBar
+							value={
+								agreement.principal_minor === 0
+									? 0
+									: paid / agreement.principal_minor
+							}
+							label={fill(tr.agreement.paidOf, {
+								paid: formatTRY(paid),
+								amount: formatTRY(agreement.principal_minor),
+							})}
+							testID="agreement.progress"
+						/>
+						<Text style={[typography.caption, { color: colors.textMuted }]}>
+							{fill(tr.agreement.paidOf, {
+								paid: formatTRY(paid),
+								amount: formatTRY(agreement.principal_minor),
+							})}
+						</Text>
+						{agreement.reported_minor > 0 ? (
+							<Text
+								testID="agreement.awaiting.text"
+								style={[typography.caption, { color: colors.warning }]}
+							>
+								{fill(tr.payment.awaiting, {
+									amount: formatTRY(agreement.reported_minor),
+								})}
+							</Text>
+						) : null}
 
+						{canAddPayment(agreement) ? (
+							<View style={{ gap: spacing.sm }}>
+								<Button
+									label={paymentActionLabel(agreement)}
+									disabled={!online}
+									onPress={() => {
+										router.push({
+											pathname: "/agreement/[id]/payment",
+											params: { id: agreement.id },
+										});
+									}}
+									testID="agreement.primaryAction.button"
+								/>
+								{agreement.status === "personal" ? (
+									<Button
+										label={tr.share.action}
+										variant="secondary"
+										onPress={() => {
+											router.push({
+												pathname: "/agreement/[id]/share",
+												params: { id: agreement.id },
+											});
+										}}
+										testID="agreement.share.button"
+									/>
+								) : null}
+								{online ? null : (
+									<Text style={[typography.caption, { color: colors.textMuted }]}>
+										{tr.error.offline}
+									</Text>
+								)}
+							</View>
+						) : null}
+					</Card>
+				</>
+			)}
 			{agreement.status === "settled" ? (
 				<Card
 					testID="agreement.settled"
@@ -401,66 +426,69 @@ function Detail({ agreement }: { agreement: AgreementDetail }) {
 			<SharedStateActions agreement={agreement} />
 			<DisputeCancelActions agreement={agreement} />
 
-			<View style={{ gap: spacing.sm }}>
-				<SectionHeader>{tr.agreement.sectionAgreement}</SectionHeader>
-				<Rows>
-					{[
-						<KeyValue
-							key="kind"
-							label={tr.agreement.kindLabel}
-							value={`${tr.agreement.kinds[agreement.kind]} · ${
-								agreement.installment_count === 1
-									? tr.agreement.planSingle
-									: fill(tr.agreement.planInstallments, {
-											count: String(agreement.installment_count),
-										})
-							}`}
-						/>,
-						...(agreement.started_on === null
-							? []
-							: [
-									<KeyValue
-										key="started"
-										label={
-											agreement.my_role === "creditor"
-												? tr.new.startedOnLent
-												: tr.new.startedOnBorrowed
-										}
-										value={formatDateTR(agreement.started_on, "long")}
-										testID="agreement.startedOn.text"
-									/>,
-								]),
-						...(agreement.notes === null
-							? []
-							: [
-									<KeyValue
-										key="notes"
-										label={tr.agreement.notesLabel}
-										value={agreement.notes}
-									/>,
-								]),
-						<KeyValue
-							key="record"
-							label={tr.agreement.recordLabel}
-							value={recordLabel(agreement)}
-						/>,
-					]}
-				</Rows>
-			</View>
+			{installment ? null : (
+				<>
+					<View style={{ gap: spacing.sm }}>
+						<SectionHeader>{tr.agreement.sectionAgreement}</SectionHeader>
+						<Rows>
+							{[
+								<KeyValue
+									key="kind"
+									label={tr.agreement.kindLabel}
+									value={`${tr.agreement.kinds[agreement.kind]} · ${
+										agreement.installment_count === 1
+											? tr.agreement.planSingle
+											: fill(tr.agreement.planInstallments, {
+													count: String(agreement.installment_count),
+												})
+									}`}
+								/>,
+								...(agreement.started_on === null
+									? []
+									: [
+											<KeyValue
+												key="started"
+												label={
+													agreement.my_role === "creditor"
+														? tr.new.startedOnLent
+														: tr.new.startedOnBorrowed
+												}
+												value={formatDateTR(agreement.started_on, "long")}
+												testID="agreement.startedOn.text"
+											/>,
+										]),
+								...(agreement.notes === null
+									? []
+									: [
+											<KeyValue
+												key="notes"
+												label={tr.agreement.notesLabel}
+												value={agreement.notes}
+											/>,
+										]),
+								<KeyValue
+									key="record"
+									label={tr.agreement.recordLabel}
+									value={recordLabel(agreement)}
+								/>,
+							]}
+						</Rows>
+					</View>
 
-			<View style={{ gap: spacing.sm }}>
-				<SectionHeader>{tr.agreement.installments}</SectionHeader>
-				<Rows>
-					{agreement.installments.map((installment) => (
-						<InstallmentRow
-							key={installment.seq}
-							installment={installment}
-							count={agreement.installment_count}
-						/>
-					))}
-				</Rows>
-			</View>
-
+					<View style={{ gap: spacing.sm }}>
+						<SectionHeader>{tr.agreement.installments}</SectionHeader>
+						<Rows>
+							{agreement.installments.map((installment) => (
+								<InstallmentRow
+									key={installment.seq}
+									installment={installment}
+									count={agreement.installment_count}
+								/>
+							))}
+						</Rows>
+					</View>
+				</>
+			)}
 			<View style={{ gap: spacing.sm }}>
 				<SectionHeader>{tr.agreement.payments}</SectionHeader>
 				{agreement.payments.length === 0 ? (

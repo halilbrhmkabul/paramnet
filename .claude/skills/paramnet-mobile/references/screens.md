@@ -23,9 +23,9 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 6.
 | S06 | Kişiler | `(tabs)/contacts` | Arama, kişi listesi, net bakiye (bana borçlu / borçluyum) | |
 | S07 | Kişi detay | `contact/[id]` | Net bakiye, anlaşmalar listesi, yeni kayıt | |
 | S08 | Kayıt türü | `new/index` (modal) | 4 kart: Borç verdim, Borç aldım, Taksitle aldım, Taksitle sattım | |
-| S09 | Kayıt formu | `new/form` | Dinamik alanlar, kişi seçici, AmountInput, tarih seçici, not | Türe göre alanlar spec 5.2 |
-| S10 | Plan önizleme | `new/plan` | Taksit listesi, satır düzenleme, toplam kontrolü, Kaydet | Toplam ≠ kalan ise Kaydet kapalı |
-| S11 | Anlaşma detay | `agreement/[id]/index` | Üst kart (karşı taraf, rol, kalan, toplam, ilerleme, durum etiketi), birincil aksiyon, taksitler, ödemeler, menü | Etiketler: Kişisel, Onay bekliyor, Aktif, Değişiklik bekliyor, İtirazlı, Kapandı, İptal |
+| S09 | Kayıt formu | `new/form` | Dinamik alanlar, kişi seçici, AmountInput, tarih seçici, not. Taksitli alım/satış tasarım 23: satıcı/ürün, fiyat/peşinat, taksitlendirilecek tutar, sayı düğmeleri, ilk ödeme, sıklık, alış tarihi, hesaplanan taksit, geçmiş tarih notu | Türe göre alanlar spec 5.2; ADR-059 |
+| S10 | Plan önizleme (24) | `new/plan`, `new/plan?edit=1` | Özet, salt okunur taksit listesi, geçmiş satırlarda "Ödendi", toplam eşitliği, hatırlatma kartı, Planı kaydet / Düzenle; düzenleme modunda satır düzenleme ve Eşit dağıt | Toplam ≠ kalan ise Kaydet kapalı |
+| S11 | Anlaşma detay (13, 15; elden taksitte 25) | `agreement/[id]/index` | Üst kart (karşı taraf, rol, kalan, toplam, ilerleme, durum etiketi), birincil aksiyon, taksitler, ödemeler, menü | Etiketler: Kişisel, Onay bekliyor, Aktif, Değişiklik bekliyor, İtirazlı, Kapandı, İptal |
 | S12 | Ödeme ekle | `agreement/[id]/payment` | Tutar, tarih, yöntem, dekont, not, dağıtım önizlemesi | Borçlu shared'da: "Ödeme yaptım" (onaya gider) |
 | S13 | Paylaş | `agreement/[id]/share` | Telefon / ParamNet ID seçimi; numara kontrolü, mesaj önizleme, sistem paylaşım menüsü; ID ile ad gösterimi ve uygulama içi paylaşım | Faz 2, ADR-050 |
 | S14 | Gelen paylaşım | `invite/[token]` ve Talepler'den | Anlaşma özeti, Onayla / Düzeltme öner / Reddet | Faz 2 |

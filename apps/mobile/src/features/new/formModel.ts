@@ -37,7 +37,8 @@ export type NewFormValues = {
 	// Name shown in the form for the chosen contact.
 	contact_label: string;
 	title: string;
-	// Loans only: when the money changed hands (spec 5.2, ADR-019).
+	// Loans: when the money changed hands (spec 5.2, ADR-019). Installments: the purchase date, which
+	// also dates the down payment (ADR-059).
 	started_on: IsoDate | null;
 	amount_minor: number | null;
 	down_payment_minor: number | null;
@@ -50,8 +51,8 @@ export type NewFormValues = {
 
 export type FormErrors = Partial<Record<keyof NewFormValues, string>>;
 
-// Spec 5.2 / screens.md: monthly, first payment one month from today.
-export function defaultValues(today: IsoDate): NewFormValues {
+// Spec 5.2 / screens.md: monthly, first payment one month from today. Design 23 starts at 6 rows.
+export function defaultValues(today: IsoDate, purchase = false): NewFormValues {
 	return {
 		contact: null,
 		contact_label: "",
@@ -60,7 +61,7 @@ export function defaultValues(today: IsoDate): NewFormValues {
 		amount_minor: null,
 		down_payment_minor: null,
 		repayment: "once",
-		count: "3",
+		count: purchase ? "6" : "3",
 		period: "monthly",
 		first_due_date: addMonthsClamped(today, 1),
 		notes: "",
@@ -150,6 +151,18 @@ export function planFromValues(type: NewType, values: NewFormValues): PlanInstal
 	return result.plan;
 }
 
+// The live preview on design 23: null while the amounts or dates cannot make a plan yet.
+export function tryPlan(type: NewType, values: NewFormValues): PlanInstallment[] | null {
+	const result = generatePlan({
+		principal: values.amount_minor ?? 0,
+		downPayment: downPaymentOf(type, values),
+		count: countOf(type, values),
+		period: values.period,
+		firstDueDate: values.first_due_date,
+	});
+	return result.ok ? result.plan : null;
+}
+
 export function remainingOf(type: NewType, values: NewFormValues): number {
 	return (values.amount_minor ?? 0) - downPaymentOf(type, values);
 }
@@ -169,7 +182,7 @@ export function toCreateInput(
 		creator_role: config.role,
 		title: config.purchase ? values.title.trim().normalize("NFC") : tr.new.loanTitle,
 		description: null,
-		started_on: config.purchase ? null : values.started_on,
+		started_on: values.started_on,
 		counterparty: values.contact,
 		terms: {
 			principal_minor: values.amount_minor ?? 0,

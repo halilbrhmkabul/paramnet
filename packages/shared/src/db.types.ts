@@ -1488,6 +1488,10 @@ export type Database = {
 			};
 			create_account: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_agreement: { Args: { idem_key: string; input: Json }; Returns: Json };
+			create_agreement_with_paid: {
+				Args: { idem_key: string; input: Json; p_paid_count: number };
+				Returns: Json;
+			};
 			create_card: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_loan: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };
 			create_recurring: { Args: { p_idempotency_key: string; p_input: Json }; Returns: Json };

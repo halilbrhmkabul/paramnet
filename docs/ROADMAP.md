@@ -464,7 +464,15 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 - Karar: ADR-058 (kullanıcı onaylı model).
 - **İlerleme (2026-10-25):** `request_money`, teslim onayı (`get_delivery`, `report_delivery`, `confirm_delivery`); Para iste (iki adım), Talep gönderildi (geri çek), Para teslimi ekranı ve anlaşma detayında teslim bandı; İşlem merkezinde "Para iste". Testler: pgTAP 330 (20), RNTL 4.
 
-### [ ] F4-09 Elden taksit birebir: oluştur (23), önizleme (24), detay (25)
+### [x] F4-09 Elden taksit birebir: oluştur (23), önizleme (24), detay (25)
+- Karar: ADR-059 (kararlar kullanıcının yetkisiyle varsayılanlardan verildi).
+- **İlerleme (2026-10-29):**
+	- Sunucu: `create_agreement_with_paid` (geçmiş taksitleri vade gününde ödendi yazar, tek işlemde).
+	- Oluştur (23): satıcı/ürün, fiyat/peşinat, taksitlendirilecek tutar, sayı düğmeleri, ilk ödeme, sıklık, alış tarihi (eklendi), hesaplanan taksit kartı, geçmiş tarih notu.
+	- Önizleme (24): özet, salt okunur satırlar (geçmiş tarih / N gün sonra / planlı / son taksit + kuruş farkı), "Ödendi" işaretleri, toplam eşitliği, hatırlatma kartı, Planı kaydet / Düzenle; elle düzenleme modu.
+	- Detay (25): kalan / taksitlendirilen, plan çubuğu, x/y ödendi, Sıradaki kartı (Kısmi öde / Ödendi kaydet), Ödeme planı (peşinat dahil, ödendiği gün), Bilgiler. `new` yığını ve anlaşma detayı `TopBar` kullanır.
+	- Testler: pgTAP 340 (14); RNTL ve model (akış 2, model 10, adaptör 3 yeni). Typecheck, lint, biçim temiz.
+	- **Kullanıcı kontrolü (Expo Go):** açık ve koyu temada 23, 24, 25; yarım genişlikteki tarih ve tutar alanlarının küçük ekranda sığması; `supabase` modunda geçmiş taksitleri işaretleyip kaydetme.
 
 ### [ ] F4-10 Takvim (26) ve Ana Sayfa (03) tüm modüllerle birebir
 

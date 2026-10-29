@@ -39,4 +39,5 @@ Biçim: `- [tarih] Fikir — kaynak (görev ID / kullanıcı) — not`
 - Ana Sayfa'da "Son işlemler" listesi (tasarım 03) ve açılışta tutarları gizleme tercihi; işlem akışları için Maestro senaryosu — F4-03b sırasında.
 - Rapor dışa aktarma (PDF/CSV), sabit gider işareti ve "sabitler dışında harcama" özeti, özel bütçe dönemleri; tekrarlayan transfer — F4-04 sırasında (ADR-054).
 - Kartlar: banka ekstresi PDF okuma, kart bazlı harcama kategorisi raporu, son ödeme hatırlatması (push), kart taksitlerini erken kapatma — F4-05 sırasında (ADR-055).
+- Elden taksit: kişisel kaydın planını düzenleme ekranı (`update_personal_agreement` hazır; 25'teki kalem), ödeme yöntemini kayda yazıp "Ödeme yöntemi" satırını gösterme, anlaşma bazında hatırlatma, taksit sayısında basılı tutunca hızlı artırma — F4-09 sırasında (ADR-059).
 - Para iste: teslim onayından önce talebi Borçlarım toplamlarının dışında tutma, teslim adımları için push bildirimi, rehberden ID ile kişi seçimi — F4-08 sırasında (ADR-058).

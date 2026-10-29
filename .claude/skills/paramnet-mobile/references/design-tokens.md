@@ -24,6 +24,8 @@ Kaynak: kullanıcının tasarım kanvası (ParamNet, "30 · Tasarım Sistemi"), 
 | `success` / `successSoft` | `#11613F` / `#E1F1E7` | `#6FCF9A` / `#163526` | Onaylı, ödendi |
 | `pending` / `pendingSoft` | `#24507D` / `#E3ECF6` | `#8FB6E3` / `#1B2A3B` | Talep, bilgi, yanıt bekleniyor |
 | `warning` / `warningSoft` | `#7A4E00` / `#FBEFD5` | `#E3B65E` / `#352A12` | Yaklaşan, onay bekliyor |
+| `warningTint` / `warningBorder` / `warningMark` | `#FDF6E6` / `#EBD9AE` / `#D9A847` | `#241D0E` / `#4A3B1A` / `#C89A3E` | Sıradaki taksit kartı ve plan çubuğundaki yaklaşan dilim (24, 25) |
+| `primaryTint` | `#EEF3EF` | `#17221D` | Taksitlendirilecek tutar şeridi (23) |
 | `overdue` / `overdueSoft` / `dangerBorder` | `#A1291F` / `#FBE4E1` / `#EDC1BB` | `#F08C82` / `#3A1D1A` / `#5C2C27` | Gecikmiş, itiraz, yıkıcı eylem |
 | `neutral` / `neutralSoft` | `#46534C` / `#ECEFEC` | `#B3C0B8` / `#26302B` | Planlı, manuel kayıt, iptal |
 | `heroBg` / `heroStage` / `heroCard` | `#0C2F25` / `#0F3A2E` / `#146A4E` | aynı | Karşılama (01) zemini, tanıtım (31) sahnesi, dekoratif kart |

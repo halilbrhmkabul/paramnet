@@ -181,6 +181,7 @@ create type card_color as enum ('navy','graphite','midnight','bordeaux');
 | Fonksiyon | Görev |
 |---|---|
 | `create_agreement(input jsonb, idem_key uuid)` | Anlaşma + v1 + taksitler + peşinat |
+| `create_agreement_with_paid(input jsonb, p_paid_count int, idem_key uuid)` | `create_agreement` + vadesi geçmiş ilk n taksitin ödemesi, tek işlemde (ADR-059) |
 | `update_personal_agreement(id, terms jsonb, row_version)` | Kişisel modda yeni versiyon |
 | `share_agreement(id, phone, row_version)` | `pending`; davet; düz token yalnızca bir kez döner |
 | `withdraw_share(id)` | Daveti iptal |

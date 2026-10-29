@@ -1,4 +1,4 @@
-# Taksitle aldım: 28.000 / 8.000 peşinat / 5 taksit → plan önizleme değerleri → kayıt
+# Taksitle aldım (23–25): 28.000 / 8.000 peşinat / 5 taksit → elle düzenleme ile plan → kayıt
 appId: com.paramnet.app
 ---
 - runFlow: subflows/login.yaml
@@ -25,11 +25,15 @@ appId: com.paramnet.app
     id: newForm.downPayment.input
 - inputText: "8000"
 - tapOn:
-    id: newForm.count.input
-- eraseText: 3
-- inputText: "5"
+    id: newForm.count.dec
+- assertVisible:
+    id: newForm.count.value
+    text: "5"
+- assertVisible:
+    id: newForm.remaining.text
+    text: "20.000,00 TL"
 - tapOn:
-    id: newForm.submit.button
+    id: newForm.editRows.button
 - assertVisible:
     id: plan.screen
 - assertVisible:
@@ -45,3 +49,6 @@ appId: com.paramnet.app
       id: agreement.outstanding.text
     timeout: 10000
 - assertVisible: "20.000,00 TL"
+- assertVisible:
+    id: agreement.paidCount.badge
+    text: "0/5 ödendi"
