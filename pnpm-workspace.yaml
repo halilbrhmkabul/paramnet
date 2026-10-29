@@ -64,3 +64,6 @@ auditConfig:
     # decode-uri-component via expo-router's query-string, in the app; the fix is ESM-only and breaks
     # query-string. Mitigated: links over 512 characters never reach the router (app/+native-intent.tsx).
     - GHSA-vcc3-ghjq-m6fr
+    # decode-uri-component again (quadratic percent-run replacement); same ESM-only fix (0.5.1) and the
+    # same 512-character link limit keeps the input small.
+    - GHSA-qr28-fpjm-wq7f
