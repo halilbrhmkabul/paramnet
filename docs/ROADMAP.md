@@ -474,7 +474,8 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 	- Testler: pgTAP 340 (14); RNTL ve model (akış 2, model 10, adaptör 3 yeni). Typecheck, lint, biçim temiz.
 	- **Kullanıcı kontrolü (Expo Go):** açık ve koyu temada 23, 24, 25; yarım genişlikteki tarih ve tutar alanlarının küçük ekranda sığması; `supabase` modunda geçmiş taksitleri işaretleyip kaydetme.
 
-### [ ] F4-10 Takvim (26) ve Ana Sayfa (03) tüm modüllerle birebir
+### [x] F4-10 Takvim (26) ve Ana Sayfa (03) tüm modüllerle birebir
+- Not: tüm modüller cihazda birleştirilir (ADR-060); sunucu değişikliği yok.
 
 ### [ ] F4-11 Hesap bölme: oluştur (40), kişi ekle/QR/link (41), ortak hesap (42), davet edilen kişinin ekranı (43)
 

@@ -4,66 +4,121 @@ import { ApiError } from "@/api/errors";
 import { SEED_IDS } from "@/api/mock/seed";
 import { fill, tr } from "@/i18n/tr";
 import { appRoutes } from "@/testing/appRoutes";
-import { createTestApi, provideTestApi } from "@/testing/providers";
+import {
+	createTestAccountsApi,
+	createTestApi,
+	provideTestAccountsApi,
+	provideTestApi,
+} from "@/testing/providers";
 import { signInForTest } from "@/testing/session";
 
 beforeEach(() => {
 	signInForTest();
 });
 
-describe("Home (S05)", () => {
-	it("shows totals, overdue and the next five due dates from the data", async () => {
-		await renderRouter(appRoutes, { initialUrl: "/" });
+async function openHome() {
+	await renderRouter(appRoutes, { initialUrl: "/" });
+	await waitFor(() => {
+		expect(screen.getByTestId("home.upcoming.list")).toBeTruthy();
+	});
+}
+
+describe("Home (design 03)", () => {
+	it("greets with the name and ParamNet ID", async () => {
+		await openHome();
+		// The test clock is 2026-10-11 12:00 in Istanbul.
+		expect(screen.getByTestId("home.profile.button")).toHaveTextContent(/İyi günler,/);
+		await waitFor(() => {
+			expect(screen.getByTestId("home.paramnetId")).toHaveTextContent(/^PN-/);
+		});
+	});
+
+	it("shows debts and receivables with their record counts", async () => {
+		await openHome();
 		await waitFor(() => {
 			expect(screen.getByTestId("home.receivable.amount")).toHaveTextContent("15.500,00 TL");
 		});
 		expect(screen.getByTestId("home.payable.amount")).toHaveTextContent("22.500,00 TL");
-		expect(screen.getByTestId("home.dueThisMonth.amount")).toHaveTextContent("4.000,00 TL");
-		expect(screen.getByTestId("home.collectThisMonth.amount")).toHaveTextContent("5.500,00 TL");
+		await waitFor(() => {
+			expect(screen.getByTestId("home.payable.count")).toHaveTextContent(/\d+ kayıt/);
+		});
+		expect(screen.getByText(tr.home.payableHint)).toBeTruthy();
+		expect(screen.getByText(tr.home.receivableHint)).toBeTruthy();
+	});
 
-		const overdue = screen.getByTestId("home.overdue.list");
-		expect(within(overdue).getByText("Ahmet Yılmaz · Borç")).toBeTruthy();
-		expect(within(overdue).getByText("2.500,00 TL")).toBeTruthy();
-		expect(
-			within(overdue).getByText(
-				`${tr.installment.status.overdue} · ${tr.installment.partial}`,
-			),
-		).toBeTruthy();
-
-		const upcoming = screen.getByTestId("home.upcoming.list");
-		expect(within(upcoming).getAllByTestId(/^home\.upcoming\.item\./)).toHaveLength(5);
-		expect(within(upcoming).getByText(tr.installment.status.due_today)).toBeTruthy();
-		// The demo has one plan shared with me (S19).
-		expect(screen.getByTestId("home.pending.band")).toHaveTextContent("1 iş seni bekliyor", {
-			exact: false,
+	it("offers the design's four quick actions", async () => {
+		await openHome();
+		await fireEvent.press(screen.getByTestId("home.quick.expense"));
+		await waitFor(() => {
+			expect(screen.getByTestId("txForm.screen")).toBeTruthy();
 		});
 	});
 
-	it("opens the agreement from a due item", async () => {
-		await renderRouter(appRoutes, { initialUrl: "/" });
-		await waitFor(() => {
-			expect(screen.getByTestId(`home.overdue.item.${SEED_IDS.ahmetLoan}.2`)).toBeTruthy();
-		});
-		await fireEvent.press(screen.getByTestId(`home.overdue.item.${SEED_IDS.ahmetLoan}.2`));
-		await waitFor(() => {
-			expect(screen.getByTestId("agreement.screen")).toBeTruthy();
-		});
-	});
-
-	it("empty: explains the next step and offers three quick templates", async () => {
-		provideTestApi(createTestApi({ seed: "empty" }));
-		await renderRouter(appRoutes, { initialUrl: "/" });
-		await waitFor(() => {
-			expect(screen.getByText(tr.home.emptyTitle)).toBeTruthy();
-		});
-		expect(screen.getByText(tr.home.emptyBody)).toBeTruthy();
-		await fireEvent.press(screen.getByTestId("home.template.boughtInstallment"));
+	it("lends from the quick action", async () => {
+		await openHome();
+		await fireEvent.press(screen.getByTestId("home.quick.lend"));
 		await waitFor(() => {
 			expect(screen.getByTestId("newForm.screen")).toBeTruthy();
 		});
-		// Design 23: the bought/sold side shows in the contact label under the "Elden taksit" title.
-		expect(screen.getByText(tr.new.installmentTitle)).toBeTruthy();
-		expect(screen.getByText(tr.new.sellerOrPerson)).toBeTruthy();
+	});
+
+	it("lists what waits for my answer", async () => {
+		await openHome();
+		await waitFor(() => {
+			expect(screen.getByTestId("home.pending.card")).toHaveTextContent(
+				fill(tr.home.pendingTitle, { count: "1" }),
+				{ exact: false },
+			);
+		});
+		await fireEvent.press(screen.getByTestId(`home.pending.item.${SEED_IDS.zeynepShare}`));
+		await waitFor(() => {
+			expect(screen.getByTestId("decide.screen")).toBeTruthy();
+		});
+	});
+
+	it("shows the cards with statement, minimum and payment day", async () => {
+		await openHome();
+		await waitFor(() => {
+			expect(screen.getByTestId("home.cards")).toBeTruthy();
+		});
+		const cards = within(screen.getByTestId("home.cards"));
+		expect(cards.getByText("12.450,00 TL")).toBeTruthy();
+		expect(cards.getByText("4.980,00 TL")).toBeTruthy();
+		expect(cards.getByText("19 Eki")).toBeTruthy();
+	});
+
+	it("lists the next payments of every module, late ones first", async () => {
+		await openHome();
+		const upcoming = within(screen.getByTestId("home.upcoming.list"));
+		await waitFor(() => {
+			expect(upcoming.getAllByTestId(/^home\.upcoming\.item\./)).toHaveLength(3);
+		});
+		expect(upcoming.getAllByText(tr.calendar.status.overdue).length).toBeGreaterThan(0);
+		await fireEvent.press(screen.getByTestId("home.upcoming.calendar"));
+		await waitFor(() => {
+			expect(screen.getByTestId("calendar.screen")).toBeTruthy();
+		});
+	});
+
+	it("shows the latest cash records", async () => {
+		await openHome();
+		await waitFor(() => {
+			expect(screen.getByTestId("home.recent.list")).toBeTruthy();
+		});
+		const recent = within(screen.getByTestId("home.recent.list"));
+		expect(recent.getByText("Freelance proje geliri")).toBeTruthy();
+		expect(recent.getByText("+8.000,00 TL")).toBeTruthy();
+	});
+
+	it("a new user sees empty sections, not errors", async () => {
+		provideTestApi(createTestApi({ seed: "empty" }));
+		provideTestAccountsApi(createTestAccountsApi({ seed: "empty" }));
+		await openHome();
+		expect(screen.getByText(tr.home.upcomingEmpty)).toBeTruthy();
+		expect(screen.getByText(tr.home.recentEmpty)).toBeTruthy();
+		expect(screen.queryByTestId("home.cards")).toBeNull();
+		expect(screen.queryByTestId("home.pending.card")).toBeNull();
+		expect(screen.getByTestId("home.payable.count")).toHaveTextContent("0 kayıt");
 	});
 
 	it("error: shows a Turkish message and retries", async () => {
@@ -84,7 +139,7 @@ describe("Home (S05)", () => {
 		});
 	});
 
-	it("the bell shows unread notices and opens Bildirimler (design 03)", async () => {
+	it("the bell shows unread notices and opens Bildirimler", async () => {
 		await renderRouter(appRoutes, { initialUrl: "/" });
 		await waitFor(() => {
 			expect(screen.getByTestId("home.notifications.badge")).toHaveTextContent("2");
@@ -105,17 +160,6 @@ describe("Home (S05)", () => {
 		await fireEvent.press(screen.getByTestId("home.menu.button"));
 		await waitFor(() => {
 			expect(screen.getByTestId("menu.screen")).toBeTruthy();
-		});
-	});
-
-	it("quick starts stay on Home once there are records", async () => {
-		await renderRouter(appRoutes, { initialUrl: "/" });
-		await waitFor(() => {
-			expect(screen.getByTestId("home.receivable.amount")).toBeTruthy();
-		});
-		await fireEvent.press(screen.getByTestId("home.template.lent"));
-		await waitFor(() => {
-			expect(screen.getByTestId("newForm.screen")).toBeTruthy();
 		});
 	});
 });

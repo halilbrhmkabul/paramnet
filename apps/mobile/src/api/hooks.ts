@@ -25,6 +25,7 @@ import {
 	infiniteQueryOptions,
 	useInfiniteQuery,
 	useMutation,
+	useQueries,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
@@ -93,6 +94,17 @@ export function useAgreements() {
 export function useCalendar(month: IsoDate) {
 	const api = useApi();
 	return useQuery({ queryKey: queryKeys.calendar(month), queryFn: () => api.getCalendar(month) });
+}
+
+// Design 26 and 03 read several months at once (a 30-day window can span three).
+export function useCalendars(months: readonly IsoDate[]) {
+	const api = useApi();
+	return useQueries({
+		queries: months.map((month) => ({
+			queryKey: queryKeys.calendar(month),
+			queryFn: () => api.getCalendar(month),
+		})),
+	});
 }
 
 export function useCreateAgreement() {
@@ -468,6 +480,16 @@ export function useTransactions(month: IsoDate, accountId: string | null) {
 	return useQuery({
 		queryKey: queryKeys.transactions(month, accountId),
 		queryFn: () => api.listTransactions(month, accountId),
+	});
+}
+
+export function useTransactionMonths(months: readonly IsoDate[]) {
+	const api = useAccountsApi();
+	return useQueries({
+		queries: months.map((month) => ({
+			queryKey: queryKeys.transactions(month, null),
+			queryFn: () => api.listTransactions(month, null),
+		})),
 	});
 }
 
