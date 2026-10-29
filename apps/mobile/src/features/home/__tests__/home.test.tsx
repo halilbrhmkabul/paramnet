@@ -61,7 +61,9 @@ describe("Home (S05)", () => {
 		await waitFor(() => {
 			expect(screen.getByTestId("newForm.screen")).toBeTruthy();
 		});
-		expect(screen.getByText(tr.new.boughtInstallment)).toBeTruthy();
+		// Design 23: the bought/sold side shows in the contact label under the "Elden taksit" title.
+		expect(screen.getByText(tr.new.installmentTitle)).toBeTruthy();
+		expect(screen.getByText(tr.new.sellerOrPerson)).toBeTruthy();
 	});
 
 	it("error: shows a Turkish message and retries", async () => {

@@ -21,8 +21,14 @@ export function createSupabaseAgreementsApi(client: SupabaseClient): AgreementsA
 		listAgreements: () => call("list_agreements"),
 		getAgreement: (id) => call("get_agreement_detail", { p_id: id }),
 		getCalendar: (month) => call("get_calendar", { p_month: month }),
-		createAgreement: (input, idempotencyKey) =>
-			call("create_agreement", { input, idem_key: idempotencyKey }),
+		createAgreement: (input, idempotencyKey, paidCount = 0) =>
+			paidCount === 0
+				? call("create_agreement", { input, idem_key: idempotencyKey })
+				: call("create_agreement_with_paid", {
+						input,
+						p_paid_count: paidCount,
+						idem_key: idempotencyKey,
+					}),
 		recordPayment: (agreementId, input, rowVersion, idempotencyKey) =>
 			call("record_payment", {
 				p_agreement_id: agreementId,

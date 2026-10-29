@@ -415,6 +415,11 @@ Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle 
 - **Para iste:** borç alan, ParamNet ID'si bilinen kişiden para ister. Bu, borç alanın kendisini borçlu olarak kaydettiği tek ödemeli bir borç kaydıdır ve aynı işlemde ID ile paylaşılır (5.4'teki ID ile paylaşım). Anlaşma durum makinesine yeni durum eklenmez: talep "pending", kabul "active" olur. Bulunamayan ID'ye talep kaydı tutulmaz. Talep, karşı taraf yanıtlamadan geri çekilebilir.
 - **Para teslimi:** "Para iste" ile kurulan anlaşmada kabulden sonra para elden ele geçer. Anlaşma "active" kalır; ayrı bir teslim onayı tutulur: önce borç veren "Parayı verdim" der, sonra borç alan "Aldım" diye onaylar. İki adım da olay kaydına yazılır. Onay tamamlanana kadar iki tarafın anlaşma ekranında "Para teslimi bekleniyor" bandı görünür.
 
+## 5.16 Elden taksit kaydı (ADR-059)
+
+- Taksitli alım ya da satışta alış (satış) tarihi tutulur; peşinat bu tarihle kaydedilir.
+- Planın ilk taksitlerinin tarihi geçmişse önizlemede "Ödendi" işaretlenebilir. İşaretlenen taksitler kendi vade gününde ödenmiş sayılır ve kayıtla aynı işlemde yazılır. Ödemeler sırayla dağıtıldığı için yalnızca baştan ardışık taksitler işaretlenir.
+
 # 6. Ekranlar ve Bilgi Mimarisi
 
 ## 6.1 Navigasyon
@@ -901,6 +906,7 @@ Diğer tablolar
 | create_loan / update_loan / archive_loan / list_loans / get_loan / record_loan_payment | Banka kredileri, türetilmiş ödeme planı, taksit kaydı (ADR-056) |
 | request_money(input, paramnet_id, idem_key) | Borç alanın kaydı + ID ile paylaşım, tek işlemde (ADR-058) |
 | get_delivery(id) / report_delivery(id, row_version) / confirm_delivery(id, row_version) | Para teslimi: borç veren bildirir, borç alan onaylar |
+| create_agreement_with_paid(input, paid_count, idem_key) | Kayıt + geçmiş ilk n taksitin ödemesi, tek işlemde (ADR-059) |
 
 ## 10.4 Edge Functions
 

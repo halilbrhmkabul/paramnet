@@ -70,6 +70,13 @@ describe("Supabase AgreementsApi", () => {
 			{ input, idem_key: "k1" },
 		],
 		[
+			"createAgreement with paid rows",
+			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
+				api.createAgreement(input, "k1", 2),
+			"create_agreement_with_paid",
+			{ input, p_paid_count: 2, idem_key: "k1" },
+		],
+		[
 			"recordPayment",
 			(api: ReturnType<typeof createSupabaseAgreementsApi>) =>
 				api.recordPayment(

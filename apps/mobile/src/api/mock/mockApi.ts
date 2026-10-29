@@ -225,7 +225,7 @@ export function createMockApi({
 				return { month, days };
 			}),
 
-		createAgreement: (input, idempotencyKey) =>
+		createAgreement: (input, idempotencyKey, paidCount = 0) =>
 			respond(() => {
 				const existing = createdByKey.get(idempotencyKey);
 				if (existing !== undefined) {
@@ -237,6 +237,16 @@ export function createMockApi({
 					throw new ApiError("validation_error");
 				}
 				const { counterparty, terms, ...fields } = parsed.data;
+				// Checked before anything is written: create_agreement_with_paid rolls back as a whole.
+				const paidRows = terms.plan.slice(0, paidCount);
+				if (
+					!Number.isSafeInteger(paidCount) ||
+					paidCount < 0 ||
+					paidCount > terms.plan.length ||
+					paidRows.some((row) => row.due_date === null || row.due_date > today())
+				) {
+					throw new ApiError("validation_error");
+				}
 				let contactId: string;
 				if ("contact_id" in counterparty) {
 					contactId = contactOf(counterparty.contact_id).id;
@@ -245,7 +255,7 @@ export function createMockApi({
 					state.contacts.push({ id: contactId, ...counterparty.contact });
 				}
 				const id = nextId();
-				insertAgreement(state, {
+				const created = insertAgreement(state, {
 					id,
 					kind: fields.kind,
 					title: fields.title,
@@ -256,10 +266,27 @@ export function createMockApi({
 					contact_id: contactId,
 					principal_minor: terms.principal_minor,
 					down_payment_minor: terms.down_payment_minor,
-					down_payment_on: today(),
+					// Same as create_agreement: the down payment is dated on the purchase when there is one.
+					down_payment_on: fields.started_on ?? today(),
 					created_at: now().toISOString(),
 					plan: terms.plan,
 				});
+				for (const row of paidRows) {
+					if (row.due_date === null) {
+						break;
+					}
+					applyPayment(created, {
+						id: nextId(),
+						amount_minor: row.amount_minor,
+						paid_on: row.due_date,
+						method: "cash",
+						note: null,
+						kind: "payment",
+						status: "confirmed",
+						created_at: now().toISOString(),
+						by_me: true,
+					});
+				}
 				createdByKey.set(idempotencyKey, id);
 				return { agreement_id: id, replayed: false };
 			}),

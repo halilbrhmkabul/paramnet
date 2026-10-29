@@ -1,7 +1,7 @@
 import { fireEvent, renderRouter, screen, waitFor, within } from "expo-router/testing-library";
 
 import { resetNewDraft } from "../draftStore";
-import { tr } from "@/i18n/tr";
+import { fill, tr } from "@/i18n/tr";
 import { appRoutes } from "@/testing/appRoutes";
 import { signInForTest } from "@/testing/session";
 
@@ -33,9 +33,7 @@ async function openForm(type: string) {
 }
 
 describe("new record flow (S08–S10)", () => {
-	it("furniture example: 28.000 / 8.000 down / 5 monthly from 10 Nov 2026 previews and saves", async () => {
-		await openForm("boughtInstallment");
-
+	async function fillFurniture() {
 		await fireEvent.press(screen.getByTestId("newForm.contact.picker"));
 		await fireEvent.press(screen.getByTestId("contactPicker.manual.button"));
 		await fireEvent.changeText(
@@ -44,23 +42,95 @@ describe("new record flow (S08–S10)", () => {
 		);
 		await fireEvent.press(screen.getByTestId("contactPicker.manualSave.button"));
 		expect(screen.getByTestId("newForm.contact.picker")).toHaveTextContent("Kaya Mobilya");
-
-		await fireEvent.changeText(screen.getByTestId("newForm.title.input"), "Mobilya");
+		await fireEvent.changeText(screen.getByTestId("newForm.title.input"), "Salon mobilyası");
 		await fireEvent.changeText(screen.getByTestId("newForm.amount.input"), "28000");
 		await fireEvent.changeText(screen.getByTestId("newForm.downPayment.input"), "8000");
-		await fireEvent.changeText(screen.getByTestId("newForm.count.input"), "5");
+	}
+
+	// Design 23 → 24 → 25 with the design's own numbers; today is 11 Oct 2026, so two rows are behind.
+	it("design example: 28.000 / 8.000 / 6 monthly from 15 Aug, two past rows saved as paid", async () => {
+		await openForm("boughtInstallment");
+		await fillFurniture();
+		expect(screen.getByTestId("newForm.remaining.text")).toHaveTextContent("20.000,00 TL");
+		expect(screen.getByTestId("newForm.count.value")).toHaveTextContent("6");
 		await fireEvent.press(screen.getByTestId("newForm.dueDate"));
-		await fireEvent.changeText(screen.getByTestId("newForm.dueDate.picker"), "2026-11-10");
-		expect(screen.getByTestId("newForm.dueDate")).toHaveTextContent("10 Kasım 2026");
+		await fireEvent.changeText(screen.getByTestId("newForm.dueDate.picker"), "2026-08-15");
+		await fireEvent.press(screen.getByTestId("newForm.startedOn"));
+		await fireEvent.changeText(screen.getByTestId("newForm.startedOn.picker"), "2026-07-15");
+
+		expect(screen.getByTestId("newForm.each.text")).toHaveTextContent("3.333,33 TL");
+		expect(screen.getByTestId("newForm.split.text")).toHaveTextContent(
+			"5 × 3.333,33 TL + son taksit 3.333,35 TL",
+		);
+		expect(screen.getByTestId("newForm.pastNote")).toHaveTextContent(
+			fill(tr.new.pastNote, { count: "2" }),
+		);
 
 		await fireEvent.press(screen.getByTestId("newForm.submit.button"));
 		await waitFor(() => {
 			expect(screen.getByTestId("plan.screen")).toBeTruthy();
 		});
-
-		expect(screen.getByTestId("plan.total.text")).toHaveTextContent("28.000,00 TL");
-		expect(screen.getByTestId("plan.downPayment.text")).toHaveTextContent("8.000,00 TL");
+		expect(screen.getByTestId("plan.summary")).toHaveTextContent(
+			"Kaya Mobilya · Aylık · 6 taksit",
+			{ exact: false },
+		);
+		expect(screen.getByTestId("plan.downPayment.text")).toHaveTextContent("−8.000,00 TL");
 		expect(screen.getByTestId("plan.remaining.text")).toHaveTextContent("20.000,00 TL");
+		expect(screen.getByTestId("plan.row.1")).toHaveTextContent(tr.plan.past, { exact: false });
+		expect(screen.getByTestId("plan.row.3")).toHaveTextContent("4 gün sonra", { exact: false });
+		expect(screen.getByTestId("plan.row.4")).toHaveTextContent(tr.plan.planned, {
+			exact: false,
+		});
+		expect(screen.getByTestId("plan.row.6")).toHaveTextContent("Son taksit · +2 kuruş", {
+			exact: false,
+		});
+		expect(screen.queryByTestId("plan.row.3.paid")).toBeNull();
+		expect(screen.getByTestId("plan.sum.text")).toHaveTextContent("20.000,00 TL");
+
+		// Ticking the second row pays the first one too (FIFO).
+		await fireEvent.press(screen.getByTestId("plan.row.2.paid"));
+		expect(screen.getByTestId("plan.row.1.paid")).toHaveProp("accessibilityState", {
+			checked: true,
+		});
+		await fireEvent.press(screen.getByTestId("plan.save.button"));
+
+		await waitFor(() => {
+			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent(
+				"13.333,34 TL",
+			);
+		});
+		expect(screen.getByTestId("agreement.paidCount.badge")).toHaveTextContent("2/6 ödendi");
+		expect(screen.getByTestId("agreement.next")).toHaveTextContent("Sıradaki · 3. taksit", {
+			exact: false,
+		});
+		expect(screen.getByTestId("agreement.next")).toHaveTextContent("3.333,33 TL", {
+			exact: false,
+		});
+		expect(screen.getByTestId("agreement.paidWithDown.text")).toHaveTextContent(
+			"Peşinat dahil ödenen 14.666,66 TL",
+		);
+		expect(screen.getByTestId("agreement.purchasedOn.text")).toHaveTextContent(
+			"15 Temmuz 2026",
+		);
+		expect(screen.getByTestId("agreement.plan.down")).toHaveTextContent(
+			tr.installment.status.paid,
+			{ exact: false },
+		);
+	});
+
+	it("manual edit: rows are editable and Save waits until they add up", async () => {
+		await openForm("boughtInstallment");
+		await fillFurniture();
+		await fireEvent.press(screen.getByTestId("newForm.count.dec"));
+		expect(screen.getByTestId("newForm.count.value")).toHaveTextContent("5");
+		await fireEvent.press(screen.getByTestId("newForm.dueDate"));
+		await fireEvent.changeText(screen.getByTestId("newForm.dueDate.picker"), "2026-11-10");
+		expect(screen.queryByTestId("newForm.pastNote")).toBeNull();
+
+		await fireEvent.press(screen.getByTestId("newForm.editRows.button"));
+		await waitFor(() => {
+			expect(screen.getByTestId("plan.screen")).toBeTruthy();
+		});
 		const expectedDates = [
 			"10 Kasım 2026",
 			"10 Aralık 2026",
@@ -89,9 +159,10 @@ describe("new record flow (S08–S10)", () => {
 		await fireEvent.press(screen.getByTestId("plan.save.button"));
 
 		await waitFor(() => {
-			expect(screen.getByTestId("agreement.title.text")).toHaveTextContent("Mobilya");
+			expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent(
+				"20.000,00 TL",
+			);
 		});
-		expect(screen.getByTestId("agreement.outstanding.text")).toHaveTextContent("20.000,00 TL");
 		expect(screen.getByTestId("agreement.status.badge")).toHaveTextContent(
 			tr.agreement.status.personal,
 		);

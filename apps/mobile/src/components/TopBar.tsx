@@ -82,6 +82,38 @@ export function TopBar({
 	);
 }
 
+type HeaderProps = {
+	navigation: { goBack: () => void };
+	options: {
+		title?: string;
+		presentation?: string;
+		headerRight?: (props: { canGoBack: boolean }) => ReactNode;
+	};
+	back?: unknown;
+};
+
+// Stack screen options that draw TopBar; a screen sets its title and right action with <Stack.Screen>.
+export function topBarHeader({ close }: { close?: boolean } = {}) {
+	return {
+		headerShown: true,
+		title: "",
+		header: ({ navigation, options, back }: HeaderProps) => (
+			<TopBar
+				title={typeof options.title === "string" ? options.title : ""}
+				close={close ?? options.presentation === "modal"}
+				right={options.headerRight?.({ canGoBack: back !== undefined })}
+				onBack={
+					back === undefined
+						? undefined
+						: () => {
+								navigation.goBack();
+							}
+				}
+			/>
+		),
+	};
+}
+
 const styles = StyleSheet.create({
 	bar: {
 		flexDirection: "row",
