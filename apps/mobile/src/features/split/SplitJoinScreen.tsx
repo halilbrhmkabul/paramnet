@@ -18,7 +18,15 @@ import { useAppTheme } from "@/theme/useAppTheme";
 
 import { MemberCard } from "./parts";
 
-export function LinkBanner({ code, seat }: { code: string; seat?: string }) {
+export function LinkBanner({
+	code,
+	via,
+	seat,
+}: {
+	code: string;
+	via: "link" | "qr";
+	seat?: string;
+}) {
 	const { colors, fonts } = useAppTheme();
 	return (
 		<View
@@ -40,7 +48,7 @@ export function LinkBanner({ code, seat }: { code: string; seat?: string }) {
 					{ fontFamily: fonts.semibold, fontSize: 12, color: colors.textMuted },
 				]}
 			>
-				{fill(tr.split.fromLink, { code })}
+				{fill(via === "qr" ? tr.split.fromQr : tr.split.fromLink, { code })}
 				{seat === undefined ? "" : ` · ${fill(tr.split.asSeat, { name: seat })}`}
 			</Text>
 		</View>
@@ -98,7 +106,7 @@ function Seats({
 		);
 	return (
 		<Screen testID="splitJoin.screen" edges={["bottom"]} footer={footer}>
-			<LinkBanner code={code} />
+			<LinkBanner code={code} via={via} />
 			<View style={[styles.center, { gap: 2 }]}>
 				<Avatar name={invite.owner_name} size={60} />
 				<Text

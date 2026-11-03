@@ -1754,6 +1754,7 @@ export const tr = {
 		// 43
 		joinTitle: "Hesap daveti",
 		fromLink: "Linkten açıldı · {code}",
+		fromQr: "Kare koddan açıldı · {code}",
 		asSeat: "{name} olarak görüyorsun",
 		addedYou: "{name} seni bir hesaba ekledi",
 		meta: "{date} · Toplam {total} · {count} kişi",

@@ -140,6 +140,17 @@ describe("Davet edilen kişinin ekranı (43)", () => {
 		});
 	});
 
+	it("says when it was opened from the QR code", async () => {
+		await renderRouter(appRoutes, {
+			initialUrl: `/split/join/${MOCK_INVITE_CODE}?via=qr`,
+		});
+		await waitFor(() => {
+			expect(screen.getByTestId("splitJoin.banner")).toHaveTextContent("Kare koddan açıldı", {
+				exact: false,
+			});
+		});
+	});
+
 	it("an unknown code says so", async () => {
 		await renderRouter(appRoutes, { initialUrl: "/split/join/XXX-0000" });
 		await waitFor(() => {

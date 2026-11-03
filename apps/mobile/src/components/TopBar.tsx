@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { tr } from "@/i18n/tr";
@@ -49,17 +49,26 @@ export function TopBar({
 	title,
 	onBack,
 	close = false,
+	sheet = false,
 	right,
 }: {
 	title: string;
 	onBack?: () => void;
 	close?: boolean;
+	// iOS draws a modal as a card below the status bar, so the inset would count twice.
+	sheet?: boolean;
 	right?: ReactNode;
 }) {
 	const { colors, typography } = useAppTheme();
 	const insets = useSafeAreaInsets();
 	return (
-		<View style={[styles.bar, { paddingTop: insets.top + 12, backgroundColor: colors.bg }]}>
+		<View
+			testID="topbar"
+			style={[
+				styles.bar,
+				{ paddingTop: (sheet ? 0 : insets.top) + 12, backgroundColor: colors.bg },
+			]}
+		>
 			{onBack === undefined ? (
 				<View style={styles.slot} />
 			) : (
@@ -101,6 +110,7 @@ export function topBarHeader({ close }: { close?: boolean } = {}) {
 			<TopBar
 				title={typeof options.title === "string" ? options.title : ""}
 				close={close ?? options.presentation === "modal"}
+				sheet={Platform.OS === "ios" && options.presentation === "modal"}
 				right={options.headerRight?.({ canGoBack: back !== undefined })}
 				onBack={
 					back === undefined
