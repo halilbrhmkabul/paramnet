@@ -51,8 +51,6 @@ minimumReleaseAgeExclude:
 # test tooling only and never in the app bundle or a server; revisit when Expo/Metro update them.
 auditConfig:
   ignoreGhsas:
-    # node-forge via @expo/cli (code signing during builds); no patched version.
-    - GHSA-86w9-cpqp-85rv
     # braces via metro / jest file globbing on our own sources; no patched version.
     - GHSA-vfj7-8cjw-p6xm
     # sprintf-js via jest / babel tooling; no patched version.
