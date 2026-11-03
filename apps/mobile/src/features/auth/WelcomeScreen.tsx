@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { formatTRY } from "@paramnet/shared";
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -23,6 +24,8 @@ export function WelcomeScreen() {
 			edges={["top", "bottom"]}
 			style={{ flex: 1, backgroundColor: colors.heroBg }}
 		>
+			{/* The hero stays dark in both themes, so the status bar must not follow the system. */}
+			<StatusBar style="light" />
 			<ScrollView
 				contentContainerStyle={[styles.content, { paddingHorizontal: spacing.xl }]}
 				bounces={false}
@@ -159,7 +162,7 @@ export function WelcomeScreen() {
 					</View>
 				</View>
 
-				<View style={[styles.actions, { gap: 10, paddingTop: spacing.xxl }]}>
+				<View style={[styles.actions, { gap: 10, paddingTop: spacing.lg }]}>
 					<Pressable
 						testID="welcome.create.button"
 						accessibilityRole="button"
@@ -215,7 +218,7 @@ export function WelcomeScreen() {
 }
 
 const styles = StyleSheet.create({
-	content: { flexGrow: 1, paddingTop: 28, paddingBottom: 40 },
+	content: { flexGrow: 1, paddingTop: 28, paddingBottom: 16 },
 	stack: { ...StyleSheet.absoluteFill },
 	ghost: { position: "absolute", width: 300, height: 190, borderRadius: 24, borderWidth: 1 },
 	card: { padding: 20, gap: 2 },

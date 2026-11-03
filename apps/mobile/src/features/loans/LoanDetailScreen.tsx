@@ -1,5 +1,5 @@
 import { formatDateTR, formatRateBps, formatTRY } from "@paramnet/shared";
-import { router } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -158,22 +158,25 @@ export function LoanDetailScreen({ id }: { id: string }) {
 	const divider = <View style={{ height: 1, backgroundColor: colors.divider }} />;
 	return (
 		<Screen testID="loanDetail.screen" edges={["bottom"]}>
-			<View style={[styles.head, { gap: spacing.sm }]}>
-				<Text
-					accessibilityRole="header"
-					style={[typography.title, styles.grow, { color: colors.text }]}
-				>
-					{loan.loan_type}
-				</Text>
-				<IconButton
-					icon="create-outline"
-					label={tr.loans.edit}
-					onPress={() => {
-						router.push({ pathname: "/loans/[id]/edit", params: { id: loan.id } });
-					}}
-					testID="loanDetail.edit.button"
-				/>
-			</View>
+			{/* Design 28: the loan's name and the edit button live in the top bar. */}
+			<Stack.Screen
+				options={{
+					title: loan.loan_type,
+					headerRight: () => (
+						<IconButton
+							icon="create-outline"
+							label={tr.loans.edit}
+							onPress={() => {
+								router.push({
+									pathname: "/loans/[id]/edit",
+									params: { id: loan.id },
+								});
+							}}
+							testID="loanDetail.edit.button"
+						/>
+					),
+				}}
+			/>
 			<LoanPanel loan={loan} testID="loanDetail.panel" />
 			<Button
 				label={tr.loans.early}
@@ -289,7 +292,6 @@ export function LoanDetailScreen({ id }: { id: string }) {
 
 const styles = StyleSheet.create({
 	grow: { flex: 1, minWidth: 0 },
-	head: { flexDirection: "row", alignItems: "center" },
 	kv: {
 		flexDirection: "row",
 		justifyContent: "space-between",

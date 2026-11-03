@@ -163,7 +163,10 @@ describe("Bütçe (39)", () => {
 		expect(screen.queryByTestId("budget.item.food")).toBeNull();
 
 		await fireEvent.press(screen.getByTestId("budget.tab.all"));
-		await fireEvent.press(screen.getByTestId("budget.add.button"));
+		// headerRight also reaches the hidden native header under Jest; one TopBar is drawn.
+		expect(screen.getAllByTestId("topbar")).toHaveLength(1);
+		const [add] = screen.getAllByTestId("budget.add.button");
+		await fireEvent.press(add as NonNullable<typeof add>);
 		await fireEvent.press(screen.getByTestId("budget.sheet.category.rent"));
 		await fireEvent.changeText(screen.getByTestId("budget.sheet.limit.input"), "15000");
 		await fireEvent.press(screen.getByTestId("budget.sheet.save.button"));

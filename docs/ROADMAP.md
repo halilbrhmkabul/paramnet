@@ -495,7 +495,10 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 	- Bakılmayanlar: giriş öncesi ekranlar (01, 02, 31; F4-01b'de karşılaştırıldı), kredi detayı (mock'ta kredi yok), teslim, gelen talep, kısmi ödeme, profil düzenleme.
 	- Bilinen farklar: para biçimi `12.000,00 TL` (tasarımda `₺`; F4-01c kapatıldı, BACKLOG) ve Ionicons; uzun tutarlar bu yüzden bazı yerlerde küçülerek sığar. Hesabı böl (40) formu etiketli alanlarla, tasarımdaki büyük başlık ve tutar satırı yerine.
 	- **Simülatör turu (2026-11-04, iPhone 18 Pro, Expo Go, mock):** Kartlarım, Borçlarım, Ortak hesaplar, Ortak hesap (ödeme onayı), Kişi ekle (kare kod macOS çözücüsüyle okundu), davet edilen kişi (katıl, kabul, ödedim bildir), Hesabı böl (koyu tema). Düzeltilenler: iOS modallarında çift durum çubuğu boşluğu, Ortak hesaplar satırının iç boşluğu, kare koddan açılan davetin bandı, mock'ta ödeyenin payı. Görülen ama prototipe özgü: mock'ta "Borçlarım'da gör" gerçek kayda gitmediği için yüklemede kalır. Denenemeyen: simülatörde yazı girişi (yapıştırma ulaşmadı, RNTL kapsıyor), mock dışı `supabase` modu, Android, küçük ekran.
-	- **Kapıyı kapatmak için (kullanıcı):** Expo Go'da açık ve koyu temada her ekran; küçük ekranda (iPhone SE) tutar taşması; `supabase` modunda iki hesapla hesap bölme ve kare kod.
+	- **Küçük ekran turu (2026-11-04, iPhone 17e 390×844, Expo Go, mock, açık ve koyu):** Karşılama, Onboarding 1–2, Kayıt, Kredi detayı, Gelen talep, Kısmi ödeme, Profil düzenleme, Bütçe, Takvim. Düzeltilenler: karşılamada durum çubuğu koyu zeminde siyahtı ve "Giriş yap" kesiliyordu; Kredi detayı (28) ve Bütçe (39) başlık ve düğmeleri üst çubuğa alındı; dar bölümlü seçicilerde etiket kırılmıyor ("Havale/EFT"). Kredi detayı için mock'a geçici kayıt eklendi, commit'lenmedi.
+	- Hâlâ bakılmayanlar: Para teslimi (17; mock'ta yazı girişi gerektiriyor), Onboarding 3. slayt; ekranlar 390 pt'den dar cihazda denenmedi (simülatörde iPhone SE yok).
+	- Bilinen fark: Kredi detayında (28) tasarımdaki iki yan yana düğme bizde alt alta, "Taksit ödedim kaydet" etiketi yarım genişliğe sığmıyor.
+	- **Kapıyı kapatmak için (kullanıcı):** Android'de açık ve koyu tema; `supabase` modunda iki hesapla hesap bölme ve kare kod (Supabase en sona bırakıldı).
 
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
 ### [ ] F3-09 Faz 3 kapısı: mağaza yayını
