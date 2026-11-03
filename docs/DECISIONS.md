@@ -683,8 +683,9 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 
 ## ADR-062 — Faz 4 kapısında görsel karşılaştırma yöntemi (F4-12)
 - **Tarih:** 2026-10-30
-- **Bağlam:** Bu makinede Xcode/simülatör yok; deneme Expo Go ile yapılıyor. Kanvasın claude.ai sürümü oturum ister.
+- **Bağlam:** Deneme Expo Go ile yapılıyor. Kanvasın claude.ai sürümü oturum ister.
 - **Karar:**
 	- Uygulama, yalnızca karşılaştırma için Expo web'de çizdirilir: `PARAMNET_WEB_PREVIEW=1` `app.config.ts`'de `platforms`'a `web` ekler (`EXPO_NO_WEB_SETUP=1` ile). Web bir ürün hedefi değildir; push web'de kapalıdır (`notifications.ts`).
 	- Referans, kanvasın güncel sayfaları ve paketten çıkarılan `support.js` ile yerelde statik sunulur (oturum dışı kopya, depoda değil).
 	- Web görüntüsü cihazın yerini tutmaz: `adjustsFontSizeToFit` web'de çalışmaz, yazı tipleri ve gölgeler farklıdır. Kapı, kullanıcının Expo Go kontrolüyle kapanır.
+	- **Düzeltme (2026-11-04):** Bu ADR'nin ilk sürümü makinede simülatör olmadığını söylüyordu; yanlıştı. Xcode kurulu ve iOS simülatörü Expo Go ile çalışıyor. Web taraması iOS modallarındaki çift durum çubuğu boşluğunu yakalayamamıştı; simülatör turu yakaladı. Görsel kontrol bundan sonra önce simülatörde yapılır.

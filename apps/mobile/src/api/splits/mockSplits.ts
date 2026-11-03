@@ -115,6 +115,7 @@ export function createMockSplitsApi(options: MockSplitsOptions = {}): SplitsApi 
 			member({
 				id: "so-owner",
 				display_name: "Ahmet Yılmaz",
+				share_minor: 60000,
 				is_owner: true,
 				state: "payer",
 			}),

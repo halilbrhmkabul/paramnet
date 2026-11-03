@@ -58,27 +58,31 @@ export function SplitListScreen() {
 				<View style={{ gap: spacing.sm }}>
 					<MemberCard>
 						{splits.data.map((s) => (
-							<ListItem
-								key={s.id}
-								title={s.title}
-								subtitle={`${fill(tr.split.listItem, {
-									date: formatDateTR(s.spent_on, "short"),
-									count: String(s.member_count),
-								})} · ${
-									s.is_owner
-										? tr.split.listMine
-										: fill(tr.split.listTheirs, {
-												name: s.owner_name,
-												amount: formatTRY(s.my_share_minor ?? 0),
-											})
-								}`}
-								left={<Avatar name={s.owner_name} size={40} />}
-								right={<AmountText minor={s.total_minor} />}
-								onPress={() => {
-									router.push({ pathname: "/split/[id]", params: { id: s.id } });
-								}}
-								testID={`splitList.item.${s.id}`}
-							/>
+							<View key={s.id} style={{ paddingHorizontal: 14 }}>
+								<ListItem
+									title={s.title}
+									subtitle={`${fill(tr.split.listItem, {
+										date: formatDateTR(s.spent_on, "short"),
+										count: String(s.member_count),
+									})} · ${
+										s.is_owner
+											? tr.split.listMine
+											: fill(tr.split.listTheirs, {
+													name: s.owner_name,
+													amount: formatTRY(s.my_share_minor ?? 0),
+												})
+									}`}
+									left={<Avatar name={s.owner_name} size={40} />}
+									right={<AmountText minor={s.total_minor} />}
+									onPress={() => {
+										router.push({
+											pathname: "/split/[id]",
+											params: { id: s.id },
+										});
+									}}
+									testID={`splitList.item.${s.id}`}
+								/>
+							</View>
 						))}
 					</MemberCard>
 				</View>

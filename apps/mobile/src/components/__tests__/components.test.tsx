@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { useState } from "react";
+import { StyleSheet } from "react-native";
+import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 import { AmountInput } from "../AmountInput";
 import { AmountText } from "../AmountText";
@@ -10,6 +12,7 @@ import { ErrorState } from "../ErrorState";
 import { ListItem } from "../ListItem";
 import { LoadingState } from "../LoadingState";
 import { AgreementStatusBadge, InstallmentStatusBadge } from "../StatusBadge";
+import { TopBar } from "../TopBar";
 import { tr } from "@/i18n/tr";
 
 describe("Button", () => {
@@ -133,6 +136,26 @@ describe("Status badges", () => {
 		);
 		expect(screen.getByTestId("open")).toHaveTextContent(tr.installment.undated);
 		expect(screen.getByTestId("late")).toHaveTextContent(tr.installment.status.overdue);
+	});
+});
+
+describe("TopBar", () => {
+	const top = async (sheet: boolean) => {
+		await render(
+			<SafeAreaInsetsContext.Provider value={{ top: 59, bottom: 34, left: 0, right: 0 }}>
+				<TopBar title="Başlık" sheet={sheet} />
+			</SafeAreaInsetsContext.Provider>,
+		);
+		const style = StyleSheet.flatten(screen.getByTestId("topbar").props.style as object);
+		return (style as { paddingTop?: number }).paddingTop;
+	};
+
+	it("clears the status bar on a full screen", async () => {
+		expect(await top(false)).toBe(71);
+	});
+
+	it("does not count the status bar twice on an iOS modal card", async () => {
+		expect(await top(true)).toBe(12);
 	});
 });
 
