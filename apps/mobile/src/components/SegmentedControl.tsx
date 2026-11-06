@@ -62,7 +62,11 @@ export function SegmentedControl<T extends string>({
 								},
 							]}
 						>
+							{/* Narrow segments shrink the label instead of wrapping it ("Havale/EFT"). */}
 							<Text
+								numberOfLines={1}
+								adjustsFontSizeToFit
+								minimumFontScale={0.75}
 								style={[
 									typography.rowTitle,
 									{ color: selected ? colors.primary : colors.neutral },

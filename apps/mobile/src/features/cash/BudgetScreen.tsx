@@ -5,7 +5,8 @@ import {
 	monthOf,
 	type TransactionCategory,
 } from "@paramnet/shared";
-import { useState } from "react";
+import { Stack } from "expo-router";
+import { useMemo, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { messageForError } from "@/api/errors";
@@ -251,30 +252,29 @@ function LimitSheet({
 
 // Design 39: this month's limits per expense category.
 export function BudgetScreen() {
-	const { colors, typography, fonts, spacing, radius } = useAppTheme();
+	const { colors, typography, fonts, radius } = useAppTheme();
 	const today = useToday();
 	const month = monthOf(today);
 	const budgets = useBudgets(month);
 	const [tab, setTab] = useState<"all" | "warn">("all");
 	const [editing, setEditing] = useState<BudgetItem | "new" | null>(null);
 
-	const header = (
-		<View style={[styles.line, { gap: spacing.sm }]}>
-			<Text
-				accessibilityRole="header"
-				style={[typography.title, styles.grow, { color: colors.text }]}
-			>
-				{fill(tr.budget.title, { month: monthTitle(month) })}
-			</Text>
-			<IconButton
-				icon="add"
-				label={tr.budget.add}
-				onPress={() => {
-					setEditing("new");
-				}}
-				testID="budget.add.button"
-			/>
-		</View>
+	// Design 39: the title and the add button live in the top bar.
+	const options = useMemo(
+		() => ({
+			title: fill(tr.budget.title, { month: monthTitle(month) }),
+			headerRight: () => (
+				<IconButton
+					icon="add"
+					label={tr.budget.add}
+					onPress={() => {
+						setEditing("new");
+					}}
+					testID="budget.add.button"
+				/>
+			),
+		}),
+		[month],
 	);
 
 	let body: React.ReactNode;
@@ -436,7 +436,7 @@ export function BudgetScreen() {
 	const free = EXPENSE_CATEGORIES.filter((c) => !used.has(c));
 	return (
 		<Screen testID="budget.screen" edges={["bottom"]}>
-			{header}
+			<Stack.Screen options={options} />
 			{body}
 			{editing === null ? null : (
 				<LimitSheet
