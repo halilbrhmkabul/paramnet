@@ -22,10 +22,10 @@ Ortak cevaplar:
 | Contact Info → Name | Görünen ad | App Functionality | Evet | Hayır |
 | Contacts | Yalnızca kullanıcının seçtiği karşı tarafın adı/numarası; rehber yüklenmez | App Functionality | Evet | Hayır |
 | Financial Info → Other Financial Info | Borç tutarları, taksit planı, ödeme kayıtları | App Functionality | Evet | Hayır |
-| User Content → Other User Content | Notlar, değişiklik/itiraz gerekçeleri | App Functionality | Evet | Hayır |
+| User Content → Other User Content | Notlar | App Functionality | Evet | Hayır |
 | Identifiers → User ID | Hesap kimliği (UUID) | App Functionality, Analytics | Evet | Hayır |
 | Identifiers → Device ID | Push bildirim anahtarı (Expo push token) | App Functionality | Evet | Hayır |
-| Usage Data → Product Interaction | Uygulama açılışı, bildirim açılışı, davet açılışı | Analytics | Evet | Hayır |
+| Usage Data → Product Interaction | Uygulama açılışı, bildirim açılışı | Analytics | Evet | Hayır |
 | Diagnostics → Crash Data, Other Diagnostic Data | Sentry hata kayıtları (kişisel veri temizlenmiş, yalnızca kullanıcı kimliği) | App Functionality | Evet | Hayır |
 
 Toplanmayanlar: konum, sağlık, ödeme kartı, e-posta, fotoğraf, arama/tarama geçmişi, reklam kimliği.

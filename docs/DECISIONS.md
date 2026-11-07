@@ -699,3 +699,28 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- **Klavyeyi kapatma:** Sayısal klavyede kapatma tuşu yok, formlarda sürükleme klavyeyi kapatır (`keyboardDismissMode="on-drag"`, kısa içerikte de sürüklenebilsin diye `alwaysBounceVertical`).
 - **Sonuç ve açık konu:** Xcode 27 ile derlenen uygulama UIScene benimsemezse iOS 27 SDK'sı açılışta süreci sonlandırır. Expo SDK 57 şablonu benimsemiyor, SDK 58 şablonu benimsiyor. Simülatör için yerel `ios/` klasörü elle yamalandı (`ExpoReactNativeFactoryProvider`, `UIApplicationSceneManifest`, `EXExpoAppSceneDelegate`). Bu yama depoda yok; EAS derlemesi Xcode 27 kullanıyorsa aynı kapanma olur. F3-06'dan önce SDK 58'e geçiş ya da config plugin kararı verilmelidir (BACKLOG).
 
+## ADR-064 — Tek taraflı defter, kart silme, tek taraflı hesap bölme
+- **Tarih:** 2026-11-07
+- **Bağlam:** Kullanıcı uygulamayı gözden geçirdi; fazla geniş buldu ve karşılıklı akışın kullanıcıyı yorduğuna karar verdi. Bunun ürünün belgelenmiş farkını kaldırdığı kendisine söylendi; yumuşak seçenekler (bilgi amaçlı paylaşım, yalnızca ödeme onayını kaldırma) yerine bunu seçti.
+- **Kullanıcının kararları:**
+	- Karşılıklı borç onayı silinir. Her kullanıcı kendi defterini tutar, karşı taraf hiç dahil olmaz, aralarında bildirim gitmez.
+	- Kredi kartları kod ve tablosuyla silinir.
+	- Hesap bölme tek taraflı Splitwise'dır: kişiler isimdir; hesap, kare kod, link, davet yoktur.
+	- Kullanıcının kendi vade hatırlatmaları kalır.
+	- Gelir-gider, hesaplar, Toplam Nakit, bütçe, aylık rapor ve tekrarlayan işlem gizlenir, silinmez.
+	- Banka kredisi ve kredi simülasyonu görünür kalır.
+	- Sıra: önce belgeler, kod adım adım; uzak Supabase en sonda ve onayla.
+- **Kullanıcının onayladığı planla gelenler:** Telefonla giriş ve PIN kalır, çünkü bulut yedeği ve hesap silme buna bağlı. ParamNet ID kalkar. `version` + `terms_hash` onayı ve "kabul edilmiş kayıt değişmez" kuralı kalkar; olay geçmişi, RPC, idempotency ve kuruş kuralları sürer.
+- **Belgeler yazılırken verilen varsayılanlar (spec 0.4'e işlendi, kullanıcı değiştirebilir):**
+	- Durum `personal` adıyla kalır, arayüzde "Açık" görünür: enum ve mevcut veri yeniden adlandırılmaz. Geçerli durumlar `personal`, `settled`, `cancelled`; ödeme durumları `confirmed`, `voided`.
+	- Ödeme silinebilir (`void_payment`); kapanmış kayıt yeniden açılır. Önceden karşılıklı onay istediği için tek taraflı yolu yoktu.
+	- Kişi kaydında telefon tutulmaz: paylaşım için vardı, veri minimizasyonu lehine kalkar.
+	- Kapanışta bildirim gitmez, uygulama içi mesaj görünür. Bildirimler yalnızca hatırlatmadır; kategori kalkar.
+	- Sekmeler: Ana Sayfa, Borçlarım, İşlem (+), Ortak, Takvim.
+	- Grup bakiyeleri borç kaydı oluşturmaz, Ana Sayfa toplamlarına katılmaz, hatırlatma üretmez. Tek seferlik hesap da grup olarak açılır. Kuruş farkı ödeyene, ödeyen dahil değilse ilk dahil üyeye yazılır. Ödeyen herhangi bir üye olabilir; bir harcamanın tek ödeyeni vardır.
+	- Kart silinince hesaba bağlı olmayan kart işlemleri de silinir.
+	- Gizli modüller derleme bayrağıyla (`EXPO_PUBLIC_PERSONAL_FINANCE=1`) açılır, varsayılan kapalıdır.
+	- Kredi taksit kaydı hesap istemez; hesaplar açıkken seçilebilir.
+	- Paylaşılmış kayıt oluşturanda kalır, karşı tarafın erişimi kalkar. Uygulama henüz yayında değildir, kopya üretilmez.
+- **Geçersiz kalan ADR'ler:** Karşılıklı akış, davet, web onay, ParamNet ID paylaşımı (ADR-050'nin paylaşım kısmı), kartlar (ADR-055), Para iste ve teslim (ADR-058), eski hesabı böl (ADR-061) ve bunlara bağlı kararlar uygulanmaz. Tarihçe olarak durur.
+- **Sonuç:** Kod belgelerin gerisindedir ve F5-02–F5-06'da yetişir. Tek taraflı defter pazarda tek başına fark yaratmaz (spec 2.2); risk spec 17'de. Kayıtlar delil değildir.

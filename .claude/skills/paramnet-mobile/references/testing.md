@@ -25,8 +25,8 @@ agreement.primaryAction.button
 agreement.installment.2.row
 payment.amount.input
 payment.save.button
-requests.tab.payments
-invite.accept.button
+split.create.button
+split.expense.save.button
 ```
 
 - Listelerde sıra numarası veya kararlı ID kullanılır (`agreement.installment.<seq>.row`).
@@ -48,9 +48,7 @@ invite.accept.button
 | `create-loan.yaml` | Borç verdim, tek seferlik → detay | 1 |
 | `create-installment.yaml` | Taksitle aldım: 28.000 / 8.000 / 5 taksit → plan önizleme değerleri | 1 |
 | `record-payment.yaml` | Kısmi ödeme → taksit `partial` → tam ödeme → kapandı | 1 |
-| `share-and-accept.yaml` | Paylaş → (2. cihaz/hesap) davet linki → onayla → iki tarafta aynı kalan | 2 |
-| `payment-confirm.yaml` | Borçlu ödeme bildirir → alacaklı onaylar | 2 |
-| `amendment.yaml` | Taksit erteleme önerisi → kabul | 2 |
+| `split-group.yaml` | Grup oluştur → harcama ekle → bakiyeler → ödeşme → ödeşildi | 5 |
 
 Ortak alt akışlar: `subflows/login.yaml`, `subflows/create-agreement.yaml`. Oturum açık/kapalı başlangıç durumları için `maestro-mobile-testing` skill'indeki desenler kullanılır.
 

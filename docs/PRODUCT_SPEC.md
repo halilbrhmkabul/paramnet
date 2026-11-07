@@ -1,23 +1,24 @@
 > Bu dosya `docs/Paramnet_Urun_ve_Teknik_Tasarim.docx` dokümanının Markdown kopyasıdır ve projenin tek doğruluk kaynağıdır (single source of truth).
 > Word dokümanı güncellenirse bu dosya da güncellenmelidir.
+> 7 Kasım 2026'dan itibaren ürün tek taraflı borç defteridir (ADR-064). Word dokümanı eski, iki taraflı sürümü anlatır; bu dosya öndedir.
 
 **ÜRÜN VE TEKNİK TASARIM DOKÜMANI**
 
 **Paramnet**
 
-Karşılıklı Borç ve Taksit Yönetimi Uygulaması
+Kişisel Borç, Taksit ve Hesap Bölme Defteri
 
 Fikir, çalışma şekli, kurgu, mimari, veri modeli, güvenlik ve yol haritası
 
 **Uygulama adı:** Paramnet (marka ve alan adı uygunluk kontrolü yapılacak)
 
-**Sürüm:** 0.3 — Taslak (uygulama adı: Paramnet)
+**Sürüm:** 0.4 — Tek taraflı defter (uygulama adı: Paramnet)
 
-**Tarih:** 11 Ekim 2026
+**Tarih:** 7 Kasım 2026
 
 **Hazırlayan:** Halil
 
-**Platform:** iOS ve Android mobil uygulama + tek sayfalık web onay ekranı
+**Platform:** iOS ve Android mobil uygulama
 
 
 
@@ -30,27 +31,29 @@ Fikir, çalışma şekli, kurgu, mimari, veri modeli, güvenlik ve yol haritası
 <tbody>
 <tr class="odd">
 <td><p><strong>Ürün vaadi</strong></p>
-<p>Verdiğin, aldığın ve taksitle ödeyeceğin borçları iki taraflı takip et. Borcu kaydet, ödeme planı oluştur, karşı tarafa gönder ve ödemeleri birlikte doğrula.</p></td>
+<p>Verdiğin, aldığın ve taksitle ödeyeceğin borçları kendi defterinde tut. Ödeme günlerini kaçırma, ortak harcamalarda kimin kime ne kadar borçlu olduğunu tek bakışta gör.</p></td>
 </tr>
 </tbody>
 </table>
 
-Uygulama, bireyler arasındaki borç ve taksit anlaşmalarını dijitalleştiren bir mobil uygulamadır. Kullanıcı uygulamayı tek başına kişisel borç defteri olarak kullanabilir. Karşı tarafı davet ettiğinde anlaşma iki tarafın da onayladığı, değişiklik geçmişi korunan ve ödemeleri karşılıklı doğrulanan ortak bir kayda dönüşür.
+Paramnet, kişinin kendi borç ve alacaklarını, elden taksitlerini ve banka kredilerini tuttuğu bir mobil defterdir. Her kullanıcı kendi defterini tutar. Karşı taraf hiçbir şekilde sürece girmez: uygulamaya davet edilmez, kaydı görmez, onaylamaz, ona bildirim gitmez.
 
-Pazar araştırması iki sonucu netleştirdi. Birincisi, banka hesabı ve kredi kartı birleştirme artık bankaların açık bankacılık üzerinden ücretsiz sunduğu bir özelliktir; bu alanda farklılaşmak mümkün değildir. İkincisi, tek taraflı borç defteri, elden taksit, ödeme takvimi ve WhatsApp hatırlatması Türkiye’deki birçok uygulamada zaten vardır. Doğrulanmış farklılaşma alanı, **anlaşmanın iki tarafça yönetilmesi**dir: onay, ortak takip, ödeme doğrulaması, değişiklik ve itiraz.
+Hesap bölme Splitwise mantığıyla çalışır ama yine tek taraflıdır: kullanıcı grubu ve kişileri isimleriyle kendisi yazar, harcamaları girer, uygulama kimin kime ne kadar borçlu olduğunu hesaplar ve sadeleştirir.
+
+İlk tasarımda ürünün farkı karşılıklı onaydı (Bölüm 2.2). 7 Kasım 2026'da bu akış kaldırıldı (ADR-064): kullanıcı, karşı tarafı dahil etmeden çalışan sade bir defter istedi. Tek taraflı defterin pazarda tek başına bir fark yaratmadığı bilinerek alınmış bir karardır. Ürün artık sadelik ve kayıt kolaylığıyla ayrışmayı hedefler.
 
 ## 1.1 Temel kararlar
 
 | **Konu**                | **Karar**                                                                                                                             |
 |-------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| Platform                | Mobil uygulama (iOS + Android). Davet edilen ve uygulaması olmayan kişi için tek sayfalık web onay ekranı.                            |
-| Hedef kitle             | Bireyler. Esnaf ve veresiye defteri ilk sürümde kapsam dışıdır.                                                                       |
-| Ana farklılaşma         | Karşılıklı onaylı borç anlaşması, ortak ödeme takibi ve mutabakat.                                                                    |
-| İlk sürüm kapsamı       | Kişisel borç defteri, elden taksit, kısmi ödeme, takvim, hatırlatma, davet, karşılıklı onay, ödeme doğrulaması, değişiklik ve itiraz. |
-| Kapsam dışı (ilk sürüm) | Gelir-gider, banka hesapları, kredi kartı, banka kredisi, faiz hesaplama, ekstre okuma, grup harcaması, AI asistan. Faz 4'te tasarımla birlikte görev görev eklenir (ADR-044; hesaplar ve gelir-gider: 5.11, ADR-053). |
-| Para hareketi           | Uygulama para tutmaz, transfer başlatmaz. Yalnızca kayıt ve mutabakat sağlar.                                                         |
-| Uzun vadeli vizyon      | Borç merkezli kişisel finans platformu. Diğer modüller kullanıcı verisine göre sırayla eklenir.                                       |
-| Gelir modeli            | Temel özellikler ve davet akışı ücretsiz. Premium: raporlar, PDF çıktı, gelişmiş özellikler.                                          |
+| Platform                | Mobil uygulama (iOS + Android). Web sayfası yoktur.                                                                                   |
+| Hedef kitle             | Bireyler. Esnaf ve veresiye defteri kapsam dışıdır.                                                                                   |
+| Ana değer               | Sade borç defteri, ödeme günü hatırlatması ve tek taraflı hesap bölme.                                                                |
+| Sürüm kapsamı           | Borç ve alacak kaydı, elden taksit, kısmi ödeme, takvim, kendine hatırlatma, hesap bölme, banka kredisi takibi ve kredi simülasyonu.  |
+| Silinenler              | Karşılıklı onay, paylaşım, davet, web onay sayfası, Para iste, para teslimi, itiraz, değişiklik talebi, ParamNet ID, kredi kartları.  |
+| Gizlenenler             | Hesaplar, Toplam Nakit, gelir-gider, tekrarlayan işlem, bütçe, aylık rapor. Kod durur, arayüzde görünmez (5.18).                      |
+| Para hareketi           | Uygulama para tutmaz, transfer başlatmaz. Yalnızca kayıt tutar.                                                                       |
+| Gelir modeli            | Temel defter ücretsiz. Premium: raporlar, PDF çıktı, gelişmiş özellikler.                                                             |
 
 # 2. Problem ve Pazar
 
@@ -64,7 +67,7 @@ Türkiye’de bireyler arasında borç, elden taksit ve vadeli alışveriş çok
 
 - Tek taraflı tutulan Excel tabloları veya basit borç defteri uygulamaları
 
-Bunun sonuçları: unutulan ödeme günleri, tarafların farklı hatırladığı kalan tutarlar, para isteme mahcubiyeti ve ilişkiyi geren tartışmalar. Tek taraflı kayıt bu sorunların yalnızca bir kısmını çözer; çünkü karşı taraf kayda itiraz edebilir ve kaydı görmez.
+Bunun sonuçları: unutulan ödeme günleri, tarafların farklı hatırladığı kalan tutarlar, para isteme mahcubiyeti ve ilişkiyi geren tartışmalar. Paramnet bu sorunların kullanıcının kendi tarafındaki kısmını çözer: ne verdiğini, ne aldığını ve ne zaman ödeyeceğini unutmamasını sağlar.
 
 ## 2.2 Pazar bulguları
 
@@ -83,8 +86,8 @@ Bunun sonuçları: unutulan ödeme günleri, tarafların farklı hatırladığı
 </colgroup>
 <tbody>
 <tr class="odd">
-<td><p><strong>Doğrulanması gereken varsayım</strong></p>
-<p>Rakiplerin hiçbirinde “anlaşma oluştur → karşı taraf onaylar → iki tarafta ortak takip → ödeme bildirimi → doğrulama → itiraz/yeniden anlaşma” akışının tamamı görülmedi. Bu, mağaza açıklamalarına dayalı bir tespittir; rakip uygulamalar bizzat kurulup test edilerek teyit edilmelidir.</p></td>
+<td><p><strong>Karar notu (ADR-064)</strong></p>
+<p>Bu tablo iki taraflı akışı önerdiği dönemden kalmadır. Tek taraflı defter rakiplerde de var; ürün karşılıklı onaydan vazgeçerek bu alana bilerek girer. Fark, Splitwise mantığını hesap gerektirmeden sunmak ve uygulamayı sade tutmaktır.</p></td>
 </tr>
 </tbody>
 </table>
@@ -93,65 +96,63 @@ Bunun sonuçları: unutulan ödeme günleri, tarafların farklı hatırladığı
 
 ## 3.1 Konumlandırma
 
-Uygulama ne bir bütçe uygulaması ne de bir harcama bölüştürme uygulamasıdır. **Bireyler arası borç ve vadeli ödeme anlaşmalarının dijital mutabakat aracıdır.** Faz 4'te eklenen "Hesabı böl" (5.17) da bir bölüştürme defteri değildir: her pay, ödeyene karşı kişinin kabul ettiği ayrı bir borç kaydıdır (ADR-061).
+Paramnet **kişinin kendi borç defteridir.** Kayıtlar yalnızca sahibine aittir, başka kimse görmez ve kimseyi bağlamaz.
 
-| **Biz neyiz**                                     | **Biz ne değiliz**                        |
-|---------------------------------------------------|-------------------------------------------|
-| İki tarafın onayladığı borç kaydı                 | Para transfer eden bir ödeme kuruluşu     |
-| Elden taksit ve vadeli alışveriş takibi           | Banka hesabı / kart birleştirme aracı     |
-| Ödeme hatırlatma ve doğrulama                     | Hukuken geçerli e-senet düzenleme hizmeti |
-| Değişiklik ve itiraz geçmişi tutan kayıt          | Kredi veren veya faiz hesaplayan platform |
-| Tek başına da kullanılabilen kişisel borç defteri | Esnaf veresiye / cari hesap yazılımı      |
+| **Biz neyiz**                                  | **Biz ne değiliz**                        |
+|------------------------------------------------|-------------------------------------------|
+| Kişisel borç ve alacak defteri                 | Para transfer eden bir ödeme kuruluşu     |
+| Elden taksit ve vadeli alışveriş takibi        | Banka hesabı / kart birleştirme aracı     |
+| Kendine ödeme hatırlatması                     | Hukuken geçerli e-senet düzenleme hizmeti |
+| Tek taraflı hesap bölme                        | Kredi veren platform                      |
+| Banka kredisi takibi ve kredi simülasyonu      | Esnaf veresiye / cari hesap yazılımı      |
 
 ## 3.2 Hedef kullanıcılar
 
 | **Persona**                    | **Durum**                                       | **Uygulamadan beklentisi**                                                    |
 |--------------------------------|-------------------------------------------------|-------------------------------------------------------------------------------|
-| Borç veren arkadaş             | Arkadaşına 18.000 TL verdi, 3 ayda geri alacak. | Para istemek zorunda kalmadan hatırlatma; kalan tutarda anlaşmazlık olmaması. |
-| Borç alan kişi                 | Akrabasından borç aldı, aylık ödüyor.           | Ne kadar ödediğini ve ne kadar kaldığını kanıtlayabilmek.                     |
+| Borç veren arkadaş             | Arkadaşına 18.000 TL verdi, 3 ayda geri alacak. | Ne verdiğini ve ne kadarının döndüğünü unutmamak; geri ödeme gününü bilmek. |
+| Borç alan kişi                 | Akrabasından borç aldı, aylık ödüyor.           | Ne kadar ödediğini ve ne kadar kaldığını net görmek.                     |
 | Elden taksitle alışveriş yapan | Mobilyacıdan peşinat + 5 taksitle aldı.         | Ödeme günlerini kaçırmamak, ödenen taksitleri işaretlemek.                    |
-| Ev arkadaşı / aile içi borç    | Düzenli küçük borçlar ve geri ödemeler.         | Kimin kime ne kadar borçlu olduğunu net görmek.                               |
+| Ev arkadaşı / tatil grubu      | Ortak harcamalar, sırayla ödenen hesaplar.      | Kimin kime ne kadar borçlu olduğunu tek bakışta görmek.                       |
 
-## 3.3 Değer önerisinin iki katmanı
+## 3.3 Değer önerisi
 
-- **Tek başına kullanım:** Kişisel borç defteri, taksit planı, takvim, hatırlatma. Karşı taraf uygulamayı kullanmasa da tam çalışır.
+- **Defter:** Borç, alacak ve elden taksit kaydı, ödeme planı, takvim, kendine hatırlatma. Başka kimse gerekmez.
 
-- **Karşılıklı kullanım:** Anlaşma paylaşılır, karşı taraf onaylar, iki tarafta aynı kayıt ve bakiye görünür, ödemeler karşılıklı doğrulanır.
+- **Hesap bölme:** Grup, harcama, kimin ödediği, paylar ve sadeleştirilmiş borçlar. Diğer kişilerin uygulamayı kullanması gerekmez.
 
-Ürün tasarımının temel ilkesi: Uygulama tek başına yeterince faydalı olmalı; arkadaş davet edildiğinde fayda artmalı. Davet zorunlu bir adım değil, değer katan bir yükseltmedir.
+- **Banka kredisi:** Kullanıcının kendi kredilerinin planı ve erken kapama simülasyonu.
 
 ## 3.4 İletişim tonu
 
-Kişiler arası borç kaydı Türkiye’de güvensizlik veya ayıp olarak algılanabilir. Bu nedenle ürün dili “kontrol” yerine “kolaylık” üzerine kurulur:
+Borç konusu hassastır. Uygulama yalnızca kullanıcıyla konuşur; suçlayıcı veya resmî dil kullanmaz.
 
-| **Kaçınılacak ifade** | **Kullanılacak ifade**                          |
-|-----------------------|-------------------------------------------------|
-| Borcunu onayla        | Ödeme planımızı birlikte takip edelim           |
-| Borç talebi           | Anlaşma paylaşımı                               |
-| Ödemen gecikti        | Bugün ödeme günü (hatırlatma uygulamadan gelir) |
-| İtiraz et             | Bir şey yanlış mı? Düzeltme öner                |
+| **Kaçınılacak ifade** | **Kullanılacak ifade** |
+|-----------------------|------------------------|
+| Ödemen gecikti        | Bugün ödeme günü       |
+| Borcunu ödemedin      | Henüz kaydedilmedi     |
+| Hata oluştu           | Bir sorun çıktı        |
 
 # 4. Temel Kavramlar (Alan Modeli)
 
 Tüm ekip ve kod aynı terimleri kullanır. Kod tarafında İngilizce karşılıklar parantez içinde verilmiştir.
 
-| **Kavram**                            | **Tanım**                                                                                                                         |
-|---------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| Kullanıcı (profile)                   | Telefon numarasıyla doğrulanmış uygulama hesabı.                                                                                  |
-| Kişi (contact)                        | Kullanıcının rehberindeki karşı taraf. Uygulamaya kayıtlı olabilir veya olmayabilir. Ad ve isteğe bağlı telefon numarası tutulur. |
-| Anlaşma (agreement)                   | İki taraf arasındaki tek bir borç ilişkisi. Ana kayıttır.                                                                         |
-| Rol (role)                            | Anlaşmadaki taraf: alacaklı (creditor) veya borçlu (debtor).                                                                      |
-| Mod (mode)                            | Kişisel (personal): yalnızca oluşturan görür. Paylaşılan (shared): iki taraf da görür ve onaylar.                                 |
-| Anlaşma versiyonu (agreement_version) | Anlaşma şartlarının değiştirilemez bir anlık görüntüsü. Her onay belirli bir versiyona verilir.                                   |
-| Ödeme planı / Taksit (installment)    | Vadesi ve tutarı olan ödeme kalemi. Tek seferlik borç = tek taksitli plan.                                                        |
-| Peşinat (down_payment)                | Anlaşma anında ödenen ve plandan düşülen tutar.                                                                                   |
-| Ödeme (payment)                       | Gerçekleşen bir geri ödeme kaydı. Bildirilir, karşı tarafça doğrulanır.                                                           |
-| Dağıtım (allocation)                  | Bir ödemenin hangi taksitlere ne kadar uygulandığı.                                                                               |
-| Değişiklik talebi (amendment)         | Aktif anlaşmanın şartlarında önerilen değişiklik (erteleme, tutar, vade). Karşı taraf onaylarsa yeni versiyon olur.               |
-| İtiraz (dispute)                      | Taraflardan birinin kayıt veya ödemeye itiraz ettiği durum.                                                                       |
-| Davet (invite)                        | Anlaşmayı karşı tarafa ileten, süreli ve tek amaçlı link.                                                                         |
-| ParamNet ID (paramnet_id)             | Kullanıcının rastgele, yeniden üretilebilir kimliği (PN-XXXXXX). Kayıtlı kullanıcıyı telefonsuz bulmak ve paylaşmak içindir (ADR-050). |
-| Olay kaydı (agreement_event)          | Anlaşmada olan her şeyin değiştirilemez günlüğü. Denetim ve itiraz kanıtıdır.                                                     |
+| **Kavram**                            | **Tanım**                                                                                                     |
+|---------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| Kullanıcı (profile)                   | Telefon numarasıyla doğrulanmış uygulama hesabı. Defterin sahibi.                                             |
+| Kişi (contact)                        | Kullanıcının defterine isimle yazdığı karşı taraf. Uygulama hesabıyla bağı yoktur, yalnızca ad ve tür tutulur. |
+| Kayıt (agreement)                     | Bir kişiyle olan tek bir borç ilişkisi. Ana kayıttır.                                                         |
+| Rol (role)                            | Kullanıcının kayıttaki yeri: alacaklı (creditor) veya borçlu (debtor).                                        |
+| Kayıt versiyonu (agreement_version)   | Kaydın şartlarının değiştirilemez anlık görüntüsü. Her düzenleme yeni versiyondur.                            |
+| Ödeme planı / Taksit (installment)    | Vadesi ve tutarı olan ödeme kalemi. Tek seferlik borç = tek taksitli plan.                                    |
+| Peşinat (down_payment)                | Kayıt anında ödenen ve plandan düşülen tutar.                                                                 |
+| Ödeme (payment)                       | Gerçekleşen bir geri ödeme kaydı. Yazıldığı anda bakiyeden düşer.                                             |
+| Dağıtım (allocation)                  | Bir ödemenin hangi taksitlere ne kadar uygulandığı.                                                           |
+| Olay kaydı (agreement_event)          | Kayıtta olan her şeyin değiştirilemez günlüğü. Kullanıcının kendi geçmişidir.                                 |
+| Grup (split_group)                    | Ortak harcamaların toplandığı başlık: "Ev", "Kapadokya", "Akşam yemeği".                                      |
+| Üye (split_group_member)              | Gruptaki kişi. Biri her zaman kullanıcının kendisidir, diğerleri yalnızca isimdir.                            |
+| Harcama (split_expense)               | Grupta bir üyenin ödediği ve üyeler arasında paylaştırılan tutar.                                             |
+| Ödeşme (split_settlement)             | Bir üyenin başka bir üyeye yaptığı geri ödemenin kaydı.                                                       |
 
 # 5. Uygulamanın Çalışma Şekli
 
@@ -169,9 +170,7 @@ Bu bölüm kullanıcının uygulamada yaptığı her işi uçtan uca anlatır.
 
 5.  Bildirim izni istenir; gerekçe ekranda açıkça yazar: “Ödeme günlerini hatırlatabilmemiz için”.
 
-6.  Telefon numarasına bekleyen davet varsa (başkası bu kullanıcıyla anlaşma paylaşmışsa) doğrudan Talepler ekranı açılır.
-
-7.  Yoksa boş durum ekranı: “İlk kaydını ekle” butonu ve 3 hızlı şablon (Borç verdim, Borç aldım, Taksitle aldım).
+6.  Boş durum ekranı: “İlk kaydını ekle” butonu ve 3 hızlı şablon (Borç verdim, Borç aldım, Taksitle aldım).
 
 Sonraki girişler (02 "Giriş yap"): telefon + 6 haneli PIN. "Şifremi unuttum" SMS koduyla yeni PIN belirletir (Bölüm 11.1).
 
@@ -208,7 +207,7 @@ Kullanıcı “+” butonuna bastığında önce ne yaptığını seçer. Her se
 
 - **Eşit olmayan plan:** Kullanıcı her taksitin tarih ve tutarını tek tek düzenleyebilir. Toplam, kalan tutara eşit olmadan kaydedilemez.
 
-- **Peşinat:** Ödenmiş bir ödeme olarak kaydedilir ve anlaşma oluşturulurken onaylı sayılır.
+- **Peşinat:** Ödenmiş bir ödeme olarak kaydedilir.
 
 - **Önizleme:** Kaydetmeden önce plan liste halinde gösterilir; kullanıcı tek dokunuşla düzenler.
 
@@ -224,81 +223,27 @@ Kullanıcı “+” butonuna bastığında önce ne yaptığını seçer. Her se
 
 Kişi seçimi
 
-- Rehberden seçme (izin istenir, yalnızca seçilen kişinin adı ve numarası okunur; rehber sunucuya yüklenmez).
+- Rehberden seçme (izin istenir, yalnızca seçilen kişinin adı okunur; rehber sunucuya yüklenmez).
 
-- Elle ad yazma; telefon numarası isteğe bağlı. Numara yoksa anlaşma yalnızca kişisel modda kalabilir.
+- Elle ad yazma. Telefon numarası istenmez ve saklanmaz.
 
-- Satıcı gibi uygulamayı kullanmayacak taraflar için serbest metin karşı taraf (ör. “Yıldız Mobilya”).
+- Satıcı gibi taraflar için serbest metin karşı taraf (ör. “Yıldız Mobilya”).
 
-## 5.3 Kişisel mod (tek taraflı kullanım)
+## 5.3 Tek taraflı defter
 
-Paylaşılmayan her anlaşma kişisel moddadır. Kullanıcı tüm işlemleri tek başına yapar: ödeme ekler, taksit erteler, düzenler, kapatır. Doğrulama gerekmez çünkü karşı taraf yoktur. Ekranda “Yalnızca sen görüyorsun” etiketi bulunur.
-
-Kişisel moddaki bir anlaşma her an paylaşılabilir. Paylaşıldığında o anki şartlar ilk versiyon olarak karşı tarafa gönderilir. Paylaşımdan önce yapılan ödemeler “karşı tarafça henüz doğrulanmadı” olarak gösterilir ve onay sırasında karşı tarafa listelenir.
+Her kayıt yalnızca oluşturanındır. Kullanıcı tüm işlemleri tek başına yapar: ödeme ekler, taksit erteler, düzenler, kapatır. Doğrulama yoktur çünkü karşı taraf yoktur. Hiçbir kayıt başka bir kullanıcıya bağlanmaz, gönderilmez, paylaşılmaz.
 
 ## 5.4 Paylaşım ve karşılıklı onay
 
-Akış
+Kaldırıldı (ADR-064).
 
-1.  Oluşturan kullanıcı “Paylaş”a basar. Karşı tarafın telefon numarası zorunludur.
+## 5.5 Ödeme kaydı
 
-2.  Sunucu tek kullanımlık bir davet oluşturur: rastgele token, hedef telefon numarası, 7 gün geçerlilik.
-
-3.  Uygulama paylaşım menüsünü açar; hazır mesaj + link WhatsApp, SMS veya başka kanalla gönderilir. (Uygulama kendisi SMS ile davet göndermez; maliyet ve spam riski nedeniyle.)
-
-4.  Karşı taraf linke tıklar. Uygulama yüklüyse Universal/App Link ile doğrudan uygulamada açılır; değilse web onay sayfası açılır.
-
-5.  Karşı taraf telefon numarasını SMS kodu ile doğrular. Numara, davetteki hedef numarayla eşleşmezse onay verilemez.
-
-6.  Anlaşma detayları gösterilir: taraflar, roller, tutar, peşinat, ödeme planı, varsa daha önce bildirilmiş ödemeler.
-
-7.  Karşı taraf üç seçenekten birini seçer: Onayla, Düzeltme öner, Reddet.
-
-8.  Onaylanırsa anlaşma “aktif” olur. İki tarafa bildirim gider, kayıt iki tarafın ekranında aynı görünür.
-
-Web onay sayfası
-
-- OTP doğrulamasından önce yalnızca “\[Ad\] seninle bir ödeme planı paylaştı” bilgisi görünür; tutar ve detay gösterilmez.
-
-- Doğrulamadan sonra anlaşma detayı ve karar butonları görünür.
-
-- Karar verildikten sonra “Ödeme günlerinde hatırlatma almak için uygulamayı indir” çağrısı ve mağaza butonları gösterilir.
-
-- Web’de onaylayan kişi daha sonra aynı numarayla uygulamaya kayıt olursa anlaşma otomatik olarak hesabına bağlanır.
-
-- Web sayfası yalnızca bu işlemi yapar: onay, düzeltme önerisi, red. Hesap yönetimi veya başka işlem yoktur.
-
-ParamNet ID ile paylaşım (ADR-050)
-
-- Paylaş ekranında telefon numarası yerine karşı tarafın ParamNet ID'si girilebilir. Uygulama ID'yi arar ve yalnızca görünen adı ve baş harfleri gösterir; kullanıcı doğru kişi olduğunu teyit eder.
-
-- Sunucu hedef profile bağlı bir davet oluşturur; link, token ve OTP yoktur. Davet 7 gün geçerlidir; geri çekme ve süre dolumu telefonla paylaşımdaki gibidir.
-
-- Karşı tarafa push ve Bildirimler'de talep gider; kararı uygulama içinde verir (adım 6–8 aynı).
-
-- Arama tam eşleşmedir ve kullanıcı başına saatte 20 ile sınırlıdır; ID ile paylaşım günde 10 ile sınırlıdır. "ID ile bulunabilirim" kapalı olan kullanıcı bulunamaz.
-
-- Kullanıcı ID'sini Profil'den 30 günde bir yeniden üretebilir; eski ID hemen geçersiz olur ve tekrar kullanılmaz.
-
-Düzeltme önerisi
-
-Karşı taraf tutar, peşinat veya plan üzerinde değişiklik önerebilir. Öneri yeni bir versiyon taslağı oluşturur ve oluşturan kullanıcıya gider. Oluşturan kabul ederse anlaşma bu versiyonla aktif olur; karşı öneri yaparsa döngü devam eder. Her tur olay kaydına yazılır.
-
-## 5.5 Ödeme kaydı ve doğrulama
-
-| **Ödemeyi kaydeden**     | **Sonuç**                                                                                                            |
-|--------------------------|----------------------------------------------------------------------------------------------------------------------|
-| Alacaklı (“Ödeme aldım”) | Ödeme doğrudan onaylanır. Parayı alan taraf kabul ediyorsa doğrulamaya gerek yoktur. Borçluya bilgi bildirimi gider. |
-| Borçlu (“Ödeme yaptım”)  | Ödeme “bildirildi” durumunda kalır. Alacaklıya bildirim gider: Onayla / Reddet. Onaylanınca bakiyeden düşer.         |
-| Kişisel mod              | Kullanıcının kaydettiği ödeme doğrudan geçerlidir.                                                                   |
+Kullanıcının kaydettiği ödeme doğrudan geçerlidir ve bakiyeden düşer. Alacaklıysa “Ödeme aldım”, borçluysa “Ödeme yaptım” der; sonuç aynıdır.
 
 - Ödeme alanları: tutar, ödeme tarihi, yöntem (nakit, havale/EFT, kart, diğer), not, isteğe bağlı dekont görseli.
 
-- Bekleyen ödemeler bakiyede ayrıca gösterilir: “Kalan 12.000 TL · 4.000 TL onay bekliyor”.
-
-- Alacaklı 7 gün içinde yanıt vermezse hatırlatma gider. Otomatik onay yoktur.
-
-- Reddedilen ödeme silinmez; “reddedildi” olarak geçmişte kalır. Borçlu düzeltip yeniden bildirebilir.
+- Yanlış girilen ödeme silinebilir: silinen ödeme iptal edildi olarak geçmişte kalır, dağıtımı geri alınır, kalan artar. Kapanmış kayıt yeniden açılır.
 
 Ödemenin taksitlere dağıtımı
 
@@ -312,60 +257,46 @@ Karşı taraf tutar, peşinat veya plan üzerinde değişiklik önerebilir. Öne
 
 - Kullanıcı isterse ödemeyi belirli bir taksite yönlendirebilir (gelişmiş seçenek).
 
-## 5.6 Değişiklik talepleri (aktif anlaşmada)
+## 5.6 Düzenleme
 
-Paylaşılan ve aktif bir anlaşmanın şartları tek taraflı değiştirilemez. Değişiklik bir talep olarak açılır.
+Kullanıcı kendi kaydını istediği zaman düzenler; kimseden onay alınmaz. Taksit erteleme, planı yeniden düzenleme ve tutar düzeltme aynı düzenleme ekranındadır.
 
-| **Değişiklik türü**    | **Örnek**                                                                                |
-|------------------------|------------------------------------------------------------------------------------------|
-| Taksit erteleme        | 3\. taksit 10 Ocak yerine 10 Şubat                                                       |
-| Plan yeniden düzenleme | Kalan 12.000 TL, 3 yerine 4 taksit                                                       |
-| Tutar düzeltme         | Anlaşma tutarı yanlış girilmiş                                                           |
-| Borç affı / indirim    | Alacaklı kalan 1.000 TL’den vazgeçiyor (yalnızca alacaklı önerebilir ve kendisi uygular) |
+- Her düzenleme yeni bir versiyon oluşturur ve geçmişe yazılır.
 
-- Talep yeni versiyon taslağıdır; karşı taraf kabul ederse yürürlüğe girer, reddederse eski versiyon geçerli kalır.
+- Yapılmış ödemeler düzenlemeyle silinmez; yeni plan kalan tutar üzerinden kurulur.
 
-- Aynı anda tek bir açık değişiklik talebi olabilir.
-
-- Geçmiş ödemeler ve onaylanmış ödemeler değişiklikle silinmez; yeni plan kalan tutar üzerinden kurulur.
-
-- Alacaklının lehine olmayan tek taraflı işlemler (borç affı, indirim) karşı taraf onayı gerektirmez; yalnızca bilgi verilir.
+- **Borç silme:** Alacaklı kalanın bir kısmından ya da tamamından vazgeçebilir; indirim olarak kaydedilir ve kalandan düşer.
 
 ## 5.7 İtiraz
 
-- Taraflardan biri anlaşmanın tamamına veya bir ödemeye itiraz edebilir; gerekçe yazmak zorunludur.
-
-- İtirazlı anlaşmada hatırlatmalar durur, ekranda uyarı görünür.
-
-- Çözüm yolları: itirazı açan geri çeker veya taraflar bir değişiklik talebinde uzlaşır.
-
-- Uygulama hakem değildir; yalnızca kaydı ve geçmişi şeffaf tutar.
+Kaldırıldı (ADR-064).
 
 ## 5.8 Kapanış ve iptal
 
-- **Otomatik kapanış:** Onaylı ödemeler toplamı borca eşit olunca anlaşma “kapandı” olur, iki tarafa tebrik bildirimi gider.
+- **Otomatik kapanış:** Ödemeler toplamı borca eşit olunca kayıt “kapandı” olur. Uygulama içinde tebrik mesajı görünür, bildirim gitmez.
 
-- **İptal:** Kişisel modda kullanıcı istediği zaman iptal eder. Paylaşılan aktif anlaşmada iptal karşı taraf onayı gerektirir; onay bekleyen anlaşmayı oluşturan tek taraflı geri çekebilir.
+- **İptal:** Kullanıcı istediği zaman iptal eder.
 
-- Kapanan ve iptal edilen anlaşmalar silinmez; arşivde görünür. Kullanıcı kendi görünümünden gizleyebilir.
+- Kapanan ve iptal edilen kayıtlar silinmez; arşivde görünür. Kullanıcı kendi görünümünden gizleyebilir.
 
 ## 5.9 Hatırlatmalar
 
-| **Zaman**                         | **Kime**           | **Mesaj örneği**                                               |
-|-----------------------------------|--------------------|----------------------------------------------------------------|
-| Vadeden 7, 3 ya da 1 gün önce (kullanıcı tercihi, ADR-051) | Borçlu | 10 Kasım’da Yıldız Mobilya’ya 4.000 TL ödemen var. |
-| Vade günü 10:00 (kullanıcı tercihi) | Borçlu ve alacaklı | Bugün ödeme günü: 4.000 TL (2/5. taksit).                    |
-| Vadeden 1 gün sonra (ödenmemişse) | Borçlu             | Dünkü 4.000 TL’lik ödeme henüz kaydedilmedi. Ödediysen kaydet. |
-| Vadeden 7 gün sonra               | Borçlu ve alacaklı | 2\. taksit 7 gündür açık görünüyor.                            |
-| Bildirilen ödeme bekliyorsa       | Alacaklı           | Ahmet 6.000 TL ödeme bildirdi. Onaylıyor musun?                |
+Hatırlatma yalnızca defter sahibine gider. Karşı tarafa hiçbir şey gönderilmez. Kullanıcı alacaklı da borçlu da olsa kendi kaydı için hatırlatılır.
+
+| **Zaman**                         | **Kullanıcı borçluysa**                                        | **Kullanıcı alacaklıysa**                                  |
+|-----------------------------------|----------------------------------------------------------------|------------------------------------------------------------|
+| Vadeden 7, 3 ya da 1 gün önce (kullanıcı tercihi, ADR-051) | 10 Kasım’da Yıldız Mobilya’ya 4.000 TL ödemen var. | 10 Kasım’da Ahmet’ten 4.000 TL alacağın var. |
+| Vade günü 10:00 (kullanıcı tercihi) | Bugün ödeme günü: 4.000 TL (2/5. taksit).                    | Bugün Ahmet’in ödeme günü: 4.000 TL.                       |
+| Vadeden 1 gün sonra (ödenmemişse) | Dünkü 4.000 TL’lik ödeme henüz kaydedilmedi. Ödediysen kaydet. | Ahmet’in dünkü 4.000 TL’si henüz kaydedilmedi. Aldıysan kaydet. |
+| Vadeden 7 gün sonra               | 2\. taksit 7 gündür açık görünüyor.                            | Ahmet’in 2. taksiti 7 gündür açık görünüyor.               |
 
 - Sessiz saatler: 22:00–09:00 arası bildirim gönderilmez (Europe/Istanbul).
 
 - Kullanıcı vade öncesi hatırlatma zamanlarını Bildirimler ekranından seçer (7, 3, 1 gün önce, vade günü; varsayılan 3 gün önce ve vade günü). Anlaşma bazında kapatma sonraki sürümde.
 
-- Hatırlatma alacaklı adına değil, uygulama adına yazılır; amaç para isteme mahcubiyetini kaldırmaktır.
+- Banka kredisi taksitleri için de aynı kural geçerlidir.
 
-- İtirazlı, iptal edilmiş veya kapanmış anlaşmalara hatırlatma gitmez.
+- İptal edilmiş veya kapanmış kayıtlara hatırlatma gitmez.
 
 ## 5.10 Hızlı kayıt (sonraki küçük güncelleme)
 
@@ -373,7 +304,9 @@ Kullanıcı tek cümle yazar: “Ahmet’ten 12.000 TL aldım, 3 taksitte ödeye
 
 ## 5.11 Hesaplar ve işlemler (kişisel kayıt, ADR-053)
 
-Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle kaydeder; gelir, gider ve hesaplar arası transfer girer. Banka bağlantısı yoktur, uygulama para tutmaz ve transfer başlatmaz: "Transfer" yalnızca kullanıcının kendi iki hesabı arasındaki bir kayıttır. Bu kayıtlar anlaşmalara, karşı tarafa ya da borç bakiyelerine yansımaz.
+> Gizli modül (5.18).
+
+Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle kaydeder; gelir, gider ve hesaplar arası transfer girer. Banka bağlantısı yoktur, uygulama para tutmaz ve transfer başlatmaz: "Transfer" yalnızca kullanıcının kendi iki hesabı arasındaki bir kayıttır. Bu kayıtlar borç bakiyelerine yansımaz.
 
 - **Hesap:** tür (banka hesabı, nakit cüzdan, birikim, diğer), ad, isteğe bağlı banka adı, açılış bakiyesi, "Toplam Nakit'e dahil et". IBAN ya da hesap numarası istenmez. Kullanıcı başına en fazla 50 açık hesap.
 - **Bakiye saklanmaz:** açılış bakiyesi + gelir − gider ± transfer + düzeltme. Açılış bakiyesi gelir sayılmaz; eksi olabilir.
@@ -388,6 +321,8 @@ Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle 
 
 ## 5.12 Tekrarlayan işlem, bütçe ve aylık rapor (ADR-054)
 
+> Gizli modül (5.18).
+
 - **Tekrarlayan işlem:** gelir ya da gider; ad, tutar, kategori, hesap, sıklık (haftalık, aylık, yıllık), ilk tarih ve "Her seferinde onay iste". Tarihler ilk tarihten sayılır; ay sonu kısalırsa ayın son günü kullanılır (31 Ocak → 28 Şubat → 31 Mart).
 	- Onay isteyen kuralın günü gelen tarihi "Onay bekleyenler"de görünür: Onayla gerçekleşen kaydı yazar, Atla yazmaz. Onay istemeyen kural günü gelince kendiliğinden kaydedilir (saatlik iş).
 	- Kural oluşturulmadan en fazla 31 gün önceki tarihler sayılır; durdurulup sürdürülen kuralda durdurma süresindeki tarihler sayılmaz. Arşivlenmiş hesaba kayıt yazılmaz.
@@ -395,38 +330,43 @@ Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle 
 - **Bütçe:** gider kategorisi başına aylık sınır. Harcanan, o ayın silinmemiş gider kayıtlarıdır. Sınırın %80'inde "sınıra yakın", aşınca "aşıldı" uyarısı; özet kartında kalan gün ve kalan günlük pay.
 - **Aylık rapor:** seçilen ayın geliri, gideri ve neti; son 6 ayın gelir-gider sütunları; gider kategorisi dağılımı; borç ve alacak dengesi (anlaşmalardan). Transfer, düzeltme ve borç kayıtları gelir-gidere dahil değildir. Varsayılan ay son tamamlanan aydır.
 
-## 5.13 Kredi kartları (ADR-055)
+## 5.13 Kredi kartları
 
-- **Kart:** banka, isteğe bağlı kart adı, son 4 hane, renk, limit, güncel borç (son ekstreye dahil sayılır), hesap kesim günü (1–28), son ödeme (kesimden kaç gün sonra) ve asgari ödeme oranı. Tam kart numarası, CVV ya da şifre istenmez. Limit 50.000 TL'ye kadar %20, üstünde %40 önerilir. Kullanıcı başına en fazla 20 açık kart.
-- **Kart harcaması** bir gider kaydıdır ama bir hesaba değil karta yazılır: Toplam Nakit'i değiştirmez, kart borcunu artırır, gider olarak bir kez sayılır. Taksitli harcama (2–36) eşit parçalara bölünür; kalan kuruş ilk taksittedir ve her taksit kendi ayının ekstresine girer. **İade** kartta gelir kaydıdır ve borcu azaltır.
-- **Kart ödemesi** bir hesaptan karta transferdir: hesabın bakiyesi düşer, kart borcu azalır, gider sayılmaz.
-- **Ekstre türetilir:** son kesimde kartta biriken (açılış borcu + o güne kadar faturalanan taksitler ve harcamalar − o güne kadar yapılan ödeme ve iadeler, sıfırın altına inmez). Kalan ekstre borcu = ekstre − kesimden sonraki ödemeler. Asgari = ekstre × oran (yukarı yuvarlanır). Son ödeme = kesim + gün. Dönem içi harcama = son kesimden sonraki kesime kadar faturalanacak taksitler. Kullanılabilir limit = limit − (açılış borcu + tüm harcamalar − ödeme ve iadeler).
-- **Faiz hesaplanmaz** (simülasyon F4-07). Uygulama banka ile konuşmaz; ödeme bir kayıttır.
+Kaldırıldı (ADR-064). Kartlar, kart harcamaları, ekstre ve kart faiz simülasyonu kod ve tablolarıyla silinir.
 
 ## 5.14 Banka kredileri (ADR-056)
 
 - Kullanıcının kendi banka kredisi: banka, kredi türü, çekilen tutar, aylık faiz (vergiler dahil, yüzde ikinci haneye kadar), vade (1–120 ay), ilk taksit tarihi, isteğe bağlı bankanın taksiti ve ödeme hesabı.
 - **Ödeme planı türetilir:** eşit taksit P·r / (1 − (1 + r)^−n), ondalıklı sayı kullanılmadan kuruşta tam hesaplanır; her ay faiz kalan anapara × r (yarım yukarı yuvarlanır), taksitin kalanı anaparadır, son taksit kalanı kapatır. Bankanın taksiti girilirse o kullanılır.
-- **Faiz yalnızca planı göstermek için** hesaplanır (ADR-045); kişiler arası anlaşmalara, Toplam Nakit'e ya da karşı tarafa yansımaz.
-- **Taksit kaydı** bir hesaptan krediye transferdir: hesap bakiyesi düşer, gider sayılmaz; sıradaki taksitin tutarıyla yazılır, düzenlenmez, yalnızca silinir. Ödenen taksit sayısı bu kayıtlardan gelir.
+- **Faiz yalnızca planı ve simülasyonu göstermek için** hesaplanır (ADR-045); kişiler arası kayıtlara yansımaz.
+- **Görünürlük:** Banka kredileri Borçlarım'da ve Ana menüde görünür. Kredi simülasyonu erken kapama tutarını, ücreti ve kazancı gösterir, kayıt yazmaz (ADR-057).
+- **Taksit kaydı** sıradaki taksitin tutarıyla yazılır, düzenlenmez, yalnızca silinir; ödenen taksit sayısı bu kayıtlardan gelir. Hesap seçmek gerekmez. Hesaplar modülü açıksa (5.18) hesap seçilebilir; o zaman kayıt hesaptan krediye transferdir, gider sayılmaz.
 
-## 5.15 Para iste ve para teslimi (ADR-058)
+## 5.15 Para iste ve para teslimi
 
-- **Para iste:** borç alan, ParamNet ID'si bilinen kişiden para ister. Bu, borç alanın kendisini borçlu olarak kaydettiği tek ödemeli bir borç kaydıdır ve aynı işlemde ID ile paylaşılır (5.4'teki ID ile paylaşım). Anlaşma durum makinesine yeni durum eklenmez: talep "pending", kabul "active" olur. Bulunamayan ID'ye talep kaydı tutulmaz. Talep, karşı taraf yanıtlamadan geri çekilebilir.
-- **Para teslimi:** "Para iste" ile kurulan anlaşmada kabulden sonra para elden ele geçer. Anlaşma "active" kalır; ayrı bir teslim onayı tutulur: önce borç veren "Parayı verdim" der, sonra borç alan "Aldım" diye onaylar. İki adım da olay kaydına yazılır. Onay tamamlanana kadar iki tarafın anlaşma ekranında "Para teslimi bekleniyor" bandı görünür.
+Kaldırıldı (ADR-064).
 
 ## 5.16 Elden taksit kaydı (ADR-059)
 
 - Taksitli alım ya da satışta alış (satış) tarihi tutulur; peşinat bu tarihle kaydedilir.
 - Planın ilk taksitlerinin tarihi geçmişse önizlemede "Ödendi" işaretlenebilir. İşaretlenen taksitler kendi vade gününde ödenmiş sayılır ve kayıtla aynı işlemde yazılır. Ödemeler sırayla dağıtıldığı için yalnızca baştan ardışık taksitler işaretlenir.
 
-## 5.17 Hesabı böl (ADR-061)
+## 5.17 Hesap bölme (ADR-064)
 
-- **Ödeyen** hesabın adını, toplamını, tarihini ve kişileri girer; paylar eşit, tutarla ya da yüzdeyle bölünür. Kuruş farkı ödeyenin payına eklenir. Paylar toplamı hesaba eşit olmalıdır.
-- **Her pay ayrı bir borç kaydıdır:** ödeyen alacaklı, kişi borçlu, tek ödemeli ve vadesiz. Kişi payını kabul edince kayıt "active" olur ve Borçlarım / Alacaklarım'da görünür; ödemesini bildirir, ödeyen "Aldım, onayla" der (5.6'daki ödeme onayı). Anlaşma durum makinesine yeni durum eklenmez; hesap bu kayıtları gruplayan bir başlıktır.
-- **Kişi ekleme:** ParamNet ID ile eklenen kişiye pay hemen gönderilir (5.4'teki ID ile paylaşım). Diğerleri adıyla eklenir ve 48 saat geçerli kare kod ya da davet linkiyle (`/h/<kod>`) kendi adını seçerek katılmak ister; ödeyen katılımı onaylayınca pay o hesaba gönderilir. Reddedilen yer yeniden açılır.
-- **Görünürlük:** hesabı ödeyen ve payı olan herkes görür: toplam, herkesin adı, payı ve ödeme durumu. Borç kaydının kendisini yalnızca o iki taraf görür; kimse diğerlerinin bakiyesini görmez.
-- **Hatırlatma:** ödeyen, açık bir payın sahibine günde en fazla bir kez "Hatırlat" gönderebilir.
+Splitwise mantığıyla çalışır, ama tek taraflıdır: grubu yalnızca kullanıcı görür. Diğer kişiler isimden ibarettir; hesap açmaz, gruba katılmaz, bildirim almaz. Kare kod, davet linki ve ParamNet ID yoktur.
+
+- **Grup:** ad ve üyeler. Kullanıcı her zaman üyedir. Üyeler elle ya da rehberden isimle eklenir. Tek seferlik bir hesap da grup olarak açılır (ör. "Akşam yemeği").
+- **Harcama:** başlık, toplam, tarih, ödeyen üye (kullanıcı olmak zorunda değil), dahil edilen üyeler ve bölme şekli: eşit, tutar ya da yüzde. Paylar toplamı harcamaya eşit olmalıdır. Kuruş farkı ödeyenin payına, ödeyen paylaşıma dahil değilse ilk dahil üyeye eklenir.
+- **Bakiye türetilir, saklanmaz:** üyenin bakiyesi = ödediği harcamalar − payları + yaptığı ödeşmeler − aldığı ödeşmeler. Grup içindeki bakiyeler toplamı her zaman sıfırdır.
+- **Sadeleştirme:** kimin kime ne kadar ödeyeceği, en çok alacaklı ile en çok borçlu eşleştirilerek en az sayıda ödemeye indirilir. Hesap `packages/shared`'dadır ve aynı girdiden hep aynı sonucu verir.
+- **Ödeşme:** kullanıcı "Mehmet Ayşe'ye 500 TL verdi" diye kaydeder. Ödeşmeye kullanıcının taraf olması gerekmez. Tüm bakiyeler sıfırsa grup "ödeşildi" görünür.
+- **Düzenleme:** harcama ve ödeşme düzenlenir ya da silinir; her değişiklik grubun geçmişine yazılır. Harcamada ya da ödeşmede geçen üye gruptan çıkarılamaz.
+- **Defterle ilişki:** Grup bakiyeleri borç kaydı oluşturmaz, Borçlarım toplamlarına ve Ana Sayfa'daki toplam alacak ve borca katılmaz. Ortak sekmesinde ayrıca gösterilir, hatırlatma üretmez.
+- **Arşiv:** grup arşivlenebilir; silinmez, listeden çıkar.
+
+## 5.18 Gizli modüller (ADR-064)
+
+Hesaplar, Toplam Nakit, gelir-gider, işlem geçmişi, tekrarlayan işlem, bütçe, aylık rapor ve takvimdeki nakit projeksiyonu arayüzde görünmez. Kod ve tablolar durur; `EXPO_PUBLIC_PERSONAL_FINANCE=1` ile derlenen uygulamada açılırlar. Varsayılan kapalıdır. Kapalıyken bu modüller için sorgu çalışmaz, rota açılmaz, tekrarlayan işlem kuralı oluşturulamaz.
 
 # 6. Ekranlar ve Bilgi Mimarisi
 
@@ -434,15 +374,15 @@ Kullanıcı kendi banka hesaplarını, nakit cüzdanını ve birikimlerini elle 
 
 Alt sekme çubuğu 4 sekme + ortada “+” butonundan oluşur.
 
-| **Sekme**       | **İçerik**                                                                                                                             |
-|-----------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| Ana Sayfa       | Özet: toplam alacak, toplam borç, bu ay ödenecekler, bu ay tahsil edilecekler, gecikenler, yaklaşan 5 vade, onay bekleyen işler bandı. |
-| Kişiler         | Kişi bazında net bakiye (bana borçlu / benim borçlu olduğum). Kişiye dokununca o kişiyle tüm anlaşmalar.                               |
-| \+ (Yeni kayıt) | Kayıt türü seçimi ve form (modal).                                                                                                     |
-| Takvim          | Aylık takvim: vadeler, beklenen tahsilatlar, gecikmeler. Gün seçince o günün listesi.                                                  |
-| Talepler        | Gelen paylaşımlar, onay bekleyen ödemeler, değişiklik talepleri, itirazlar. Rozet ile sayı gösterilir.                                 |
+| **Sekme**       | **İçerik**                                                                                             |
+|-----------------|--------------------------------------------------------------------------------------------------------|
+| Ana Sayfa       | Özet: toplam alacak, toplam borç, bu ay ödenecekler, bu ay alınacaklar, gecikenler, yaklaşan vadeler.  |
+| Borçlarım       | Borç ve alacak kayıtları, banka kredileri.                                                             |
+| \+ (İşlem)      | Borç ver, Borç al, Elden taksit, Hesap böl, Kredi ekle.                                                |
+| Ortak           | Gruplar, net bakiyeler, sadeleştirilmiş borçlar.                                                       |
+| Takvim          | Aylık takvim: vadeler ve beklenen ödemeler, kredi taksitleri. Gün seçince o günün listesi.             |
 
-Profil ve ayarlar Ana Sayfa’nın sağ üstündeki avatar ile açılır.
+Ana menü ve bildirimler Ana Sayfa üst çubuğundan, profil selamlama alanından açılır.
 
 ## 6.2 Ekran listesi
 
@@ -452,40 +392,40 @@ Profil ve ayarlar Ana Sayfa’nın sağ üstündeki avatar ile açılır.
 | S02    | Telefon girişi                | Ülke kodu, numara, KVKK linki                                                         |
 | S03    | OTP doğrulama                 | 6 hane, yeniden gönder (60 sn), hata durumları                                        |
 | S04    | Profil kurulumu               | Görünen ad, bildirim izni                                                             |
-| S05    | Ana Sayfa                     | Özet kartları, yaklaşan vadeler, bekleyen işler                                       |
-| S06    | Kişiler                       | Arama, kişi listesi, net bakiye                                                       |
-| S07    | Kişi detay                    | Net bakiye, anlaşmalar listesi, yeni kayıt                                            |
-| S08    | Kayıt türü seçimi             | 4 seçenek kartı                                                                       |
+| S05    | Ana Sayfa                     | Özet kartları, yaklaşan vadeler                                                       |
+| S06    | Borçlarım                     | Arama, kişi bazında net bakiye, kayıtlar, banka kredileri                             |
+| S07    | Kişi detay                    | Net bakiye, kayıtlar, yeni kayıt                                                      |
+| S08    | İşlem merkezi                 | Borç ver, Borç al, Elden taksit, Hesap böl, Kredi ekle                                |
 | S09    | Kayıt formu                   | Dinamik alanlar, kişi seçici, tutar klavyesi                                          |
 | S10    | Plan önizleme / düzenleme     | Taksit listesi, satır düzenleme, toplam kontrolü                                      |
-| S11    | Anlaşma detay                 | Durum etiketi, bakiye, ilerleme çubuğu, taksitler, ödemeler, geçmiş, aksiyonlar       |
+| S11    | Kayıt detay                   | Durum etiketi, bakiye, ilerleme çubuğu, taksitler, ödemeler, geçmiş, aksiyonlar       |
 | S12    | Ödeme ekle                    | Tutar, tarih, yöntem, dekont, not, dağıtım önizlemesi                                 |
-| S13    | Paylaş                        | Numara kontrolü, mesaj önizleme, paylaşım menüsü                                      |
-| S14    | Gelen paylaşım (uygulama içi) | Anlaşma özeti, Onayla / Düzeltme öner / Reddet                                        |
-| S15    | Değişiklik talebi             | Mevcut ve önerilen plan karşılaştırması                                               |
-| S16    | İtiraz                        | Gerekçe, ilgili ödeme seçimi                                                          |
-| S17    | Anlaşma geçmişi               | Zaman çizelgesi (olay kaydı)                                                          |
-| S18    | Takvim                        | Ay görünümü, gün listesi                                                              |
-| S19    | Talepler                      | Sekmeli liste: Paylaşımlar, Ödemeler, Değişiklikler                                   |
-| S20    | Profil / Ayarlar              | Fotoğraf, ad, @kullanıcı adı, ParamNet ID (kopyala, paylaş), ID ile bulunabilirlik ve yeni ID, bildirim tercihleri, veri dışa aktarma, yasal metinler, hesabı sil (ADR-050, 051) |
-| W01    | Web onay – giriş              | Kısa bilgi, numara doğrulama                                                          |
-| W02    | Web onay – OTP                | Kod girişi                                                                            |
-| W03    | Web onay – detay ve karar     | Anlaşma detayı, 3 aksiyon                                                             |
-| W04    | Web onay – sonuç              | Teşekkür, uygulama indirme çağrısı                                                    |
+| S13    | Kayıt düzenleme               | Tutar, tarih, plan; düzenleme geçmişe yazılır                                         |
+| S14    | Kayıt geçmişi                 | Zaman çizelgesi (olay kaydı)                                                          |
+| S15    | Takvim                        | Ay görünümü, gün listesi                                                              |
+| S16    | Ortak (gruplar)               | Gruplar, her grupta net bakiyen, Grup oluştur                                         |
+| S17    | Grup oluştur / düzenle        | Ad, üyeler (isim ya da rehber)                                                        |
+| S18    | Grup detay                    | Bakiyeler, kim kime ne kadar, harcamalar, ödeşmeler, geçmiş                           |
+| S19    | Harcama ekle / düzenle        | Başlık, tutar, tarih, ödeyen, dahil üyeler, eşit / tutar / yüzde                      |
+| S20    | Ödeşme ekle                   | Kimden, kime, tutar, tarih                                                            |
+| S21    | Profil / Ayarlar              | Fotoğraf, ad, @kullanıcı adı, bildirim tercihleri, veri dışa aktarma, yasal metinler, hesabı sil (ADR-051) |
+| S22    | Ana menü                      | Banka kredileri, Kredi simülasyonu, Bildirimler, Profil                               |
+| S23    | Bildirimler                   | Hatırlatma listesi, gün grupları, okunmamış noktası, hatırlatma tercihleri            |
+| S24    | Banka kredileri               | Liste, detay, ekle, taksit kaydı, kredi simülasyonu                                   |
 
-## 6.3 Anlaşma detay ekranı yapısı
+## 6.3 Kayıt detay ekranı yapısı
 
-- Üst kart: karşı taraf adı, rol (“Sana borçlu” / “Borçlusun”), kalan tutar, toplam, ilerleme çubuğu, durum etiketi (Kişisel, Onay bekliyor, Aktif, İtirazlı, Kapandı).
+- Üst kart: karşı taraf adı, rol (“Sana borçlu” / “Borçlusun”), kalan tutar, toplam, ilerleme çubuğu, durum etiketi (Açık, Kapandı, İptal).
 
-- Birincil aksiyon (duruma göre tek buton): Ödeme ekle / Paylaş / Onayla.
+- Birincil aksiyon: Ödeme ekle.
 
 - Taksitler listesi: vade, tutar, ödenen, durum.
 
-- Ödemeler listesi: tarih, tutar, yöntem, doğrulama durumu.
+- Ödemeler listesi: tarih, tutar, yöntem.
 
 - Geçmiş: tüm olaylar zaman sırasıyla.
 
-- Menü: Düzenle / Değişiklik öner, İtiraz et, İptal et, PDF çıktı (premium).
+- Menü: Düzenle, Borç sil (alacaklı), İptal et, PDF çıktı (premium).
 
 ## 6.4 Tasarım ilkeleri
 
@@ -501,82 +441,61 @@ Profil ve ayarlar Ana Sayfa’nın sağ üstündeki avatar ile açılır.
 
 # 7. İş Kuralları
 
-Aşağıdaki kurallar sunucu tarafında zorunlu kılınır; istemci yalnızca kullanıcıya önceden gösterir.
+Aşağıdaki kurallar sunucu tarafında zorunlu kılınır; istemci yalnızca kullanıcıya önceden gösterir. Kaldırılan kuralların numaraları yeniden kullanılmaz.
 
-| **Kod** | **Kural**                                                                                                                                          |
-|---------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| BR-01   | Tüm tutarlar kuruş cinsinden tam sayı (bigint) saklanır. Ondalıklı sayı tipi kullanılmaz.                                                          |
-| BR-02   | İlk sürümde para birimi TRY’dir. Şema çoklu para birimini destekler; bir anlaşmanın para birimi sonradan değişmez.                                 |
-| BR-03   | Taksit tutarları toplamı + peşinat, anlaşma tutarına her zaman eşittir.                                                                            |
-| BR-04   | Kalan borç = anlaşma tutarı − onaylı ödemeler − onaylı indirimler. Hiçbir zaman negatif olamaz.                                                    |
-| BR-05   | Paylaşılan ve aktif anlaşmanın şartları yalnızca karşı tarafın onayladığı bir değişiklik talebiyle değişir.                                        |
-| BR-06   | Her onay belirli bir versiyona ve o versiyonun içerik hash’ine bağlanır. Onay ekranında gösterilen versiyon ile onaylanan versiyon aynı olmalıdır. |
-| BR-07   | Bir anlaşmada aynı anda en fazla bir açık değişiklik talebi olabilir.                                                                              |
-| BR-08   | Borçlunun bildirdiği ödeme, alacaklı onaylamadan bakiyeden düşmez. Alacaklının kaydettiği ödeme doğrudan onaylıdır.                                |
-| BR-09   | Her ödeme işlemi idempotency anahtarı taşır; aynı anahtarla gelen ikinci istek yeni kayıt oluşturmaz, ilk sonucu döner.                            |
-| BR-10   | Onaylanmış ödeme silinmez; yalnızca karşı taraf onayıyla “iptal edildi” durumuna geçer.                                                            |
-| BR-11   | Davet linki yalnızca davette belirtilen telefon numarasını doğrulayan kişi tarafından kullanılabilir. ID ile verilen davette karar yalnızca hedef profil tarafından uygulama içinden verilir. |
-| BR-12   | Kullanıcı kendisiyle anlaşma paylaşamaz (oluşturanın numarası = hedef numara ya da hedef ID kendi ID'si ise reddedilir).                           |
-| BR-13   | Olay kaydı yalnızca eklenir; güncellenemez ve silinemez (hesap silme hariç, bkz. KVKK).                                                            |
-| BR-14   | Kapanmış, iptal edilmiş veya itirazlı anlaşmaya yeni ödeme ve değişiklik eklenemez (itiraz çözülene kadar).                                        |
-| BR-15   | Uygulama faiz hesaplamaz ve faiz alanı sunmaz (ilk sürüm).                                                                                         |
-| BR-16   | Tarihler Europe/Istanbul saat dilimine göre “gün” olarak (date) saklanır; olay zamanları timestamptz.                                              |
-| BR-17   | ParamNet ID araması yalnızca görünen adı ve baş harfleri döner; telefon ve profil kimliği dönmez. Kapalı, silinmiş ve olmayan ID aynı yanıtı alır. |
-| BR-18   | ParamNet ID 30 günde en fazla bir kez yeniden üretilir; kullanılmış bir ID hiçbir hesaba yeniden verilmez.                                         |
+| **Kod** | **Kural**                                                                                                                          |
+|---------|------------------------------------------------------------------------------------------------------------------------------------|
+| BR-01   | Tüm tutarlar kuruş cinsinden tam sayı (bigint) saklanır. Ondalıklı sayı tipi kullanılmaz.                                          |
+| BR-02   | İlk sürümde para birimi TRY’dir. Şema çoklu para birimini destekler; bir kaydın para birimi sonradan değişmez.                     |
+| BR-03   | Taksit tutarları toplamı + peşinat, kayıt tutarına her zaman eşittir.                                                              |
+| BR-04   | Kalan borç = kayıt tutarı − geçerli ödemeler − indirimler. Hiçbir zaman negatif olamaz.                                            |
+| BR-05   | Kayıt şartlarını yalnızca sahibi değiştirir. Her değişiklik yeni versiyon ve olay kaydıdır.                                        |
+| BR-08   | Kaydedilen ödeme doğrudan geçerlidir ve bakiyeden düşer.                                                                           |
+| BR-09   | Her ödeme ve oluşturma işlemi idempotency anahtarı taşır; aynı anahtarla gelen ikinci istek yeni kayıt oluşturmaz, ilk sonucu döner. |
+| BR-10   | Ödeme satırı silinmez; `voided` durumuna geçer, dağıtımı geri alınır. Kapanmış kayıtta kalan sıfırın üstüne çıkarsa kayıt açılır.  |
+| BR-13   | Olay kaydı yalnızca eklenir; güncellenemez ve silinemez (hesap silme hariç, bkz. KVKK).                                            |
+| BR-14   | Kapanmış veya iptal edilmiş kayda yeni ödeme ve düzenleme eklenemez.                                                               |
+| BR-15   | Kişiler arası kayıtta faiz alanı ve hesabı yoktur. Faiz yalnızca kullanıcının banka kredisi için gösterilir (ADR-045).              |
+| BR-16   | Tarihler Europe/Istanbul saat dilimine göre “gün” olarak (date) saklanır; olay zamanları timestamptz.                              |
+| BR-19   | Her kaydı, grubu ve bildirimi yalnızca sahibi görür. Hiçbir veri başka kullanıcıya gösterilmez ya da gönderilmez.                  |
+| BR-20   | Harcamanın payları toplamı harcama tutarına eşittir. Kuruş farkı ödeyene, ödeyen dahil değilse ilk dahil üyeye yazılır.            |
+| BR-21   | Grup bakiyeleri saklanmaz, harcama ve ödeşmelerden türetilir; toplamları her zaman sıfırdır.                                       |
+| BR-22   | Harcamada ya da ödeşmede geçen üye gruptan çıkarılamaz. Ödeşmede iki taraf farklı üye olmalıdır.                                   |
 
 # 8. Durum Makineleri
 
-Uygulamanın doğruluğu durum makinelerine dayanır. Durum geçişleri yalnızca sunucu fonksiyonlarında yapılır; her geçiş tek bir veritabanı işlemi (transaction) içinde gerçekleşir ve olay kaydına yazılır.
+Durum geçişleri yalnızca sunucu fonksiyonlarında yapılır; her geçiş tek bir veritabanı işlemi (transaction) içinde gerçekleşir ve olay kaydına yazılır.
 
-## 8.1 Anlaşma durumları
+## 8.1 Kayıt durumları
 
-| **Durum**         | **Anlamı**                                                            |
-|-------------------|-----------------------------------------------------------------------|
-| personal          | Kişisel mod. Yalnızca oluşturan görür ve yönetir.                     |
-| pending           | Paylaşıldı, karşı tarafın yanıtı bekleniyor.                          |
-| countered         | Karşı taraf düzeltme önerdi, oluşturanın yanıtı bekleniyor.           |
-| active            | İki taraf onayladı. Ödemeler ve hatırlatmalar işler.                  |
-| amendment_pending | Aktif anlaşmada açık bir değişiklik talebi var. Eski şartlar geçerli. |
-| disputed          | İtiraz açık. Hatırlatmalar durur.                                     |
-| settled           | Kalan borç sıfır. Son durum.                                          |
-| cancelled         | İptal edildi. Son durum.                                              |
-| rejected          | Karşı taraf reddetti. Oluşturan isterse kişisel moda döndürebilir.    |
+| **Durum** | **Anlamı**                       | **Etiket** |
+|-----------|----------------------------------|------------|
+| personal  | Açık kayıt. Tek çalışma durumu.  | Açık       |
+| settled   | Kalan borç sıfır.                | Kapandı    |
+| cancelled | İptal edildi. Son durum.         | İptal      |
 
-## 8.2 Anlaşma geçiş tablosu
+`personal` adı mevcut veriyle uyum için kalır (ADR-064).
 
-| **Mevcut**        | **Olay**                        | **Kim**              | **Yeni**                       | **Koşul / Etki**                                           |
-|-------------------|---------------------------------|----------------------|--------------------------------|------------------------------------------------------------|
-| —                 | create                          | Oluşturan            | personal                       | Versiyon 1 oluşur.                                         |
-| personal          | share                           | Oluşturan            | pending                        | Telefon numarası ya da ParamNet ID zorunlu. Davet oluşur.  |
-| personal          | record_payment / edit / cancel  | Oluşturan            | personal / settled / cancelled | Doğrulama gerekmez.                                        |
-| pending           | accept                          | Karşı taraf          | active                         | Versiyon hash eşleşmeli. Karşı taraf profile bağlanır.     |
-| pending           | counter                         | Karşı taraf          | countered                      | Yeni versiyon taslağı.                                     |
-| pending           | reject                          | Karşı taraf          | rejected                       | Gerekçe isteğe bağlı.                                      |
-| pending           | withdraw                        | Oluşturan            | personal                       | Davet geçersiz olur.                                       |
-| pending           | invite_expired                  | Sistem               | personal                       | 7 gün dolunca. Oluşturan yeniden paylaşabilir.             |
-| countered         | accept_counter                  | Oluşturan            | active                         | Karşı önerideki versiyon yürürlüğe girer.                  |
-| countered         | counter                         | Oluşturan            | pending                        | Yeni versiyonla tekrar karşı tarafa gider.                 |
-| countered         | withdraw                        | Oluşturan            | personal                       |                                                            |
-| rejected          | make_personal                   | Oluşturan            | personal                       |                                                            |
-| active            | propose_amendment               | Herhangi bir taraf   | amendment_pending              | Tek açık talep.                                            |
-| amendment_pending | accept_amendment                | Diğer taraf          | active                         | Yeni versiyon yürürlüğe girer, taksitler yeniden üretilir. |
-| amendment_pending | reject / withdraw               | Diğer taraf / Öneren | active                         | Eski versiyon geçerli.                                     |
-| active            | open_dispute                    | Herhangi bir taraf   | disputed                       | Gerekçe zorunlu.                                           |
-| disputed          | resolve_dispute                 | İtirazı açan         | active                         | Veya değişiklik kabulüyle.                                 |
-| active            | payment_confirmed               | Sistem               | settled                        | Kalan borç 0 ise.                                          |
-| active            | request_cancel → confirm_cancel | İki taraf            | cancelled                      | Karşılıklı onay.                                           |
-| active            | forgive_remaining               | Alacaklı             | settled                        | Kalan borç indirim olarak kapatılır.                       |
+## 8.2 Kayıt geçiş tablosu
+
+| **Mevcut** | **Olay**                  | **Yeni**                 | **Koşul / Etki**                                  |
+|------------|---------------------------|--------------------------|---------------------------------------------------|
+| —          | create                    | personal                 | Versiyon 1 oluşur.                                |
+| personal   | edit                      | personal                 | Yeni versiyon; yapılmış ödemeler korunur.         |
+| personal   | record_payment            | personal / settled       | Kalan 0 ise settled.                              |
+| personal   | forgive_remaining         | personal / settled       | İndirim kaydı; kalan 0 ise settled.               |
+| personal   | cancel                    | cancelled                |                                                   |
+| personal   | void_payment              | personal                 | Dağıtım geri alınır.                              |
+| settled    | void_payment              | personal                 | Kalan sıfırın üstüne çıkar.                       |
+
+Tüm geçişleri yalnızca kaydın sahibi yapar.
 
 ## 8.3 Ödeme durumları
 
-| **Mevcut** | **Olay**                           | **Kim**          | **Yeni**  |
-|------------|------------------------------------|------------------|-----------|
-| —          | record (alacaklı veya kişisel mod) | Alacaklı / Sahip | confirmed |
-| —          | report (borçlu)                    | Borçlu           | reported  |
-| reported   | confirm                            | Alacaklı         | confirmed |
-| reported   | reject                             | Alacaklı         | rejected  |
-| reported   | withdraw                           | Borçlu           | withdrawn |
-| confirmed  | void (karşılıklı onayla)           | İki taraf        | voided    |
+| **Mevcut** | **Olay** | **Yeni**  |
+|------------|----------|-----------|
+| —          | record   | confirmed |
+| confirmed  | void     | voided    |
 
 ## 8.4 Taksit durumları
 
@@ -590,16 +509,6 @@ Taksit durumu saklanmaz, her sorguda hesaplanır (türetilmiş durum). Böylece 
 | partial   | 0 \< paid \< amount (yukarıdakilerle birlikte gösterilir) |
 | paid      | paid = amount                                             |
 
-## 8.5 Davet durumları
-
-| **Durum** | **Anlamı**                                        |
-|-----------|---------------------------------------------------|
-| active    | Geçerli, kullanılabilir.                          |
-| consumed  | Karar verildi (onay, düzeltme veya red).          |
-| revoked   | Oluşturan geri çekti veya yeni davet oluşturuldu. |
-| expired   | Süre doldu.                                       |
-| locked    | Çok fazla başarısız OTP denemesi.                 |
-
 # 9. Teknik Mimari
 
 ## 9.1 Teknoloji seçimleri
@@ -608,52 +517,26 @@ Taksit durumu saklanmaz, her sorguda hesaplanır (türetilmiş durum). Böylece 
 |------------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------------------|
 | Mobil            | React Native + Expo (güncel SDK), TypeScript, Expo Router                               | Tek kod tabanı ile iOS ve Android; EAS Build/Update ile hızlı yayın.   |
 | Durum yönetimi   | TanStack Query (sunucu durumu), Zustand (yerel UI durumu)                               | Sunucu verisi tek kaynaktan; önbellek ve yeniden deneme hazır.         |
-| Formlar          | react-hook-form + zod                                                                   | Aynı zod şemaları web onay sayfasında da kullanılır.                   |
+| Formlar          | react-hook-form + zod                                                                   | Şemalar `packages/shared`'da.                                          |
 | Backend          | Supabase: PostgreSQL, Auth, RLS, RPC (plpgsql), Edge Functions, Storage, pg_cron        | İş kuralları veritabanında; transaction ve kilitleme garantisi.        |
 | SMS / OTP        | Supabase Phone Auth + Send SMS Hook ile yerli SMS sağlayıcı (ör. Netgsm, İleti Merkezi) | Türkiye’de teslim oranı ve maliyet. Sağlayıcı değiştirilebilir katman. |
 | Bildirim         | Expo Push Notifications (APNs/FCM)                                                      | Tek API; token yönetimi basit.                                         |
-| Web onay sayfası | Next.js (veya Astro) – tek rota, sunucu tarafı render                                   | Hafif, hızlı açılış; Universal Link dosyalarını da sunar.              |
-| Derin bağlantı   | iOS Universal Links, Android App Links (apple-app-site-association, assetlinks.json)    | Uygulama yüklüyse link doğrudan uygulamayı açar.                       |
-| Bot koruması     | Cloudflare Turnstile (web onay sayfası)                                                 | SMS pumping ve otomasyon engeli.                                       |
-| Hata izleme      | Sentry (mobil + web + edge)                                                             | Kırılma ve hata görünürlüğü.                                           |
+| Hata izleme      | Sentry (mobil + edge)                                                             | Kırılma ve hata görünürlüğü.                                           |
 | Ürün analitiği   | PostHog (AB bölgesi) veya kendi olay tablosu                                            | Huni ve kohort analizi. KVKK için kişisel veri gönderilmez.            |
 | CI/CD            | GitHub Actions + EAS Build + Supabase CLI migration                                     | Her PR’da test, tag ile yayın.                                         |
 
 ## 9.2 Bileşen yapısı
 
-> ┌──────────────────────┐ ┌──────────────────────────┐
->
-> │ Mobil Uygulama │ │ Web Onay Sayfası │
->
-> │ (Expo / RN) │ │ (Next.js, tek rota) │
->
-> └─────────┬────────────┘ └────────────┬─────────────┘
->
-> │ HTTPS (JWT) │ HTTPS (davet token + OTP)
->
-> ▼ ▼
->
-> ┌──────────────────────────────────────────────────────────┐
->
-> │ Supabase │
->
-> │ ├─ Auth (telefon OTP, JWT) │
->
-> │ ├─ PostgREST → yalnızca okuma görünümleri (RLS) │
->
-> │ ├─ RPC fonksiyonları → tüm yazma işlemleri │
->
-> │ ├─ Edge Functions → davet, web onay, push, SMS hook │
->
-> │ ├─ pg_cron → hatırlatma üretimi, davet süre sonu │
->
-> │ └─ Storage → dekont görselleri (özel bucket) │
->
-> └──────────────┬──────────────────────────┬────────────────┘
->
-> ▼ ▼
->
-> SMS sağlayıcı (OTP) Expo Push (APNs/FCM)
+Mobil uygulama (Expo / RN) HTTPS ve JWT ile Supabase'e bağlanır. Web bileşeni yoktur.
+
+- **Auth:** telefon OTP, JWT.
+- **PostgREST:** yalnızca okuma görünümleri (RLS).
+- **RPC fonksiyonları:** tüm yazma işlemleri.
+- **Edge Functions:** PIN girişi, push, SMS hook, hesap silme.
+- **pg_cron:** hatırlatma üretimi, tekrarlayan işlem (gizli modül açıkken).
+- **Storage:** dekont ve profil görselleri (özel bucket).
+
+Dış servisler: SMS sağlayıcı (OTP), Expo Push (APNs/FCM).
 
 ## 9.3 Mimari ilkeler
 
@@ -663,53 +546,30 @@ Taksit durumu saklanmaz, her sorguda hesaplanır (türetilmiş durum). Böylece 
 
 3.  **İyimser eşzamanlılık:** Anlaşmada row_version sütunu bulunur. İstemci gördüğü versiyonu gönderir; uyuşmazsa işlem 409 conflict ile reddedilir ve istemci güncel veriyi çeker.
 
-4.  **Idempotency:** Ödeme ve karar işlemleri istemcide üretilen UUID anahtar taşır; UNIQUE kısıt ile tekrar işlenmez.
+4.  **Idempotency:** Ödeme ve oluşturma işlemleri istemcide üretilen UUID anahtar taşır; UNIQUE kısıt ile tekrar işlenmez.
 
-5.  **Değiştirilemez geçmiş:** Versiyonlar ve olay kaydı yalnızca eklenir. Bakiye, onaylı ödemelerden türetilir; ayrıca önbelleğe alınmış bir outstanding_minor sütunu aynı transaction’da güncellenir ve periyodik tutarlılık kontrolüyle doğrulanır.
+5.  **Değiştirilemez geçmiş:** Versiyonlar ve olay kaydı yalnızca eklenir. Bakiye, geçerli ödemelerden türetilir; ayrıca önbelleğe alınmış bir outstanding_minor sütunu aynı transaction’da güncellenir ve periyodik tutarlılık kontrolüyle doğrulanır.
 
 6.  **Bildirimler asenkron:** Transaction içinde notification_outbox tablosuna yazılır; edge function kuyruktan okuyup gönderir (outbox deseni). Bildirim hatası iş işlemini geri almaz.
 
 7.  **Çevrimiçi yazma:** İlk sürümde yazma işlemleri bağlantı ister. Çevrimdışıyken veriler önbellekten okunur, yazma butonları açıklamalı olarak devre dışı kalır.
 
-## 9.4 Mobil uygulama klasör yapısı
+## 9.4 Klasör yapısı
 
-> app/
->
-> (auth)/welcome.tsx, phone.tsx, otp.tsx, profile.tsx
->
-> (tabs)/index.tsx, contacts.tsx, calendar.tsx, requests.tsx
->
-> agreement/\[id\]/index.tsx, payment.tsx, share.tsx, amend.tsx, history.tsx
->
-> new/index.tsx, form.tsx, plan.tsx
->
-> invite/\[token\].tsx ← derin bağlantı girişi
->
-> src/
->
-> domain/ ← saf TS: plan üretimi, dağıtım, para biçimlendirme, zod şemaları
->
-> api/ ← RPC çağrıları, query key’leri, hook’lar
->
-> components/ ← tasarım sistemi bileşenleri
->
-> features/ ← agreement, payment, invite, reminders
->
-> lib/ ← supabase istemcisi, push, sentry, analytics
->
-> supabase/
->
-> migrations/ ← şema, RLS, fonksiyonlar
->
-> functions/ ← edge functions
->
-> tests/ ← pgTAP testleri
->
-> web-confirm/ ← Next.js onay sayfası
->
-> packages/shared/ ← ortak zod şemaları ve domain mantığı
+```
+apps/mobile/
+	app/                 yalnızca rotalar: (auth), (tabs), agreement/[id], new, split, loans, me
+	src/
+		api/               AgreementsApi, adaptörler (mock, supabase), hook'lar
+		components/        tasarım sistemi bileşenleri
+		features/          agreement, new, debts, split, loans, calendar, home, auth, me, push
+		i18n/tr.ts         tüm metinler
+		lib/               supabase istemcisi, push, sentry, analytics
+packages/shared/       saf TS: plan üretimi, dağıtım, para, hesap bölme, zod şemaları
+supabase/              migrations, functions, tests (pgTAP)
+```
 
-domain/ katmanı saf TypeScript’tir ve hem mobilde hem web onay sayfasında kullanılır. Plan üretimi ve ödeme dağıtımı aynı algoritmayla hem istemcide (önizleme) hem veritabanında (kesin sonuç) çalışır; iki uygulamanın aynı sonucu verdiği testlerle doğrulanır.
+Plan üretimi ve ödeme dağıtımı aynı algoritmayla hem istemcide (önizleme) hem veritabanında (kesin sonuç) çalışır; iki uygulamanın aynı sonucu verdiği testlerle doğrulanır. Hesap bölme bakiyeleri ve sadeleştirme de aynı kurala uyar.
 
 # 10. Veri Modeli
 
@@ -728,9 +588,6 @@ profiles
 | avatar_path       | text null        | Özel `avatars` bucket'ında yol |
 | reminder_before_days | int[]         | Vade öncesi hatırlatma: 7, 3, 1, 0 alt kümesi; varsayılan {3,0} |
 | phone_e164        | text UNIQUE      | Doğrulanmış numara, +90… |
-| paramnet_id       | text UNIQUE      | PN-XXXXXX, rastgele (ADR-050) |
-| paramnet_id_changed_at | timestamptz | Son yeniden üretim; 30 gün sınırı |
-| id_discoverable   | boolean          | ID ile bulunabilir; varsayılan true |
 | locale / timezone | text             | tr-TR / Europe/Istanbul  |
 | deleted_at        | timestamptz null | Hesap silme işareti      |
 
@@ -741,8 +598,6 @@ contacts
 | id                | uuid PK                |                                      |
 | owner_id          | uuid FK profiles       | Rehber sahibi                        |
 | display_name      | text                   | Sahibin verdiği ad                   |
-| phone_e164        | text null              | UNIQUE(owner_id, phone_e164)         |
-| linked_profile_id | uuid null              | Numara kayıtlı bir kullanıcıya aitse |
 | kind              | enum: person, merchant | Satıcı serbest metin taraf           |
 
 agreements
@@ -753,15 +608,13 @@ agreements
 | creator_id                | uuid FK profiles                 | Oluşturan                        |
 | creator_role              | enum: creditor, debtor           | Oluşturanın rolü                 |
 | counterparty_contact_id   | uuid FK contacts                 | Oluşturanın gözünden karşı taraf |
-| counterparty_profile_id   | uuid null                        | Onaylayınca dolar                |
 | kind                      | enum: loan, installment_purchase |                                  |
 | title / description       | text                             | ör. “Mobilya”                    |
 | currency                  | char(3)                          | TRY                              |
 | principal_minor           | bigint                           | Toplam tutar (kuruş)             |
 | outstanding_minor         | bigint                           | Önbelleğe alınmış kalan          |
-| status                    | enum (bkz. 8.1)                  |                                  |
+| status                    | enum (bkz. 8.1)                  | personal, settled, cancelled     |
 | active_version            | int                              | Yürürlükteki versiyon            |
-| pending_version           | int null                         | Onay bekleyen versiyon           |
 | row_version               | int                              | İyimser kilit                    |
 | settled_at / cancelled_at | timestamptz null                 |                                  |
 
@@ -771,10 +624,8 @@ agreement_versions
 |------------------------|-------------------------------------------------------|------------------------------------------------------------------------|
 | agreement_id + version | PK                                                    |                                                                        |
 | terms                  | jsonb                                                 | principal, down_payment, plan\[\] {seq, due_date, amount_minor}, notes |
-| terms_hash             | text                                                  | terms’in kanonik JSON’unun SHA-256’sı                                  |
-| proposed_by            | uuid                                                  |                                                                        |
+| created_by             | uuid                                                  |                                                                        |
 | reason                 | text null                                             | Değişiklik gerekçesi                                                   |
-| status                 | enum: draft, proposed, accepted, rejected, superseded |                                                                        |
 
 installments
 
@@ -797,25 +648,11 @@ payments ve payment_allocations
 | paid_on                  | date                                     | Ödeme tarihi               |
 | method                   | enum: cash, transfer, card, other        |                            |
 | kind                     | enum: payment, down_payment, discount    | İndirim/af da bakiye düşer |
-| status                   | enum (bkz. 8.3)                          |                            |
-| reported_by / decided_by | uuid                                     |                            |
+| status                   | enum (bkz. 8.3)                          | confirmed, voided          |
+| recorded_by              | uuid                                     |                            |
 | idempotency_key          | uuid UNIQUE                              |                            |
 | attachment_path          | text null                                | Storage yolu               |
 | allocations              | payment_id, installment_id, amount_minor | Ayrı tablo                 |
-
-invites
-
-| **Sütun**             | **Tip**          | **Açıklama**                        |
-|-----------------------|------------------|-------------------------------------|
-| id                    | uuid PK          |                                     |
-| agreement_id, version | FK               | Paylaşılan versiyon                 |
-| token_hash            | bytea UNIQUE     | SHA-256(token); düz token saklanmaz |
-| target_phone_e164     | text null        | Yalnızca bu numara onaylayabilir    |
-| target_profile_id     | uuid null        | ID ile paylaşımda hedef profil; token ve OTP yok. İkisinden tam biri dolu (CHECK). |
-| status                | enum (bkz. 8.5)  |                                     |
-| expires_at            | timestamptz      | Oluşturma + 7 gün                   |
-| otp_attempts          | int              | Üst sınır 5                         |
-| consumed_at           | timestamptz null |                                     |
 
 agreement_events (olay kaydı)
 
@@ -823,13 +660,10 @@ agreement_events (olay kaydı)
 |----------------------|------------------------|---------------------------------------------------------|
 | id                   | bigint identity        |                                                         |
 | agreement_id         | uuid                   |                                                         |
-| actor_id             | uuid null              | Web’den onayda null olabilir                            |
-| actor_phone_e164     | text                   | Doğrulanmış numara                                      |
-| channel              | enum: app, web, system |                                                         |
-| type                 | text                   | created, shared, accepted, countered, payment_reported… |
+| actor_id             | uuid null              | Sistem olayında null                                    |
+| type                 | text                   | created, updated, payment_recorded, payment_voided…     |
 | version              | int                    | İlgili versiyon                                         |
 | payload              | jsonb                  | Olaya özgü veri                                         |
-| ip_hash / user_agent | text                   | Kanıt amaçlı, kısaltılmış                               |
 
 Diğer tablolar
 
@@ -839,11 +673,9 @@ Diğer tablolar
 
 - push_tokens: user_id, expo_token, platform, last_seen_at.
 
-- notifications (bildirim kutusu, ADR-051): user_id, template, payload, agreement_id null, category (approval, reminder, completed, info), created_at, read_at null. Outbox'a yazılan her bildirim buraya da yazılır; 90 gün saklanır.
+- notifications (bildirim kutusu, ADR-051): user_id, template, payload, agreement_id null, created_at, read_at null. Outbox'a yazılan her bildirim buraya da yazılır; 90 gün saklanır.
 
 - consents: user_id, document (kvkk, terms), version, accepted_at.
-
-- retired_paramnet_ids: paramnet_id (PK), retired_at. Kullanılmış ID'ler yeniden verilmez.
 
 - accounts (ADR-053): owner_id, kind (bank, cash, savings, other), name, bank_name null, opening_balance_minor bigint (eksi olabilir), include_in_total, archived_at null, idempotency_key, row_version, updated_at.
 
@@ -857,50 +689,40 @@ Diğer tablolar
 
 - budgets: owner_id + category (PK, gider kategorisi), limit_minor.
 
-- cards (ADR-055): owner_id, bank_name, card_name null, last4, color, limit_minor, opening_debt_minor, statement_day (1–28), due_offset_days, min_payment_rate, archived_at null, idempotency_key, row_version. transactions'a card_id, to_card_id ve installments eklendi; kart harcamasında account_id boştur.
+- loans (ADR-056): owner_id, bank_name, loan_type, principal_minor, monthly_rate_bps (339 = %3,39), term_months, first_due_on, installment_minor, payment_account_id null, archived_at null. Taksit kaydı transactions.to_loan_id ile krediye bağlanır; hesap seçilmediyse account_id boştur.
 
-- loans (ADR-056): owner_id, bank_name, loan_type, principal_minor, monthly_rate_bps (339 = %3,39), term_months, first_due_on, installment_minor, payment_account_id null, archived_at null. transactions.to_loan_id taksit kaydını krediye bağlar.
+- split_groups (ADR-064): owner_id, title, archived_at null, idempotency_key, row_version.
 
-- splits (ADR-061): owner_id, title, total_minor, spent_on, mode (equal, amount, percent), join_code (`ABC-DEFG`), join_expires_at (48 saat), idempotency_key, row_version. split_members: split_id, seq (ödeyen 0), display_name, share_minor, is_owner, profile_id null, join_state (none, requested, approved), joined_via (paramnet_id, link, qr), agreement_id null (payın borç kaydı). split_events yalnızca katılım olaylarını tutar; ödeme ve kabul olayları payların agreement_events kayıtlarından okunur.
+- split_group_members: group_id, seq, display_name, is_me. Grup başına bir is_me üye.
 
-- Arama, paylaşım ve kullanıcı adı kontrolü sayaçları mevcut `rate_limits` tablosundadır (`pnid:find:`, `pnid:share:`, `username:check:` + kullanıcı).
+- split_expenses: group_id, title, total_minor, spent_on, payer_member_id, mode (equal, amount, percent), idempotency_key, deleted_at null, row_version. split_expense_shares: expense_id + member_id (PK), share_minor.
+
+- split_settlements: group_id, from_member_id, to_member_id, amount_minor, settled_on, idempotency_key, deleted_at null. Bakiye tablosu yoktur.
+
+- split_group_events (yalnızca ekleme): group_id, type, payload. Harcama ve ödeşme eklemelerini, değişiklikleri ve silmeleri tutar.
+
+- Kullanıcı adı kontrolü sayacı `rate_limits` tablosundadır.
 
 ## 10.2 Satır düzeyi güvenlik (RLS)
 
-- Okuma: kullanıcı creator_id veya counterparty_profile_id ise anlaşmayı, versiyonlarını, taksitlerini, ödemelerini ve olaylarını görebilir.
-
-- Kişisel moddaki anlaşmayı yalnızca oluşturan görür.
-
-- contacts yalnızca sahibine görünür. Karşı tarafa sizin onu rehberde hangi adla kaydettiğiniz gösterilmez; karşı taraf kendi display_name’ini görür.
+- Okuma: kullanıcı yalnızca creator_id / owner_id kendisi olan kayıtları görür. Kullanıcılar arası hiçbir görünürlük yoktur.
 
 - Yazma: tüm tablolarda istemciye kapalı. Yalnızca RPC fonksiyonları yazar.
-
-- invites istemciye hiç açılmaz; yalnızca edge function servis rolüyle erişir.
 
 ## 10.3 RPC fonksiyonları
 
 | **Fonksiyon**                                                       | **Görev**                                                                   |
 |---------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| create_agreement(input, idem_key)                                   | Anlaşma + v1 + taksitler + peşinat ödemesi                                  |
-| update_personal_agreement(id, terms, row_version)                   | Kişisel modda düzenleme (yeni versiyon)                                     |
-| share_agreement(id, phone, row_version)                             | pending’e geçirir, davet token’ı üretir, düz token’ı yalnızca bir kez döner |
-| share_agreement_by_id(id, paramnet_id, row_version)                 | ID ile pending'e geçirir; hedef profile bağlı davet, token yok (günde 10)   |
-| withdraw_share(id)                                                  | Daveti iptal eder                                                           |
-| find_by_paramnet_id(paramnet_id)                                    | status (found, not_found, self, invalid) + görünen ad; saatte 20 (ADR-050)  |
+| create_agreement(input, idem_key)                                   | Kayıt + v1 + taksitler + peşinat ödemesi                                    |
+| update_personal_agreement(id, terms, row_version)                   | Düzenleme (yeni versiyon)                                                   |
+| cancel_agreement(id, row_version)                                   | İptal                                                                       |
 | get_my_profile() / update_profile(first, last, username) / check_username(u) | Kendi profili; ad, soyad, @kullanıcı adı (ADR-051)                |
 | set_avatar(path)                                                    | `avatars/{uid}/{uuid}.jpg`; eski yolu silinmek üzere döner                  |
-| list_notifications(category, before_id, limit) / mark_notifications_read(ids) | Bildirim kutusu; okunmamış ve canlı onay bekleyen sayısı           |
+| list_notifications(before_id, limit) / mark_notifications_read(ids) | Bildirim kutusu; okunmamış sayısı                                           |
 | set_reminder_prefs(days)                                            | Vade öncesi hatırlatma: 7, 3, 1, 0 alt kümesi                               |
-| regenerate_paramnet_id() / set_id_discoverable(on)                  | Yeni rastgele ID (30 günde bir) / bulunabilirlik anahtarı                   |
-| decide_agreement(id, version, terms_hash, decision, counter_terms?) | accept / counter / reject                                                   |
-| record_payment(id, input, idem_key)                                 | Alacaklı/kişisel: confirmed; borçlu: reported                               |
-| decide_payment(payment_id, decision)                                | confirm / reject                                                            |
-| withdraw_payment(payment_id)                                        | Borçlu bildirimini geri çeker                                               |
-| propose_amendment(id, terms, reason)                                | amendment_pending                                                           |
-| decide_amendment(id, version, terms_hash, decision)                 | accept / reject                                                             |
-| open_dispute(id, reason, payment_id?) / resolve_dispute(id)         | İtiraz                                                                      |
-| request_cancel(id) / decide_cancel(id, decision)                    | Karşılıklı iptal                                                            |
-| forgive_remaining(id, amount?)                                      | Alacaklının indirimi/affı                                                   |
+| record_payment(id, input, idem_key)                                 | Ödeme: confirmed, dağıtım, gerekirse kapanış                                |
+| void_payment(payment_id, row_version)                               | Ödemeyi siler: voided, dağıtım geri alınır, gerekirse kayıt açılır          |
+| forgive_remaining(id, amount?)                                      | Alacaklının indirimi                                                        |
 | get_dashboard() / get_calendar(month)                               | Okuma için optimize görünümler                                              |
 | create_account(input, idem_key) / update_account(id, input, row_version) / archive_account(id, row_version) | Kendi hesapları (ADR-053)                  |
 | list_accounts()                                                     | Açık hesaplar, türetilmiş bakiyeler, Toplam Nakit                           |
@@ -912,28 +734,22 @@ Diğer tablolar
 | confirm_recurring(rule, date, idem_key) / skip_recurring(rule, date) | Günü gelen tarihi kaydet ya da atla |
 | set_budget(category, limit) / list_budgets(month) | Kategori bütçesi; harcananla birlikte |
 | get_monthly_report(month) | Gelir, gider, kategori dağılımı, 6 aylık seri |
-| create_card / update_card / archive_card / list_cards / get_card | Kartlar; türetilmiş ekstre, asgari, son ödeme, kullanılabilir limit (ADR-055) |
 | create_loan / update_loan / archive_loan / list_loans / get_loan / record_loan_payment | Banka kredileri, türetilmiş ödeme planı, taksit kaydı (ADR-056) |
-| request_money(input, paramnet_id, idem_key) | Borç alanın kaydı + ID ile paylaşım, tek işlemde (ADR-058) |
-| get_delivery(id) / report_delivery(id, row_version) / confirm_delivery(id, row_version) | Para teslimi: borç veren bildirir, borç alan onaylar |
 | create_agreement_with_paid(input, paid_count, idem_key) | Kayıt + geçmiş ilk n taksitin ödemesi, tek işlemde (ADR-059) |
-| create_split(input, idem_key) / get_split(id) / list_splits() / split_for_agreement(agreement_id) | Hesabı böl: paylar borç kaydı, ID'li kişilere tek işlemde paylaşılır (ADR-061) |
-| get_split_invite(code) / request_split_join(code, member_id, via) | Kare kod ve link: boş yerler; kendi yerini seçip katılma isteği (saatte 20) |
-| decide_split_join(member_id, decision) / assign_split_member(member_id, paramnet_id) / remind_split_member(member_id) | Ödeyen: katılımı onayla/reddet, boş yere ID ile kişi, günde bir hatırlatma |
+| create_split_group(input, idem_key) / update_split_group(id, input, row_version) / archive_split_group(id, row_version) | Grup ve üyeler (ADR-064) |
+| add_split_expense(group, input, idem_key) / update_split_expense(id, input, row_version) / delete_split_expense(id, row_version) | Harcama ve paylar |
+| add_split_settlement(group, input, idem_key) / delete_split_settlement(id) | Ödeşme |
+| list_split_groups() / get_split_group(id) | Gruplar, türetilmiş bakiyeler, sadeleştirilmiş borçlar, geçmiş |
 
 ## 10.4 Edge Functions
 
-| **Fonksiyon**                | **Görev**                                                                                 |
-|------------------------------|-------------------------------------------------------------------------------------------|
-| invite-open                  | Token’ı doğrular, minimum bilgiyi döner (oluşturanın adı).                                |
-| invite-otp-send              | Turnstile + rate limit kontrolü, hedef numaraya OTP gönderir.                             |
-| invite-otp-verify            | OTP’yi doğrular, kısa ömürlü (15 dk) onay oturumu verir.                                  |
-| invite-decide                | Onay oturumuyla decide_agreement çağırır; olay kaydına web kanalı ve kanıt bilgisi yazar. |
-| link-pending-invites         | Yeni kayıt olan kullanıcının numarasına bekleyen davetleri hesaba bağlar.                 |
-| dispatch-notifications       | Outbox’tan push gönderir; geçersiz token’ları temizler.                                   |
-| schedule-reminders (pg_cron) | Her gün 08:00’de vadesi yaklaşan/geçen taksitler için hatırlatma üretir.                  |
-| expire-invites (pg_cron)     | Süresi dolan davetleri kapatır, anlaşmayı personal’a döndürür.                            |
-| send-sms-hook                | Supabase Auth OTP’sini yerli SMS sağlayıcıya iletir.                                      |
+| **Fonksiyon**                | **Görev**                                                                |
+|------------------------------|--------------------------------------------------------------------------|
+| pin-login / pin-set          | PIN girişi ve belirleme (ADR-049).                                       |
+| dispatch-notifications       | Outbox’tan push gönderir; geçersiz token’ları temizler.                  |
+| schedule-reminders (pg_cron) | Her gün vadesi yaklaşan ve geçen taksitler için hatırlatma üretir.       |
+| delete-account               | Hesabı ve tüm verisini siler.                                            |
+| send-sms-hook                | Supabase Auth OTP’sini yerli SMS sağlayıcıya iletir.                     |
 
 # 11. Güvenlik
 
@@ -952,24 +768,13 @@ Diğer tablolar
 
 ## 11.2 Web onay sayfası tehdit modeli
 
-| **Tehdit**                                       | **Önlem**                                                                                             |
-|--------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| Link tahmini                                     | 256-bit rastgele token (base64url). Veritabanında yalnızca SHA-256 hash’i.                            |
-| Linkin başkasına iletilmesi                      | Link tek başına yetki vermez; davetteki hedef numaraya giden OTP zorunlu.                             |
-| OTP öncesi bilgi sızıntısı                       | Doğrulamadan önce yalnızca oluşturanın adı gösterilir.                                                |
-| Mesajlaşma uygulamalarının link önizleme botları | GET hiçbir durumu değiştirmez; tüm kararlar POST + CSRF token ile.                                    |
-| OTP kaba kuvvet                                  | Davet başına 5 deneme, OTP 5 dakika geçerli, aşımda davet kilitlenir.                                 |
-| SMS pumping                                      | Yalnızca +90 numaralar; Turnstile; IP ve numara başına rate limit; günlük SMS bütçe alarmı.           |
-| Onaylanan içeriğin değişmesi                     | Karar versiyon numarası + terms_hash ile gönderilir; uyuşmazsa reddedilir.                            |
-| Tekrar kullanım                                  | Karar sonrası token consumed; süre sonunda expired.                                                   |
-| Oltalama (sahte site)                            | Tek sabit alan adı; sayfa şifre veya kart bilgisi istemez; uygulama içinde kullanıcı bilgilendirilir. |
-| Tarayıcı kaynaklı sızıntı                        | HTTPS + HSTS, Referrer-Policy: no-referrer, noindex, sıkı CSP, ayrı alt alan adı.                     |
+Kaldırıldı (ADR-064). Web yüzeyi yoktur. SMS kötüye kullanımına karşı yalnızca +90 numaralar, numara başına zaman sınırı ve günlük SMS bütçe alarmı kalır.
 
 ## 11.3 Uygulama ve altyapı
 
 - İstemci yalnızca anon anahtarı taşır; servis rolü anahtarı yalnızca edge function ortam değişkenlerinde.
 
-- Storage: dekont bucket’ı özel; erişim kısa süreli imzalı URL ile ve yalnızca anlaşma taraflarına.
+- Storage: dekont bucket’ı özel; erişim kısa süreli imzalı URL ile ve yalnızca kaydın sahibine.
 
 - Dekont yükleme: yalnızca görsel/PDF, en fazla 5 MB, sunucuda MIME doğrulama, EXIF temizleme.
 
@@ -981,7 +786,7 @@ Diğer tablolar
 
 - Yedekleme: Supabase günlük yedek + PITR (ücretli plan).
 
-- Loglarda telefon numarası ve tutar maskelenir. ParamNet ID loglara ve analitik olaylarına yazılmaz.
+- Loglarda telefon numarası ve tutar maskelenir.
 
 # 12. KVKK ve Hukuki Çerçeve
 
@@ -1000,14 +805,14 @@ Diğer tablolar
 | **Konu**                  | **Durum ve yaklaşım**                                                                                                                                          |
 |---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Kullanıcı verisi          | Aydınlatma metni, açık rıza gereken durumların belirlenmesi, VERBİS yükümlülüğünün değerlendirilmesi.                                                          |
-| Üçüncü kişi verisi        | Kullanıcı, uygulamayı kullanmayan kişilerin adını, numarasını ve borç bilgisini giriyor. Veri minimizasyonu: numara isteğe bağlı; rehber sunucuya yüklenmez.   |
+| Üçüncü kişi verisi        | Kullanıcı, başka kişilerin adını ve borç bilgisini kendi defterine giriyor. Veri minimizasyonu: numara alınmaz; rehber sunucuya yüklenmez.   |
 | Yurt dışına veri aktarımı | Supabase/Sentry/PostHog sunucularının konumu ve KVKK’daki yurt dışı aktarım kuralları. Gerekirse bölge seçimi veya yurt içi barındırma.                        |
-| Silme hakkı               | Hesap silmede kullanıcının kişisel verisi silinir/anonimleştirilir. Karşı tarafın da taraf olduğu anlaşmalarda olay kaydının nasıl korunacağı netleştirilmeli. |
+| Silme hakkı               | Hesap silmede kullanıcının tüm kayıtları silinir. Başka kullanıcıyı ilgilendiren veri yoktur. |
 | Ödeme hizmeti kapsamı     | Uygulama para tutmaz, ödeme başlatmaz; 6493 sayılı Kanun kapsamındaki ödeme hizmeti sunulmaz. Bu sınır ürün kararı olarak korunmalı.                           |
-| Faiz                      | Kişiler arası faizli borç kaydı ve hesaplaması sunulmaz (ilk sürüm).                                                                                           |
+| Faiz                      | Kişiler arası faizli borç kaydı ve hesaplaması sunulmaz. Banka kredisinde faiz yalnızca gösterim ve simülasyondur.                                                                                           |
 | Senet                     | Senet görseli ve bilgisi saklanabilir; uygulama e-senet düzenlemez ve kaydın hukuki geçerliliği hakkında iddiada bulunmaz.                                     |
-| Kayıtların delil niteliği | Olay kaydı tarafların kendi kullanımı içindir; “resmi belge” olarak pazarlanmaz.                                                                               |
-| Kullanım koşulları        | Kötüye kullanım (taciz amaçlı hatırlatma vb.) yasağı ve hesap kapatma hakkı.                                                                                   |
+| Kayıtların delil niteliği | Kayıtlar tek taraflıdır ve kullanıcının kendi notudur; delil ya da “resmi belge” olarak pazarlanmaz.                                                                               |
+| Kullanım koşulları        | Kötüye kullanım yasağı ve hesap kapatma hakkı.                                                                                   |
 
 # 13. Analitik ve Başarı Ölçütleri
 
@@ -1019,8 +824,8 @@ Diğer tablolar
 </colgroup>
 <tbody>
 <tr class="odd">
-<td><p><strong>Haftalık aktif anlaşma sayısı</strong></p>
-<p>Son 7 günde en az bir olay (ödeme, onay, değişiklik) yaşayan anlaşma sayısı. Uygulama açılış sayısı yerine, borç ilişkilerinin gerçekten uygulamada yönetilip yönetilmediğini ölçer.</p></td>
+<td><p><strong>Haftalık aktif kayıt sayısı</strong></p>
+<p>Son 7 günde en az bir olay (ödeme, düzenleme, yeni harcama) yaşayan kayıt ve grup sayısı. Uygulama açılış sayısı yerine, defterin gerçekten kullanılıp kullanılmadığını ölçer.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1032,19 +837,15 @@ Diğer tablolar
 | Aktivasyon               | Kayıt olanların ilk anlaşmayı oluşturma oranı                  | %60+              |
 | İlk kayıt süresi         | Uygulama açılışından ilk anlaşmaya                             | \< 90 sn          |
 | Taksitli oran            | Oluşturulan anlaşmalardan taksitli olanlar                     | İzlenecek         |
-| Paylaşım oranı           | Anlaşmalardan paylaşılanlar                                    | %25+              |
-| Davet kabulü             | Paylaşımlardan onaylananlar (web + uygulama)                   | %50+              |
-| Web’den uygulamaya geçiş | Web’de onaylayıp uygulamayı indirenler                         | İzlenecek         |
-| Doğrulanan ödeme oranı   | Paylaşılan anlaşmalarda onaylanan ödemeler                     | İzlenecek         |
+| Hesap bölme kullanımı    | En az bir grup açan kullanıcı oranı                            | İzlenecek         |
 | Tekrar kullanım          | İlk anlaşması kapanan kullanıcıların ikinci anlaşma açma oranı | %30+              |
-| Viral katsayı            | Davetle gelen kullanıcının kendi anlaşmasını oluşturma oranı   | İzlenecek         |
 | Tutunma                  | D7 ve D30 aktif kullanıcı (bilgi amaçlı)                       | D7 %30+, D30 %15+ |
 
 Hedefler sektör garantisi değil, pilot için konan karar eşikleridir. Ödemeler aylık olduğundan günlük açılış başarının doğru ölçüsü değildir.
 
 ## 13.3 Olay listesi
 
-app_opened, signup_completed, agreement_created {kind, installments, mode}, agreement_shared, invite_opened {channel}, invite_otp_verified, agreement_decided {decision, channel}, payment_recorded {by_role}, payment_decided {decision}, amendment_proposed, amendment_decided, dispute_opened, agreement_settled, reminder_sent, reminder_opened.
+app_opened, signup_completed, agreement_created {kind, installments}, agreement_updated, payment_recorded {role}, agreement_settled, reminder_sent, reminder_opened, split_group_created, split_expense_added {mode}, split_settlement_added.
 
 Olaylara tutar aralığı dışında kişisel veri eklenmez (ad, numara, not gönderilmez).
 
@@ -1054,12 +855,11 @@ Olaylara tutar aralığı dışında kişisel veri eklenmez (ad, numara, not gö
 |-----------------------------------|-----------------------------------------------|
 | Sınırsız kişisel anlaşma          | Anlaşma ve ödeme geçmişinin PDF çıktısı       |
 | Taksit planı, kısmi ödeme, takvim | Gelişmiş raporlar ve dışa aktarma (Excel/CSV) |
-| Paylaşım, davet, karşılıklı onay  | Çoklu para birimi ve altın bazlı borç         |
-| Ödeme bildirimi ve doğrulama      | Aile paylaşımı / ortak görünüm                |
+| Hesap bölme                       | Çoklu para birimi ve altın bazlı borç         |
 | Hatırlatmalar                     | Doğal dil ile hızlı kayıt (yüksek kota)       |
 | Temel dekont ekleme               | İleride: kişisel finans modülleri             |
 
-- İlke: Davet, onay ve hatırlatma asla ücret duvarı arkasında olmaz. Bunlar büyümenin motorudur.
+- İlke: Kayıt, hesap bölme ve hatırlatma ücret duvarı arkasında olmaz.
 
 - Fiyat, pilot sonrası ödeme isteği görüşmeleri ve test ile belirlenir. Abonelik yönetimi için RevenueCat değerlendirilir.
 
@@ -1094,21 +894,21 @@ Faz 1 — Temel ve kişisel defter (Hafta 1–4)
 
 **Çıkış ölçütü:** Kişisel modda anlaşma oluştur, öde, kapat; hatırlatma telefona düşüyor.
 
-Faz 2 — Karşılıklı akış (Hafta 5–7)
+Faz 2 — Karşılıklı akış
 
-- Davet üretimi ve paylaşım ekranı.
+Tamamlandı, sonra kaldırıldı (ADR-064).
 
-- Universal Links / App Links yapılandırması.
+Faz 5 — Tek taraflı defter
 
-- Web onay sayfası (W01–W04), Turnstile, OTP edge function’ları.
+- Kredi kartlarının silinmesi.
 
-- Uygulama içi gelen paylaşım, ödeme doğrulama, değişiklik talebi, itiraz, karşılıklı iptal.
+- Gizli modüller ve borç odaklı Ana Sayfa.
 
-- Talepler ekranı, bildirim şablonları, outbox gönderici.
+- Karşılıklı akışın mobilden ve sunucudan silinmesi, web onay sayfasının kaldırılması.
 
-- Yeni kayıtta bekleyen davetleri bağlama.
+- Tek taraflı hesap bölme.
 
-**Çıkış ölçütü:** İki farklı cihazda (biri uygulamasız) uçtan uca senaryolar eksiksiz çalışıyor; iki taraf aynı bakiyeyi görüyor.
+**Çıkış ölçütü:** Bölüm 5'teki akışlar tek hesapla eksiksiz çalışıyor; başka kullanıcıya ait hiçbir veri ne görünüyor ne gönderiliyor. Görev listesi `docs/ROADMAP.md`'dedir.
 
 Faz 3 — Pilot ve yayın (Hafta 8–10)
 
@@ -1131,8 +931,8 @@ Sonraki sürümler (kullanıcı verisine göre önceliklendirilir)
 | **Sürüm** | **İçerik**                                                                              |
 |-----------|-----------------------------------------------------------------------------------------|
 | 1.1       | Doğal dil ile hızlı kayıt, PDF çıktı, premium başlangıcı                                |
-| 1.2       | Grup / ortak harcama, çoklu para birimi ve altın                                        |
-| 2.0       | Kişisel finans: gelir-gider, hesaplar, kredi kartı ve kredi takibi (ledger mimarisiyle) |
+| 1.2       | Çoklu para birimi ve altın                                                              |
+| 2.0       | Kişisel finans: gizli modüllerin açılması (kullanıcı verisine göre)                     |
 | 2.x       | Ekstre PDF okuma, nakit akışı tahmini, AI asistan                                       |
 | 3.x       | Lisanslı bir açık bankacılık sağlayıcısıyla iş ortaklığı                                |
 
@@ -1152,45 +952,43 @@ Sonraki sürümler (kullanıcı verisine göre önceliklendirilir)
 
 | **Katman**      | **Araç**                     | **Kapsam**                                                                                                                                |
 |-----------------|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| Domain (TS)     | Vitest                       | Plan üretimi, yuvarlama, ay sonu tarihleri, ödeme dağıtımı; özellik tabanlı testler (fast-check) ile “toplam her zaman eşit” değişmezleri |
+| Domain (TS)     | Vitest                       | Plan üretimi, yuvarlama, ay sonu tarihleri, ödeme dağıtımı, hesap bölme; özellik tabanlı testler (fast-check) ile “toplam her zaman eşit” ve “bakiyeler toplamı sıfır” değişmezleri |
 | Veritabanı      | pgTAP                        | Her durum geçişi (izinli ve izinsiz), RLS politikaları, idempotency, eşzamanlı ödeme yarışları                                            |
-| Edge Functions  | Deno test                    | Token doğrulama, OTP limitleri, karar akışı                                                                                               |
 | Mobil bileşen   | React Native Testing Library | Formlar, durum etiketleri, boş durumlar                                                                                                   |
-| Uçtan uca mobil | Maestro                      | Kayıt → anlaşma → paylaş → onay → ödeme → kapanış                                                                                         |
-| Uçtan uca web   | Playwright                   | Web onay sayfası tüm senaryolar                                                                                                           |
+| Edge Functions  | Deno test                    | PIN girişi, kilit, bildirim gönderimi                                                                                                     |
+| Uçtan uca mobil | Maestro                      | Kayıt → kayıt oluşturma → ödeme → kapanış; grup → harcama → ödeşme                                                                        |
 | Tutarlılık işi  | pg_cron                      | Günlük: outstanding_minor ile ödemelerden hesaplanan bakiye karşılaştırması, sapma alarmı                                                 |
 
 Kritik test senaryoları
 
-1.  İki taraf aynı anda farklı ödemeler kaydeder: bakiye doğru, çakışma yok.
+1.  Aynı ödeme isteği iki kez gelir: tek kayıt oluşur.
 
-2.  Aynı ödeme isteği iki kez gelir: tek kayıt oluşur.
+2.  Ödeme kalan borçtan fazla: reddedilir.
 
-3.  Karşı taraf eski versiyonu onaylamaya çalışır (oluşturan bu arada değiştirmiş): reddedilir.
+3.  31 Ocak başlangıçlı aylık plan: Şubat taksiti ayın son günü.
 
-4.  Link önizleme botu linki açar: davet tüketilmez.
+4.  Düzenleme sonrası geçmiş ödemeler korunur, yeni plan kalan tutara kurulur.
 
-5.  Yanlış numarayla OTP denemesi: onay verilemez; 5 hatada kilit.
+5.  Kapanmış kayıtta ödeme silinir: kayıt açılır, kalan doğru.
 
-6.  Ödeme kalan borçtan fazla: reddedilir.
+6.  Başka kullanıcı kaydı, grubu ya da bildirimi okuyamaz ve yazamaz.
 
-7.  31 Ocak başlangıçlı aylık plan: Şubat taksiti ayın son günü.
+7.  Grup bakiyeleri toplamı her harcama ve ödeşmeden sonra sıfırdır.
 
-8.  Değişiklik kabul edildikten sonra geçmiş ödemeler korunur, yeni plan kalan tutara kurulur.
+8.  Sadeleştirme aynı girdiden aynı sonucu verir; ödeme sayısı üye sayısından az olur.
 
-9.  Web’de onaylayan kişi sonra uygulamaya kaydolur: anlaşma hesabına bağlanır.
+9.  Ödeyen dahil olmayan harcamada kuruş farkı doğru üyeye yazılır.
 
-10. Hesap silme: karşı tarafın görünümünde anlaşma “silinmiş kullanıcı” ile korunur.
+10. Hesap silme: kullanıcının tüm kayıtları ve grupları silinir.
 
 # 17. Riskler ve Önlemler
 
 | **Risk**                                                     | **Etki**   | **Olasılık** | **Önlem**                                                              |
 |--------------------------------------------------------------|------------|--------------|------------------------------------------------------------------------|
-| İnsanlar borç onaylatmayı sosyal olarak rahatsız edici bulur | Yüksek     | Orta         | Faz 0 görüşmeleri; kolaylık odaklı dil; kişisel mod tek başına değerli |
-| Davet kabul oranı düşük                                      | Yüksek     | Orta         | Uygulamasız web onayı; tek ekranlık karar; mesaj metni A/B testi       |
 | Manuel giriş yorar, kullanım düşer                           | Yüksek     | Yüksek       | 90 sn hedefi; şablonlar; doğal dil kaydı 1.1’de                        |
 | Bakiye tutarsızlığı güveni zedeler                           | Çok yüksek | Düşük        | Sunucu otoritesi, transaction, pgTAP, günlük tutarlılık işi            |
-| SMS maliyeti ve kötüye kullanım                              | Orta       | Orta         | Turnstile, rate limit, bütçe alarmı, yalnızca +90                      |
+| SMS maliyeti ve kötüye kullanım                              | Orta       | Orta         | Rate limit, bütçe alarmı, yalnızca +90                                 |
+| Tek taraflı defter rakiplerden ayrışmaz                      | Yüksek     | Yüksek       | Sadelik, hesapsız hesap bölme, Türkçe dil; pilotta ölçülür             |
 | Rakip aynı özelliği ekler                                    | Orta       | Orta         | Hız, deneyim kalitesi, Türkiye’ye özgü dil ve akışlar                  |
 | KVKK uyumsuzluğu                                             | Yüksek     | Düşük        | Avukat ön görüşmesi, veri minimizasyonu, bölge seçimi                  |
 | Kapsam kayması                                               | Yüksek     | Yüksek       | Bu doküman kapsam sözleşmesi; yeni fikirler sonraki sürüm listesine    |
@@ -1355,13 +1153,13 @@ Skill 1: paramnet-domain (alan ve backend kuralları)
 >
 > references/business-rules.md ← BR-01 … BR-16 (Bölüm 7)
 >
-> references/state-machines.md ← anlaşma, ödeme, davet geçiş tabloları (Bölüm 8)
+> references/state-machines.md ← kayıt ve ödeme geçiş tabloları (Bölüm 8)
 >
 > references/schema.md ← tablolar, RLS ilkeleri, RPC listesi (Bölüm 10)
 >
-> references/security.md ← davet/OTP tehdit modeli (Bölüm 11)
+> references/security.md ← kimlik, anahtar ve kişisel veri kuralları (Bölüm 11)
 
-- **Tetiklenme:** migration, RLS, RPC, edge function, bakiye, taksit, ödeme dağıtımı, davet veya durum geçişi ile ilgili her iş.
+- **Tetiklenme:** migration, RLS, RPC, edge function, bakiye, taksit, ödeme dağıtımı, hesap bölme veya durum geçişi ile ilgili her iş.
 
 - **İş akışı – yeni durum geçişi eklemek:** 1) Geçiş tablosuna satır ekle, 2) pgTAP testini önce yaz (izinli ve izinsiz aktör), 3) RPC’yi security definer + FOR UPDATE + row_version kontrolüyle yaz, 4) olay kaydı ve outbox satırı, 5) TS tiplerini yeniden üret.
 
@@ -1379,7 +1177,7 @@ Skill 2: paramnet-mobile (mobil uygulama kuralları)
 >
 > references/copy-tr.md ← Türkçe metinler ve iletişim tonu (Bölüm 3.4)
 >
-> references/deep-links.md ← davet linki rotaları, Universal/App Links
+> references/deep-links.md ← bildirimden uygulama içi rotaya geçiş
 >
 > references/testing.md ← testID adlandırma, Maestro akış listesi
 
@@ -1493,7 +1291,6 @@ npx skills komutlarının --skill parametresinin birden fazla değer alma biçim
 |--------------------------------------------|-----------------------------------------------------------------------------------------------|--------------|
 | Marka ve alan adı                          | Paramnet için TÜRKPATENT marka araştırması (9. ve 36. sınıf), alan adı ve mağaza adı kontrolü | Faz 0        |
 | SMS sağlayıcı                              | Netgsm, İleti Merkezi, diğer                                                                  | Faz 1 başı   |
-| Web onay sayfası teknolojisi ve barındırma | Next.js / Astro; Vercel / Cloudflare                                                          | Faz 2 başı   |
 | Analitik aracı                             | PostHog (AB) / kendi olay tablosu                                                             | Faz 1        |
 | Supabase bölgesi                           | KVKK görüşmesine göre                                                                         | Faz 0 sonu   |
 | Yayın sırası                               | iOS ve Android birlikte / önce Android                                                        | Faz 3        |

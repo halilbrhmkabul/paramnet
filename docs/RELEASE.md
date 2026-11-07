@@ -24,7 +24,6 @@ Değerler eas.json'a yazılmaz. Expo panelinde (Project → Environment variable
 | `EXPO_PUBLIC_API_MODE` | `supabase` | Plain text |
 | `EXPO_PUBLIC_SUPABASE_URL` | `https://<ref>.supabase.co` | Plain text |
 | `EXPO_PUBLIC_SUPABASE_KEY` | Publishable key (asla secret/service role değil) | Plain text |
-| `EXPO_PUBLIC_APP_DOMAIN` | Davet linki alan adı (karar verilince) | Plain text |
 | `EXPO_PUBLIC_SENTRY_DSN` / `EXPO_PUBLIC_SENTRY_ENV` | Sentry (AB bölgesi) | Plain text |
 
 `EXPO_PUBLIC_*` değerleri uygulamanın içine gömülür. Bu yüzden buraya gizli anahtar konmaz.

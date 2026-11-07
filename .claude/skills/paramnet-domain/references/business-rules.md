@@ -10,18 +10,20 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 7.
 | BR-02 | İlk sürümde para birimi TRY. Şema çoklu para birimine hazır; anlaşmanın para birimi sonradan değişmez. |
 | BR-03 | Taksit tutarları toplamı + peşinat = anlaşma tutarı, her zaman. |
 | BR-04 | Kalan borç = anlaşma tutarı − onaylı ödemeler − onaylı indirimler. Asla negatif değil. |
-| BR-05 | Paylaşılan ve aktif anlaşmanın şartları yalnızca karşı tarafın onayladığı değişiklik talebiyle değişir. |
-| BR-06 | Her onay belirli versiyona ve o versiyonun `terms_hash`'ine bağlanır. Gösterilen ve onaylanan versiyon aynı olmalı. |
-| BR-07 | Bir anlaşmada aynı anda en fazla bir açık değişiklik talebi. |
-| BR-08 | Borçlunun bildirdiği ödeme alacaklı onaylamadan bakiyeden düşmez. Alacaklının kaydettiği ödeme doğrudan onaylıdır. |
-| BR-09 | Her ödeme/karar işlemi idempotency anahtarı taşır; tekrar eden istek yeni kayıt oluşturmaz. |
-| BR-10 | Onaylanmış ödeme silinmez; yalnızca karşı taraf onayıyla `voided` olur. |
-| BR-11 | Davet linkini yalnızca davetteki hedef numarayı OTP ile doğrulayan kişi kullanabilir. |
-| BR-12 | Kullanıcı kendisiyle anlaşma paylaşamaz. |
-| BR-13 | Olay kaydı yalnızca eklenir (hesap silme anonimleştirmesi hariç). |
-| BR-14 | `settled`, `cancelled` veya `disputed` anlaşmaya yeni ödeme/değişiklik eklenemez (itiraz çözülene kadar). |
-| BR-15 | Faiz hesaplanmaz, faiz alanı yoktur. |
+| BR-05 | Kayıt şartlarını yalnızca sahibi değiştirir. Her değişiklik yeni versiyon ve olay kaydıdır. |
+| BR-08 | Kaydedilen ödeme doğrudan geçerlidir ve bakiyeden düşer. |
+| BR-09 | Her ödeme ve oluşturma işlemi idempotency anahtarı taşır; tekrar eden istek yeni kayıt oluşturmaz. |
+| BR-10 | Ödeme satırı silinmez; `voided` olur, dağıtımı geri alınır. Kapanmış kayıtta kalan sıfırın üstüne çıkarsa kayıt açılır. |
+| BR-13 | Olay kaydı yalnızca eklenir (hesap silme hariç). |
+| BR-14 | `settled` veya `cancelled` kayda yeni ödeme ve düzenleme eklenemez. |
+| BR-15 | Kişiler arası kayıtta faiz yoktur. Faiz yalnızca banka kredisi için gösterilir (ADR-045). |
 | BR-16 | Vade tarihleri `date` (Europe/Istanbul gününe göre), olay zamanları `timestamptz`. |
+| BR-19 | Her kaydı, grubu ve bildirimi yalnızca sahibi görür. |
+| BR-20 | Harcamanın payları toplamı harcama tutarına eşittir. Kuruş farkı ödeyene, ödeyen dahil değilse ilk dahil üyeye yazılır. |
+| BR-21 | Grup bakiyeleri saklanmaz, türetilir; toplamları her zaman sıfırdır. |
+| BR-22 | Harcamada ya da ödeşmede geçen üye gruptan çıkarılamaz. Ödeşmede iki taraf farklı üye olmalıdır. |
+
+Kaldırılan kural numaraları (BR-06, 07, 11, 12, 17, 18) yeniden kullanılmaz.
 
 ## Ödeme planı üretimi
 
@@ -41,38 +43,36 @@ Kaynak: `docs/PRODUCT_SPEC.md` Bölüm 5 ve 7.
 - Taksitten fazla → artan sonraki taksitlere.
 - Kalan borçtan fazla ödeme → `amount_exceeds_outstanding` hatası.
 - Gelişmiş: kullanıcı ödemeyi belirli taksite yönlendirebilir (ilk sürümde opsiyonel).
-- `reported` (onay bekleyen) ödemeler dağıtılmaz ve bakiyeden düşmez; UI'da ayrıca gösterilir.
 
-## Ödemeyi kim kaydeder
+## Düzenleme
 
-| Kaydeden | Mod | Sonuç |
-|---|---|---|
-| Sahip | personal | `confirmed` |
-| Alacaklı | shared | `confirmed`, borçluya bilgi bildirimi |
-| Borçlu | shared | `reported`, alacaklıya onay isteği; 7 gün yanıt yoksa hatırlatma, otomatik onay yok |
-
-## Değişiklik talepleri
-
-- Türler: taksit erteleme, plan yeniden düzenleme, tutar düzeltme, indirim/af.
-- Yeni plan **kalan tutar** üzerinden kurulur; geçmiş onaylı ödemeler ve dağıtımları korunur.
-- İndirim/af yalnızca alacaklı tarafından yapılır ve karşı taraf onayı gerekmez (alacaklının aleyhine). `payments.kind = discount`.
+- Taksit erteleme, plan düzenleme ve tutar düzeltme tek düzenleme ekranındadır; onay yoktur.
+- Yeni plan **kalan tutar** üzerinden kurulur; yapılmış ödemeler ve dağıtımları korunur.
+- İndirim yalnızca alacaklı sahipte vardır. `payments.kind = discount`.
 
 ## Kapanış ve iptal
 
-- Kalan borç 0 olduğunda otomatik `settled` (aynı transaction'da).
-- Kişisel mod: sahip istediği zaman iptal eder.
-- Paylaşılan `pending`: oluşturan geri çeker → `personal`.
-- Paylaşılan `active`: iptal karşılıklı onay ister.
-- Kapanan ve iptal edilen anlaşmalar silinmez; kullanıcı kendi görünümünden gizleyebilir (`hidden_by` gibi kullanıcıya özel bir işaretle).
+- Kalan borç 0 olduğunda otomatik `settled` (aynı transaction'da). Bildirim gitmez.
+- Sahip istediği zaman iptal eder.
+- Kapanan ve iptal edilen kayıtlar silinmez; kullanıcı kendi görünümünden gizleyebilir.
 
 ## Hatırlatmalar
 
+Yalnızca kayıt sahibine gider (ADR-064). Kullanıcı alacaklı da borçlu da olsa kendi kaydı için hatırlatılır.
+
 | Zaman | Kime |
 |---|---|
-| Vadeden 3 gün önce | Borçlu |
-| Vade günü 10:00 | Borçlu ve alacaklı |
-| Vade +1 gün (ödenmemişse) | Borçlu |
-| Vade +7 gün | Borçlu ve alacaklı |
-| `reported` ödeme bekliyorsa | Alacaklı |
+| Vadeden önce, tercihe göre 7, 3, 1 gün (varsayılan 3) | Sahip |
+| Vade günü 10:00 | Sahip |
+| Vade +1 gün (ödenmemişse) | Sahip |
+| Vade +7 gün | Sahip |
 
-Sessiz saatler 22:00–09:00 (Europe/Istanbul). `disputed`, `cancelled`, `settled` anlaşmalara hatırlatma yok. Kullanıcı anlaşma bazında kapatabilir.
+Sessiz saatler 22:00–09:00 (Europe/Istanbul). `cancelled`, `settled` kayda hatırlatma yok. Banka kredisi taksitlerine de aynı kural uygulanır.
+
+## Hesap bölme (ADR-064)
+
+- Üyeler isimdir, hesapla bağı yoktur; bir üye `is_me`'dir.
+- Üye bakiyesi = ödediği harcamalar − payları + yaptığı ödeşmeler − aldığı ödeşmeler.
+- Sadeleştirme: en çok alacaklı ile en çok borçlu eşleştirilir, ödeme sayısı en aza iner, aynı girdi aynı sonucu verir. Eşitlikte küçük `seq` önce gelir.
+- Grup bakiyeleri borç kaydı oluşturmaz, Ana Sayfa toplamlarına katılmaz, hatırlatma üretmez.
+- Hesap `packages/shared` ve plpgsql'de aynıdır; aynı test vektörleriyle doğrulanır.
