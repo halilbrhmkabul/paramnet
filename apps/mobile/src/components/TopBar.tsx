@@ -110,7 +110,10 @@ export function topBarHeader({ close }: { close?: boolean } = {}) {
 			<TopBar
 				title={typeof options.title === "string" ? options.title : ""}
 				close={close ?? options.presentation === "modal"}
-				sheet={Platform.OS === "ios" && options.presentation === "modal"}
+				// A close button means a modal, also in a nested stack, where presentation is not set.
+				sheet={
+					Platform.OS === "ios" && (close === true || options.presentation === "modal")
+				}
 				right={options.headerRight?.({ canGoBack: back !== undefined })}
 				onBack={
 					back === undefined

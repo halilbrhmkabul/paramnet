@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { useState } from "react";
-import { StyleSheet } from "react-native";
+import { Dimensions, Keyboard, StyleSheet, Text, type KeyboardEvent } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 import { AmountInput } from "../AmountInput";
@@ -13,6 +13,7 @@ import { ListItem } from "../ListItem";
 import { LoadingState } from "../LoadingState";
 import { AgreementStatusBadge, InstallmentStatusBadge } from "../StatusBadge";
 import { TopBar } from "../TopBar";
+import { keyboardOverlap, Screen } from "../Screen";
 import { tr } from "@/i18n/tr";
 
 describe("Button", () => {
@@ -136,6 +137,48 @@ describe("Status badges", () => {
 		);
 		expect(screen.getByTestId("open")).toHaveTextContent(tr.installment.undated);
 		expect(screen.getByTestId("late")).toHaveTextContent(tr.installment.status.overdue);
+	});
+});
+
+describe("keyboardOverlap", () => {
+	it("lifts the content by the whole keyboard", () => {
+		expect(keyboardOverlap(874, 572)).toBe(302);
+	});
+
+	it("does nothing when the keyboard is hidden", () => {
+		expect(keyboardOverlap(874, 874)).toBe(0);
+	});
+});
+
+describe("Screen and the keyboard", () => {
+	it("gives up the bottom safe area while the keyboard is open, or the footer stays covered", async () => {
+		const addListener = jest.spyOn(Keyboard, "addListener");
+		await render(
+			<Screen testID="t.screen" edges={["bottom"]} footer={<Text>Kaydet</Text>}>
+				<Text>İçerik</Text>
+			</Screen>,
+		);
+		const safeArea = () => screen.getByTestId("t.screen");
+		const bottomEdge = () => (safeArea().props as { edges: { bottom: string } }).edges.bottom;
+		expect(bottomEdge()).toBe("additive");
+
+		const change = addListener.mock.calls.find(
+			([name]) => name === "keyboardWillChangeFrame",
+		)?.[1];
+		const send = async (screenY: number) => {
+			await act(async () => {
+				change?.({ endCoordinates: { screenY } } as KeyboardEvent);
+				await Promise.resolve();
+			});
+		};
+		const height = Dimensions.get("window").height;
+		await send(height - 302);
+		expect(bottomEdge()).toBe("off");
+		expect(safeArea().parent?.props.style).toMatchObject({ paddingBottom: 302 });
+
+		await send(height);
+		expect(bottomEdge()).toBe("additive");
+		addListener.mockRestore();
 	});
 });
 

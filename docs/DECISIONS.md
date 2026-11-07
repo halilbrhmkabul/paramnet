@@ -689,3 +689,13 @@ Biçim: her karar için tarih, bağlam, karar, sonuç. Yeni kararlar en alta ekl
 	- Referans, kanvasın güncel sayfaları ve paketten çıkarılan `support.js` ile yerelde statik sunulur (oturum dışı kopya, depoda değil).
 	- Web görüntüsü cihazın yerini tutmaz: `adjustsFontSizeToFit` web'de çalışmaz, yazı tipleri ve gölgeler farklıdır. Kapı, kullanıcının Expo Go kontrolüyle kapanır.
 	- **Düzeltme (2026-11-04):** Bu ADR'nin ilk sürümü makinede simülatör olmadığını söylüyordu; yanlıştı. Xcode kurulu ve iOS simülatörü Expo Go ile çalışıyor. Web taraması iOS modallarındaki çift durum çubuğu boşluğunu yakalayamamıştı; simülatör turu yakaladı. Görsel kontrol bundan sonra önce simülatörde yapılır.
+
+## ADR-063 — Maestro'nun simülatörde çalıştırılması ve iOS klavye düzeni (F1-19)
+- **Tarih:** 2026-11-07
+- **Bağlam:** Akışlar yazıldığından beri hiçbir cihazda çalışmamıştı. Bellekteki Expo Go kuralı gereği kullanıcıya soruldu; kullanıcı kurulumu ve yerel derlemeyi onayladı. Depoya native klasör eklenmedi.
+- **Karar:**
+	- **Ortam:** Maestro 2.12.1, Java 17 ve CocoaPods için taşınabilir Ruby proje dışında kurulur. `apps/mobile/ios/` yalnızca yereldir ve commit edilmez. Akışlar sahte modda, Release derlemesiyle çalışır.
+	- **Klavye:** iOS'ta `Screen`, `keyboardWillChangeFrame` olayındaki klavye üst kenarını pencere yüksekliğinden çıkarır ve o kadar yukarı alır. Klavye açıkken alt güvenli alan bırakılır; bırakılmazsa modalda alt düğmenin 18 pt'si klavyenin altında kalıyordu. `measureInWindow` kullanılmaz, modal içinde kart koordinatı döner. Android `adjustResize` ile çözülür.
+	- **Klavyeyi kapatma:** Sayısal klavyede kapatma tuşu yok, formlarda sürükleme klavyeyi kapatır (`keyboardDismissMode="on-drag"`, kısa içerikte de sürüklenebilsin diye `alwaysBounceVertical`).
+- **Sonuç ve açık konu:** Xcode 27 ile derlenen uygulama UIScene benimsemezse iOS 27 SDK'sı açılışta süreci sonlandırır. Expo SDK 57 şablonu benimsemiyor, SDK 58 şablonu benimsiyor. Simülatör için yerel `ios/` klasörü elle yamalandı (`ExpoReactNativeFactoryProvider`, `UIApplicationSceneManifest`, `EXExpoAppSceneDelegate`). Bu yama depoda yok; EAS derlemesi Xcode 27 kullanıyorsa aynı kapanma olur. F3-06'dan önce SDK 58'e geçiş ya da config plugin kararı verilmelidir (BACKLOG).
+

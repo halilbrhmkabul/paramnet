@@ -155,6 +155,7 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - **Kabul (spec 15):** Kişisel modda anlaşma oluştur, öde, kapat; hatırlatma telefona düşüyor. Tüm testler yeşil.
 - **Skill:** maestro-mobile-testing — yüklü değil; spec 18.7 Faz 2'de kurulumu öngörüyor, bu görevden önce kurulmalı.
 - **Durum (2026-10-12):** Kapı açık; kullanıcı kararıyla ertelendi, Faz 2'ye geçildi. Hazır olanlar: `apps/mobile/.maestro/` (onboarding, create-loan, create-installment, record-payment, subflows/login; **hiçbir cihazda çalıştırılmadı**), `pnpm --filter mobile e2e`; CI'da `integration` işi tam yerel Supabase yığınıyla mobil adaptör entegrasyon testini çalıştırıyor.
+- **Durum (2026-11-07):** `onboarding`, `create-loan`, `create-installment`, `record-payment` iPhone 18 Pro (iOS 27) simülatöründe sahte modda, Release derlemesiyle iki turda geçti (ADR-063). Eskimiş akışlar düzeltildi. Tur, iOS'ta klavyenin form alt düğmesini örttüğü hatayı yakaladı ve düzeltildi. Kalanlar: Android, `supabase` modu, bildirimin telefona düşmesi.
 - **Kapıyı kapatmak için (kullanıcı):** Maestro CLI + simülatör/emülatör veya development build (EAS, `eas init` → `extra.eas.projectId`); akışları çalıştır ve düzelt; Vault sırlarıyla zamanı ileri alınmış bir vade için bildirimin telefona düştüğünü gör (supabase/README.md).
 
 ---
@@ -246,7 +247,7 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 		10. hesap silme → F3-03 (henüz yok).
 - **Kapıyı kapatmak için (kullanıcı):**
 	- İki cihazla uçtan uca deneme (biri uygulamasız, web onayı): paylaş → web'de onayla → kaydol → bağlandı → ödeme bildir/onayla → değişiklik → itiraz → iptal.
-	- Faz 2 için Maestro akışları (F1-19 ile aynı önkoşullar).
+	- Faz 2 için Maestro akışları (önkoşullar 2026-11-07'de kuruldu, ADR-063; Faz 2 akışları henüz yazılmadı).
 	- Senaryo 10, F3-03'ten sonra.
 	- claude-security skill'i bu ortamda yok; elle tarama, yukarıdaki invariant testleriyle yapıldı.
 
