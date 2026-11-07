@@ -162,6 +162,8 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 
 ## Faz 2 — Karşılıklı akış
 
+> Kaldırıldı (2026-11-07, ADR-064). Görevler tarihçe olarak durur; kod Faz 5'te silinir.
+
 ### [x] F2-01 Davet altyapısı
 - `invites` tablosu, `share_agreement` (256-bit token, yalnızca hash saklanır, düz token bir kez döner), `withdraw_share`, `expire-invites` cron.
 - **Kabul:** pgTAP: token hash, süre sonu, geri çekme, kendine paylaşım reddi (BR-12).
@@ -222,7 +224,8 @@ Sıralama mantığı: Önce saf domain mantığı, sonra **sahte (mock) veriyle 
 - Tüm olay bildirimleri, copy-tr.md tonunda.
 - **Not (2026-10-13):** Paylaşım akışı olayları (`shared`, `share_withdrawn`, `invite_expired`, `accepted`, `countered`, `rejected`, `settled`) `agreement_events` trigger'ıyla outbox'a düşer: `shareReceived` (hesabı olan davetli numaraya), `shareAccepted`/`shareCountered`/`shareRejected`/`inviteExpired` (oluşturana; web kararları dahil), `counterAccepted`/`shareWithdrawn`, `settled` (paylaşılmışsa iki tarafa). 7 gündür yanıtsız bildirilen ödeme için alacaklıya `paymentPending` (`enqueue_payment_reminders`, pg_cron 15 dk, ödeme başına bir kez, sessiz saatler). Push verisi şablonu taşır; uygulama karar isteyen bildirimlerde karar ekranını, geri çekilen paylaşımda Talepler'i açar. copy-tr.md tablosu tüm şablonlarla güncellendi. pgTAP 17, Vitest sözleşme, RNTL push (ADR-036).
 
-### [ ] F2-12 Faz 2 kapısı
+### [!] F2-12 Faz 2 kapısı
+- **Kapsamdan çıktı (2026-11-07, ADR-064):** Karşılıklı akış kaldırıldığı için bu kapı kapatılmayacak.
 - Güvenlik taraması (claude-security), iki cihazla (biri uygulamasız) uçtan uca senaryolar, Maestro + Playwright.
 - **Kabul (spec 15):** İki taraf aynı bakiyeyi görüyor; spec 16 "Kritik test senaryoları"nın tamamı geçiyor.
 - **Durum (2026-10-13):** Kapı açık; kullanıcı kararıyla ertelendi, Faz 3'e geçildi. Yapılanlar:
@@ -500,6 +503,50 @@ Kaynak: tasarım kanvası "ParamNet" (43 ekran). Kullanıcı kararı: tüm ekran
 	- Hâlâ bakılmayanlar: Para teslimi (17; mock'ta yazı girişi gerektiriyor), Onboarding 3. slayt; ekranlar 390 pt'den dar cihazda denenmedi (simülatörde iPhone SE yok).
 	- Bilinen fark: Kredi detayında (28) tasarımdaki iki yan yana düğme bizde alt alta, "Taksit ödedim kaydet" etiketi yarım genişliğe sığmıyor.
 	- **Kapıyı kapatmak için (kullanıcı):** Android'de açık ve koyu tema; `supabase` modunda iki hesapla hesap bölme ve kare kod (Supabase en sona bırakıldı).
+
+## Faz 5 — Tek taraflı defter (kullanıcı kararı, 2026-11-07, ADR-064)
+
+Karar: her kullanıcı kendi defterini tutar; karşı taraf sürece girmez. Kartlar silinir, kişisel finans modülleri gizlenir, hesap bölme tek taraflı Splitwise olur. Uzak Supabase'e uygulama en sona bırakıldı ve kullanıcı onayı ister. Her görev ayrı PR'dır.
+
+### [x] F5-01 Belgeler
+- `PRODUCT_SPEC` 0.4, `CLAUDE.md`, `paramnet-domain` ve `paramnet-mobile` skill'leri, ADR-064.
+- **Not (2026-11-07):** Kod değişmedi; F5-02–F5-06 tamamlanana kadar kod belgelerin gerisindedir.
+
+### [ ] F5-02 Kredi kartlarını sil
+- `features/cards`, kart rotaları ve sekmesi, `packages/shared/src/cards.ts`, API ve hook'lar, mock veri, testler.
+- Ana Sayfa, takvim, nakit ve kredi simülasyonundaki kart satırları, `tr.ts` metinleri, kart faiz hesabı (`cardInterestEstimate`).
+- Yeni migration: kart işlemleri silinir, `transactions.card_id`, `to_card_id`, `installments` ve `cards` tablosu kalkar, ilgili RPC'ler düşer. pgTAP güncellenir.
+- Sekme boşluğu F5-03'te kapanır.
+- **Kabul:** "card" referansı yalnızca dekont, ödeme yöntemi (`payment_method.card`) ve görsel kart bileşenlerinde kalır. Testler yeşil.
+
+### [ ] F5-03 Gizli modüller ve borç odaklı Ana Sayfa
+- `EXPO_PUBLIC_PERSONAL_FINANCE` bayrağı (varsayılan kapalı): hesaplar, işlemler, tekrarlayan işlem, bütçe, aylık rapor, nakit projeksiyonu arayüzden çıkar, sorgu çalışmaz, rota açılmaz.
+- Ana Sayfa toplam alacak, toplam borç, bu ay, gecikenler, yaklaşan vadeler. İşlem merkezi: Borç ver, Borç al, Elden taksit, Hesap böl, Kredi ekle. Ana menü: Banka kredileri, Kredi simülasyonu, Bildirimler, Profil.
+- Banka kredisi Borçlarım'da görünür; taksit kaydı hesap istemez (migration: `record_loan_payment` ve `transactions` kısıtı).
+- **Kabul:** Bayrak kapalıyken gizli modüle hiçbir yoldan ulaşılmıyor, bayrak açıkken eski ekranlar çalışıyor. Her iki durum RNTL ile test edildi.
+
+### [ ] F5-04 Mobilde karşılıklı akışı sil
+- Paylaş, gelen paylaşım, davet, Talepler, değişiklik, itiraz, karşılıklı iptal, Para iste, para teslimi, ParamNet ID ve bulunabilirlik ekranları, derin bağlantılar ve bu akışların API yüzeyi.
+- Ödeme doğrudan yazılır; "Ödeme sil" eklenir. Etiketler Açık, Kapandı, İptal. Bildirimler yalnızca hatırlatma.
+- Kişi formundan telefon kalkar.
+- **Kabul:** `invite`, `share`, `paramnet_id` referansı mobilde kalmıyor. Maestro akışları güncel. Testler yeşil.
+
+### [ ] F5-05 Sunucuda karşılıklı akışı sil, web onayı kaldır
+- `apps/web-confirm`, `invite-*` edge function'ları, ilgili RPC'ler, `invites`, `disputes`, `retired_paramnet_ids`, teslim sütunları, ParamNet ID alanları, kişi telefonu, `terms_hash`, Playwright ve CI işleri.
+- Yeni migration: paylaşılmış kayıtlar oluşturanda kalır ve `personal` olur (kapanmış/iptal hariç), `reported`, `rejected`, `withdrawn` ödemeler silinir; karşı taraf erişimi kalkar. `void_payment` yazılır. `enqueue_due_reminders` yalnızca sahibe, rolüne göre şablonla. Bildirim şablonları ve sözleşme testi güncellenir.
+- Mağaza için gizlilik politikası adresi nereden sunulacak: web-confirm silinmeden önce kullanıcıya sorulur.
+- **Kabul:** Başka kullanıcının verisine ulaşan yol kalmadığı pgTAP ile doğrulandı. Spec 16 senaryoları 1–6 ve 10 test edildi.
+
+### [ ] F5-06 Tek taraflı hesap bölme
+- `packages/shared`: bakiye ve sadeleştirme (Vitest + fast-check, test vektörleri).
+- Yeni tablolar ve RPC'ler (spec 10.1, 10.3), eski `splits`, `split_members`, `split_events` düşer. Eski paylar sıradan borç kaydı olarak kalır. plpgsql hesabı aynı vektörlerle test edilir.
+- Mobil: Ortak sekmesi, grup, harcama, ödeşme, geçmiş (spec 5.17). Kare kod, davet ve `qrcode-generator` bağımlılığı kalkar. Sekme düzeni spec 6.1.
+- **Kabul:** Spec 5.17 akışı mock modda uçtan uca çalışıyor; bakiyeler toplamı sıfır değişmezi test edildi; `split-group.yaml` Maestro akışı geçti.
+
+### [ ] F5-07 Faz 5 kapısı
+- Tüm akışlar simülatörde, açık ve koyu temada; Android; `supabase` modu; bildirimin telefona düşmesi.
+- Uzak projeye migration: yalnızca kullanıcının açık onayıyla.
+- UI yenilemesi ayrı bir iştir (BACKLOG).
 
 ### [ ] F3-08 Pilot (30–50 kişi), metrik takibi, hata düzeltme
 ### [ ] F3-09 Faz 3 kapısı: mağaza yayını

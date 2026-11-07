@@ -1,8 +1,8 @@
 # Paramnet
 
-Karşılıklı borç ve taksit yönetimi uygulaması.
+Kişisel borç, taksit ve hesap bölme defteri.
 
-Paramnet, bireyler arası borç ve elden taksit anlaşmalarını iki taraflı takip eden mobil uygulama (iOS + Android) ve tek sayfalık web onay ekranı.
+Paramnet, kullanıcının kendi borç, alacak ve elden taksit kayıtlarını tuttuğu mobil uygulamadır (iOS + Android). Her kullanıcı kendi defterini tutar; karşı taraf sürece girmez, ona hiçbir şey gönderilmez (ADR-064). Hesap bölme Splitwise mantığıyla ve tek taraflı çalışır.
 
 ## Doğruluk kaynakları
 
@@ -34,9 +34,9 @@ Faz sonundaki "Faz kapısı" görevi tamamlanmadan sonraki faza başlanmaz.
 
 - Monorepo (pnpm workspaces):
 	- `apps/mobile` — Expo (React Native, TypeScript, Expo Router)
-	- `apps/web-confirm` — Next.js, tek rota web onay sayfası (Faz 2)
 	- `packages/shared` — saf TS domain mantığı + zod şemaları (plan üretimi, ödeme dağıtımı, para)
 	- `supabase/` — migration, RLS, RPC fonksiyonları, edge functions, pgTAP testleri
+- `apps/web-confirm` ve karşılıklı akış kodu F5-05'e kadar depoda durur; yeni iş eklenmez.
 - Backend: Supabase (Postgres, Auth telefon OTP, RLS, RPC, Edge Functions, pg_cron, Storage).
 - Mobil durum: TanStack Query (sunucu), Zustand (yalnızca yerel UI).
 - Formlar: react-hook-form + zod (şemalar `packages/shared`'dan).
@@ -45,12 +45,13 @@ Faz sonundaki "Faz kapısı" görevi tamamlanmadan sonraki faza başlanmaz.
 
 - **Para:** Kuruş cinsinden tam sayı (`bigint` / TS'de `number` tam sayı veya `bigint`). Ondalıklı sayı ile para hesabı yasak. Biçimlendirme tek yardımcıdan: `12.000,00 TL`.
 - **Sunucu otoritesi:** İstemci çekirdek tablolara doğrudan yazamaz (RLS ile kapalı). Tüm yazmalar `security definer` RPC'lerle; her RPC yetki + durum geçişi kontrolü yapar, tek transaction'da çalışır, olay kaydı yazar.
-- **Idempotency:** Ödeme ve karar işlemleri istemcide üretilen UUID anahtar taşır.
-- **Versiyon:** Onaylar `version` + `terms_hash` ile verilir. Kabul edilmiş anlaşma tek taraflı değişmez.
+- **Tek sahip:** Her kayıt, grup ve bildirim tek kullanıcınındır. Kullanıcılar arası paylaşım, onay ve bildirim yoktur. Hatırlatma yalnızca kayıt sahibine gider.
+- **Idempotency:** Ödeme ve oluşturma işlemleri istemcide üretilen UUID anahtar taşır.
 - **Değiştirilemez geçmiş:** `agreement_versions` ve `agreement_events` yalnızca eklenir.
 - **Tarih/saat:** Vade tarihleri `date`, olaylar `timestamptz`. Saat dilimi `Europe/Istanbul`.
-- **Kişiler arası borçta faiz yok, para hareketi yok:** Kişiler arası borç ve taksit anlaşmalarında faiz kaydı ve hesaplaması yoktur. Kullanıcının kendi banka kredisi ve kredi kartı için faiz yalnızca hesaplama ve gösterim (simülasyon) amacıyla kullanılabilir (ADR-045). Uygulama para tutmaz, transfer başlatmaz.
+- **Kişiler arası borçta faiz yok, para hareketi yok:** Kişiler arası borç ve taksit kayıtlarında faiz kaydı ve hesaplaması yoktur. Kullanıcının kendi banka kredisi için faiz yalnızca hesaplama ve gösterim (simülasyon) amacıyla kullanılabilir (ADR-045). Uygulama para tutmaz, transfer başlatmaz.
 - **Kişisel veri:** Loglarda ve analitik olaylarında telefon, ad, not, tutar (aralık hariç) yok.
+- **Gizli modüller:** Hesaplar, gelir-gider, tekrarlayan işlem, bütçe ve aylık rapor `EXPO_PUBLIC_PERSONAL_FINANCE=1` olmadan görünmez. Bunlara yeni özellik eklenmez.
 
 ## Kod stili
 

@@ -1,6 +1,6 @@
 ---
 name: paramnet-mobile
-description: Paramnet (borç ve taksit uygulaması) mobil (Expo / React Native) kuralları. Ekran, bileşen, navigasyon (Expo Router), form, tutar girişi/gösterimi, tema/renk/tipografi, Türkçe arayüz metni, bildirim, derin bağlantı (davet linki), erişilebilirlik, testID veya Maestro/RNTL testi yazarken ya da değiştirirken MUTLAKA kullan. Use for any screen, UI component, copy, deep link or mobile test work in apps/mobile.
+description: Paramnet (borç ve taksit uygulaması) mobil (Expo / React Native) kuralları. Ekran, bileşen, navigasyon (Expo Router), form, tutar girişi/gösterimi, tema/renk/tipografi, Türkçe arayüz metni, bildirim, derin bağlantı, erişilebilirlik, testID veya Maestro/RNTL testi yazarken ya da değiştirirken MUTLAKA kullan. Use for any screen, UI component, copy, deep link or mobile test work in apps/mobile.
 ---
 
 # paramnet-mobile
@@ -14,7 +14,7 @@ Bu skill `apps/mobile` için proje kurallarıdır. Genel Expo/React Native bilgi
 | Hangi ekran, rota, bileşenler, durumlar | `references/screens.md` |
 | Renk, tipografi, boşluk, köşe, durum renkleri | `references/design-tokens.md` |
 | Kullanıcıya görünen her metin, ton | `references/copy-tr.md` |
-| Davet linki, Universal/App Links, invite rotası | `references/deep-links.md` |
+| Bildirimden uygulama içi rotaya geçiş | `references/deep-links.md` |
 | testID, RNTL, Maestro akışları | `references/testing.md` |
 
 ## Klasör ve katman kuralları
@@ -22,11 +22,11 @@ Bu skill `apps/mobile` için proje kurallarıdır. Genel Expo/React Native bilgi
 ```
 apps/mobile/
 	app/                    ← yalnızca rotalar (Expo Router); iş mantığı yok
-		(auth)/ (tabs)/ agreement/[id]/ new/ invite/[token].tsx
+		(auth)/ (tabs)/ agreement/[id]/ new/ split/ loans/ me/
 	src/
 		api/                  ← AgreementsApi arayüzü + adaptörler (mock, supabase) + TanStack Query hook'ları
 		components/           ← tasarım sistemi bileşenleri (yalnızca token kullanır)
-		features/             ← agreement, payment, invite, reminders, contacts (ekran parçaları + hook'lar)
+		features/             ← agreement, new, debts, split, loans, calendar, home, push (ekran parçaları + hook'lar)
 		i18n/tr.ts            ← tüm metinler
 		theme/                ← token'lar, useTheme
 		lib/                  ← supabase istemcisi, push, sentry, analytics, secure-store
@@ -40,16 +40,17 @@ apps/mobile/
 
 ## Ekran kuralları
 
-1. **Tek birincil aksiyon** her ekranda (ör. anlaşma detayında duruma göre: Ödeme ekle / Paylaş / Onayla).
+1. **Tek birincil aksiyon** her ekranda (ör. kayıt detayında Ödeme ekle).
 2. **Dört durum zorunlu:** yükleniyor (skeleton), boş (açıklama + buton), hata (Türkçe mesaj + Tekrar dene), veri. Çevrimdışıyken yazma butonları devre dışı ve nedeni yazılı.
 3. **Tutar:** giriş `AmountInput` (sayısal klavye, kuruş tam sayı tutar, Türk biçimi), gösterim `AmountText` (`12.000,00 TL`, tabular rakamlar). Elle biçimlendirme yasak.
 4. **Tarih:** gösterim `10 Kas 2026` / uzun `10 Kasım 2026`; `packages/shared` tarih yardımcıları; Europe/Istanbul.
 5. **Durum renkleri** yalnızca token'lardan ve her zaman metin etiketiyle birlikte (renk tek başına anlam taşımaz).
 6. **Erişilebilirlik:** her etkileşimli öğede `accessibilityRole`, `accessibilityLabel` (Türkçe) ve `testID`; minimum dokunma alanı 44×44 pt; Dynamic Type/yazı ölçeği bozulmadan çalışır; koyu tema.
 7. **Metin:** tüm metinler `src/i18n/tr.ts`'den; tonu `copy-tr.md`. Bileşen içinde sabit Türkçe metin yasak.
-8. **Mutasyonlar:** her yazma çağrısında istemcide `idempotency_key` (uuid) üretilir ve tekrar denemede aynısı kullanılır. 409 conflict → sorguyu yenile, kullanıcıya "Kayıt güncellendi, tekrar bak" de.
-9. **Hata eşleme:** sunucu hata kodları `src/api/errors.ts`'de Türkçe mesajlara eşlenir.
-10. **Performans:** uzun listelerde FlashList; `expo-image`; gereksiz yeniden render'ı önle (react-native-best-practices).
+8. **Gizli modüller:** Hesaplar, gelir-gider, tekrarlayan işlem, bütçe, aylık rapor ve nakit projeksiyonu `EXPO_PUBLIC_PERSONAL_FINANCE=1` olmadan görünmez, sorgu çalıştırmaz (ADR-064).
+9. **Mutasyonlar:** her yazma çağrısında istemcide `idempotency_key` (uuid) üretilir ve tekrar denemede aynısı kullanılır. 409 conflict → sorguyu yenile, kullanıcıya "Kayıt güncellendi, tekrar bak" de.
+10. **Hata eşleme:** sunucu hata kodları `src/api/errors.ts`'de Türkçe mesajlara eşlenir.
+11. **Performans:** uzun listelerde FlashList; `expo-image`; gereksiz yeniden render'ı önle (react-native-best-practices).
 
 ## İş akışı: yeni ekran yazmak
 

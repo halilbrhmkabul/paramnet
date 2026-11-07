@@ -11,9 +11,9 @@ Boyutlar:
 |---|---|---|---|
 | 1 | Ana sayfa `(tabs)/index` | Alacak/borç özeti, yaklaşan vadeler | Kim kime ne kadar borçlu, tek bakışta |
 | 2 | Yeni kayıt `new` | Taksit planı önizlemesi (5 taksit) | Taksit planını saniyeler içinde kur |
-| 3 | Anlaşma detayı `agreement/[id]` | İlerleme çubuğu, taksit listesi | Kalan tutar hep güncel |
-| 4 | Web onay sayfası (web-confirm) | Planı onayla ekranı | Karşı taraf uygulama indirmeden onaylasın |
-| 5 | Talepler `(tabs)/requests` | Bildirilen ödeme onay bekliyor | Ödemeyi iki taraf birlikte doğrular |
+| 3 | Kayıt detayı `agreement/[id]` | İlerleme çubuğu, taksit listesi | Kalan tutar hep güncel |
+| 4 | Grup detayı `split/[id]` | Bakiyeler, kim kime ne kadar | Ortak harcamada kim kime borçlu, hemen gör |
+| 5 | Ödeme ekle `agreement/[id]/payment` | Kısmi ödeme, dağıtım önizlemesi | Ödemeni kaydet, kalan hemen güncellensin |
 | 6 | Takvim `(tabs)/calendar` | Bu ayın vadeleri | Hatırlatmayı Paramnet yapar |
 
 Açık ve koyu temadan biri seçilir; tüm görüntüler aynı temada olmalı. Durum çubuğunda saat 09:41, tam pil ve operatör adı yok (simülatör: `xcrun simctl status_bar booted override ...`).
