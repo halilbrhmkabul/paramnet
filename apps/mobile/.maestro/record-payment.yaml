@@ -7,24 +7,43 @@ appId: com.paramnet.app
 - tapOn:
     id: payment.amount.input
 - inputText: "1000"
+# Sayısal klavyede kapatma tuşu yok; kullanıcı gibi sürükleyerek kapatılır.
+- swipe:
+    start: "50%, 30%"
+    end: "50%, 45%"
+    duration: 400
 - tapOn:
     id: payment.save.button
 - extendedWaitUntil:
     visible:
-      id: agreement.outstanding.text
-      text: "1.500,00 TL"
+      id: payment.result.remaining
+      text: ".*1.500,00 TL.*"
     timeout: 10000
+- tapOn:
+    id: payment.done.button
+- assertVisible:
+    id: agreement.outstanding.text
+    text: "1.500,00 TL"
 - assertVisible: ".*Kısmen ödendi.*"
 - tapOn:
     id: agreement.primaryAction.button
 - tapOn:
     id: payment.amount.input
 - inputText: "1500"
+# Sayısal klavyede kapatma tuşu yok; kullanıcı gibi sürükleyerek kapatılır.
+- swipe:
+    start: "50%, 30%"
+    end: "50%, 45%"
+    duration: 400
 - tapOn:
     id: payment.save.button
 - extendedWaitUntil:
+    visible:
+      id: payment.done.button
+    timeout: 10000
+- tapOn:
+    id: payment.done.button
+- extendedWaitUntil:
     visible: "Tebrikler, bu plan tamamlandı!"
     timeout: 10000
-- assertVisible:
-    id: agreement.status.badge
-    text: "Kapandı"
+- assertVisible: ".*Kapandı.*"

@@ -19,6 +19,11 @@ appId: com.paramnet.app
 - tapOn:
     id: login.phone.input
 - inputText: "5550000002"
+# Sayısal klavyede kapatma tuşu yok; kullanıcı gibi sürükleyerek kapatılır.
+- swipe:
+    start: "50%, 30%"
+    end: "50%, 45%"
+    duration: 400
 - tapOn:
     id: login.submit.button
 - tapOn:
@@ -46,6 +51,11 @@ appId: com.paramnet.app
       - inputText: "Maestro"
       - tapOn:
           id: profile.consent.checkbox
+      # Sayısal klavyede kapatma tuşu yok; kullanıcı gibi sürükleyerek kapatılır.
+      - swipe:
+          start: "50%, 30%"
+          end: "50%, 45%"
+          duration: 400
       - tapOn:
           id: profile.save.button
       - assertVisible:

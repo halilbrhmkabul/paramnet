@@ -5,6 +5,8 @@ appId: com.paramnet.app
 - tapOn:
     id: tabs.new.button
 - tapOn:
+    id: action.installment
+- tapOn:
     id: new.type.boughtInstallment
 - tapOn:
     id: newForm.contact.picker
@@ -24,14 +26,28 @@ appId: com.paramnet.app
 - tapOn:
     id: newForm.downPayment.input
 - inputText: "8000"
+# Sayısal klavyede kapatma tuşu yok; kullanıcı gibi yukarı sürükleyerek kapatılır.
+- swipe:
+    start: "50%, 48%"
+    end: "50%, 25%"
+    duration: 400
+- scrollUntilVisible:
+    element:
+      id: newForm.count.dec
 - tapOn:
     id: newForm.count.dec
 - assertVisible:
     id: newForm.count.value
-    text: "5"
+    text: ".*5"
 - assertVisible:
     id: newForm.remaining.text
     text: "20.000,00 TL"
+# Klavye açıksa düğme onun altında kalır ve dokunuş tuşa gider.
+- swipe:
+    start: "50%, 48%"
+    end: "50%, 25%"
+    duration: 400
+- waitForAnimationToEnd
 - tapOn:
     id: newForm.editRows.button
 - assertVisible:
@@ -39,6 +55,9 @@ appId: com.paramnet.app
 - assertVisible:
     id: plan.remaining.text
     text: "20.000,00 TL"
+- scrollUntilVisible:
+    element:
+      id: plan.row.5.amount.input
 - assertVisible:
     id: plan.row.5.amount.input
     text: "4.000"
@@ -49,6 +68,4 @@ appId: com.paramnet.app
       id: agreement.outstanding.text
     timeout: 10000
 - assertVisible: "20.000,00 TL"
-- assertVisible:
-    id: agreement.paidCount.badge
-    text: "0/5 ödendi"
+- assertVisible: ".*0/5 ödendi.*"

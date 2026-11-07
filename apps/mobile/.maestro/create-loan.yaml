@@ -5,7 +5,7 @@ appId: com.paramnet.app
 - tapOn:
     id: tabs.new.button
 - tapOn:
-    id: new.type.lent
+    id: action.lend
 - tapOn:
     id: newForm.contact.picker
 - tapOn:
@@ -18,6 +18,14 @@ appId: com.paramnet.app
 - tapOn:
     id: newForm.amount.input
 - inputText: "2500"
+# Sayısal klavyede kapatma tuşu yok; kullanıcı gibi yukarı sürükleyerek kapatılır.
+- swipe:
+    start: "50%, 48%"
+    end: "50%, 25%"
+    duration: 400
+- scrollUntilVisible:
+    element:
+      id: newForm.noDueDate.checkbox
 - tapOn:
     id: newForm.noDueDate.checkbox
 - tapOn:
